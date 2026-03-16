@@ -1,0 +1,113 @@
+---
+title: "Programa del curso"
+---
+
+## Descripción general
+
+Este curso introduce a estudiantes de ciencias sociales en los fundamentos de la Inteligencia Artificial y el Machine Learning usando R. Se cubren conceptos básicos, aprendizaje supervisado y no supervisado, análisis de texto y modelos de lenguaje extensos (LLMs). El enfoque es aplicado, priorizando la intuición y el uso de herramientas computacionales sobre la teoría matemática.
+
+## Objetivos
+
+Al finalizar el curso, los estudiantes podrán:
+
+1. Comprender los conceptos fundamentales de IA, Machine Learning y Deep Learning
+2. Aplicar algoritmos de clasificación y regresión para resolver problemas de investigación social
+3. Implementar técnicas de aprendizaje no supervisado y análisis computacional de texto
+4. Evaluar críticamente las capacidades y limitaciones de los LLMs como herramientas de investigación
+5. Analizar las implicancias éticas, sesgos y desafíos de equidad en el uso de sistemas de IA
+
+## Público objetivo
+
+Estudiantes de grado y posgrado de ciencias sociales con conocimientos básicos de métodos de investigación y manejo intermedio de R. No se requiere conocimiento previo de Python ni de matemáticas avanzadas.
+
+## Modalidad
+
+Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 días, 4 horas por día). Cada jornada se divide en dos sesiones de 2 horas que combinan exposición teórica con laboratorios prácticos en R, donde los estudiantes aplican los métodos discutidos a datos reales.
+
+## Contenido por día
+
+### Día 1: Fundamentos de IA y Machine Learning
+
+**Sesión 1.1: ¿Qué es la Inteligencia Artificial?**
+
+- Definición de IA, historia (de la IA simbólica al deep learning)
+- Tipos de aprendizaje: supervisado, no supervisado, refuerzo
+- Ética básica y contexto actual
+
+**Sesión 1.2: Fundamentos de Machine Learning**
+
+- Flujo de trabajo: datos, entrenamiento, evaluación
+- División de datos (train/test)
+- Compromiso sesgo-varianza y métricas de evaluación
+- Laboratorio: configuración de RStudio y primer flujo de trabajo con `tidymodels`
+
+### Día 2: Aprendizaje supervisado
+
+**Sesión 2.1: Métodos de clasificación**
+
+- Regresión logística, árboles de decisión y Random Forests
+- Aplicaciones: predicción de comportamiento político y social
+
+**Sesión 2.2: Regresión y predicción**
+
+- Predicción vs. explicación en ciencias sociales
+- Regularización: LASSO, Ridge, Elastic Net
+- Ingeniería de variables para datos sociales
+- Laboratorio: clasificación y predicción con datos de Latinobarómetro usando `ranger` y `glmnet`
+
+### Día 3: Texto y aprendizaje no supervisado
+
+**Sesión 3.1: Clustering y reducción de dimensionalidad (versión express)**
+
+- K-means y PCA: conceptos e intuición
+- Laboratorio breve: segmentación de países latinoamericanos por indicadores socioeconómicos
+
+**Sesión 3.2: Análisis computacional de texto**
+
+- Preprocesamiento, tokenización, Bag-of-words, TF-IDF
+- Análisis de sentimiento
+- Topic Modeling (LDA)
+- Laboratorio: extracción de tópicos en discursos políticos con `tidytext` y `topicmodels`
+
+### Día 4: Modelos de lenguaje extensos (LLMs) y aplicaciones
+
+**Sesión 4.1: Entendiendo los LLMs**
+
+- Arquitectura Transformer: la intuición detrás de la atención
+- Capacidades de GPT-4 y Claude
+- Ingeniería de prompts: zero-shot, few-shot, chain-of-thought
+
+**Sesión 4.2: LLMs como herramientas de investigación**
+
+- Anotación automática de textos
+- Generación de datos sintéticos
+- Uso de APIs desde R
+- Laboratorio: interacción con LLMs usando `ellmer` y auditoría de sesgos
+
+### Día 5: Ética, sesgo algorítmico y cierre
+
+**Sesión 5.1: Ética y sesgo algorítmico**
+
+- Tipos de sesgo y cómo surgen
+- Métricas de equidad
+- Regulación: EU AI Act, legislación latinoamericana, Ley 18.331 (Uruguay)
+
+**Sesión 5.2: Mini-propuestas de investigación**
+
+- Integración de IA en el flujo de investigación
+- Taller: cada estudiante diseña una mini-propuesta aplicando una técnica del curso a una pregunta de ciencias sociales relevante para América Latina
+- Presentaciones breves (5 minutos) y discusión
+
+## Software necesario
+
+Los estudiantes deben tener instalado antes del inicio del curso:
+
+- [R](https://cran.r-project.org/) (versión 4.3 o superior)
+- [RStudio](https://posit.co/download/rstudio-desktop/) (versión reciente)
+- Paquetes de R: `tidyverse`, `tidymodels`, `ranger`, `glmnet`, `tidytext`, `topicmodels`, `ellmer`
+
+Se proporcionarán instrucciones detalladas de instalación antes del curso.
+
+## Programa completo
+
+El programa completo del curso está disponible en formato Word: [Introduccion-IA-Danilo-Freire.docx](programa/Introduccion-IA-Danilo-Freire.docx).

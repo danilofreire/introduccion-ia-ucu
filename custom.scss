@@ -1,0 +1,265 @@
+/*-- scss:defaults --*/
+
+// Colour palette — navy base with warm gold accent (Sol de Mayo)
+$navy:        #1E3A5F;
+$gold:        #D4A843;
+$gold-dark:   #B8922E;
+$ivory:       #F9F8F6;
+$dark-grey:   #374151;
+$mid-grey:    #6B7280;
+$taupe:       #E5E1D8;
+$white:       #FFFFFF;
+
+$body-bg:     $ivory;
+$body-color:  $dark-grey;
+$link-color:  $gold-dark;
+$primary:     $navy;
+
+$font-family-sans-serif: 'Inter', 'Helvetica Neue', sans-serif;
+$headings-font-family:   'Source Serif 4', 'Georgia', serif;
+$headings-font-weight:   600;
+$headings-color:         $navy;
+
+$border-radius: 0.25rem;
+
+/*-- scss:rules --*/
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ── Navbar ──────────────────────────────────────
+.navbar {
+  font-family: $font-family-sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-bottom: 3px solid $gold;
+}
+
+.navbar-brand {
+  font-family: $headings-font-family;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+// ── Headings ────────────────────────────────────
+h1, .h1 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 3px solid $gold;
+}
+
+h2, .h2 {
+  font-size: 1.6rem;
+  color: $navy;
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+}
+
+h3, .h3 {
+  font-size: 1.15rem;
+  color: $mid-grey;
+  font-family: $font-family-sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 1.8em;
+}
+
+// ── Day cards (course schedule) ─────────────────
+.day-card {
+  background: $white;
+  border: 1px solid $taupe;
+  border-left: 5px solid $navy;
+  border-radius: $border-radius;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, border-left-color 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-left-color: $gold;
+  }
+
+  .day-number {
+    display: inline-block;
+    font-family: $font-family-sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.7rem;
+    border-radius: 999px;
+    background-color: rgba($navy, 0.1);
+    color: $navy;
+    margin-bottom: 0.6rem;
+  }
+
+  .day-title {
+    font-family: $headings-font-family;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: $navy;
+    margin-bottom: 0.4rem;
+  }
+
+  .day-topics {
+    font-size: 0.95rem;
+    color: $dark-grey;
+    margin-bottom: 0.5rem;
+  }
+
+  .day-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+
+    span {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      background-color: rgba($gold, 0.15);
+      color: $gold-dark;
+    }
+  }
+}
+
+// ── Resource cards (readings, labs) ─────────────
+.resource-card {
+  background: $white;
+  border: 1px solid $taupe;
+  border-radius: $border-radius;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .resource-title {
+    font-family: $headings-font-family;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: $navy;
+    margin-bottom: 0.3rem;
+  }
+
+  .resource-meta {
+    font-size: 0.92rem;
+    color: $mid-grey;
+    margin-bottom: 0.25rem;
+  }
+
+  .resource-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+
+    a {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-family: $font-family-sans-serif;
+      font-weight: 500;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+      background-color: rgba($gold, 0.15);
+      color: $gold-dark;
+      text-decoration: none;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background-color: $gold;
+        color: $white;
+      }
+    }
+  }
+}
+
+// ── Info box (course details) ───────────────────
+.info-box {
+  background: $white;
+  border: 1px solid $taupe;
+  border-radius: $border-radius;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .info-item {
+    .info-label {
+      font-family: $font-family-sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: $mid-grey;
+      margin-bottom: 0.2rem;
+    }
+
+    .info-value {
+      font-size: 0.95rem;
+      color: $navy;
+      font-weight: 500;
+    }
+  }
+}
+
+// ── Blockquotes ─────────────────────────────────
+blockquote {
+  border-left: 4px solid $gold;
+  background-color: rgba($gold, 0.06);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0 $border-radius $border-radius 0;
+}
+
+// ── Footer ──────────────────────────────────────
+.nav-footer {
+  border-top: 3px solid $gold;
+  font-size: 0.85rem;
+  color: $mid-grey;
+}
+
+// ── Responsive ──────────────────────────────────
+@media (max-width: 768px) {
+  h1, .h1 {
+    font-size: 1.6rem;
+  }
+
+  h2, .h2 {
+    font-size: 1.3rem;
+  }
+
+  .info-box .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Print ───────────────────────────────────────
+@media print {
+  .day-card,
+  .resource-card,
+  .info-box {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}

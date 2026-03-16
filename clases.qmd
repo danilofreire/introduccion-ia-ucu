@@ -1,0 +1,77 @@
+---
+title: "Clases"
+---
+
+## Diapositivas y materiales
+
+Las diapositivas de cada día se publicarán aquí a medida que avance el curso. Cada sesión incluye una parte teórica y un laboratorio práctico en R.
+
+::: {.day-card}
+[Día 1]{.day-number}
+
+[Fundamentos de IA y Machine Learning]{.day-title}
+
+[Sesión 1.1: ¿Qué es la Inteligencia Artificial? Historia, tipos de aprendizaje, ética básica.]{.day-topics}
+
+[Sesión 1.2: Fundamentos de ML. Flujo de trabajo, train/test, sesgo-varianza, métricas.]{.day-topics}
+
+::: {.resource-links}
+Diapositivas (próximamente)
+:::
+:::
+
+::: {.day-card}
+[Día 2]{.day-number}
+
+[Aprendizaje supervisado]{.day-title}
+
+[Sesión 2.1: Clasificación. Regresión logística, árboles de decisión, Random Forest.]{.day-topics}
+
+[Sesión 2.2: Regresión y predicción. LASSO, Ridge, Elastic Net.]{.day-topics}
+
+::: {.resource-links}
+Diapositivas (próximamente)
+:::
+:::
+
+::: {.day-card}
+[Día 3]{.day-number}
+
+[Texto y aprendizaje no supervisado]{.day-title}
+
+[Sesión 3.1: Clustering y PCA (versión express).]{.day-topics}
+
+[Sesión 3.2: Análisis de texto. Tokenización, TF-IDF, sentimiento, LDA.]{.day-topics}
+
+::: {.resource-links}
+Diapositivas (próximamente)
+:::
+:::
+
+::: {.day-card}
+[Día 4]{.day-number}
+
+[LLMs y aplicaciones]{.day-title}
+
+[Sesión 4.1: Entendiendo los LLMs. Transformers, prompting, capacidades.]{.day-topics}
+
+[Sesión 4.2: LLMs como herramientas de investigación. Anotación, datos sintéticos, APIs.]{.day-topics}
+
+::: {.resource-links}
+Diapositivas (próximamente)
+:::
+:::
+
+::: {.day-card}
+[Día 5]{.day-number}
+
+[Ética, sesgo algorítmico y cierre]{.day-title}
+
+[Sesión 5.1: Ética y sesgo. Métricas de equidad, regulación.]{.day-topics}
+
+[Sesión 5.2: Mini-propuestas de investigación y presentaciones.]{.day-topics}
+
+::: {.resource-links}
+Diapositivas (próximamente)
+:::
+:::

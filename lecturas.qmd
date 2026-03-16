@@ -1,0 +1,99 @@
+---
+title: "Lecturas"
+---
+
+## Lecturas por día
+
+Las lecturas son indicativas y pueden cambiar antes del inicio del curso. Se recomienda leer los textos asignados antes de cada sesión.
+
+### Día 1: Fundamentos de IA y Machine Learning
+
+::: {.resource-card}
+[Russell, S. & Norvig, P. (2021). *Artificial Intelligence: A Modern Approach*. Capítulo 1.]{.resource-title}
+
+[Introducción clásica a la IA: definiciones, historia y enfoques fundamentales.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[James, G., Witten, D., Hastie, T. & Tibshirani, R. (2021). *An Introduction to Statistical Learning with Applications in R*. Capítulos 1-2.]{.resource-title}
+
+[Fundamentos de aprendizaje estadístico. Disponible gratuitamente en [statlearning.com](https://www.statlearning.com/).]{.resource-meta}
+:::
+
+### Día 2: Aprendizaje supervisado
+
+::: {.resource-card}
+[Muchlinski, D. et al. (2016). Comparing random forest with logistic regression for predicting class-membership. *Political Analysis*, 24(2), 168-185.]{.resource-title}
+
+[Aplicación de Random Forest a la predicción de conflictos civiles. Ejemplo clásico de ML en ciencia política.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[Mullainathan, S. & Spiess, J. (2017). Machine learning: An applied econometric approach. *Journal of Economic Perspectives*, 31(2), 87-106.]{.resource-title}
+
+[Discusión sobre predicción vs. explicación, relevante para científicos sociales que vienen de la tradición inferencial.]{.resource-meta}
+:::
+
+### Día 3: Texto y aprendizaje no supervisado
+
+::: {.resource-card}
+[Grimmer, J. & Stewart, B. (2013). Text as data: The promise and pitfalls of automatic content analysis methods for political texts. *Political Analysis*, 21(3), 267-297.]{.resource-title}
+
+[Artículo fundacional sobre el uso de métodos computacionales para analizar textos políticos.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[Silge, J. & Robinson, D. (2017). *Text Mining with R: A Tidy Approach*. O'Reilly.]{.resource-title}
+
+[Manual práctico de análisis de texto en R. Disponible gratuitamente en [tidytextmining.com](https://www.tidytextmining.com/).]{.resource-meta}
+:::
+
+### Día 4: LLMs y aplicaciones
+
+::: {.resource-card}
+[Gilardi, F., Alizadeh, M. & Kubli, M. (2023). ChatGPT outperforms crowd workers for text-annotation tasks. *PNAS*, 120(30).]{.resource-title}
+
+[Evidencia empírica de que los LLMs pueden superar a anotadores humanos en tareas de clasificación de texto.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[Bail, C. A. (2024). Can generative AI improve social science? *PNAS*, 121(21).]{.resource-title}
+
+[Revisión crítica del potencial y las limitaciones de la IA generativa para la investigación en ciencias sociales.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[Törnberg, P. (2024). Best practices for text annotation with large language models. *Sociological Methods & Research*.]{.resource-title}
+
+[Guía práctica para usar LLMs en tareas de anotación, con recomendaciones metodológicas.]{.resource-meta}
+:::
+
+### Día 5: Ética y sesgo algorítmico
+
+::: {.resource-card}
+[O'Neil, C. (2016). *Weapons of Math Destruction*. Crown.]{.resource-title}
+
+[Libro accesible sobre cómo los algoritmos pueden perpetuar y amplificar desigualdades sociales.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[Barocas, S., Hardt, M. & Narayanan, A. (2023). *Fairness and Machine Learning*. MIT Press.]{.resource-title}
+
+[Referencia sobre equidad algorítmica. Disponible gratuitamente en [fairmlbook.org](https://fairmlbook.org/).]{.resource-meta}
+:::
+
+## Bibliografía complementaria
+
+Estas lecturas no son obligatorias pero ofrecen perspectivas valiosas para profundizar en temas específicos:
+
+- Argyle, L. P. et al. (2023). Out of one, many: Using language models to simulate human samples. *Political Analysis*.
+- Athey, S. (2017). Beyond prediction: Using big data for policy problems. *Science*, 355(6324), 483-485.
+- Breiman, L. (2001). Statistical modeling: The two cultures. *Statistical Science*, 16(3), 199-231.
+- Crawford, K. (2021). *Atlas of AI*. Yale University Press.
+- Gentzkow, M., Kelly, B. & Taddy, M. (2019). Text as data. *Journal of Economic Literature*, 57(3), 535-574.
+- Grimmer, J., Roberts, M. E. & Stewart, B. M. (2022). *Text as Data: A New Framework*. Princeton University Press.
+- Kuhn, M. & Silge, J. (2022). *Tidy Modeling with R*. O'Reilly.
+- Lazer, D. et al. (2020). Computational social science: Obstacles and opportunities. *Science*, 369(6507), 1060-1062.
+- Molina, M. & Garip, F. (2019). Machine learning for sociology. *Annual Review of Sociology*, 45, 27-45.
+- Salganik, M. J. (2018). *Bit by Bit: Social Research in the Digital Age*. Princeton University Press.
+- Ziems, C. et al. (2024). Can large language models transform computational social science? *Computational Linguistics*, 50(1), 237-291.

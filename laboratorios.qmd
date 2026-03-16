@@ -1,0 +1,82 @@
+---
+title: "Laboratorios"
+---
+
+## Ejercicios prácticos
+
+Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en clase a datos reales. Los laboratorios se realizan en R usando RStudio.
+
+::: {.resource-card}
+[Lab 1: Primer flujo de trabajo con tidymodels]{.resource-title}
+
+[Día 1. Configuración del entorno, carga de datos, división train/test, ajuste de un modelo simple y evaluación de métricas básicas.]{.resource-meta}
+
+::: {.resource-links}
+Código (próximamente)
+:::
+:::
+
+::: {.resource-card}
+[Lab 2: Clasificación y predicción con datos latinoamericanos]{.resource-title}
+
+[Día 2. Clasificación de actitudes políticas con Latinobarómetro. Comparación de modelos: regresión logística, Random Forest y Elastic Net con `parsnip`.]{.resource-meta}
+
+::: {.resource-links}
+Código (próximamente)
+:::
+:::
+
+::: {.resource-card}
+[Lab 3a: Clustering de países (versión express)]{.resource-title}
+
+[Día 3, sesión 1. Segmentación de países latinoamericanos por indicadores socioeconómicos del Banco Mundial usando K-means y PCA.]{.resource-meta}
+
+::: {.resource-links}
+Código (próximamente)
+:::
+:::
+
+::: {.resource-card}
+[Lab 3b: Análisis de texto en discursos políticos]{.resource-title}
+
+[Día 3, sesión 2. Tokenización, TF-IDF, análisis de sentimiento y extracción de tópicos (LDA) en discursos políticos latinoamericanos con `tidytext` y `topicmodels`.]{.resource-meta}
+
+::: {.resource-links}
+Código (próximamente)
+:::
+:::
+
+::: {.resource-card}
+[Lab 4: Interacción con LLMs desde R]{.resource-title}
+
+[Día 4. Uso de `ellmer` para interactuar con modelos de lenguaje. Anotación automática de textos, generación de datos sintéticos y auditoría de sesgos.]{.resource-meta}
+
+::: {.resource-links}
+Código (próximamente)
+:::
+:::
+
+::: {.resource-card}
+[Lab 5: Mini-propuesta de investigación]{.resource-title}
+
+[Día 5. Cada estudiante diseña una propuesta breve que integra una técnica del curso con una pregunta de ciencias sociales relevante para América Latina.]{.resource-meta}
+
+::: {.resource-links}
+Plantilla (próximamente)
+:::
+:::
+
+## Requisitos de software
+
+Antes del primer día, asegurarse de tener instalado:
+
+```r
+install.packages(c(
+  "tidyverse", "tidymodels",
+  "ranger", "glmnet",
+  "tidytext", "topicmodels", "textrecipes",
+  "ellmer", "httr2"
+))
+```
+
+Se enviarán instrucciones detalladas de instalación por correo electrónico antes del inicio del curso.
