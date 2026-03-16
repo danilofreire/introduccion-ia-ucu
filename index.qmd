@@ -1,0 +1,116 @@
+---
+title: "Introducción a la IA para Científicos Sociales"
+toc: false
+---
+
+::: {.info-box}
+::: {.info-grid}
+
+::: {.info-item}
+[Docente]{.info-label}
+[Danilo Freire]{.info-value}
+:::
+
+::: {.info-item}
+[Institución]{.info-label}
+[Universidad Católica del Uruguay]{.info-value}
+:::
+
+::: {.info-item}
+[Modalidad]{.info-label}
+[Presencial, 5 días (20 horas)]{.info-value}
+:::
+
+::: {.info-item}
+[Programa]{.info-label}
+[Escuela en Métodos, Centro Hodos]{.info-value}
+:::
+
+::: {.info-item}
+[Idioma]{.info-label}
+[Español]{.info-value}
+:::
+
+::: {.info-item}
+[Herramientas]{.info-label}
+[R, RStudio, tidymodels]{.info-value}
+:::
+
+:::
+:::
+
+## Bienvenidos
+
+Este curso introduce a estudiantes de ciencias sociales en los fundamentos de la Inteligencia Artificial y el Machine Learning usando R. Se cubren conceptos básicos de IA, aprendizaje supervisado y no supervisado, análisis de texto y modelos de lenguaje extensos (LLMs).
+
+El enfoque es aplicado: priorizamos la intuición y el uso de herramientas computacionales sobre la teoría matemática. Usaremos RStudio como entorno de desarrollo y los ecosistemas `tidyverse` y `tidymodels` para todos los ejercicios prácticos.
+
+El curso está diseñado para quienes ya tienen una base en R y buscan expandir sus capacidades analíticas hacia métodos computacionales modernos.
+
+## Estructura del curso
+
+Cada jornada combina exposición teórica con laboratorios prácticos en R.
+
+::: {.day-card}
+[Día 1]{.day-number}
+
+[Fundamentos de IA y Machine Learning]{.day-title}
+
+[Definición de IA, historia, tipos de aprendizaje. Flujo de trabajo de ML: datos, entrenamiento, evaluación. División train/test y métricas básicas.]{.day-topics}
+
+::: {.day-tools}
+[tidymodels]{span} [rsample]{span} [parsnip]{span}
+:::
+:::
+
+::: {.day-card}
+[Día 2]{.day-number}
+
+[Aprendizaje supervisado]{.day-title}
+
+[Clasificación: regresión logística, árboles de decisión, Random Forest. Regresión y regularización: LASSO, Ridge, Elastic Net. Predicción vs. explicación.]{.day-topics}
+
+::: {.day-tools}
+[ranger]{span} [glmnet]{span} [recipes]{span}
+:::
+:::
+
+::: {.day-card}
+[Día 3]{.day-number}
+
+[Texto y aprendizaje no supervisado]{.day-title}
+
+[Clustering (K-means) y PCA: versión express. Análisis computacional de texto: tokenización, TF-IDF, sentimiento y Topic Modeling (LDA).]{.day-topics}
+
+::: {.day-tools}
+[tidytext]{span} [topicmodels]{span} [textrecipes]{span}
+:::
+:::
+
+::: {.day-card}
+[Día 4]{.day-number}
+
+[Modelos de lenguaje extensos (LLMs)]{.day-title}
+
+[Arquitectura Transformer, capacidades de GPT-4 y Claude. Ingeniería de prompts. LLMs como herramientas de investigación: anotación automática, datos sintéticos, APIs.]{.day-topics}
+
+::: {.day-tools}
+[ellmer]{span} [httr2]{span}
+:::
+:::
+
+::: {.day-card}
+[Día 5]{.day-number}
+
+[Ética, sesgo algorítmico y cierre]{.day-title}
+
+[Auditoría de algoritmos, métricas de equidad, regulación (EU AI Act, legislación latinoamericana). Taller de mini-propuestas de investigación.]{.day-topics}
+
+::: {.day-tools}
+[fairness]{span}
+:::
+:::
+
+## Contacto
+
+Para preguntas sobre el curso, escribir a [danilofreire@gmail.com](mailto:danilofreire@gmail.com).
