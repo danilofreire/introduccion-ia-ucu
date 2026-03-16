@@ -9,7 +9,7 @@ website:
   page-navigation: true
   back-to-top-navigation: true
   reader-mode: true
-  repo-url: https://github.com/danilofreire/introduccion-ai-ucu
+  repo-url: https://github.com/danilofreire/introduccion-ia-ucu
   repo-actions: [issue, source]
   navbar:
     pinned: true
@@ -31,7 +31,7 @@ website:
         href: mailto:danilofreire@gmail.com
         aria-label: Email
       - icon: github
-        href: https://github.com/danilofreire/introduccion-ai-ucu
+        href: https://github.com/danilofreire/introduccion-ia-ucu
         aria-label: GitHub
   page-footer:
     left: |
