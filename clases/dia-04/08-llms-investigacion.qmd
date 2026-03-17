@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -173,7 +174,7 @@ Fuente: [Nielsen Norman Group](https://www.nngroup.com/articles/ai-hallucination
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- [RAG]{.alert}: en lugar de confiar en la "memoria" del modelo, le damos [documentos reales]{.alert} como contexto
+- [RAG]{.alert} ([Lewis et al., 2020](https://arxiv.org/abs/2005.11401)): en lugar de confiar en la "memoria" del modelo, le damos [documentos reales]{.alert} como contexto
 - El pipeline:
     1. El usuario hace una pregunta
     2. El sistema [busca]{.alert} documentos relevantes en una base de conocimiento
@@ -232,7 +233,7 @@ Fuente: [Nielsen Norman Group](https://www.nngroup.com/articles/ai-hallucination
     - Captura [negaciones]{.alert}: "no es bueno" = negativo
     - Maneja [ironía]{.alert} y lenguaje complejo
     - Funciona en [múltiples idiomas]{.alert}
-- Estudios recientes muestran que GPT-4 y Claude tienen [precisión comparable a anotadores humanos]{.alert} en muchas tareas (Gilardi et al., 2023)
+- Estudios recientes muestran que GPT-4 y Claude tienen [precisión comparable a anotadores humanos]{.alert} en muchas tareas ([Gilardi, Alizadeh y Kubli, 2023](https://doi.org/10.1073/pnas.2305016120), publicado en PNAS)
 - Costo: centavos por texto vs. dólares por anotador humano
 :::
 
@@ -408,8 +409,17 @@ clasificador$chat(textos$texto[1])
 
 ```{r lab-clasificar-batch, eval=FALSE, prompt=FALSE}
 # Función para clasificar un texto
-clasificar_texto <- function(texto, chat) {
-  respuesta <- chat$chat(texto)
+# IMPORTANTE: creamos un chat nuevo cada vez para evitar que el
+# historial de conversación acumule contexto y afecte las respuestas
+clasificar_texto <- function(texto) {
+  chat_temp <- chat_openai(
+    model = "gpt-4o-mini",
+    system_prompt = "Eres un clasificador de textos políticos.
+    Clasifica cada texto en UNO de estos temas:
+    economía, educación, seguridad, salud, medio ambiente.
+    Responde SOLO con el nombre del tema, sin explicación."
+  )
+  respuesta <- chat_temp$chat(texto)
   return(trimws(tolower(respuesta)))
 }
 
@@ -417,7 +427,7 @@ clasificar_texto <- function(texto, chat) {
 resultados <- textos |>
   slice(1:20) |>
   mutate(
-    tema_llm = map_chr(texto, ~clasificar_texto(.x, clasificador))
+    tema_llm = map_chr(texto, clasificar_texto)
   )
 
 # Comparar con los temas reales
@@ -522,7 +532,7 @@ tibble(pais = paises_test,
 
 :::{style="margin-top: 30px; font-size: 26px;"}
 
-- Los [LLMs]{.alert} son modelos de lenguaje que predicen el siguiente token, pero generan capacidades emergentes
+- Los [LLMs]{.alert} predicen el siguiente token, pero a gran escala muestran capacidades que no fueron programadas explícitamente
 - [Embeddings]{.alert} y [atención]{.alert} son los mecanismos clave que permiten entender contexto
 - El [prompt engineering]{.alert} determina la calidad de los resultados: PTCF, temperatura, few-shot, CoT
 - Las [alucinaciones]{.alert} son un riesgo real; [RAG]{.alert} ayuda a mitigarlas

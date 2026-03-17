@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -98,7 +99,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 20px;"}
-**El desafío fundamental**
+**El desafío central**
 
 Las computadoras trabajan con [números]{.alert}.
 
@@ -297,7 +298,7 @@ por la similitud de sus vectores.
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- [TF-IDF]{.alert}: Term Frequency - Inverse Document Frequency
+- [TF-IDF]{.alert}: Term Frequency - Inverse Document Frequency (el concepto de IDF viene de [Sparck Jones, 1972](https://doi.org/10.1108/eb026526))
 - Problema con bag-of-words: las palabras [más frecuentes]{.alert} no siempre son las más [informativas]{.alert}
 - TF-IDF pondera la frecuencia de una palabra por su [rareza en el corpus]{.alert}:
 
@@ -392,7 +393,7 @@ ampliamente a los diccionarios.
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- [LDA]{.alert} (Latent Dirichlet Allocation): el método más usado para descubrir temas en un corpus
+- [LDA]{.alert} (Latent Dirichlet Allocation, [Blei, Ng y Jordan, 2003](https://www.jmlr.org/papers/v3/blei03a.html)): el método más usado para descubrir temas en un corpus
 - Idea: cada documento es una [mezcla de temas]{.alert}, y cada tema es una [mezcla de palabras]{.alert}
 - LDA descubre ambas mezclas simultáneamente
 - Ejemplo:
@@ -462,7 +463,7 @@ dado el texto, recupera los temas.
 - No captura [relaciones entre palabras]{.alert} (como lo hacen los embeddings)
 - Los temas no tienen [nombre]{.alert}: los nombres los pone el investigador
 - Es un [modelo probabilístico]{.alert}: resultados pueden variar entre ejecuciones
-- Para textos cortos (tweets, respuestas breves), LDA funciona mal
+- Para textos cortos (tweets, respuestas breves), LDA funciona mal porque cada documento tiene muy pocas palabras para estimar distribuciones de tópicos
 - Los [LLMs modernos]{.alert} pueden hacer este trabajo mucho mejor (Día 4)
 :::
 :::

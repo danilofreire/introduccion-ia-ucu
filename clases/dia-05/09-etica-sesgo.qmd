@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -183,7 +184,7 @@ Fuente: [NIST](https://www.nist.gov/news-events/news/2022/03/theres-more-ai-bias
 
 **Ejemplo: word embeddings**
 
-- "Hombre" es a "Doctor" como "Mujer" es a... "Enfermera"
+- "Hombre" es a "Doctor" como "Mujer" es a... "Enfermera" ([Bolukbasi et al., 2016](https://arxiv.org/abs/1607.06520))
 - La IA aprendió esto de [millones de textos humanos]{.alert}
 - Recogió [nuestro propio sexismo]{.alert} del texto
 - Si el sesgo viene de nosotros, ¿eso hace a la IA menos responsable, o más?
@@ -227,7 +228,7 @@ El sesgo puede entrar en [cualquier etapa]{.alert}: recolección de datos, etiqu
 :::{.column width=55%}
 Ocurre cuando la [discriminación pasada]{.alert} se incorpora a los datos de entrenamiento, aunque los datos reflejen con precisión el mundo real de ese momento.
 
-**El caso de Amazon (2018):**
+**El caso de Amazon (2018)** ([Dastin, Reuters](https://www.reuters.com/article/world/insight-amazon-scraps-secret-ai-recruiting-tool-that-showed-bias-against-women-idUSKCN1MK0AG/)):
 
 - Amazon construyó una IA para filtrar CVs
 - Entrenada con [10 años de contrataciones pasadas]{.alert}
@@ -261,9 +262,9 @@ Datos precisos $\neq$ datos justos.
 :::{.column width=55%}
 Cuando ciertos grupos están [subrepresentados]{.alert} en los datos de entrenamiento, el modelo funciona mal para ellos.
 
-**Ejemplo: reconocimiento facial** (Buolamwini y Gebru, 2018)
+**Ejemplo: reconocimiento facial** ([Buolamwini y Gebru, 2018](https://proceedings.mlr.press/v81/buolamwini18a.html))
 
-- Sistemas comerciales de reconocimiento facial:
+- Sistemas comerciales de reconocimiento facial (peor de los tres sistemas evaluados):
     - Hombres de piel clara: [0,8% de error]{.alert}
     - Mujeres de piel oscura: [34,7% de error]{.alert}
     - Un rendimiento [43 veces peor]{.alert} para un grupo
@@ -312,7 +313,7 @@ Usar un [proxy medible]{.alert} para algo que realmente nos importa, pero el pro
 | Calidad laboral | Antigüedad | Penaliza a cuidadores |
 | Necesidades de salud | Gasto pasado | Refleja barreras de acceso |
 
-[Se puede eliminar la raza de los datos y terminar con un modelo racialmente sesgado.]{.alert}
+[Se puede eliminar la raza de los datos y terminar con un modelo racialmente sesgado]{.alert} (ver [Obermeyer et al., 2019](https://doi.org/10.1126/science.aax2342), sobre sesgo racial en algoritmos de salud en EE.UU.).
 :::
 
 :::{.column width=45%}
@@ -334,7 +335,7 @@ Fuente: [Harvard Law Review](https://harvardlawreview.org/print/vol-138/resettin
 
 Cuando las [predicciones del algoritmo influyen en los datos]{.alert} que se usarán para entrenarlo en el futuro.
 
-**Ejemplo: vigilancia predictiva**
+**Ejemplo: vigilancia predictiva** ([Ensign et al., 2018](https://doi.org/10.1145/3219819.3220109); [Lum e Isaac, 2016](https://doi.org/10.1111/j.1740-9713.2016.00960.x))
 
 1. El algoritmo predice zonas de alta criminalidad basándose en [datos de arrestos pasados]{.alert}
 2. La policía patrulla esas zonas con más intensidad
@@ -390,7 +391,7 @@ Arreglar los datos de entrenamiento no sirve si el benchmark de evaluación tamb
 
 3. **Igualdad de falsos negativos**: los grupos deben tener tasas iguales de ser ignorados erróneamente
 
-**El teorema de imposibilidad:**
+**El teorema de imposibilidad** ([Chouldechova, 2017](https://doi.org/10.1089/big.2016.0047); [Kleinberg, Mullainathan y Raghavan, 2016](https://arxiv.org/abs/1609.05807)):
 
 > Si las tasas base difieren entre grupos, [no se pueden satisfacer los tres criterios]{.alert} simultáneamente.
 
@@ -494,15 +495,15 @@ Ningún algoritmo puede decidir qué errores importan más. Esa es una [pregunta
 
 - Sin ley federal integral
 - Regulación sectorial y estatal
-- NYC: ley de auditoría de IA en contratación (2023)
-- Orden ejecutiva de Biden sobre IA (2023)
+- NYC: ley de auditoría de IA en contratación (Local Law 144, 2023)
+- Orden ejecutiva de Biden sobre IA (2023), revocada por la administración Trump en enero de 2025
 :::
 
 :::{.column width=50%}
 **América Latina**
 
 - [Uruguay]{.alert}: Ley 18.331 de Protección de Datos; Estrategia Nacional de IA (2019); URCDP como órgano de control. Referente regional en gobierno digital
-- [Brasil]{.alert}: LGPD (2018) para protección de datos; proyecto de ley de IA (PL 2338/2023) en debate en el Senado
+- [Brasil]{.alert}: LGPD (2018) para protección de datos; proyecto de ley de IA (PL 2338/2023) aprobado por el Senado en diciembre de 2024, ahora en la Cámara de Diputados
 - [Chile]{.alert}: primera Política Nacional de IA (2021) en la región; proyecto de ley de neuroderechos
 - [Colombia]{.alert}: marco ético de IA (2019); sandbox regulatorio
 - [Argentina]{.alert}: Plan Nacional de IA (2019); ley de datos personales en actualización

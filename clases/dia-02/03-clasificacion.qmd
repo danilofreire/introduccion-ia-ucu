@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -351,7 +352,7 @@ pred_arbol <- predict(ajuste_arbol, datos_test) |>
 :::{.column width=55%}
 - Un solo árbol es [inestable]{.alert} y propenso al sobreajuste
 - Solución: [combinar muchos árboles]{.alert} y promediar sus predicciones
-- [Random Forest]{.alert} (bosque aleatorio) = un [ensemble]{.alert} (conjunto) de árboles de decisión
+- [Random Forest]{.alert} ([Breiman, 2001](https://doi.org/10.1023/A:1010933404324)) = un [ensemble]{.alert} (conjunto) de árboles de decisión
 - Dos fuentes de aleatoriedad:
     1. [Bootstrap]{.alert}: cada árbol entrena con una muestra diferente de los datos (con reemplazo)
     2. [Subconjunto de variables]{.alert}: en cada división, cada árbol solo considera un subconjunto aleatorio de variables
@@ -395,9 +396,9 @@ Predicción final: VOTÓ
 :::{.column width=55%}
 - [Reduce la varianza]{.alert} sin aumentar mucho el sesgo
 - Cada árbol individual sobreajusta, pero al promediar, el sobreajuste se diluye
-- Analogía: si les piden a 500 personas que estimen el peso de un buey, [el promedio será sorprendentemente cercano al valor real]{.alert} (el "efecto de la sabiduría de la multitud")
+- Analogía: si les piden a 500 personas que estimen el peso de un buey, [el promedio será sorprendentemente cercano al valor real]{.alert}. Francis Galton documentó este fenómeno en 1907; Surowiecki lo popularizó como "la sabiduría de la multitud"
 - Funciona bien [sin mucha afinación]{.alert} de hiperparámetros
-- Robusto frente a outliers y ruido
+- Resistente frente a outliers y ruido
 - Es uno de los [modelos más usados en la práctica]{.alert} por su combinación de rendimiento y simplicidad
 :::
 
@@ -558,13 +559,13 @@ ajuste_3 <- fit(modelo_3, voto ~ ., data = datos_train)
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
-**Muchlinski et al. (2016)**
+**[Muchlinski et al. (2016)](https://doi.org/10.1093/pan/mpv024)**
 
 - Pregunta: ¿podemos predecir guerras civiles?
 - Compararon regresión logística con Random Forest
 - RF tuvo mejor rendimiento predictivo
-- Pero: Ward et al. (2010) mostraron que [los modelos estadísticos clásicos predicen mal las guerras civiles]{.alert}
-- RF mejoró la predicción al capturar interacciones complejas entre factores como PIB, tipo de régimen y diversidad étnica
+- Pero: [Wang (2019)](https://doi.org/10.1093/pan/mpz004) replicó el estudio y encontró errores en el código; con datos corregidos, la ventaja de RF era menor
+- La lección sigue siendo válida: RF puede capturar interacciones complejas que la regresión logística no capta
 :::
 
 :::{.column width=50%}

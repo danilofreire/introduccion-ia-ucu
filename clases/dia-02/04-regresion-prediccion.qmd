@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -120,12 +121,11 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- La regresión lineal (OLS) busca el [mejor ajuste]{.alert} a los datos de entrenamiento
-- Problema: si tenemos muchas variables, el modelo puede [sobreajustar]{.alert}
-- Ejemplo: con 50 variables y 100 observaciones, el modelo puede encontrar un "ajuste perfecto" que no generaliza
-- [Sobreajuste en regresión]{.alert}: el modelo "memoriza" los datos, incluyendo el ruido
-- La regresión OLS [no tiene mecanismo de control]{.alert} contra el sobreajuste
-- Solución: [regularización]{.alert}, un método para penalizar la complejidad del modelo
+- La regresión lineal (OLS) minimiza el error en los datos de entrenamiento
+- Problema: si tenemos [muchas variables relativas al número de observaciones]{.alert}, OLS se ajusta demasiado al ruido
+- Ejemplo: con 50 variables y 100 observaciones, OLS encuentra coeficientes que parecen funcionar pero no generalizan
+- OLS no tiene un mecanismo para [descartar variables irrelevantes]{.alert} ni para reducir coeficientes inflados
+- Solución: [regularización]{.alert}, que agrega una penalización por la magnitud de los coeficientes
 :::
 
 :::{.column width=45%}
@@ -186,7 +186,7 @@ Es como un profesor que dice:
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- [LASSO]{.alert} = Least Absolute Shrinkage and Selection Operator
+- [LASSO]{.alert} = Least Absolute Shrinkage and Selection Operator ([Tibshirani, 1996](https://doi.org/10.1111/j.2517-6161.1996.tb02080.x))
 - Penalización L1: suma de los [valores absolutos]{.alert} de los coeficientes
 
 $$\min \sum (y_i - \hat{y}_i)^2 + \lambda \sum |\beta_j|$$
@@ -268,7 +268,7 @@ pero con coeficientes más pequeños.
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- [Elastic Net]{.alert} combina LASSO (L1) y Ridge (L2):
+- [Elastic Net]{.alert} ([Zou y Hastie, 2005](https://doi.org/10.1111/j.1467-9868.2005.00503.x)) combina LASSO (L1) y Ridge (L2):
 
 $$\min \sum (y_i - \hat{y}_i)^2 + \lambda \left[ \alpha \sum |\beta_j| + (1-\alpha) \sum \beta_j^2 \right]$$
 
