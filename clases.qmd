@@ -16,7 +16,8 @@ Las diapositivas de cada día se publicarán aquí a medida que avance el curso.
 [Sesión 1.2: Fundamentos de ML. Flujo de trabajo, train/test, sesgo-varianza, métricas.]{.day-topics}
 
 ::: {.resource-links}
-Diapositivas (próximamente)
+[Sesión 1.1: ¿Qué es la IA?](clases/dia-01/01-que-es-ia.html) |
+[Sesión 1.2: Fundamentos de ML](clases/dia-01/02-fundamentos-ml.html)
 :::
 :::
 
@@ -30,7 +31,8 @@ Diapositivas (próximamente)
 [Sesión 2.2: Regresión y predicción. LASSO, Ridge, Elastic Net.]{.day-topics}
 
 ::: {.resource-links}
-Diapositivas (próximamente)
+[Sesión 2.1: Clasificación](clases/dia-02/03-clasificacion.html) |
+[Sesión 2.2: Regresión y predicción](clases/dia-02/04-regresion-prediccion.html)
 :::
 :::
 
@@ -44,7 +46,8 @@ Diapositivas (próximamente)
 [Sesión 3.2: Análisis de texto. Tokenización, TF-IDF, sentimiento, LDA.]{.day-topics}
 
 ::: {.resource-links}
-Diapositivas (próximamente)
+[Sesión 3.1: Clustering y PCA](clases/dia-03/05-clustering-pca.html) |
+[Sesión 3.2: Análisis de texto](clases/dia-03/06-analisis-texto.html)
 :::
 :::
 
@@ -58,7 +61,8 @@ Diapositivas (próximamente)
 [Sesión 4.2: LLMs como herramientas de investigación. Anotación, datos sintéticos, APIs.]{.day-topics}
 
 ::: {.resource-links}
-Diapositivas (próximamente)
+[Sesión 4.1: Entendiendo los LLMs](clases/dia-04/07-entendiendo-llms.html) |
+[Sesión 4.2: LLMs como herramientas](clases/dia-04/08-llms-investigacion.html)
 :::
 :::
 
@@ -72,6 +76,7 @@ Diapositivas (próximamente)
 [Sesión 5.2: Mini-propuestas de investigación y presentaciones.]{.day-topics}
 
 ::: {.resource-links}
-Diapositivas (próximamente)
+[Sesión 5.1: Ética y sesgo](clases/dia-05/09-etica-sesgo.html) |
+[Sesión 5.2: Propuestas y cierre](clases/dia-05/10-propuestas-cierre.html)
 :::
 :::

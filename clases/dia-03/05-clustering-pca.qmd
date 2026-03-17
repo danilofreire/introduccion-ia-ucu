@@ -1,0 +1,460 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 3.1: Clustering y reducción de dimensionalidad"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 3.1](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-03/05-clustering-pca.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Día 3: Texto y aprendizaje no supervisado {background-color="#2d4563"}
+
+## Repaso del Día 2
+
+:::{style="margin-top: 20px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+- [Regresión logística]{.alert}: interpretable, produce probabilidades
+- [Árboles de decisión]{.alert}: intuitivos pero sobreajustan
+- [Random Forest]{.alert}: combina muchos árboles para mejor predicción
+- [Predicción vs. explicación]{.alert}: dos objetivos diferentes en ciencias sociales
+- [Regularización]{.alert}: LASSO selecciona variables, Ridge reduce coeficientes
+- tidymodels permite comparar modelos con [la misma sintaxis]{.alert}
+:::
+
+:::{.column width=50%}
+:::{style="text-align: center;"}
+[![](figures/learning-types.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/learning-types.png"}
+:::
+:::
+:::
+:::
+
+## Agenda de hoy
+
+:::{style="margin-top: 20px; font-size: 32px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**Sesión 3.1: Clustering y PCA (~2 h)**
+
+- ¿Qué es el aprendizaje no supervisado?
+- K-means: conceptos e intuición
+- PCA: reducción de dimensionalidad
+- Laboratorio: segmentación de países
+
+:::
+
+:::{.column width=50%}
+**Sesión 3.2: Análisis de texto (~2 h)**
+
+- Texto como datos
+- Tokenización y bag-of-words
+- TF-IDF
+- Análisis de sentimiento
+- Topic Modeling (LDA)
+- Laboratorio con tidytext
+:::
+:::
+:::
+
+# ¿Qué es el aprendizaje no supervisado? {background-color="#2d4563"}
+
+## Aprender sin etiquetas
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- En aprendizaje supervisado, teníamos [respuestas correctas]{.alert} (etiquetas)
+- En aprendizaje no supervisado, [no hay etiquetas]{.alert}
+- El modelo debe descubrir [patrones ocultos]{.alert} en los datos por sí mismo
+- ¿Por qué usarlo?
+    - Las etiquetas son [costosas]{.alert} (requieren expertos)
+    - A veces las etiquetas [no existen]{.alert} ("¿cuántos tipos de votantes hay?")
+    - [Exploración]{.alert}: entender los datos antes de modelar
+- Dos técnicas principales:
+    - [Clustering]{.alert}: agrupar observaciones similares
+    - [Reducción de dimensionalidad]{.alert}: simplificar datos con muchas variables
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![El aprendizaje no supervisado descubre estructura](figures/unsupervised-learning.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/unsupervised-learning.png"}
+:::
+:::
+:::
+:::
+
+# K-means {background-color="#2d4563"}
+
+## ¿Qué es K-means?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [K-means]{.alert}: el algoritmo de clustering más popular
+- Particiona los datos en [K grupos]{.alert} (clusters)
+- Los puntos dentro del mismo cluster son [similares]{.alert} entre sí
+- Los puntos en clusters diferentes son [disimilares]{.alert}
+- ¿Cómo funciona?
+    1. Elegir K centros [aleatoriamente]{.alert}
+    2. [Asignar]{.alert} cada punto al centro más cercano
+    3. [Mover]{.alert} cada centro al promedio de sus puntos asignados
+    4. Repetir pasos 2-3 hasta que los centros [no se muevan]{.alert}
+- Simple, rápido y funciona bien en muchos casos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![K-means en acción](figures/kmeans2.gif){width="90%"}](#){data-modal-type="image" data-modal-url="figures/kmeans2.gif"}
+
+Fuente: [Machine Learning CoBan](https://machinelearningcoban.com/2017/01/01/kmeans/)
+:::
+:::
+:::
+:::
+
+## ¿Cómo elegir K?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- El usuario debe [elegir el número de clusters]{.alert} (K) de antemano
+- No existe un K "correcto" en general
+- Métodos para orientarse:
+    - [Método del codo]{.alert}: graficar la suma de distancias internas para diferentes K, buscar el "codo" donde la mejora se estabiliza
+    - [Silueta]{.alert}: mide qué tan bien cada punto encaja en su cluster. Valores altos (cercanos a 1) son buenos
+    - [Conocimiento del dominio]{.alert}: ¿cuántos grupos tienen sentido teóricamente?
+- En ciencias sociales, [el contexto teórico]{.alert} suele ser más importante que las métricas estadísticas
+- Ejemplo: ¿cuántos "tipos" de regímenes políticos hay? ¿3? ¿5? ¿7? Depende de la teoría
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Método del codo**
+
+```
+Suma de distancias internas
+  │
+  │\
+  │ \
+  │  \
+  │   \
+  │    \.___.___.___  ← "codo" en K=3
+  │
+  └──────────────────▶
+    K=1  2  3  4  5  6
+```
+
+Se elige el K donde la curva
+"se aplana": agregar más clusters
+ya no mejora mucho.
+:::
+:::
+:::
+:::
+
+## Limitaciones de K-means
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Supuestos que hace**
+
+- Los clusters son [esféricos]{.alert} (todos del mismo tamaño)
+- Cada punto pertenece a [un solo cluster]{.alert}
+- Sensible a la [escala]{.alert} de las variables (siempre normalizar antes)
+- Sensible a los [valores iniciales]{.alert} (ejecutar varias veces)
+:::
+
+:::{.column width=50%}
+**Aplicaciones en ciencias sociales**
+
+- [Segmentación de países]{.alert}: agrupar países por indicadores de desarrollo
+- [Tipología de votantes]{.alert}: identificar perfiles electorales
+- [Clasificación de municipios]{.alert}: agrupar por características socioeconómicas
+- [Análisis de encuestas]{.alert}: encontrar grupos de respuesta similares
+:::
+:::
+
+:::{style="margin-top: 20px; text-align: center; font-size: 22px;"}
+[K-means es un punto de partida, no el final.]{.alert} Sirve para explorar los datos y generar hipótesis, no para confirmar teorías causales.
+:::
+:::
+
+# PCA: Reducción de dimensionalidad {background-color="#2d4563"}
+
+## ¿Qué es PCA?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [PCA]{.alert} (Principal Component Analysis / Análisis de Componentes Principales)
+- Problema: tenemos [muchas variables]{.alert} y queremos simplificar
+- PCA busca las [direcciones de máxima variación]{.alert} en los datos
+- Crea nuevas variables ([componentes principales]{.alert}) que son combinaciones lineales de las originales
+- Primer componente: la dirección con [más varianza]{.alert}
+- Segundo componente: la siguiente dirección con más varianza, [perpendicular]{.alert} al primero
+- Y así sucesivamente
+- Permite [visualizar datos de alta dimensión]{.alert} en 2D o 3D
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![PCA: encontrar las direcciones de máxima varianza](figures/pca.gif){width="100%"}](#){data-modal-type="image" data-modal-url="figures/pca.gif"}
+
+Fuente: [Vizuara](https://www.vizuaranewsletter.com/p/understanding-principal-component)
+:::
+:::
+:::
+:::
+
+## ¿Para qué sirve PCA en ciencias sociales?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Visualización]{.alert}: reducir 8 variables a 2 dimensiones para graficar
+- [Construcción de índices]{.alert}: combinar muchos indicadores en uno solo
+    - Ejemplo: el Índice de Desarrollo Humano (IDH) es conceptualmente similar a un primer componente principal de esperanza de vida, educación e ingreso
+- [Preprocesamiento]{.alert}: reducir la dimensionalidad antes de aplicar otro modelo (como K-means o regresión)
+- [Detección de patrones]{.alert}: ver qué variables "van juntas"
+    - Si el primer componente carga fuertemente en PIB, educación e internet, lo podemos interpretar como un "eje de desarrollo"
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![](figures/dimensionality-reduction.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/dimensionality-reduction.png"}
+
+Fuente: [Medium](https://muhammadtaha01.medium.com/dimensionality-reduction-in-machine-learning-46d45747eaee)
+:::
+:::
+:::
+:::
+
+## PCA: lo que hay que recordar
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**Ventajas**
+
+- [Reduce la dimensionalidad]{.alert} preservando la mayor varianza posible
+- Ayuda a [visualizar]{.alert} datos complejos
+- Puede revelar [estructura latente]{.alert}
+- Los componentes son [independientes]{.alert} entre sí (ortogonales)
+- No necesita etiquetas
+:::
+
+:::{.column width=50%}
+**Limitaciones**
+
+- Solo captura relaciones [lineales]{.alert}
+- Los componentes son [difíciles de interpretar]{.alert} (son combinaciones de muchas variables)
+- Sensible a la [escala]{.alert}: siempre normalizar antes
+- No es un modelo causal: no dice [por qué]{.alert} las variables están correlacionadas
+- ¿Cuántos componentes conservar? Regla general: los que explican [~80% de la varianza]{.alert}
+:::
+:::
+:::
+
+# Laboratorio: Segmentación de países latinoamericanos {background-color="#2d4563"}
+
+## Cargar y explorar
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-load, message=FALSE, warning=FALSE, prompt=FALSE}
+library(tidyverse)
+
+# Cargar indicadores por país
+paises <- read_csv("datos/indicadores_paises.csv")
+glimpse(paises)
+```
+:::
+
+## Preparar los datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-preparar, message=FALSE, warning=FALSE, prompt=FALSE}
+# Guardar los nombres de los países
+nombres <- paises$pais
+
+# Seleccionar solo las variables numéricas y escalar
+datos_scaled <- paises |>
+  select(-pais) |>
+  scale() |>
+  as.data.frame()
+
+rownames(datos_scaled) <- nombres
+
+head(datos_scaled, 5)
+```
+
+[Siempre escalar las variables antes de K-means y PCA]{.alert}: si no lo hacemos, las variables con valores más altos (como PIB) dominarán el análisis.
+:::
+
+## K-means: agrupar países
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-kmeans, message=FALSE, warning=FALSE, prompt=FALSE}
+# Ejecutar K-means con K=3
+set.seed(2026)
+km <- kmeans(datos_scaled, centers = 3, nstart = 25)
+
+# Ver los clusters
+paises$cluster <- factor(km$cluster)
+
+paises |>
+  select(pais, cluster) |>
+  arrange(cluster)
+```
+
+- `nstart = 25` ejecuta el algoritmo 25 veces con diferentes puntos iniciales y elige el mejor resultado
+:::
+
+## Método del codo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-codo, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=7, fig.height=3.5}
+# Calcular la suma de distancias internas para K=1 a K=8
+wss <- map_dbl(1:8, function(k) {
+  kmeans(datos_scaled, centers = k, nstart = 25)$tot.withinss
+})
+
+tibble(k = 1:8, wss = wss) |>
+  ggplot(aes(x = k, y = wss)) +
+  geom_line(colour = "#2d4563") +
+  geom_point(colour = "#2d4563", size = 3) +
+  labs(x = "Número de clusters (K)", y = "Suma de distancias internas",
+       title = "Método del codo") +
+  scale_x_continuous(breaks = 1:8) +
+  theme_minimal()
+```
+:::
+
+## PCA: reducir dimensiones
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-pca, message=FALSE, warning=FALSE, prompt=FALSE}
+# Ejecutar PCA
+pca_result <- prcomp(datos_scaled)
+
+# Varianza explicada por cada componente
+summary(pca_result)
+```
+
+- Los dos primeros componentes explican la mayor parte de la varianza
+- Podemos [visualizar los 18 países en 2 dimensiones]{.alert}
+:::
+
+## Visualizar PCA + clusters
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-pca-plot, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=8, fig.height=4.5}
+# Combinar PCA con clusters
+pca_df <- as.data.frame(pca_result$x[, 1:2])
+pca_df$pais <- nombres
+pca_df$cluster <- paises$cluster
+
+ggplot(pca_df, aes(x = PC1, y = PC2, colour = cluster, label = pais)) +
+  geom_point(size = 3) +
+  geom_text(vjust = -0.8, size = 3, show.legend = FALSE) +
+  labs(x = "Componente Principal 1", y = "Componente Principal 2",
+       title = "Países latinoamericanos: PCA coloreado por cluster K-means",
+       colour = "Cluster") +
+  theme_minimal() +
+  scale_colour_manual(values = c("#2d4563", "#e63946", "#457b9d"))
+```
+:::
+
+## Interpretar los componentes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-pca-loadings, message=FALSE, warning=FALSE, prompt=FALSE}
+# ¿Qué variables contribuyen a cada componente?
+pca_result$rotation[, 1:2] |>
+  as.data.frame() |>
+  mutate(variable = rownames(pca_result$rotation)) |>
+  arrange(desc(abs(PC1)))
+```
+
+- Si PC1 carga positivamente en PIB, educación e internet, lo podemos interpretar como un [eje de desarrollo]{.alert}
+- Los países a la derecha del gráfico son "más desarrollados" en este sentido compuesto
+:::
+
+## Discusión
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+- ¿Los clusters tienen [sentido teórico]{.alert}? ¿Corresponden a categorías que ya conocemos (alto desarrollo, desarrollo medio, bajo desarrollo)?
+- ¿Qué [variables]{.alert} diferencian más a los grupos?
+- ¿El PCA nos dice algo [nuevo]{.alert} o confirma lo que ya sabíamos?
+- ¿Qué [limitaciones]{.alert} tiene este análisis?
+    - Solo 18 observaciones (un punto por país)
+    - Las variables son solo un subconjunto de los posibles indicadores
+    - K-means asume clusters esféricos
+- [El valor de estas técnicas está en la exploración]{.alert}, no en la confirmación causal
+:::
+
+## Resumen de la sesión
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+- El [aprendizaje no supervisado]{.alert} descubre patrones sin etiquetas
+- [K-means]{.alert} agrupa observaciones similares en K clusters. El usuario elige K
+- [PCA]{.alert} reduce la dimensionalidad preservando la mayor varianza posible. Útil para visualización e índices compuestos
+- Ambas técnicas requieren [escalar las variables]{.alert} antes de aplicarlas
+- Son herramientas de [exploración]{.alert}: generan hipótesis, no las confirman
+- Próximo: [análisis computacional de texto]{.alert}
+:::
+
+# Nos vemos en la próxima sesión {background-color="#2d4563"}

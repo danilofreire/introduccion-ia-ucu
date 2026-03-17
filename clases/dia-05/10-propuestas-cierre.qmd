@@ -1,0 +1,393 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 5.2: Mini-propuestas de investigación y cierre"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 5.2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-05/10-propuestas-cierre.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Mini-propuestas de investigación {background-color="#2d4563"}
+
+## Agenda de la sesión
+
+:::{style="margin-top: 20px; font-size: 32px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**Parte 1: Preparación (~30 min)**
+
+- Repaso de técnicas del curso
+- Cómo integrar la IA en investigación
+- Estructura de la mini-propuesta
+- Tiempo para preparar
+:::
+
+:::{.column width=50%}
+**Parte 2: Presentaciones (~80 min)**
+
+- Presentaciones de 5 minutos
+- Preguntas y retroalimentación
+- Discusión grupal
+- Cierre del curso
+:::
+:::
+:::
+
+# Repaso: las herramientas del curso {background-color="#2d4563"}
+
+## Lo que aprendimos esta semana
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+| Día | Técnicas | Paquetes de R |
+|-----|----------|---------------|
+| [1]{.alert} | Flujo de ML, train/test, métricas (accuracy, precision, recall) | `tidymodels` |
+| [2]{.alert} | Regresión logística, árboles de decisión, Random Forest, LASSO/Ridge/Elastic Net | `tidymodels`, `ranger`, `glmnet` |
+| [3]{.alert} | K-means, PCA, tokenización, TF-IDF, análisis de sentimiento, LDA | `tidytext`, `topicmodels` |
+| [4]{.alert} | LLMs, embeddings, prompt engineering, RAG, anotación automática, APIs | `ellmer` |
+| [5]{.alert} | Sesgo algorítmico, equidad, regulación | (conceptual) |
+
+<br>
+
+:::{style="text-align: center;"}
+[Cada una de estas técnicas puede aplicarse a una pregunta de investigación en ciencias sociales.]{.alert}
+:::
+:::
+
+## Cómo integrar la IA en su investigación
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**La IA como herramienta, no como método**
+
+- La IA no reemplaza la [teoría social]{.alert}
+- Sigue siendo necesario:
+    - Formular una [pregunta de investigación]{.alert} clara
+    - Justificar la [relevancia]{.alert} del problema
+    - Elegir [datos apropiados]{.alert}
+    - Interpretar los resultados en [contexto teórico]{.alert}
+- La IA aporta:
+    - [Escala]{.alert}: analizar datos que un humano no podría
+    - [Velocidad]{.alert}: procesar miles de textos en minutos
+    - [Patrones]{.alert}: descubrir estructuras que no veíamos
+    - [Predicción]{.alert}: anticipar resultados futuros
+:::
+
+:::{.column width=50%}
+**Cuándo usar qué**
+
+| Objetivo | Técnica sugerida |
+|----------|-----------------|
+| Clasificar textos (pocos) | Diccionarios, TF-IDF |
+| Clasificar textos (muchos) | LLMs vía `ellmer` |
+| Descubrir temas | LDA, LLMs |
+| Predecir un evento | Random Forest, reg. logística |
+| Encontrar grupos | K-means, clustering jerárquico |
+| Reducir variables | PCA |
+| Seleccionar predictores | LASSO |
+| Explicar causalidad | [No usar ML]{.alert} (usar experimentos, DiD, IV) |
+:::
+:::
+:::
+
+## Preguntas de investigación + técnicas de IA
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Ejemplos de preguntas que podrían abordar:**
+
+:::{.columns}
+:::{.column width=50%}
+**Clasificación / predicción**
+
+- ¿Qué factores predicen la [satisfacción con la democracia]{.alert} en América Latina?
+    - → Reg. logística + Random Forest con datos de Latinobarómetro
+- ¿Se puede predecir el [resultado electoral]{.alert} de un municipio a partir de indicadores socioeconómicos?
+    - → LASSO + validación cruzada
+- ¿Qué características de un tweet predicen si será [compartido]{.alert} masivamente?
+    - → Clasificación binaria + ingeniería de variables
+:::
+
+:::{.column width=50%}
+**Texto / LLMs**
+
+- ¿Cómo ha cambiado el [discurso sobre inmigración]{.alert} en la prensa uruguaya en los últimos 10 años?
+    - → TF-IDF + LDA + sentimiento
+- ¿Pueden los LLMs [anotar]{.alert} el tono de respuestas abiertas de encuestas con precisión comparable a humanos?
+    - → Anotación con `ellmer` + comparación
+- ¿Existen [sesgos de género]{.alert} en las recomendaciones de ChatGPT sobre carreras profesionales?
+    - → Auditoría de sesgo con prompts controlados
+:::
+:::
+:::
+
+# Estructura de la mini-propuesta {background-color="#2d4563"}
+
+## ¿Qué debe incluir su propuesta?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+Su presentación (5 minutos) debe cubrir estos cinco puntos:
+
+1. **Pregunta de investigación** (1 min)
+    - ¿Qué quieren saber? ¿Por qué importa?
+    - Debe ser [específica]{.alert} y [acotada]{.alert}
+
+2. **Datos** (1 min)
+    - ¿Qué datos usarían? ¿De dónde vienen?
+    - ¿Están disponibles o habría que recogerlos?
+
+3. **Técnica de IA/ML** (1 min)
+    - ¿Qué método del curso aplicarían?
+    - ¿Por qué ese método y no otro?
+
+4. **Evaluación** (1 min)
+    - ¿Cómo sabrían si su modelo funciona bien?
+    - ¿Qué métricas usarían?
+
+5. **Consideraciones éticas** (1 min)
+    - ¿Qué sesgos podrían surgir?
+    - ¿Cómo los mitigarían?
+:::
+
+## Criterios de evaluación (informales)
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que busco:**
+
+- [Claridad]{.alert}: ¿se entiende la propuesta?
+- [Relevancia]{.alert}: ¿la pregunta importa para las ciencias sociales?
+- [Factibilidad]{.alert}: ¿se podría hacer con los datos y herramientas disponibles?
+- [Conciencia ética]{.alert}: ¿identifican riesgos y sesgos?
+- [Conexión con el curso]{.alert}: ¿aplican lo que aprendimos?
+:::
+
+:::{.column width=50%}
+**Lo que NO busco:**
+
+- Resultados finales (es una propuesta, no un paper)
+- Código funcionando
+- Perfección metodológica
+- Propuestas grandiosas: una propuesta [modesta pero bien pensada]{.alert} es mejor que una ambiciosa pero vaga
+:::
+:::
+
+:::{style="margin-top: 20px; text-align: center; font-size: 22px;"}
+[No hay nota formal.]{.alert} El objetivo es practicar el diseño de investigación con las herramientas que aprendimos.
+:::
+:::
+
+## Ejemplo de mini-propuesta
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=50%}
+**Pregunta**: ¿los LLMs clasifican el sentimiento de tweets políticos en español con la misma precisión que anotadores humanos?
+
+**Datos**: 500 tweets sobre elecciones en Uruguay (2024), ya anotados por 3 investigadores
+
+**Técnica**: Clasificación con `ellmer` (GPT-4o-mini y Claude Haiku), comparando con etiquetas humanas
+
+**Evaluación**: accuracy, precision, recall; comparar con acuerdo inter-anotador (Cohen's kappa)
+:::
+
+:::{.column width=50%}
+**Consideraciones éticas**:
+
+- Los tweets son públicos pero las personas no consintieron ser analizadas
+- Los LLMs pueden tener sesgos con el español rioplatense
+- El sentimiento político es subjetivo; ¿quién tiene la "respuesta correcta"?
+- Costo de la API vs. costo de anotadores humanos
+
+**Por qué importa**: si los LLMs funcionan bien, democratizan el acceso al análisis de texto a gran escala para investigadores con pocos recursos
+:::
+:::
+:::
+
+# Tiempo de preparación {background-color="#2d4563"}
+
+## Instrucciones
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+- Tienen [25 minutos]{.alert} para preparar su mini-propuesta
+- Pueden trabajar [individualmente o en parejas]{.alert}
+- Pueden usar cualquier recurso: notas del curso, internet, ChatGPT/Claude
+- Preparen 2-3 diapositivas simples o notas para presentar
+- Si no tienen una idea propia, elijan una de las preguntas de ejemplo y adáptenla a un contexto que les interese
+- Estoy disponible para preguntas y orientación
+:::
+
+# Presentaciones {background-color="#2d4563"}
+
+## Formato de las presentaciones
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+- [5 minutos]{.alert} por presentación
+- [2-3 minutos]{.alert} de preguntas y retroalimentación
+- Orden: voluntarios primero, luego rotación
+- Sean concretos: la brevedad es una virtud
+- Preguntas constructivas: "¿han pensado en...?" es mejor que "eso no funciona porque..."
+:::
+
+# Cierre del curso {background-color="#2d4563"}
+
+## Lo que cubrimos en 5 días
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**Día 1: Fundamentos**
+
+- ¿Qué es la IA? Historia, tipos de aprendizaje
+- Flujo de trabajo de ML, métricas
+- Primer modelo con tidymodels
+
+**Día 2: Aprendizaje supervisado**
+
+- Regresión logística, árboles, Random Forest
+- Predicción vs. explicación
+- Regularización (LASSO, Ridge, Elastic Net)
+
+**Día 3: Texto y no supervisado**
+
+- K-means, PCA
+- Tokenización, TF-IDF, sentimiento, LDA
+:::
+
+:::{.column width=50%}
+**Día 4: LLMs y aplicaciones**
+
+- Transformers, embeddings, atención
+- Prompt engineering (PTCF, CoT, few-shot)
+- Alucinaciones, RAG
+- APIs desde R con ellmer
+
+**Día 5: Ética y cierre**
+
+- Sesgo algorítmico (6 tipos)
+- Teorema de imposibilidad
+- Regulación (EU AI Act, Uruguay, región)
+- Mini-propuestas de investigación
+:::
+:::
+:::
+
+## Consejos para seguir aprendiendo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Recursos gratuitos**
+
+- [Tidy Modeling with R](https://www.tmwr.org/) (Kuhn y Silge): el libro de referencia para tidymodels
+- [Text Mining with R](https://www.tidytextmining.com/) (Silge y Robinson): análisis de texto con tidytext
+- [Fairness and Machine Learning](https://fairmlbook.org/) (Barocas, Hardt, Narayanan): ética y sesgo
+- [Introduction to Statistical Learning](https://www.statlearning.com/) (ISLR): fundamentos de ML
+- [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course): transformers y NLP
+- [3Blue1Brown Neural Networks](https://www.3blue1brown.com/topics/neural-networks): visualizaciones de redes neuronales
+:::
+
+:::{.column width=50%}
+**Herramientas para explorar**
+
+- [ellmer](https://ellmer.tidyverse.org/): LLMs desde R
+- [Ollama](https://ollama.com/): modelos locales sin costo de API
+- [NotebookLM](https://notebooklm.google.com/): RAG gratuito de Google
+- [Transformer Explainer](https://poloclub.github.io/transformer-explainer/): visualización interactiva
+- [Projector TensorFlow](https://projector.tensorflow.org/): explorar embeddings
+- [LM Arena](https://lmarena.ai/): comparar modelos de lenguaje
+
+**Comunidades**
+
+- [RStudio Community](https://forum.posit.co/): preguntas sobre R
+- [Hugging Face](https://huggingface.co/): modelos y datasets
+- [r/MachineLearning](https://www.reddit.com/r/MachineLearning/): noticias y discusión
+:::
+:::
+:::
+
+## Materiales del curso
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+Todos los materiales seguirán disponibles:
+
+- `r fa('globe')` **Sitio web**: <https://danilofreire.github.io/introduccion-ia-ucu>
+- `r fa('github')` **Repositorio**: <https://github.com/danilofreire/introduccion-ia-ucu>
+- `r fa('envelope')` **Contacto**: [danilofreire@gmail.com](mailto:danilofreire@gmail.com)
+
+Las diapositivas, datasets, scripts de R y lecturas recomendadas están en el repositorio.
+
+Si tienen preguntas en el futuro, no duden en escribirme. Siempre estoy disponible para ayudar.
+:::
+
+## Evaluación del curso
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+- Les voy a compartir un formulario breve de evaluación
+- Sus comentarios me ayudan a mejorar el curso para futuras ediciones
+- Es [anónimo]{.alert} y toma menos de 5 minutos
+- Agradezco su honestidad: tanto lo positivo como las sugerencias de mejora
+:::
+
+## Agradecimientos
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+- Gracias a la [Universidad Católica del Uruguay]{.alert} y a la [Escuela en Métodos]{.alert} por la invitación
+- Gracias a todos ustedes por su [participación]{.alert}, sus preguntas y su entusiasmo
+- Ha sido un placer compartir estos cinco días con ustedes
+- Les deseo lo mejor en sus investigaciones y carreras
+- [Sigan curiosos y sigan aprendiendo]{.alert}
+:::
+
+# Muchas gracias {background-color="#2d4563"}
