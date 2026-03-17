@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -128,7 +129,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 | Encontrar grupos | K-means, clustering jerárquico |
 | Reducir variables | PCA |
 | Seleccionar predictores | LASSO |
-| Explicar causalidad | [No usar ML]{.alert} (usar experimentos, DiD, IV) |
+| Explicar causalidad | [El ML estándar no estima efectos causales]{.alert}; usar experimentos, DiD, IV (existen métodos especializados como causal forests, pero son avanzados) |
 :::
 :::
 :::
@@ -384,10 +385,9 @@ Si tienen preguntas en el futuro, no duden en escribirme. Siempre estoy disponib
 :::{style="margin-top: 40px; font-size: 28px;"}
 
 - Gracias a la [Universidad Católica del Uruguay]{.alert} y a la [Escuela en Métodos]{.alert} por la invitación
-- Gracias a todos ustedes por su [participación]{.alert}, sus preguntas y su entusiasmo
-- Ha sido un placer compartir estos cinco días con ustedes
-- Les deseo lo mejor en sus investigaciones y carreras
-- [Sigan curiosos y sigan aprendiendo]{.alert}
+- Gracias a todos ustedes por su participación y sus preguntas
+- Si algo de esta semana les resultó útil, el siguiente paso concreto es aplicarlo: elijan un dataset que les interese y prueben una técnica del curso
+- Siempre pueden escribirme con preguntas: [danilofreire@gmail.com](mailto:danilofreire@gmail.com)
 :::
 
 # Muchas gracias {background-color="#2d4563"}

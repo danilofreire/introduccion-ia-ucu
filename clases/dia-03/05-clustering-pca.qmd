@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -257,7 +258,7 @@ Fuente: [Vizuara](https://www.vizuaranewsletter.com/p/understanding-principal-co
 :::{.column width=55%}
 - [Visualización]{.alert}: reducir 8 variables a 2 dimensiones para graficar
 - [Construcción de índices]{.alert}: combinar muchos indicadores en uno solo
-    - Ejemplo: el Índice de Desarrollo Humano (IDH) es conceptualmente similar a un primer componente principal de esperanza de vida, educación e ingreso
+    - Ejemplo: el Índice de Desarrollo Humano (IDH) combina esperanza de vida, educación e ingreso en un solo número, que es la misma idea de PCA (aunque el IDH usa una media geométrica, no componentes principales)
 - [Preprocesamiento]{.alert}: reducir la dimensionalidad antes de aplicar otro modelo (como K-means o regresión)
 - [Detección de patrones]{.alert}: ver qué variables "van juntas"
     - Si el primer componente carga fuertemente en PIB, educación e internet, lo podemos interpretar como un "eje de desarrollo"
@@ -284,7 +285,7 @@ Fuente: [Medium](https://muhammadtaha01.medium.com/dimensionality-reduction-in-m
 - [Reduce la dimensionalidad]{.alert} preservando la mayor varianza posible
 - Ayuda a [visualizar]{.alert} datos complejos
 - Puede revelar [estructura latente]{.alert}
-- Los componentes son [independientes]{.alert} entre sí (ortogonales)
+- Los componentes son [no correlacionados]{.alert} entre sí (ortogonales, es decir, su correlación es cero)
 - No necesita etiquetas
 :::
 

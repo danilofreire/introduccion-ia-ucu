@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -101,15 +102,15 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 
 :::{.columns}
 :::{.column width=50%}
-- [Paso 1: Recoger datos]{.alert} -- obtener observaciones relevantes al problema
-- [Paso 2: Preprocesar]{.alert} -- limpiar valores faltantes, transformar variables, codificar categorías
-- [Paso 3: Dividir]{.alert} -- separar datos en conjuntos de entrenamiento y prueba
+- [Paso 1: Recoger datos]{.alert}: obtener observaciones relevantes al problema
+- [Paso 2: Preprocesar]{.alert}: limpiar valores faltantes, transformar variables, codificar categorías
+- [Paso 3: Dividir]{.alert}: separar en entrenamiento y prueba
 :::
 
 :::{.column width=50%}
-- [Paso 4: Entrenar]{.alert} -- ajustar un modelo a los datos de entrenamiento
-- [Paso 5: Evaluar]{.alert} -- medir el rendimiento del modelo en los datos de prueba
-- En la práctica, [este proceso es iterativo]{.alert}: volvemos a pasos anteriores para mejorar
+- [Paso 4: Entrenar]{.alert}: ajustar un modelo a los datos de entrenamiento
+- [Paso 5: Evaluar]{.alert}: medir el rendimiento en datos que el modelo nunca vio
+- En la práctica, [este proceso es iterativo]{.alert}: volvemos a pasos anteriores cuando algo falla
 :::
 :::
 :::
@@ -338,17 +339,18 @@ Error
   │      \/  ← Punto óptimo
   │      /\
   │     ╱  \
-  │    ╱    ────── ← Sesgo²
+  │    ╱    ────── ← Varianza
   │   ╱
   │  ╱
-  │─────────────── ← Varianza
+  │─────────────── ← Sesgo²
   └──────────────────▶
        Complejidad del modelo
 ```
 
 A medida que el modelo se vuelve
 más complejo, el sesgo disminuye
-pero la varianza aumenta.
+(la curva baja) pero la varianza
+aumenta (la curva sube).
 :::
 :::
 :::

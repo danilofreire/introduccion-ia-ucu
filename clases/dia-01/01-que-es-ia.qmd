@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -184,8 +185,8 @@ Al finalizar este curso, serán capaces de:
 - La IA se puede clasificar en [tres categorías principales:]{.alert}
     - [IA estrecha (narrow):]{.alert} diseñada para tareas específicas (asistentes virtuales, sistemas de recomendación)
     - [IA general:]{.alert} sistemas hipotéticos con inteligencia similar a la humana en una amplia gama de tareas
-    - [IA superinteligente:]{.alert} supera la inteligencia humana en todos los aspectos (todavía teórica)
-- La IA se apoya en diversas técnicas, incluyendo [aprendizaje automático, aprendizaje profundo y procesamiento del lenguaje natural]{.alert}
+    - [IA superinteligente:]{.alert} superaría la inteligencia humana en todos los aspectos (hipotética; no existe ni está claro que sea posible)
+- Técnicas comunes de IA: [aprendizaje automático]{.alert} (ML), [aprendizaje profundo]{.alert} (un subconjunto de ML que usa redes neuronales) y [procesamiento del lenguaje natural]{.alert} (NLP, un área de aplicación)
 :::
 :::
 
@@ -244,7 +245,7 @@ Fuente: [McKinsey & Company (2024)](https://www.mckinsey.com/featured-insights/m
     - Pocos datasets en español y portugués
     - Marcos regulatorios en construcción
     - Dependencia de infraestructura extranjera (cloud, GPUs)
-- Pero también oportunidades: problemas sociales donde la IA puede ayudar (salud pública, agricultura familiar, inclusión financiera)
+- Estos desafíos son reales, pero también hay problemas concretos donde la IA ya ayuda: triaje en hospitales públicos, detección de plagas en cultivos, scoring crediticio para personas sin historial bancario
 - [La pregunta no es si la IA llegará a la región, sino quién la diseñará y para quién]{.alert}
 :::
 :::
@@ -405,14 +406,13 @@ Fuente: [IEEE Spectrum](https://spectrum.ieee.org/dartmouth-ai-workshop)
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- **2009**: investigadores de Google publican "[The Unreasonable Effectiveness of Data](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/35179.pdf)"
+- **2009**: Halevy, Norvig y Pereira publican "[The Unreasonable Effectiveness of Data](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/35179.pdf)"
 - [Modelos simples con muchos datos superan a modelos complejos con pocos datos]{.alert}
-- **2012**: [AlexNet](https://spectrum.ieee.org/alexnet-source-code) gana ImageNet por un margen enorme
-    - Tasa de error: 15,3% (el siguiente mejor: 26,2%)
+- **2012**: [AlexNet](https://spectrum.ieee.org/alexnet-source-code) (Krizhevsky, Sutskever y Hinton) gana ImageNet por un margen enorme
+    - Tasa de error top-5: 15,3% (el siguiente mejor: 26,2%)
     - Usó [redes neuronales profundas]{.alert} entrenadas en GPUs
-- [Datos, poder computacional y mejores algoritmos]{.alert} convergieron al mismo tiempo
-- Cualquiera de ellos solo no era suficiente, pero los tres juntos cambiaron el campo
-- Demostró que [redes neuronales + big data + GPUs = avance]{.alert}
+- Datos, poder computacional y mejores algoritmos convergieron al mismo tiempo
+- Ninguno de ellos solo era suficiente, pero los tres juntos cambiaron el campo
 :::
 
 :::{.column width=45%}
@@ -456,18 +456,17 @@ Fuente: [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762)
 :::{.columns}
 :::{.column width=55%}
 
-| Modelo | Año | Parámetros | Logro notable |
-|--------|-----|------------|---------------|
-| GPT-1 | 2018 | 117M | Demostró que el pre-entrenamiento funciona |
-| BERT | 2018 | 340M | Revolucionó los benchmarks de NLP |
-| GPT-2 | 2019 | 1,5B | "Demasiado peligroso para publicar" |
-| GPT-3 | 2020 | 175B | Aprendizaje con pocos ejemplos |
-| GPT-4 | 2023 | ~1,7T? | Multimodal, razonamiento casi humano |
-| GPT-5 | 2025 | 635B? | Más eficiente, mejor razonamiento |
+| Modelo | Año | Parámetros | Referencia |
+|--------|-----|------------|------------|
+| GPT-1 | 2018 | 117M | [Radford et al. (2018)](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) |
+| BERT | 2018 | 340M | [Devlin et al. (2018)](https://arxiv.org/abs/1810.04805) |
+| GPT-2 | 2019 | 1,5B | [Radford et al. (2019)](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf) |
+| GPT-3 | 2020 | 175B | [Brown et al. (2020)](https://arxiv.org/abs/2005.14165) |
+| GPT-4 | 2023 | No divulgado | [OpenAI (2023)](https://arxiv.org/abs/2303.08774) |
 
-- ChatGPT (nov. 2022) no fue solo un modelo más grande
-- Tres innovaciones clave: [ajuste de instrucciones]{.alert}, [RLHF]{.alert} (aprendizaje por refuerzo con retroalimentación humana) y [entrenamiento de seguridad]{.alert}
-- [100 millones de usuarios en 2 meses]{.alert}: la app de consumo de crecimiento más rápido en la historia
+- ChatGPT (nov. 2022) no fue simplemente un modelo más grande
+- Tres innovaciones: [ajuste de instrucciones]{.alert}, [RLHF]{.alert} (aprendizaje por refuerzo con retroalimentación humana) y [entrenamiento de seguridad]{.alert}
+- [100 millones de usuarios en 2 meses]{.alert} ([Reuters, 2023](https://www.reuters.com/technology/chatgpt-sets-record-fastest-growing-user-base-analyst-note-2023-02-01/))
 :::
 
 :::{.column width=45%}
@@ -656,7 +655,7 @@ llevan a mejores resultados.
 
 <br>
 
-[En la práctica, muchos sistemas combinan varios tipos.]{.alert} Por ejemplo, ChatGPT usa aprendizaje supervisado (pre-entrenamiento) y por refuerzo (RLHF) a la vez.
+[En la práctica, muchos sistemas combinan varios tipos.]{.alert} Por ejemplo, ChatGPT usa aprendizaje auto-supervisado (pre-entrenamiento con predicción del siguiente token), luego ajuste supervisado con instrucciones, y finalmente aprendizaje por refuerzo (RLHF).
 
 :::
 
@@ -787,8 +786,8 @@ Siempre mantengan el pensamiento crítico.
 - [Existen sistemas de IA que aprenden sin etiquetas humanas]{.alert}
     - [Verdadero.]{.alert} El aprendizaje no supervisado encuentra patrones automáticamente
 
-- [Los sistemas de IA pueden explicar por qué tomaron una decisión]{.alert}
-    - [Falso.]{.alert} Muchos sistemas de IA son "cajas negras": no sabemos cómo llegaron a sus respuestas
+- [Los sistemas de IA siempre pueden explicar por qué tomaron una decisión]{.alert}
+    - [Depende del modelo.]{.alert} Modelos simples (regresión, árboles) sí son interpretables. Las redes neuronales profundas son "cajas negras", aunque hay métodos post hoc (SHAP, LIME) que ayudan parcialmente
 
 - [El mismo modelo de IA se puede ajustar para muchas tareas diferentes]{.alert}
     - [Verdadero.]{.alert} Este es uno de los aspectos más poderosos de la IA moderna (fine-tuning)
@@ -828,7 +827,7 @@ Siempre mantengan el pensamiento crítico.
 - La historia de la IA es un ciclo de [entusiasmo y decepción]{.alert}, pero cada ciclo dejó avances que prepararon el siguiente
 - Los tres grandes tipos de aprendizaje automático son: [supervisado]{.alert} (con etiquetas), [no supervisado]{.alert} (sin etiquetas) y [por refuerzo]{.alert} (con recompensas)
 - La IA tiene problemas reales de [sesgo]{.alert}, [alucinaciones]{.alert} y [regulación]{.alert} que debemos entender como usuarios y como investigadores
-- América Latina tiene desafíos y oportunidades propios en este campo
+- América Latina enfrenta desafíos concretos (pocos datasets en español, infraestructura desigual) pero ya tiene aplicaciones reales en fintech, salud pública y agricultura
 :::
 
 ## Próximo: Fundamentos de Machine Learning

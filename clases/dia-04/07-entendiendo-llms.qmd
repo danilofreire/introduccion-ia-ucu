@@ -18,6 +18,7 @@ revealjs-plugins:
 engine: knitr
 editor:
   render-on-save: true
+lang: es
 ---
 
 ```{r setup, include=FALSE}
@@ -65,9 +66,9 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 :::{.column width=50%}
 :::{style="text-align: center; font-size: 22px;"}
-**Hoy: la revolución de los LLMs**
+**Hoy: cómo funcionan los LLMs**
 
-Los LLMs cambian las reglas del juego:
+Los LLMs cambian la forma en que trabajamos con texto:
 
 - Entienden [contexto]{.alert} y [significado]{.alert}
 - Pueden [clasificar]{.alert}, [resumir]{.alert}, [traducir]{.alert} y [generar]{.alert} texto
@@ -121,10 +122,10 @@ Pero: ¿cómo funcionan por dentro?
     - "mesa": 18%
     - ...
 - ¿De dónde viene el "large"?
-    - GPT-3: [175 mil millones]{.alert} de parámetros
-    - GPT-4: ~1,7 billones de parámetros (estimado)
-    - Entrenados con [billones de palabras]{.alert} de internet, libros, código
-- A pesar de su simplicidad conceptual (predecir la siguiente palabra), esta tarea [genera capacidades emergentes]{.alert}: razonamiento, traducción, escritura creativa
+    - GPT-3: [175 mil millones]{.alert} de parámetros ([Brown et al., 2020](https://arxiv.org/abs/2005.14165))
+    - GPT-4: número no divulgado por OpenAI (se especula con ~1 billón)
+    - Entrenados con billones de palabras de internet, libros, código
+- A pesar de su simplicidad conceptual (predecir la siguiente palabra), a gran escala estos modelos muestran capacidades que no fueron programadas explícitamente: traducción, resumen, razonamiento básico. Si esto constituye "emergencia" genuina es un debate abierto ([Schaeffer et al., 2024](https://arxiv.org/abs/2304.15004))
 :::
 
 :::{.column width=45%}
@@ -143,7 +144,7 @@ Fuente: [Jay Alammar](https://jalammar.github.io/illustrated-transformer/)
 :::{.columns}
 :::{.column width=55%}
 - Ayer vimos tokenización por palabras. Los LLMs usan algo diferente: [subpalabras]{.alert}
-- Algoritmo más común: [BPE]{.alert} (Byte Pair Encoding)
+- Algoritmo más común: [BPE]{.alert} (Byte Pair Encoding; [Sennrich, Haddow y Birch, 2016](https://arxiv.org/abs/1508.07909))
     - Empieza con caracteres individuales
     - Fusiona los pares más frecuentes iterativamente
     - "desempleo" → ["des", "empleo"] o ["desem", "pleo"]
@@ -172,7 +173,7 @@ Fuente: [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course)
 - La [ventana de contexto]{.alert} es el número máximo de tokens que el modelo puede procesar a la vez
 - Incluye tanto la entrada (prompt) como la salida (respuesta)
 - Evolución:
-    - GPT-3 (2020): 4.096 tokens (~3.000 palabras)
+    - GPT-3 (2020): 2.048-4.096 tokens (~1.500-3.000 palabras)
     - GPT-4 (2023): 128.000 tokens (~96.000 palabras)
     - Claude (2025): [1.000.000 tokens]{.alert} (~750.000 palabras)
 - ¿Por qué importa?
@@ -200,7 +201,7 @@ Fuente: [Hugging Face NLP Course](https://huggingface.co/learn/nlp-course)
 - Cada token se convierte en un [vector]{.alert} (lista de números)
 - Estos vectores capturan [significado semántico]{.alert}:
     - Palabras similares → vectores cercanos
-    - "rey" - "hombre" + "mujer" ≈ "reina"
+    - "rey" - "hombre" + "mujer" ≈ "reina" ([Mikolov et al., 2013](https://arxiv.org/abs/1301.3781); este ejemplo clásico es una simplificación, pero la idea general funciona)
 - GPT-2: cada token → 768 números
 - GPT-4: cada token → miles de números
 - Los embeddings se [aprenden durante el entrenamiento]{.alert}
@@ -345,7 +346,7 @@ Ahora clasifica:
 :::
 
 :::{.column width=50%}
-**[Chain-of-thought (CoT)]{.alert}**: pedir razonamiento paso a paso
+**[Chain-of-thought (CoT)]{.alert}** ([Wei et al., 2022](https://arxiv.org/abs/2201.11903)): pedir razonamiento paso a paso
 
 ```
 Clasifica el sentimiento y explica
@@ -414,7 +415,7 @@ Reglas:
     - [Leer y escribir archivos]{.alert}
     - [Interactuar con APIs]{.alert}
     - [Navegar sitios web]{.alert}
-- Patrón [ReAct]{.alert} (Reasoning + Acting):
+- Patrón [ReAct]{.alert} ([Yao et al., 2023](https://arxiv.org/abs/2210.03629); Reasoning + Acting):
     1. El agente piensa sobre qué hacer (reasoning)
     2. Ejecuta una acción (acting)
     3. Observa el resultado
