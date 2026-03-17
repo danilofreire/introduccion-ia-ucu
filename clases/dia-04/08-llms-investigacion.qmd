@@ -1,0 +1,535 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 4.2: LLMs como herramientas de investigación"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 4.2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-04/08-llms-investigacion.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# LLMs como herramientas de investigación {background-color="#2d4563"}
+
+## Agenda de la sesión
+
+:::{style="margin-top: 20px; font-size: 32px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**Parte teórica (~50 min)**
+
+- Alucinaciones y cómo mitigarlas
+- RAG: Retrieval-Augmented Generation
+- LLMs para anotación de textos
+- Datos sintéticos
+- APIs y el paquete ellmer
+:::
+
+:::{.column width=50%}
+**Laboratorio práctico (~60-70 min)**
+
+- Configurar ellmer en R
+- Clasificación de textos con LLMs
+- Análisis de sentimiento con prompts
+- Auditoría de sesgos
+:::
+:::
+:::
+
+# Alucinaciones {background-color="#2d4563"}
+
+## Cuando la IA inventa cosas
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Alucinación]{.alert}: el LLM genera contenido fluido pero [factualmente incorrecto]{.alert}
+- ¿Por qué ocurre? Porque los LLMs optimizan:
+
+$$P(\text{siguiente token} | \text{contexto})$$
+
+No:
+
+$$P(\text{afirmación verdadera})$$
+
+- [No tienen acceso a hechos]{.alert}: solo a patrones estadísticos del texto de entrenamiento
+- Tipos comunes:
+    - [Citas fabricadas]{.alert}: papers que no existen
+    - [Estadísticas inventadas]{.alert}: números que suenan plausibles
+    - [Hechos incorrectos]{.alert}: fechas, nombres, eventos erróneos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![](figures/banana-hallucination.gif){width="80%"}](#){data-modal-type="image" data-modal-url="figures/banana-hallucination.gif"}
+
+Fuente: [Nielsen Norman Group](https://www.nngroup.com/articles/ai-hallucinations/)
+
+<br>
+
+[![Tasas de alucinación por modelo](figures/hallucination-rates.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/hallucination-rates.png"}
+:::
+:::
+:::
+:::
+
+## Caso real: el abogado y ChatGPT
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- **2023**: dos abogados en Nueva York presentaron un escrito legal ante un tribunal federal
+- Citaron [seis casos judiciales]{.alert} como precedentes
+- Problema: [ninguno de esos casos existía]{.alert}
+- Los habían obtenido de ChatGPT sin verificar
+- El juez los sancionó con una multa de USD 5.000
+- Lección: [los LLMs no son bases de datos]{.alert}
+- No "buscan" información: [generan texto que parece plausible]{.alert}
+- [Siempre verificar]{.alert} cualquier dato, cita o estadística generada por un LLM
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![El caso del abogado](figures/lawyer-case.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/lawyer-case.png"}
+:::
+:::
+:::
+:::
+
+## Cómo reducir las alucinaciones
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**En el prompt**
+
+- [Temperatura baja]{.alert} (0-0,3)
+- Pedir que diga ["no sé"]{.alert} cuando no está seguro
+- [Few-shot]{.alert}: dar ejemplos del formato esperado
+- [Chain-of-thought]{.alert}: obligar a razonar paso a paso
+- Pedir [citas específicas]{.alert} y verificarlas manualmente
+- Instrucción explícita: "no inventes datos"
+:::
+
+:::{.column width=50%}
+**En la arquitectura**
+
+- [RAG]{.alert} (Retrieval-Augmented Generation): darle al modelo documentos reales como contexto
+- [Grounding]{.alert}: conectar el modelo con fuentes de información verificadas
+- [Verificación cruzada]{.alert}: usar múltiples modelos y comparar respuestas
+- [Post-procesamiento]{.alert}: verificar automáticamente las afirmaciones generadas
+:::
+:::
+
+:::{style="margin-top: 20px; text-align: center; font-size: 22px;"}
+[Regla de oro]{.alert}: nunca confiar en la salida de un LLM sin verificación. Los LLMs son [herramientas de borrador]{.alert}, no fuentes de verdad.
+:::
+:::
+
+# RAG: Retrieval-Augmented Generation {background-color="#2d4563"}
+
+## ¿Qué es RAG?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [RAG]{.alert}: en lugar de confiar en la "memoria" del modelo, le damos [documentos reales]{.alert} como contexto
+- El pipeline:
+    1. El usuario hace una pregunta
+    2. El sistema [busca]{.alert} documentos relevantes en una base de conocimiento
+    3. Los documentos se incluyen en el [prompt]{.alert}
+    4. El LLM genera una respuesta basada en [esos documentos]{.alert}
+- Reduce alucinaciones porque el modelo debe basar sus respuestas en [texto real]{.alert}
+- Más fácil de [actualizar]{.alert}: cambiar los documentos, no reentrenar el modelo
+- Ya lo usan: ChatGPT con archivos, NotebookLM de Google, Perplexity AI
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Pipeline de RAG](figures/rag-pipeline.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/rag-pipeline.png"}
+:::
+:::
+:::
+:::
+
+## RAG para investigación en ciencias sociales
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Casos de uso**
+
+- [Revisión de literatura]{.alert}: subir papers y preguntar sobre hallazgos
+- [Análisis de documentos]{.alert}: subir leyes, informes o actas y hacer preguntas específicas
+- [Codificación de datos]{.alert}: subir un codebook y pedir que clasifique respuestas abiertas
+- [Preparación de clases]{.alert}: subir lecturas y generar preguntas de discusión
+:::
+
+:::{.column width=50%}
+**Herramientas accesibles**
+
+- [NotebookLM]{.alert} (Google): gratuito, sube PDFs y hace preguntas
+- [ChatGPT]{.alert} con archivos: sube documentos y analiza
+- [Claude]{.alert}: acepta documentos largos (hasta 750.000 palabras)
+- Desde R: [ellmer]{.alert} permite enviar texto como contexto vía API
+
+**Limitación**: RAG reduce pero [no elimina]{.alert} las alucinaciones. El modelo puede "ignorar" el contexto o interpretar mal los documentos.
+:::
+:::
+:::
+
+# LLMs para tareas de investigación {background-color="#2d4563"}
+
+## Anotación automática de textos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Ayer usamos diccionarios y LDA para clasificar textos. Los LLMs pueden hacerlo [mucho mejor]{.alert}
+- [Anotación con LLMs]{.alert}: darle al modelo un texto y pedirle que lo clasifique según un esquema
+- Ventajas frente a métodos clásicos:
+    - Entiende [contexto y significado]{.alert}
+    - Captura [negaciones]{.alert}: "no es bueno" = negativo
+    - Maneja [ironía]{.alert} y lenguaje complejo
+    - Funciona en [múltiples idiomas]{.alert}
+- Estudios recientes muestran que GPT-4 y Claude tienen [precisión comparable a anotadores humanos]{.alert} en muchas tareas (Gilardi et al., 2023)
+- Costo: centavos por texto vs. dólares por anotador humano
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo de prompt para anotación**
+
+```
+System: Eres un analista político.
+Clasifica textos según el tema
+principal. Temas posibles:
+economía, educación, seguridad,
+salud, medio ambiente.
+
+Responde SOLO con el tema,
+sin explicación.
+
+User: "La inflación sigue siendo
+un problema grave que afecta a
+las familias más vulnerables."
+
+Respuesta: economía
+```
+:::
+:::
+:::
+:::
+
+## Generación de datos sintéticos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Datos sintéticos]{.alert}: datos generados por un LLM que imitan datos reales
+- Casos de uso en investigación:
+    - [Pilotos]{.alert}: probar un análisis antes de recoger datos reales
+    - [Aumentación]{.alert}: expandir datasets pequeños
+    - [Privacidad]{.alert}: generar datos que preserven patrones sin exponer individuos
+    - [Entrenamiento]{.alert}: crear ejemplos para entrenar clasificadores
+- Precauciones:
+    - Los datos sintéticos [reflejan los sesgos]{.alert} del modelo que los genera
+    - No reemplazan datos reales para conclusiones sustantivas
+    - Deben ser [validados]{.alert} contra datos reales cuando sea posible
+- Útiles como [complemento]{.alert}, no como sustituto
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo de prompt**
+
+```
+Genera 10 respuestas simuladas
+a una encuesta sobre confianza
+en instituciones en Uruguay.
+
+Cada respuesta debe incluir:
+- edad (18-80)
+- género (M/F)
+- confianza_gobierno (1-4)
+- confianza_justicia (1-4)
+- comentario (1 oración)
+
+Formato: CSV con encabezados.
+Las respuestas deben reflejar
+la diversidad demográfica real.
+```
+:::
+:::
+:::
+:::
+
+## El paquete ellmer
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [ellmer]{.alert}: paquete de R para interactuar con LLMs desde R
+- Desarrollado por el equipo de [Posit]{.alert} (los creadores de RStudio)
+- Soporta múltiples proveedores: OpenAI, Anthropic (Claude), Google (Gemini), Ollama (modelos locales)
+- Interfaz simple y consistente:
+    - `chat()`: crear una sesión de chat
+    - `$chat()`: enviar un mensaje y recibir respuesta
+    - `$extract_data()`: extraer datos estructurados
+- Se integra con el [tidyverse]{.alert}
+- Permite [automatizar]{.alert} tareas de análisis de texto a escala
+- Documentación: <https://ellmer.tidyverse.org/>
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px;"}
+**Ejemplo básico**
+
+```r
+library(ellmer)
+
+# Crear un chat con Claude
+chat <- chat_claude(
+  system_prompt = "Eres un analista
+  político experto en América Latina.
+  Responde en español."
+)
+
+# Enviar un mensaje
+chat$chat("¿Cuáles son los principales
+  desafíos democráticos en la región?")
+
+# El modelo responde con texto
+# que podemos procesar en R
+```
+
+Se necesita una [API key]{.alert} del proveedor (OpenAI, Anthropic, etc.)
+:::
+:::
+:::
+:::
+
+# Laboratorio 4: Usando LLMs desde R {background-color="#2d4563"}
+
+## Configuración
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-setup2, eval=FALSE, prompt=FALSE}
+# Instalar ellmer
+install.packages("ellmer")
+
+# Cargar paquetes
+library(ellmer)
+library(tidyverse)
+
+# Configurar la API key (elegir uno)
+# Opción 1: OpenAI
+Sys.setenv(OPENAI_API_KEY = "sk-...")
+
+# Opción 2: Anthropic (Claude)
+Sys.setenv(ANTHROPIC_API_KEY = "sk-ant-...")
+```
+
+- Cada estudiante necesita su propia [API key]{.alert}
+- Si no tienen una, pueden usar la key del curso (la compartiré en clase)
+- Alternativa gratuita: usar [Ollama]{.alert} con modelos locales (más lento pero sin costo)
+:::
+
+## Clasificación de textos con LLMs
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-clasificar, eval=FALSE, prompt=FALSE}
+# Crear el chat con un system prompt para clasificación
+clasificador <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un clasificador de textos políticos.
+  Clasifica cada texto en UNO de estos temas:
+  economía, educación, seguridad, salud, medio ambiente.
+  Responde SOLO con el nombre del tema, sin explicación."
+)
+
+# Cargar los textos del Día 3
+textos <- read_csv("../dia-03/datos/textos_politicos.csv")
+
+# Clasificar un texto
+clasificador$chat(textos$texto[1])
+```
+
+- Usamos `gpt-4o-mini` porque es [rápido y barato]{.alert}
+- El system prompt define la tarea con precisión
+- [Responde SOLO con el tema]{.alert}: esto facilita el post-procesamiento
+:::
+
+## Clasificar múltiples textos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-clasificar-batch, eval=FALSE, prompt=FALSE}
+# Función para clasificar un texto
+clasificar_texto <- function(texto, chat) {
+  respuesta <- chat$chat(texto)
+  return(trimws(tolower(respuesta)))
+}
+
+# Clasificar los primeros 20 textos (para no gastar mucha API)
+resultados <- textos |>
+  slice(1:20) |>
+  mutate(
+    tema_llm = map_chr(texto, ~clasificar_texto(.x, clasificador))
+  )
+
+# Comparar con los temas reales
+resultados |>
+  mutate(correcto = tema == tema_llm) |>
+  summarise(
+    total = n(),
+    correctos = sum(correcto),
+    accuracy = mean(correcto)
+  )
+```
+
+- ¿Qué accuracy obtuvieron? ¿Mejor o peor que LDA?
+:::
+
+## Análisis de sentimiento con prompts
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-sentimiento, eval=FALSE, prompt=FALSE}
+# Chat para análisis de sentimiento
+analista <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Analiza el sentimiento del texto.
+  Responde con un JSON: {\"sentimiento\": \"positivo/negativo/neutro\",
+  \"confianza\": 0.0-1.0, \"razon\": \"explicación breve\"}
+  Solo responde con el JSON, sin texto adicional."
+)
+
+# Analizar un texto
+texto_ejemplo <- "La inversión en educación pública ha permitido
+aumentar la cobertura escolar en las zonas rurales."
+
+respuesta <- analista$chat(texto_ejemplo)
+cat(respuesta)
+
+# Parsear el JSON
+resultado <- jsonlite::fromJSON(respuesta)
+cat("Sentimiento:", resultado$sentimiento, "\n")
+cat("Confianza:", resultado$confianza, "\n")
+cat("Razón:", resultado$razon, "\n")
+```
+:::
+
+## Auditoría de sesgos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los LLMs pueden tener [sesgos]{.alert} en sus respuestas
+- Ejercicio: probar si el modelo responde diferente según el [país]{.alert} mencionado
+
+```{r lab-sesgo, eval=FALSE, prompt=FALSE}
+# Pregunta idéntica, cambiando solo el país
+paises_test <- c("Uruguay", "Bolivia",
+                 "Chile", "Venezuela")
+
+auditor <- chat_openai(model = "gpt-4o-mini")
+
+respuestas <- map_chr(paises_test, function(p) {
+  prompt <- paste0("En una oración breve,
+    describe las perspectivas económicas
+    de ", p, " para 2026.")
+  auditor$chat(prompt)
+})
+
+tibble(pais = paises_test,
+       respuesta = respuestas)
+```
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 22px;"}
+**Preguntas para reflexionar:**
+
+- ¿El modelo es más [optimista]{.alert} sobre algunos países que otros?
+- ¿Usa [estereotipos]{.alert}?
+- ¿La respuesta cambiaría si le preguntamos en [inglés]{.alert}?
+- ¿Qué implicaciones tiene esto para la [investigación]{.alert}?
+
+[Los sesgos del modelo se transfieren a cualquier análisis que hagamos con él.]{.alert}
+:::
+:::
+:::
+:::
+
+## Discusión
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+- ¿Los LLMs clasificaron [mejor]{.alert} que LDA y diccionarios?
+- ¿Qué [errores]{.alert} cometieron? ¿Son errores diferentes a los de los métodos clásicos?
+- ¿Detectaron [sesgos]{.alert} en las respuestas del modelo?
+- [Ventajas]{.alert} de los LLMs para investigación:
+    - Flexibilidad, velocidad, multilingüismo
+- [Riesgos]{.alert}:
+    - Alucinaciones, sesgos, falta de reproducibilidad, costo
+- [La combinación]{.alert} de métodos clásicos (TF-IDF, LDA) con LLMs suele dar los mejores resultados
+:::
+
+## Resumen del Día 4
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+- Los [LLMs]{.alert} son modelos de lenguaje que predicen el siguiente token, pero generan capacidades emergentes
+- [Embeddings]{.alert} y [atención]{.alert} son los mecanismos clave que permiten entender contexto
+- El [prompt engineering]{.alert} determina la calidad de los resultados: PTCF, temperatura, few-shot, CoT
+- Las [alucinaciones]{.alert} son un riesgo real; [RAG]{.alert} ayuda a mitigarlas
+- Los LLMs pueden [anotar textos]{.alert}, [generar datos sintéticos]{.alert} y automatizar tareas de investigación
+- [ellmer]{.alert} permite usar LLMs desde R de forma programática
+- Los [sesgos]{.alert} del modelo se transfieren al análisis
+- Mañana: [ética, equidad y mini-propuestas de investigación]{.alert}
+:::
+
+# Fin del Día 4 {background-color="#2d4563"}

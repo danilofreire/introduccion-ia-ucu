@@ -1,0 +1,663 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 3.2: Análisis computacional de texto"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 3.2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-03/06-analisis-texto.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Análisis computacional de texto {background-color="#2d4563"}
+
+## Agenda de la sesión
+
+:::{style="margin-top: 20px; font-size: 32px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**Parte teórica (~50 min)**
+
+- ¿Por qué analizar texto?
+- Preprocesamiento de texto
+- Bag-of-words y TF-IDF
+- Análisis de sentimiento
+- Topic Modeling (LDA)
+:::
+
+:::{.column width=50%}
+**Laboratorio práctico (~60-70 min)**
+
+- Corpus de textos políticos latinoamericanos
+- Tokenización con tidytext
+- TF-IDF por tema
+- Extracción de tópicos con LDA
+:::
+:::
+:::
+
+# El texto como datos {background-color="#2d4563"}
+
+## ¿Por qué analizar texto con computadoras?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Las ciencias sociales producen y estudian [enormes cantidades de texto]{.alert}:
+    - Discursos parlamentarios
+    - Artículos periodísticos
+    - Respuestas a encuestas abiertas
+    - Publicaciones en redes sociales
+    - Documentos legales y de política pública
+- Un investigador puede leer cientos de textos. Una computadora puede analizar [millones]{.alert}
+- El análisis computacional de texto permite:
+    - [Medir]{.alert} temas y opiniones a gran escala
+    - [Descubrir]{.alert} patrones invisibles a la lectura manual
+    - [Comparar]{.alert} textos entre países, períodos o actores
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**El desafío fundamental**
+
+Las computadoras trabajan con [números]{.alert}.
+
+El texto son [palabras]{.alert}.
+
+¿Cómo convertir palabras en números
+de forma que preserve el significado?
+
+```
+"La democracia es
+ importante para el
+ desarrollo"
+
+        ↓ ???
+
+[0.23, 0.87, 0.12,
+ 0.45, 0.91, 0.33]
+```
+
+[Esta es la pregunta central]{.alert}
+del análisis de texto.
+:::
+:::
+:::
+:::
+
+## El pipeline de análisis de texto
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+:::{style="text-align: center; font-size: 20px;"}
+```
+┌─────────┐   ┌──────────────┐   ┌────────────┐   ┌───────────┐   ┌──────────┐
+│ 1. Texto │──▶│ 2. Preprocesar│──▶│ 3. Represen-│──▶│ 4. Analizar│──▶│ 5. Inter- │
+│ crudo    │   │ (limpiar)    │   │ tar (números)│   │ (modelo)  │   │ pretar   │
+└─────────┘   └──────────────┘   └────────────┘   └───────────┘   └──────────┘
+```
+:::
+
+<br>
+
+:::{.columns}
+:::{.column width=50%}
+- [Paso 1:]{.alert} Recoger el corpus (conjunto de textos)
+- [Paso 2:]{.alert} Limpiar: quitar puntuación, convertir a minúsculas, eliminar palabras vacías (stopwords)
+- [Paso 3:]{.alert} Representar el texto como números (bag-of-words, TF-IDF, embeddings)
+:::
+
+:::{.column width=50%}
+- [Paso 4:]{.alert} Aplicar un modelo (sentimiento, tópicos, clasificación)
+- [Paso 5:]{.alert} Interpretar los resultados en contexto
+- Hoy nos enfocaremos en los pasos 2 a 4 con métodos [clásicos]{.alert} (no deep learning)
+- Mañana veremos cómo los [LLMs]{.alert} cambian este panorama
+:::
+:::
+:::
+
+# Preprocesamiento {background-color="#2d4563"}
+
+## Tokenización
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Tokenización]{.alert}: dividir el texto en unidades más pequeñas (tokens)
+- Los tokens pueden ser:
+    - [Palabras]{.alert}: "la democracia es importante" → ["la", "democracia", "es", "importante"]
+    - [N-gramas]{.alert}: secuencias de N palabras
+        - Bigramas: ["la democracia", "democracia es", "es importante"]
+    - [Subpalabras]{.alert}: para modelos de lenguaje (lo veremos mañana)
+- La tokenización es el [primer paso]{.alert} de casi todo análisis de texto
+- En R, usamos el paquete [tidytext]{.alert} con la función `unnest_tokens()`
+- tidytext sigue la filosofía de tidyverse: [una fila por token]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo con tidytext**
+
+```r
+library(tidytext)
+
+tibble(texto = "La democracia es
+  importante para el desarrollo") |>
+  unnest_tokens(palabra, texto)
+
+# Resultado:
+#   palabra
+#   <chr>
+# 1 la
+# 2 democracia
+# 3 es
+# 4 importante
+# 5 para
+# 6 el
+# 7 desarrollo
+```
+
+Noten que tidytext automáticamente
+convierte a [minúsculas]{.alert}.
+:::
+:::
+:::
+:::
+
+## Stopwords y limpieza
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Stopwords]{.alert} (palabras vacías): palabras muy frecuentes que aportan poco significado
+    - En español: "el", "la", "de", "en", "que", "y", "a", "los"...
+- Las eliminamos para centrarnos en las [palabras con contenido]{.alert}
+- Otros pasos de limpieza:
+    - Quitar [números]{.alert} y [puntuación]{.alert}
+    - Convertir a [minúsculas]{.alert}
+    - Opcionalmente, [stemming]{.alert}: reducir palabras a su raíz
+        - "democracia", "democrático", "democracias" → "democra-"
+    - O [lematización]{.alert}: reducir al lema (forma base)
+        - "gobierna", "gobernó", "gobernar" → "gobernar"
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Antes y después**
+
+```
+Texto original:
+"El gobierno anunció un nuevo
+plan de estímulo fiscal para
+reactivar la economía."
+
+Después de limpiar:
+["gobierno", "anunció", "nuevo",
+ "plan", "estímulo", "fiscal",
+ "reactivar", "economía"]
+
+Palabras eliminadas:
+"el", "un", "de", "para", "la"
+
+Estas palabras son muy frecuentes
+en todos los textos; no distinguen
+un texto de otro.
+```
+:::
+:::
+:::
+:::
+
+# Representaciones numéricas del texto {background-color="#2d4563"}
+
+## Bag-of-words
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Bag-of-words]{.alert} (bolsa de palabras): representar un texto como un [vector de frecuencias]{.alert}
+- Contar cuántas veces aparece cada palabra
+- Ignora el [orden]{.alert} de las palabras (por eso se llama "bolsa")
+- "El gato come pescado" y "El pescado come gato" tienen la misma representación
+- Simple pero sorprendentemente [efectivo]{.alert} para muchos problemas
+- Limitaciones:
+    - No captura el [orden]{.alert}
+    - No captura el [significado]{.alert}
+    - Las palabras muy frecuentes dominan
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Ejemplo**
+
+```
+Doc 1: "la economía crece"
+Doc 2: "la economía no crece"
+Doc 3: "la salud mejora"
+
+Matriz término-documento:
+
+          crece  economía  la  mejora  no  salud
+Doc 1:      1      1       1    0      0    0
+Doc 2:      1      1       1    0      1    0
+Doc 3:      0      0       1    1      0    1
+
+Cada fila es un "vector" que
+representa el documento.
+Los documentos se comparan
+por la similitud de sus vectores.
+```
+:::
+:::
+:::
+:::
+
+## TF-IDF
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [TF-IDF]{.alert}: Term Frequency - Inverse Document Frequency
+- Problema con bag-of-words: las palabras [más frecuentes]{.alert} no siempre son las más [informativas]{.alert}
+- TF-IDF pondera la frecuencia de una palabra por su [rareza en el corpus]{.alert}:
+
+$$\text{TF-IDF}(t, d) = \text{TF}(t, d) \times \log\left(\frac{N}{\text{DF}(t)}\right)$$
+
+- [TF]{.alert} (Term Frequency): frecuencia del término en el documento
+- [IDF]{.alert} (Inverse Document Frequency): $\log(N / \text{documentos que contienen el término})$
+- Una palabra que aparece mucho en [un documento]{.alert} pero poco en el [corpus]{.alert} tiene TF-IDF alto
+- Resultado: identifica las [palabras distintivas]{.alert} de cada documento
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Intuición**
+
+"gobierno" aparece en muchos textos
+→ IDF bajo → poco distintiva
+
+"deforestación" aparece solo en
+textos de medio ambiente
+→ IDF alto → muy distintiva
+
+TF-IDF responde: [¿qué palabras
+caracterizan ESTE documento
+en particular?]{.alert}
+
+<br>
+
+En tidytext:
+```r
+datos_tfidf <- datos_tokens |>
+  count(documento, palabra) |>
+  bind_tf_idf(palabra, documento, n)
+```
+:::
+:::
+:::
+:::
+
+# Análisis de sentimiento {background-color="#2d4563"}
+
+## ¿Qué es el análisis de sentimiento?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Análisis de sentimiento]{.alert}: determinar si un texto expresa una opinión positiva, negativa o neutra
+- Método más simple: [diccionarios de sentimiento]{.alert}
+    - Listas de palabras clasificadas como positivas o negativas
+    - "crecimiento", "mejora", "éxito" → positivo
+    - "crisis", "pobreza", "fracaso" → negativo
+- Contar palabras positivas y negativas; comparar
+- [Limitaciones importantes]{.alert}:
+    - No captura negaciones: "no es bueno" → cuenta "bueno" como positivo
+    - No captura ironía ni sarcasmo
+    - Los diccionarios son [dependientes del dominio]{.alert}
+- Aún así, [funciona razonablemente bien]{.alert} a gran escala
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Diccionarios disponibles en español**
+
+- [NRC]{.alert}: 8 emociones + positivo/negativo (multilingüe)
+- [AFINN]{.alert}: puntuación -5 a +5 (necesita traducción)
+- Diccionarios académicos específicos para español
+
+**Ejemplo**
+
+```
+"El crecimiento económico ha sido
+ sólido gracias a las exportaciones"
+
+Palabras positivas: crecimiento, sólido
+Palabras negativas: (ninguna)
+
+Sentimiento: POSITIVO (+2)
+```
+
+Para mayor precisión,
+los [LLMs]{.alert} (Día 4) superan
+ampliamente a los diccionarios.
+:::
+:::
+:::
+:::
+
+# Topic Modeling {background-color="#2d4563"}
+
+## LDA: Latent Dirichlet Allocation
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [LDA]{.alert} (Latent Dirichlet Allocation): el método más usado para descubrir temas en un corpus
+- Idea: cada documento es una [mezcla de temas]{.alert}, y cada tema es una [mezcla de palabras]{.alert}
+- LDA descubre ambas mezclas simultáneamente
+- Ejemplo:
+    - Tema 1 (economía): "crecimiento", "inflación", "PIB", "empleo"
+    - Tema 2 (salud): "hospital", "vacunación", "pandemia", "médicos"
+    - Documento X: 70% tema 1 + 30% tema 2
+- El usuario elige el [número de temas (K)]{.alert}
+- LDA es un modelo [generativo]{.alert}: asume que los documentos fueron "generados" por este proceso de mezcla
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**El proceso generativo de LDA**
+
+```
+Para cada documento:
+  1. Elegir una mezcla de temas
+     (ej: 70% economía, 30% salud)
+
+  2. Para cada palabra:
+     a. Elegir un tema según la mezcla
+     b. Elegir una palabra del tema
+
+Resultado:
+  "El crecimiento [economía]
+   del sector [economía]
+   salud [salud]
+   ha mejorado [economía]
+   los hospitales [salud]
+   públicos" [salud]
+
+LDA hace el proceso INVERSO:
+dado el texto, recupera los temas.
+```
+:::
+:::
+:::
+:::
+
+## Interpretar temas de LDA
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que LDA nos da**
+
+- Las [K palabras más probables]{.alert} de cada tema
+- La [proporción de cada tema]{.alert} en cada documento
+- Podemos [etiquetar]{.alert} los temas según las palabras más frecuentes
+
+**Ejemplo de resultado**
+
+| Tema | Palabras principales |
+|------|---------------------|
+| 1 | economía, crecimiento, empleo, inversión |
+| 2 | educación, escuelas, docentes, estudiantes |
+| 3 | violencia, seguridad, crimen, policía |
+
+→ Etiquetamos: tema 1 = "economía", tema 2 = "educación", tema 3 = "seguridad"
+:::
+
+:::{.column width=50%}
+**Limitaciones de LDA**
+
+- Elegir K es [difícil]{.alert}: no hay un método definitivo
+- Los temas pueden ser [incoherentes]{.alert} (mezclar conceptos)
+- No captura [relaciones entre palabras]{.alert} (como lo hacen los embeddings)
+- Los temas no tienen [nombre]{.alert}: los nombres los pone el investigador
+- Es un [modelo probabilístico]{.alert}: resultados pueden variar entre ejecuciones
+- Para textos cortos (tweets, respuestas breves), LDA funciona mal
+- Los [LLMs modernos]{.alert} pueden hacer este trabajo mucho mejor (Día 4)
+:::
+:::
+:::
+
+# Laboratorio: Análisis de textos políticos {background-color="#2d4563"}
+
+## Configuración
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+```{r lab-setup2, eval=FALSE, prompt=FALSE}
+# Instalar paquetes (si no los tienen)
+install.packages(c("tidytext", "topicmodels", "SnowballC"))
+
+# Cargar
+library(tidyverse)
+library(tidytext)
+library(topicmodels)
+```
+
+```{r lab-load2, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidytext)
+if (!require("topicmodels", character.only = TRUE)) {
+  install.packages("topicmodels", repos = "https://cran.rstudio.com/", quiet = TRUE)
+  library(topicmodels)
+}
+if (!require("SnowballC", character.only = TRUE)) {
+  install.packages("SnowballC", repos = "https://cran.rstudio.com/", quiet = TRUE)
+  library(SnowballC)
+}
+```
+
+- [tidytext]{.alert}: tokenización y análisis de texto al estilo tidyverse
+- [topicmodels]{.alert}: implementación de LDA
+- [SnowballC]{.alert}: stemming para español
+:::
+
+## Cargar el corpus
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-cargar, message=FALSE, warning=FALSE, prompt=FALSE}
+# Cargar textos políticos
+textos <- read_csv("datos/textos_politicos.csv")
+
+# Vista rápida
+textos |> count(tema)
+```
+
+- Tenemos 60 textos distribuidos en 5 temas
+- Los temas son las "etiquetas verdaderas". Vamos a ver si LDA los recupera
+:::
+
+## Tokenizar y limpiar
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-tokenizar, message=FALSE, warning=FALSE, prompt=FALSE}
+# Definir stopwords en español
+stopwords_es <- tibble(palabra = tm::stopwords("spanish"))
+
+# Tokenizar
+tokens <- textos |>
+  unnest_tokens(palabra, texto) |>
+  # Eliminar stopwords
+  anti_join(stopwords_es, by = "palabra") |>
+  # Eliminar números
+  filter(!str_detect(palabra, "^[0-9]+$"))
+
+# Palabras más frecuentes
+tokens |>
+  count(palabra, sort = TRUE) |>
+  head(15)
+```
+:::
+
+## TF-IDF por tema
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-tfidf, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=9, fig.height=4.5}
+# Calcular TF-IDF por tema
+tfidf <- tokens |>
+  count(tema, palabra) |>
+  bind_tf_idf(palabra, tema, n)
+
+# Top 5 palabras más distintivas por tema
+tfidf |>
+  group_by(tema) |>
+  slice_max(tf_idf, n = 5) |>
+  ungroup() |>
+  mutate(palabra = reorder_within(palabra, tf_idf, tema)) |>
+  ggplot(aes(x = tf_idf, y = palabra, fill = tema)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~tema, scales = "free_y") +
+  scale_y_reordered() +
+  labs(x = "TF-IDF", y = NULL,
+       title = "Palabras más distintivas por tema (TF-IDF)") +
+  theme_minimal()
+```
+:::
+
+## Topic Modeling con LDA
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-lda, message=FALSE, warning=FALSE, prompt=FALSE}
+# Crear la Document-Term Matrix (DTM)
+dtm <- tokens |>
+  count(id, palabra) |>
+  cast_dtm(id, palabra, n)
+
+# Ejecutar LDA con K=5 temas
+set.seed(2026)
+lda_model <- LDA(dtm, k = 5, control = list(seed = 2026))
+
+# Palabras más probables por tema
+terms(lda_model, 8)
+```
+
+- ¿Los temas descubiertos por LDA coinciden con los temas reales?
+:::
+
+## Visualizar los temas de LDA
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-lda-plot, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=9, fig.height=5}
+# Extraer probabilidades palabra-tema (beta)
+lda_topics <- tidy(lda_model, matrix = "beta")
+
+# Top 6 palabras por tema
+lda_topics |>
+  group_by(topic) |>
+  slice_max(beta, n = 6) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(x = beta, y = term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~topic, scales = "free_y", labeller = label_both) +
+  scale_y_reordered() +
+  labs(x = "Probabilidad (beta)", y = NULL,
+       title = "Palabras más probables por tema (LDA)") +
+  theme_minimal()
+```
+:::
+
+## Proporción de temas por documento
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-lda-gamma, message=FALSE, warning=FALSE, prompt=FALSE}
+# Extraer probabilidades documento-tema (gamma)
+lda_docs <- tidy(lda_model, matrix = "gamma") |>
+  mutate(document = as.integer(document))
+
+# Unir con los temas reales
+lda_docs |>
+  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
+  group_by(tema, topic) |>
+  summarise(gamma_promedio = mean(gamma), .groups = "drop") |>
+  pivot_wider(names_from = topic, values_from = gamma_promedio, names_prefix = "Tema_")
+```
+
+- Cada fila muestra la proporción promedio de cada tema LDA en los documentos de un tema real
+- Si LDA funciona bien, cada tema real debería estar dominado por un solo tema LDA
+:::
+
+## Discusión
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+- ¿LDA recuperó [los cinco temas]{.alert} correctamente?
+- ¿Qué [palabras]{.alert} fueron las más útiles para distinguir temas?
+- ¿TF-IDF y LDA dieron resultados [consistentes]{.alert}?
+- [Limitaciones]{.alert} de este ejercicio:
+    - Corpus pequeño (60 textos)
+    - Textos simulados (en la práctica, los textos reales son más ruidosos)
+    - LDA funciona mejor con corpus grandes
+- Mañana veremos cómo los [LLMs]{.alert} pueden hacer clasificación de texto, análisis de sentimiento y extracción de temas de forma mucho más precisa
+:::
+
+## Resumen del Día 3
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+- [K-means]{.alert} agrupa observaciones similares; [PCA]{.alert} reduce dimensiones y permite visualizar datos complejos
+- El análisis de texto convierte [palabras en números]{.alert} para poder aplicar métodos cuantitativos
+- [Tokenización]{.alert} y [stopwords]{.alert} son pasos de preprocesamiento clave
+- [TF-IDF]{.alert} identifica las palabras más [distintivas]{.alert} de cada documento o grupo
+- [LDA]{.alert} descubre temas latentes en un corpus sin necesidad de etiquetas
+- Estos métodos son [herramientas de exploración]{.alert}: generan hipótesis e identifican patrones
+- Mañana: [LLMs, transformers y cómo usarlos para investigación]{.alert}
+:::
+
+# Fin del Día 3 {background-color="#2d4563"}
