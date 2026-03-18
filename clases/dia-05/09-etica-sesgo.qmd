@@ -130,7 +130,7 @@ Y al final: sus [mini-propuestas]{.alert} de investigación.
 :::{style="text-align: center;"}
 [![El caso de Robert Williams](figures/robert-williams.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/robert-williams.png"}
 
-Fuente: [ACLU](https://www.aclumich.org/news/i-was-wrongfully-arrested-because-facial-recognition-technology-it-shouldnt-happen-anyone-else/)
+Fuente: [ACLU](https://www.aclumich.org/news/i-was-wrongfully-arrested-because-facial-recognition-technology-it-shouldnt-happen-anyone-else/); [NPR (2020)](https://www.npr.org/2020/06/24/882683463/the-computer-got-it-wrong-how-facial-recognition-led-to-a-false-arrest-in-michig)
 :::
 :::
 :::

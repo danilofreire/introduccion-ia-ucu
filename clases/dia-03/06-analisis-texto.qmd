@@ -475,7 +475,7 @@ dado el texto, recupera los temas.
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-```{r lab-setup2, eval=FALSE, prompt=FALSE}
+```{r lab-texto-setup, eval=FALSE, prompt=FALSE}
 # Instalar paquetes (si no los tienen)
 install.packages(c("tidytext", "topicmodels", "SnowballC"))
 
@@ -485,7 +485,7 @@ library(tidytext)
 library(topicmodels)
 ```
 
-```{r lab-load2, echo=FALSE, message=FALSE, warning=FALSE}
+```{r lab-texto-load, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(tidytext)
 if (!require("topicmodels", character.only = TRUE)) {

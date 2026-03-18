@@ -498,7 +498,7 @@ pred_log   <- predict(fit_log,   datos_test) |> bind_cols(datos_test)
 pred_arbol <- predict(fit_arbol, datos_test) |> bind_cols(datos_test)
 pred_rf    <- predict(fit_rf,    datos_test) |> bind_cols(datos_test)
 
-# Comparar accuracy
+# Comparar accuracy (exactitud)
 bind_rows(
   accuracy(pred_log,   truth = voto, estimate = .pred_class) |> mutate(modelo = "Logística"),
   accuracy(pred_arbol, truth = voto, estimate = .pred_class) |> mutate(modelo = "Árbol"),
