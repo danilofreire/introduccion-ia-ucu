@@ -356,7 +356,7 @@ Se necesita una [API key]{.alert} del proveedor (OpenAI, Anthropic, etc.)
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-```{r lab-setup2, eval=FALSE, prompt=FALSE}
+```{r lab-llm-setup, eval=FALSE, prompt=FALSE}
 # Instalar ellmer
 install.packages("ellmer")
 

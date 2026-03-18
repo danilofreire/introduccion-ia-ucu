@@ -363,7 +363,7 @@ aumenta (la curva sube).
 :::{style="margin-top: 40px; font-size: 26px;"}
 **Escenario**: están construyendo un modelo para predecir si los pacientes tienen una enfermedad rara que afecta a [1 de cada 1.000 personas]{.alert}.
 
-Un colega les muestra un modelo y les dice con orgullo: ["Logra un 99,9% de accuracy"]{.alert}
+Un colega les muestra un modelo y les dice con orgullo: ["Logra un 99,9% de accuracy (exactitud)"]{.alert}
 
 :::{.fragment}
 **Pregunta**: ¿es bueno este modelo?
@@ -374,7 +374,7 @@ Piénsenlo 30 segundos...
 :::{.fragment}
 **La verdad incómoda**: ese modelo "99,9% preciso" [no detecta ni un solo caso real]{.alert}. Simplemente predice "sano" para todos. Cada paciente enfermo es ignorado.
 
-[La accuracy (precisión general) no es suficiente]{.alert}, especialmente con clases desbalanceadas.
+[La accuracy (exactitud) no basta]{.alert}, especialmente con clases desbalanceadas.
 :::
 :::
 
