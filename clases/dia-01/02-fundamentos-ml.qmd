@@ -53,22 +53,24 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 32px;"}
+:::{style="margin-top: 20px; font-size: 28px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Parte teórica (~80 min)**
+**Primera parte**
 
 - El flujo de trabajo de ML
-- División train/test
+- Calidad de datos y preprocesamiento
+- Feature engineering
+- División train/test y validación cruzada
+
+**Segunda parte**
+
 - Sobreajuste y sesgo-varianza
+- Regularización
 - Métricas de evaluación
-
-**Laboratorio práctico (~35-40 min)**
-
-- Primer flujo de trabajo con tidymodels
-- Clasificación con regresión logística
-- Evaluación del modelo
+- Selección de modelos
+- Reproducibilidad en ML
 :::
 
 :::{.column width=50%}
@@ -159,6 +161,92 @@ El preprocesamiento es [la mayor parte del trabajo]{.alert} en un proyecto real 
 :::
 :::
 
+## Calidad de datos: el factor más ignorado
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Problemas comunes en datos reales:**
+
+- [Valores faltantes:]{.alert} ¿aleatorios o sistemáticos?
+    - MCAR: faltantes completamente al azar
+    - MAR: faltantes que dependen de otras variables observadas
+    - MNAR: faltantes que dependen de la variable misma (más difícil)
+- [Errores de medición:]{.alert} datos mal cargados, unidades inconsistentes
+- [Duplicados:]{.alert} registros repetidos que sesgan el modelo
+- [Desbalance de clases:]{.alert} mucho más de una categoría que de otra
+- [Data leakage:]{.alert} información del futuro que "se filtra" al entrenamiento
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo de data leakage:**
+
+Quieren predecir si un paciente será hospitalizado.
+
+```
+Variable: "días_en_hospital"
+
+Si incluyen esta variable,
+el modelo "aprende" que
+días_en_hospital > 0 → hospitalizado
+
+¡Pero esta información no existe
+al momento de la predicción!
+```
+
+<br>
+
+[El data leakage es uno de los errores más difíciles de detectar]{.alert} y puede inflar artificialmente las métricas.
+:::
+:::
+:::
+:::
+
+## Feature engineering
+### El arte de crear variables predictivas
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Feature engineering:]{.alert} crear nuevas variables a partir de las existentes
+- Puede mejorar mucho el rendimiento de un modelo simple
+- Ejemplos comunes:
+    - [Transformaciones:]{.alert} log(ingreso), raíz cuadrada, bins
+    - [Interacciones:]{.alert} edad × educación
+    - [Agregaciones:]{.alert} promedio de compras últimos 3 meses
+    - [Variables temporales:]{.alert} día de la semana, mes, año
+    - [Variables de texto:]{.alert} largo del texto, cantidad de palabras
+- [El conocimiento del dominio es clave:]{.alert} ¿qué variables tienen sentido para el problema?
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo: predicción de abandono**
+
+Variables originales:
+```
+fecha_registro, ultima_compra,
+monto_total, cantidad_compras
+```
+
+Variables derivadas:
+```
+dias_desde_registro
+dias_sin_comprar         ← predictor fuerte
+promedio_por_compra
+frecuencia_compras
+tendencia_reciente       ← ¿aumenta o baja?
+```
+
+<br>
+
+[Un buen feature engineering puede valer más que un modelo complejo.]{.alert}
+:::
+:::
+:::
+:::
+
 ## Paso 3: ¿por qué dividir los datos?
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -238,6 +326,103 @@ Dataset completo (180 observaciones)
 :::{.column width=45%}
 :::{style="text-align: center;"}
 [![Validación cruzada K-fold](figures/cv.gif){width="85%"}](#){data-modal-type="image" data-modal-url="figures/cv.gif"}
+:::
+:::
+:::
+:::
+
+## Estratificación y otras estrategias
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Estratificación**
+
+- Asegura que cada fold tenga la [misma proporción de clases]{.alert} que el dataset completo
+- Necesaria cuando las clases están [desbalanceadas]{.alert}
+- En tidymodels: `initial_split(datos, strata = variable_respuesta)`
+
+**Validación temporal (time series split)**
+
+- Para datos con [estructura temporal]{.alert} (series de tiempo)
+- [Nunca entrenar con datos del futuro]{.alert} para predecir el pasado
+- Se entrena con datos anteriores, se valida con datos posteriores
+
+**Leave-One-Out (LOO)**
+
+- K = N (cada observación es un fold)
+- Útil con [muy pocos datos]{.alert}, pero costoso computacionalmente
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Validación temporal**
+
+```
+Datos: ene feb mar abr may jun jul ago
+
+Fold 1:
+  Train: ene feb mar
+  Test:  abr
+
+Fold 2:
+  Train: ene feb mar abr
+  Test:  may
+
+Fold 3:
+  Train: ene feb mar abr may
+  Test:  jun
+
+... y así sucesivamente
+```
+
+<br>
+
+[La validación temporal es necesaria para datos con dependencia temporal.]{.alert}
+:::
+:::
+:::
+:::
+
+## ¿Cuántos datos necesito?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Pregunta frecuente sin respuesta universal
+- Depende de:
+    - [Complejidad del problema:]{.alert} ¿cuántas variables? ¿relaciones lineales o no lineales?
+    - [Ruido en los datos:]{.alert} datos limpios necesitan menos observaciones
+    - [Complejidad del modelo:]{.alert} modelos complejos necesitan más datos
+    - [Número de clases:]{.alert} más clases = más datos por clase
+- Reglas prácticas (muy aproximadas):
+    - [Mínimo:]{.alert} 10 observaciones por variable predictora
+    - [Clasificación:]{.alert} al menos 50-100 por clase minoritaria
+    - [Deep learning:]{.alert} miles a millones de ejemplos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Curvas de aprendizaje**
+
+```
+Rendimiento
+     │
+     │       ┌──────────────
+     │      ╱
+     │     ╱
+     │    ╱
+     │   ╱
+     │  ╱
+     │ ╱
+     │╱
+     └──────────────────────▶
+          Cantidad de datos
+```
+
+Con más datos, el rendimiento mejora, pero con [rendimientos decrecientes]{.alert}.
+
+A veces [más datos ayudan más]{.alert} que un modelo más complejo.
 :::
 :::
 :::
@@ -356,6 +541,102 @@ aumenta (la curva sube).
 :::
 :::
 
+## Regularización: controlando la complejidad
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Regularización:]{.alert} técnica para penalizar la complejidad del modelo
+- Agrega un término de penalización a la función de pérdida
+- Obliga al modelo a [mantener coeficientes pequeños]{.alert}
+- Reduce la varianza a costa de un pequeño aumento en el sesgo
+
+**Tipos principales:**
+
+- [L1 (LASSO):]{.alert} puede llevar coeficientes a exactamente cero (selección de variables)
+- [L2 (Ridge):]{.alert} reduce coeficientes pero no los elimina
+- [Elastic Net:]{.alert} combinación de L1 y L2
+
+Lo veremos en detalle en el [Día 2]{.alert} cuando trabajemos con regresión.
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Intuición de la regularización**
+
+Sin regularización:
+```
+Modelo: y = 15.3x₁ - 42.7x₂ + 89.1x₃
+
+Coeficientes grandes = modelo sensible
+a pequeños cambios en los datos
+```
+
+Con regularización:
+```
+Modelo: y = 2.1x₁ - 1.8x₂ + 0.5x₃
+
+Coeficientes pequeños = modelo más
+estable y generalizable
+```
+
+<br>
+
+[La regularización es como pedirle al modelo que sea "parsimonioso".]{.alert}
+:::
+:::
+:::
+:::
+
+## Cómo detectar sobreajuste en la práctica
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+**Señales de alarma:**
+
+1. [Gran brecha]{.alert} entre rendimiento en train y test
+2. El modelo mejora en train pero [empeora en validación]{.alert}
+3. Coeficientes o pesos [muy grandes]{.alert}
+4. El modelo es [muy sensible]{.alert} a pequeños cambios en los datos
+
+**Estrategias para combatirlo:**
+
+- [Más datos]{.alert} (si es posible)
+- [Regularización]{.alert} (L1, L2, Elastic Net)
+- [Early stopping]{.alert} (detener el entrenamiento antes de sobreajustar)
+- [Reducir complejidad]{.alert} del modelo
+- [Validación cruzada]{.alert} para evaluar de forma más robusta
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Curvas de entrenamiento**
+
+```
+Error
+  │
+  │\
+  │ \     ← Error en test
+  │  \   ╱
+  │   \ ╱
+  │    X  ← Punto óptimo
+  │   ╱ \
+  │  ╱   \
+  │ ╱     ──── ← Error en train
+  │╱
+  └──────────────────▶
+       Épocas/Complejidad
+```
+
+Cuando las curvas se separan, [el modelo está sobreajustando]{.alert}.
+
+El punto donde se cruzan es donde deberíamos detenernos.
+:::
+:::
+:::
+:::
+
 # Métricas de evaluación {background-color="#2d4563"}
 
 ## La paradoja de la precisión
@@ -430,6 +711,45 @@ Fuente: [Analytics Vidhya](https://www.analyticsvidhya.com/blog/2020/10/how-to-c
 :::
 :::
 
+## F1-Score y AUC-ROC
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**F1-Score**
+
+- [Media armónica]{.alert} de precisión y recall
+- F1 = 2 × (precision × recall) / (precision + recall)
+- Un solo número que [balancea ambas métricas]{.alert}
+- F1 = 1 es perfecto; F1 = 0 es el peor caso
+- Útil cuando [no podés priorizar]{.alert} una métrica sobre la otra
+
+**Macro vs. Micro F1:**
+
+- [Macro F1:]{.alert} promedio simple de F1 por clase (trata todas las clases igual)
+- [Micro F1:]{.alert} calcula F1 global (favorece clases mayoritarias)
+:::
+
+:::{.column width=50%}
+**AUC-ROC**
+
+- [Curva ROC:]{.alert} grafica tasa de verdaderos positivos vs. falsos positivos
+- [AUC:]{.alert} área bajo la curva ROC (0.5 = azar, 1.0 = perfecto)
+- Mide qué tan bien el modelo [separa las clases]{.alert} en general
+- [Independiente del umbral:]{.alert} evalúa todas las probabilidades
+- Muy usado para comparar clasificadores
+
+| AUC | Interpretación |
+|-----|----------------|
+| 0.5 | No mejor que azar |
+| 0.7-0.8 | Aceptable |
+| 0.8-0.9 | Bueno |
+| >0.9 | Excelente |
+:::
+:::
+:::
+:::
+
 ## Métricas de regresión
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -481,7 +801,237 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 :::
 :::
 
-# Resumen y transición al laboratorio {background-color="#2d4563"}
+# Hiperparámetros y selección de modelos {background-color="#2d4563"}
+
+## ¿Qué son los hiperparámetros?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Parámetros vs. hiperparámetros:**
+
+- [Parámetros:]{.alert} los aprende el modelo durante el entrenamiento (coeficientes, pesos)
+- [Hiperparámetros:]{.alert} los definimos nosotros antes de entrenar
+
+**Ejemplos de hiperparámetros:**
+
+| Modelo | Hiperparámetros |
+|--------|-----------------|
+| Regresión regularizada | λ (fuerza de regularización) |
+| Árbol de decisión | Profundidad máxima, mínimo de observaciones por hoja |
+| Random Forest | Número de árboles, variables por split |
+| K-NN | Número de vecinos (k) |
+| Red neuronal | Tasa de aprendizaje, capas, neuronas |
+
+[Elegir bien los hiperparámetros puede mejorar mucho el rendimiento.]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ajuste de hiperparámetros (tuning)**
+
+```
+Para cada combinación de hiperparámetros:
+  1. Entrenar modelo con train
+  2. Evaluar en validación
+  3. Guardar rendimiento
+
+Elegir la combinación con mejor rendimiento
+
+Evaluar modelo final en test
+```
+
+<br>
+
+**Estrategias de búsqueda:**
+
+- [Grid search:]{.alert} probar todas las combinaciones
+- [Random search:]{.alert} probar combinaciones aleatorias
+- [Bayesian optimization:]{.alert} búsqueda inteligente
+
+<br>
+
+[Nunca ajustar hiperparámetros usando los datos de test.]{.alert}
+:::
+:::
+:::
+:::
+
+## Selección de modelos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**¿Qué modelo usar?**
+
+- No existe un modelo "mejor" para todos los problemas
+- Depende de:
+    - [Cantidad de datos]{.alert} disponibles
+    - [Interpretabilidad]{.alert} requerida
+    - [Tiempo de entrenamiento]{.alert} aceptable
+    - [Tipo de relaciones]{.alert} en los datos
+
+**Principio de parsimonia:**
+
+- Empezar con [modelos simples]{.alert} (regresión, árboles)
+- Aumentar complejidad solo si es necesario
+- [Un modelo simple que funciona bien es mejor que uno complejo que funciona igual]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Guía práctica**
+
+| Situación | Modelo sugerido |
+|-----------|-----------------|
+| Pocos datos, interpretabilidad alta | Regresión logística/lineal |
+| Datos moderados, interpretabilidad media | Árboles, Random Forest |
+| Muchos datos, rendimiento máximo | Gradient Boosting, Redes |
+| Relaciones muy no lineales | Random Forest, XGBoost |
+| Texto | Transformers, BERT |
+
+<br>
+
+[En la práctica, probar varios modelos y comparar con validación cruzada.]{.alert}
+:::
+:::
+:::
+:::
+
+## El ciclo de vida de un modelo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="text-align: center; font-size: 18px;"}
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  Definir    │───▶│  Recoger    │───▶│  Entrenar   │───▶│  Desplegar  │───▶│  Monitorear │
+│  problema   │    │  datos      │    │  y evaluar  │    │  (deploy)   │    │  y mantener │
+└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+                                                                                    │
+                                                                                    ▼
+                                                                            ┌─────────────┐
+                                                                            │  Reentrenar │
+                                                                            │  si es      │
+                                                                            │  necesario  │
+                                                                            └─────────────┘
+```
+:::
+
+:::{.columns}
+:::{.column width=50%}
+- El entrenamiento es [solo una parte]{.alert} del ciclo
+- Después de desplegar, el modelo puede [degradarse]{.alert} (model drift)
+- Los datos del mundo real [cambian con el tiempo]{.alert}
+- Hay que [monitorear]{.alert} el rendimiento en producción
+:::
+
+:::{.column width=50%}
+- Causas de degradación:
+    - [Data drift:]{.alert} la distribución de los datos cambia
+    - [Concept drift:]{.alert} la relación entre variables cambia
+    - [Cambios en el negocio:]{.alert} nuevos productos, mercados
+- [Un modelo no es "listo y olvidado"]{.alert}
+:::
+:::
+:::
+
+# Reproducibilidad en ML {background-color="#2d4563"}
+
+## ¿Por qué importa la reproducibilidad?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Reproducibilidad:]{.alert} poder obtener los mismos resultados con los mismos datos y código
+- Necesaria para:
+    - [Verificar resultados]{.alert} propios y ajenos
+    - [Colaborar]{.alert} con otros investigadores
+    - [Debugging]{.alert}: entender qué salió mal
+    - [Producción]{.alert}: desplegar el mismo modelo que probamos
+
+**Problemas comunes:**
+
+- Diferentes versiones de paquetes
+- Semillas aleatorias no fijadas
+- Datos no versionados
+- Código no documentado
+- Hiperparámetros no registrados
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Buenas prácticas**
+
+1. [Fijar semillas aleatorias]{.alert}
+   ```r
+   set.seed(2026)
+   ```
+
+2. [Documentar versiones]{.alert}
+   ```r
+   sessionInfo()
+   ```
+
+3. [Usar control de versiones]{.alert}
+   - Git para código
+   - DVC para datos (si son grandes)
+
+4. [Registrar experimentos]{.alert}
+   - Qué modelo, qué hiperparámetros
+   - Qué datos, qué preprocesamiento
+   - Qué métricas obtuvieron
+:::
+:::
+:::
+:::
+
+## Herramientas para reproducibilidad
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**En R:**
+
+- [renv:]{.alert} gestión de dependencias (versiones de paquetes)
+- [targets:]{.alert} pipelines reproducibles
+- [Quarto/RMarkdown:]{.alert} código + documentación juntos
+- [Git:]{.alert} control de versiones
+
+**En general:**
+
+- [Docker:]{.alert} contenedores con ambiente completo
+- [MLflow:]{.alert} tracking de experimentos
+- [DVC:]{.alert} versionado de datos
+:::
+
+:::{.column width=50%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo: estructura de proyecto reproducible**
+
+```
+mi_proyecto/
+├── README.md           ← descripción
+├── renv.lock           ← versiones de paquetes
+├── data/
+│   ├── raw/            ← datos originales
+│   └── processed/      ← datos procesados
+├── scripts/
+│   ├── 01-preprocess.R
+│   ├── 02-train.R
+│   └── 03-evaluate.R
+├── models/             ← modelos guardados
+└── reports/            ← resultados
+```
+
+<br>
+
+[Invertir en reproducibilidad ahorra tiempo a futuro.]{.alert}
+:::
+:::
+:::
+:::
+
+# Resumen y preparación para el laboratorio {background-color="#2d4563"}
 
 ## El ecosistema tidymodels
 
@@ -536,232 +1086,43 @@ predicciones <- predict(ajuste, testing(datos_split))
 
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Conceptos fundamentales:**
+
 - El flujo de trabajo de ML tiene 5 pasos: [recoger, preprocesar, dividir, entrenar, evaluar]{.alert}
-- Dividimos los datos en [entrenamiento y prueba]{.alert} para saber si el modelo generaliza
-- La [validación cruzada]{.alert} es más confiable que una sola división, especialmente con pocos datos
+- La [calidad de los datos]{.alert} determina la calidad del modelo
+- El [feature engineering]{.alert} puede mejorar mucho un modelo simple
+- Dividimos los datos en [entrenamiento y prueba]{.alert} para evaluar generalización
+- La [validación cruzada]{.alert} es más confiable que una sola división
+:::
+
+:::{.column width=50%}
+**Problemas y soluciones:**
+
 - El [sobreajuste]{.alert} ocurre cuando el modelo memoriza en lugar de aprender
-- La [accuracy no es suficiente]{.alert}: necesitamos métricas como precisión, recall y matrices de confusión
-- [La elección de la métrica depende del problema]{.alert}: el costo de los errores varía según el contexto
-- Ahora vamos a [poner todo esto en práctica]{.alert} con tidymodels
+- La [regularización]{.alert} controla la complejidad del modelo
+- La [accuracy no es suficiente]{.alert}: necesitamos precisión, recall, F1, AUC-ROC
+- Los [hiperparámetros]{.alert} se ajustan con validación, no con test
+- La [reproducibilidad]{.alert} es necesaria para verificar y colaborar
+:::
+:::
 :::
 
 ## Próximos pasos
 
-:::{style="margin-top: 40px; font-size: 28px;"}
-- [Mañana (Día 2):]{.alert} aprendizaje supervisado
-    - Sesión 2.1: clasificación (regresión logística, árboles de decisión, random forest)
-    - Sesión 2.2: regresión y predicción (LASSO, Ridge, Elastic Net)
-- Vamos a aplicar todo lo que vimos hoy con modelos más sofisticados
-- Ahora: [Laboratorio 1]{.alert}
+:::{style="margin-top: 40px; font-size: 26px;"}
+- [Ahora:]{.alert} Laboratorio práctico (Sesiones 1.3 y 1.4)
+    - Primer flujo de trabajo con tidymodels
+    - Clasificación con regresión logística
+    - Evaluación y comparación de modelos
+
+- [Mañana (Día 2):]{.alert} Aprendizaje supervisado
+    - Sesión 2.1: Clasificación (regresión logística, árboles de decisión, random forest)
+    - Sesión 2.2: Regresión y predicción (LASSO, Ridge, Elastic Net)
+
+- Vamos a aplicar todo lo que vimos hoy con [modelos más sofisticados]{.alert}
 :::
 
-# Laboratorio 1: Primer flujo de trabajo con tidymodels {background-color="#2d4563"}
-
-## Configuración del entorno
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-Necesitamos instalar y cargar los paquetes. Ejecuten este código en RStudio:
-
-```{r lab-setup, eval=FALSE, prompt=FALSE}
-# Instalar paquetes (solo la primera vez)
-install.packages(c("tidymodels", "tidyverse"))
-
-# Cargar paquetes
-library(tidymodels)
-library(tidyverse)
-```
-
-```{r lab-load, echo=FALSE, message=FALSE, warning=FALSE}
-library(tidymodels)
-library(tidyverse)
-```
-
-- Si ya tienen tidyverse instalado, solo necesitan instalar [tidymodels]{.alert}
-- tidymodels carga automáticamente: rsample, parsnip, yardstick, y otros paquetes que necesitaremos
-- Si la instalación falla, intenten: `install.packages("tidymodels", dependencies = TRUE)`
-:::
-
-## Cargar los datos
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-Vamos a trabajar con un dataset de indicadores socioeconómicos de países de América Latina (datos simulados inspirados en el Banco Mundial):
-
-```{r lab-cargar, message=FALSE, warning=FALSE, prompt=FALSE}
-# Cargar los datos
-datos <- read_csv("datos/indicadores_latam.csv")
-
-# Ver las primeras filas
-glimpse(datos)
-```
-:::
-
-## Definir el problema
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-:::{.columns}
-:::{.column width=55%}
-- **Problema**: predecir si un país tendrá [crecimiento alto del PIB]{.alert} (>= 3%) en un año dado
-- **Variable de resultado**: `crecimiento_alto` (sí/no)
-- **Predictores**: gasto en educación, acceso a internet, urbanización, gasto en salud, inflación, desempleo, inversión extranjera, índice de gobierno digital
-- Esto es un problema de [clasificación binaria]{.alert}
-:::
-
-:::{.column width=45%}
-```{r lab-outcome, prompt=FALSE}
-# Verificar la distribución del outcome
-datos |>
-  count(crecimiento_alto) |>
-  mutate(prop = n / sum(n))
-```
-:::
-:::
-:::
-
-## Preparar los datos
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-Convertimos la variable de resultado a factor (necesario para clasificación) y seleccionamos las variables numéricas:
-
-```{r lab-preparar, prompt=FALSE}
-# Asegurar que el outcome sea un factor
-datos <- datos |>
-  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si")))
-
-# Seleccionar variables para el modelo (solo numéricas)
-datos_modelo <- datos |>
-  select(crecimiento_alto, gasto_educacion, acceso_internet,
-         urbanizacion, gasto_salud, inflacion, desempleo,
-         inversion_extranjera, indice_gobierno_digital)
-```
-:::
-
-## Dividir los datos
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-Usamos `initial_split()` de rsample para crear la división train/test:
-
-```{r lab-dividir, prompt=FALSE}
-# Fijar semilla para reproducibilidad
-set.seed(2026)
-
-# Dividir: 75% entrenamiento, 25% prueba
-datos_split <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
-
-# Extraer los conjuntos
-datos_train <- training(datos_split)
-datos_test  <- testing(datos_split)
-
-# Verificar tamaños
-cat("Entrenamiento:", nrow(datos_train), "filas\n")
-cat("Prueba:", nrow(datos_test), "filas\n")
-```
-
-- `strata = crecimiento_alto` asegura que la proporción de sí/no sea similar en ambos conjuntos
-- [La estratificación es buena práctica]{.alert}, especialmente con clases desbalanceadas
-:::
-
-## Especificar el modelo
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-Usamos `logistic_reg()` de parsnip para definir una regresión logística:
-
-```{r lab-modelo, prompt=FALSE}
-# Especificar el modelo
-modelo_log <- logistic_reg() |>
-  set_engine("glm") |>
-  set_mode("classification")
-
-modelo_log
-```
-
-- `logistic_reg()` define [qué tipo de modelo]{.alert} queremos
-- `set_engine("glm")` define [qué implementación]{.alert} usar (glm es la función base de R)
-- `set_mode("classification")` indica que es un problema de clasificación
-- Noten que aún [no hemos entrenado nada]{.alert}: solo definimos la especificación
-:::
-
-## Ajustar el modelo
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-Ahora ajustamos el modelo a los datos de entrenamiento:
-
-```{r lab-ajustar, prompt=FALSE}
-# Ajustar el modelo
-ajuste <- modelo_log |>
-  fit(crecimiento_alto ~ ., data = datos_train)
-
-# Ver los coeficientes
-tidy(ajuste)
-```
-
-- `crecimiento_alto ~ .` significa: predecir `crecimiento_alto` usando [todas las demás variables]{.alert}
-- `tidy()` nos da una tabla limpia con coeficientes, errores estándar y p-valores
-- ¿Qué variables parecen ser importantes? ¿Tienen el signo esperado?
-:::
-
-## Evaluar el modelo
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-Generamos predicciones en los datos de prueba y calculamos métricas:
-
-```{r lab-evaluar, prompt=FALSE}
-# Predecir en datos de prueba
-predicciones <- ajuste |>
-  predict(datos_test) |>
-  bind_cols(datos_test)
-
-# Matriz de confusión
-conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
-```
-:::
-
-## Métricas de evaluación
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-metricas, prompt=FALSE}
-# Calcular múltiples métricas
-predicciones |>
-  metrics(truth = crecimiento_alto, estimate = .pred_class)
-
-# Precision y recall
-predicciones |>
-  precision(truth = crecimiento_alto, estimate = .pred_class)
-
-predicciones |>
-  recall(truth = crecimiento_alto, estimate = .pred_class)
-```
-
-- `metrics()` calcula accuracy y kappa por defecto
-- ¿Es la accuracy un buen indicador para nuestro problema?
-- ¿Qué pasa con la precision y el recall?
-:::
-
-## Discusión
-
-:::{style="margin-top: 30px; font-size: 26px;"}
-
-Reflexionemos sobre los resultados:
-
-- ¿Qué variables fueron las más [predictivas]{.alert}?
-- ¿Los signos de los coeficientes tienen [sentido teórico]{.alert}?
-    - ¿Más gasto en educación se asocia con mayor crecimiento?
-    - ¿Más inflación se asocia con menor crecimiento?
-- ¿La [accuracy]{.alert} fue buena? ¿Qué nos dicen la precisión y el recall?
-- ¿Qué [mejorarían]{.alert} en un modelo real?
-    - Más datos (más países, más años)
-    - Más variables (comercio exterior, estabilidad política)
-    - Modelos más complejos (random forest, boosting)
-- [Mañana exploraremos modelos más sofisticados]{.alert} en el Día 2
-:::
-
-# Fin del Día 1 {background-color="#2d4563"}
+# Nos vemos en el laboratorio {background-color="#2d4563"}

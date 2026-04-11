@@ -49,26 +49,30 @@ if (!require("fontawesome", character.only = TRUE)) {
 }
 ```
 
-# Bienvenidos {background-color="#2d4563"}
+# Bienvenidos! 🥳 {background-color="#2d4563"}
 
 ## Agenda de la sesión
 ### ¿Qué veremos hoy?
 
-:::{style="margin-top: 20px; font-size: 40px;"}
+:::{style="margin-top: 20px; font-size: 23px;"}
 
 :::{.columns}
 :::{.column width=50%}
-- Bienvenida y presentaciones
-- ¿Qué es la IA?
-- Breve historia de la IA
-- Tipos de aprendizaje automático
-- Ética básica de la IA
-- Actividad: verdadero o falso
+1. [Bienvenida y presentaciones]{.alert}
+    - Quiénes somos, materiales del curso, filosofía de trabajo
+2. [¿Qué es la IA?]{.alert}
+    - Definición, tipos (estrecha, general, superinteligente), mitos comunes, taxonomía
+3. [Historia de la IA]{.alert}
+    - De Turing y Dartmouth a ChatGPT
+4. [Tipos de aprendizaje automático]{.alert}
+    - Supervisado, no supervisado, por refuerzo
+5. [Ética y regulación]{.alert}
+    - Sesgos, alucinaciones, legislación actual
 :::
 
 :::{.column width=50%}
 :::{style="text-align: center; margin-top: -50px;"}
-![](figures/cute-robot.png){width="65%"}
+[![](figures/cute-robot.png){width="65%"}](#){data-modal-type="image" data-modal-url="figures/cute-robot.png"}
 :::
 :::
 :::
@@ -77,17 +81,17 @@ if (!require("fontawesome", character.only = TRUE)) {
 ## Materiales del curso
 ### Enlaces importantes
 
-::: {style="font-size: 26px;"}
+::: {style="font-size: 30px;"}
 `r fa('github')` Repositorio del curso: <https://github.com/danilofreire/introduccion-ia-ucu>
 
 `r fa('globe')` Sitio web del curso: <https://danilofreire.github.io/introduccion-ia-ucu>
 
 Todos los materiales del curso (diapositivas, código, laboratorios y lecturas) están disponibles en nuestro [repositorio de GitHub](https://github.com/danilofreire/introduccion-ia-ucu) y [sitio web](https://danilofreire.github.io/introduccion-ia-ucu)
 
-Las diapositivas se publicarán antes de cada sesión y se actualizarán a lo largo de la semana
+Las diapositivas se publicarán antes de cada sesión y se actualizarán a lo largo de la semana si surgen nuevas ideas o preguntas 😉
 
 ::: {.callout-note}
-Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevos materiales.
+Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevos materiales!
 :::
 :::
 
@@ -109,7 +113,7 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 
 :::{.column}
 :::{style="font-size: 28px;"}
-`r fa('chalkboard-user')` Visiting Assistant Professor en el [Department of Data and Decision Sciences](https://quantitative.emory.edu), Emory University
+`r fa('chalkboard-user')` Professor Assistente en el [Department of Data and Decision Sciences](https://datascience.emory.edu/), [Emory University](https://www.emory.edu/)
 
 `r fa('graduation-cap')` MA del Graduate Institute Geneva, PhD de King's College London, Postdoc en Brown University, Senior Lecturer en la University of Lincoln, UK
 
@@ -118,48 +122,35 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 :::
 ::::
 
-## {background-image="figures/neymar.jpg" background-size="100%"}
-
 ## Sobre ustedes
 
 :::{style="margin-top: 60px; font-size: 40px;"}
 
-- Ahora les toca a ustedes
+- Ahora les toca a ustedes! 😊
 
 - Por favor, preséntense brevemente
 
 - Cuéntennos su nombre, su área de trabajo y qué les gustaría aprender en este curso
 :::
 
-## Filosofía del curso
-
-:::{style="margin-top: 60px; font-size: 36px;"}
-
-- Me encanta enseñar y busco que el aprendizaje sea algo ameno
-- Las clases donde los estudiantes participan son las mejores
-- Las actividades prácticas ayudan a aprender mejor
-- Siempre estoy disponible para ayudar y responder preguntas. [Y lo digo en serio]{.alert}
-- Este es un curso intensivo: vamos a aprovechar cada minuto, pero con calma
-:::
-
 ## Estructura del curso
 ### Cinco días, 20 horas
 
-:::{style="margin-top: 20px; font-size: 24px; text-align: center;"}
+:::{style="margin-top: 50px; font-size: 26px; text-align: center;"}
 
-| Día | Tema | Sesiones |
-|-----|------|----------|
-| 1 | Fundamentos de IA y Machine Learning | ¿Qué es la IA? + Flujo de trabajo de ML |
-| 2 | Aprendizaje supervisado | Clasificación + Regresión y predicción |
-| 3 | Texto y aprendizaje no supervisado | Clustering/PCA + Análisis de texto |
-| 4 | LLMs y aplicaciones | Transformers/prompting + APIs y datos sintéticos |
-| 5 | Ética, sesgo y cierre | Equidad y regulación + Mini-propuestas |
+| Día | Tema | Sesiones | Laboratorios |
+|-----|------|----------|--------------|
+| 1 | Fundamentos de IA y ML | ¿Qué es la IA? + Flujo de ML | tidymodels + comparación de modelos |
+| 2 | Aprendizaje supervisado | Clasificación + Predicción | clasificación + regresión |
+| 3 | Texto y no supervisado | Clustering/PCA + Texto | clustering + análisis de texto |
+| 4 | LLMs y aplicaciones | Transformers + APIs | ellmer + aplicaciones avanzadas |
+| 5 | Ética y cierre | Sesgo/regulación + Propuestas | auditoría de sesgo |
 
 :::
 
 ## Objetivos de aprendizaje
 
-:::{style="margin-top: 40px; font-size: 32px;"}
+:::{style="margin-top: 40px; font-size: 30px;"}
 
 Al finalizar este curso, serán capaces de:
 
@@ -178,7 +169,7 @@ Al finalizar este curso, serán capaces de:
 
 ## Definición de IA
 
-:::{style="margin-top: 40px; font-size: 27px;"}
+:::{style="margin-top: 40px; font-size: 25px;"}
 :::{.incremental}
 - Una definición sencilla: [la Inteligencia Artificial (IA) es una rama de la informática centrada en crear sistemas capaces de realizar tareas que normalmente requieren inteligencia humana]{.alert}
 - Estas tareas incluyen aprender, razonar, resolver problemas, percibir, entender el lenguaje y muchas más
@@ -190,38 +181,45 @@ Al finalizar este curso, serán capaces de:
 :::
 :::
 
+## ¿Qué NO es la IA?
+### Mitos y concepciones erróneas
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Mitos comunes:**
+
+- [La IA "piensa" como los humanos]{.alert}
+    - No. Procesa patrones estadísticos, no tiene conciencia ni comprensión real
+- [La IA es objetiva e imparcial]{.alert}
+    - No. Refleja los sesgos de los datos con los que fue entrenada
+- [La IA va a reemplazar todos los trabajos]{.alert}
+    - Parcialmente. Transforma trabajos más de lo que los elimina por completo
+- [La IA es infalible]{.alert}
+    - No. Comete errores, a veces con mucha confianza
+:::
+
+:::{.column width=50%}
+**Lo que la IA realmente es:**
+
+- Una [herramienta poderosa]{.alert} para tareas específicas
+- Un sistema que [encuentra patrones]{.alert} en grandes cantidades de datos
+- Una tecnología que [requiere supervisión humana]{.alert}
+- Un campo en [rápida evolución]{.alert} con limitaciones reales
+
+<br>
+
+[Entender qué NO es la IA es tan importante como entender qué es.]{.alert}
+:::
+:::
+:::
+
 ## Taxonomía de la IA
 
 :::{style="margin-top: 40px; font-size: 26px; text-align: center;"}
-![](figures/ai-overview.png){width="80%"}
+[![](figures/ai-overview.png){width="80%"}](#){data-modal-type="image" data-modal-url="figures/ai-overview.png"}
 
 Fuente: [McKinsey & Company (2024)](https://www.mckinsey.com/featured-insights/mckinsey-explainers/what-is-ai)
-:::
-
-## ¿Por qué importa la IA?
-
-:::{style="margin-top: 40px; font-size: 20px;"}
-:::{.columns}
-:::{.column width=50%}
-- [La IA ya influye en muchos aspectos de nuestra vida cotidiana:]{.alert}
-    - Asistentes virtuales (Siri, Alexa)
-    - Sistemas de recomendación (Netflix, Spotify)
-    - Aplicaciones de citas (Tinder, Bumble)
-    - Algoritmos de redes sociales (Instagram, TikTok)
-- [La IA está transformando industrias:]{.alert}
-    - Salud (diagnóstico, medicina personalizada)
-    - Finanzas (detección de fraude, trading algorítmico)
-    - Transporte (vehículos autónomos, optimización de rutas)
-    - Educación (aprendizaje personalizado, tutoría 24/7)
-- Cumpla o no las expectativas, [la IA ya está cambiando cómo funcionan muchas de estas industrias]{.alert}
-:::
-
-:::{.column width=50%}
-:::{style="text-align: center;"}
-![](figures/wave.jpg){width="100%"}
-:::
-:::
-:::
 :::
 
 ## IA en América Latina
@@ -229,24 +227,24 @@ Fuente: [McKinsey & Company (2024)](https://www.mckinsey.com/featured-insights/m
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
-- La región no es solo consumidora de IA: [también la produce y la adapta]{.alert}
-- [Agricultura:]{.alert} modelos predictivos para cosechas en Argentina y Brasil; monitoreo satelital de deforestación en la Amazonia
-- [Fintech:]{.alert} MercadoLibre usa IA para detección de fraude y recomendaciones; Nubank y Ualá aplican modelos de scoring crediticio
-- [Salud:]{.alert} sistemas de triaje automático en hospitales públicos de Colombia y Chile
-- [Justicia:]{.alert} Uruguay y Brasil experimentan con IA para clasificar procesos judiciales
-- [Logística:]{.alert} Rappi y otras plataformas optimizan entregas con modelos de rutas en tiempo real
+- La región [produce y adapta]{.alert} IA, no solo la consume
+- [Agricultura:]{.alert} predicción de cosechas, monitoreo de deforestación
+- [Fintech:]{.alert} detección de fraude (MercadoLibre, Nubank)
+- [Salud:]{.alert} triaje automático en hospitales públicos
+- [Justicia:]{.alert} clasificación de procesos (Uruguay, Brasil)
+- [Logística:]{.alert} optimización de rutas (Rappi)
+- [Desafíos:]{.alert}
+    - Pocos datos en español/portugués
+    - Brecha digital urbano-rural
+    - Infraestructura desigual
+    - Dependencia de cloud extranjero
+- [¿Quién diseñará la IA para la región?]{.alert}
 :::
 
 :::{.column width=50%}
 :::{style="text-align: center;"}
-- [Desafíos específicos de la región:]{.alert}
-    - Infraestructura de datos desigual
-    - Brecha digital urbano-rural
-    - Pocos datasets en español y portugués
-    - Marcos regulatorios en construcción
-    - Dependencia de infraestructura extranjera (cloud, GPUs)
-- Estos desafíos son reales, pero también hay problemas concretos donde la IA ya ayuda: triaje en hospitales públicos, detección de plagas en cultivos, scoring crediticio para personas sin historial bancario
-- [La pregunta no es si la IA llegará a la región, sino quién la diseñará y para quién]{.alert}
+[![](figures/wave.jpg){width="100%"}](#){data-modal-type="image" data-modal-url="figures/wave.jpg"}
+:::
 :::
 :::
 :::
@@ -254,9 +252,44 @@ Fuente: [McKinsey & Company (2024)](https://www.mckinsey.com/featured-insights/m
 ## Benchmarks de IA y desempeño humano
 
 :::{style="margin-top: 40px; font-size: 28px; text-align: center;"}
-![](figures/ai-benchmarks.png){width="60%"}
+[![](figures/ai-benchmarks.png){width="60%"}](#){data-modal-type="image" data-modal-url="figures/ai-benchmarks.png"}
 
 Fuente: [Artificial Intelligence Index Report (2025)](https://hai.stanford.edu/ai-index/2025-ai-index-report)
+:::
+
+## El estado actual de la IA (2025)
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Lo que la IA ya hace bien:**
+
+- [Generación de texto:]{.alert} redacción, resumen, traducción, código
+- [Análisis de imágenes:]{.alert} diagnóstico médico, reconocimiento facial
+- [Predicción:]{.alert} demanda, riesgo crediticio, mantenimiento preventivo
+- [Automatización:]{.alert} atención al cliente, clasificación de documentos
+
+**Lo que todavía le cuesta:**
+
+- [Razonamiento causal:]{.alert} entender por qué, no solo correlaciones
+- [Sentido común:]{.alert} cosas obvias para humanos pero difíciles para máquinas
+- [Explicabilidad:]{.alert} justificar sus decisiones de forma comprensible
+:::
+
+:::{.column width=45%}
+**Tendencias actuales:**
+
+- Modelos cada vez [más grandes]{.alert} (pero con rendimientos decrecientes)
+- Énfasis en [eficiencia]{.alert} (modelos más pequeños y rápidos)
+- [Multimodalidad:]{.alert} texto + imagen + audio + video
+- [Agentes:]{.alert} sistemas que pueden realizar tareas complejas de forma autónoma
+- [IA abierta vs. cerrada:]{.alert} debate sobre transparencia y acceso
+
+<br>
+
+[Estamos en un momento de experimentación activa: nadie sabe exactamente a dónde va esto!]{.alert}
+:::
+:::
 :::
 
 # Breve historia de la IA {background-color="#2d4563"}
@@ -289,11 +322,11 @@ Fuente: [Wikipedia - Talos](https://es.wikipedia.org/wiki/Talos)
 
 ## Alan Turing y los fundamentos
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- **1936**: [Alan Turing](https://es.wikipedia.org/wiki/Alan_Turing) publica "On Computable Numbers", donde introduce el concepto de [máquina universal]{.alert}
-- **1950**: publica "Computing Machinery and Intelligence" en la revista [Mind](https://es.wikipedia.org/wiki/Mind_(revista))
+- **1936**: [Alan Turing](https://es.wikipedia.org/wiki/Alan_Turing) publica ["On Computable Numbers"](https://doi.org/10.1112/plms/s2-42.1.230), donde introduce el concepto de [máquina universal]{.alert}
+- **1950**: publica ["Computing Machinery and Intelligence"](https://doi.org/10.1093/mind/LIX.236.433) en la revista [Mind](https://es.wikipedia.org/wiki/Mind_(revista))
     - Propone el famoso [Test de Turing](https://es.wikipedia.org/wiki/Test_de_Turing): ¿puede una máquina engañar a un humano haciéndole creer que es humana?
     - Pregunta: ["¿Pueden pensar las máquinas?"]{.alert} y la reformula como una pregunta práctica
 - Las ideas de Turing sentaron las [bases teóricas]{.alert} tanto de la computación como de la IA
@@ -337,13 +370,13 @@ Fuente: [IEEE Spectrum](https://spectrum.ieee.org/dartmouth-ai-workshop)
 
 ## IA simbólica y sistemas expertos
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=50%}
 
 **IA simbólica, 1956-1980s**
 
-- [Inteligencia = manipular símbolos según reglas]{.alert}
+- [Inteligencia = manipular símbolos según reglas]{.alert} (la "IA clásica")
 - Programar las [reglas formales]{.alert} del comportamiento inteligente
 - Primeros éxitos: [ELIZA](https://es.wikipedia.org/wiki/ELIZA) (terapeuta), [SHRDLU](https://es.wikipedia.org/wiki/SHRDLU) (mundo de bloques)
 - Prueben ELIZA: <https://anthay.github.io/eliza.html>
@@ -355,7 +388,7 @@ Fuente: [IEEE Spectrum](https://spectrum.ieee.org/dartmouth-ai-workshop)
 **Sistemas expertos, 1970s-1980s**
 
 - Cambio hacia [dominios especializados]{.alert} con conocimiento experto
-- Codificar la experiencia humana como [reglas si-entonces]{.alert}
+- Codificar la experiencia humana como [reglas si-entonces]{.alert} (`if x then y else z`)
 - Ejemplos: [MYCIN](https://es.wikipedia.org/wiki/Mycin) (infecciones), [DENDRAL](https://es.wikipedia.org/wiki/Dendral) (análisis químico)
 - Ambos enfoques dependían del [conocimiento codificado a mano]{.alert}, no del aprendizaje a partir de datos
 - Ninguno podía [aprender o mejorar automáticamente]{.alert}
@@ -365,7 +398,7 @@ Fuente: [IEEE Spectrum](https://spectrum.ieee.org/dartmouth-ai-workshop)
 
 ## Los inviernos de la IA
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=50%}
 
@@ -379,8 +412,7 @@ Fuente: [IEEE Spectrum](https://spectrum.ieee.org/dartmouth-ai-workshop)
 
 - Sistemas [costosos de mantener]{.alert}, [cuello de botella del conocimiento]{.alert}, [no podían aprender]{.alert}
 - Las computadoras de escritorio hicieron obsoleto el hardware especializado
-- El mercado colapsó en 1987
-- ["IA"]{.alert} se convirtió en una mala palabra
+- El mercado colapsó en 1987 y "IA" se convirtió en una mala palabra
 :::
 
 :::{.column width=50%}
@@ -452,10 +484,11 @@ Fuente: [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762)
 
 ## De GPT a ChatGPT
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
 
+:::{style="text-align: center; font-size: 26px;"}
 | Modelo | Año | Parámetros | Referencia |
 |--------|-----|------------|------------|
 | GPT-1 | 2018 | 117M | [Radford et al. (2018)](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf) |
@@ -463,9 +496,13 @@ Fuente: [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762)
 | GPT-2 | 2019 | 1,5B | [Radford et al. (2019)](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf) |
 | GPT-3 | 2020 | 175B | [Brown et al. (2020)](https://arxiv.org/abs/2005.14165) |
 | GPT-4 | 2023 | No divulgado | [OpenAI (2023)](https://arxiv.org/abs/2303.08774) |
+:::
+
+:::{style="margin-top: 30px;"}
+:::
 
 - ChatGPT (nov. 2022) no fue simplemente un modelo más grande
-- Tres innovaciones: [ajuste de instrucciones]{.alert}, [RLHF]{.alert} (aprendizaje por refuerzo con retroalimentación humana) y [entrenamiento de seguridad]{.alert}
+- Tres innovaciones: [[ajuste de instrucciones](https://en.wikipedia.org/wiki/Fine-tuning_(deep_learning))]{.alert}, [[RLHF](https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback)]{.alert} (aprendizaje por refuerzo con retroalimentación humana) y [[entrenamiento de seguridad](https://en.wikipedia.org/wiki/AI_safety)]{.alert}
 - [100 millones de usuarios en 2 meses]{.alert} ([Reuters, 2023](https://www.reuters.com/technology/chatgpt-sets-record-fastest-growing-user-base-analyst-note-2023-02-01/))
 :::
 
@@ -481,7 +518,7 @@ Fuente: [Voronoi](https://www.voronoiapp.com/technology/OpenAIs-ChatGPT-Hits-Rec
 
 ## IA multimodal
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=55%}
 - La IA moderna no se limita solo al texto
@@ -504,6 +541,43 @@ Fuente: [Tarun Sharma](https://www.linkedin.com/pulse/multimodal-generative-ai-t
 :::
 :::
 
+## Capacidades emergentes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- A medida que los modelos crecen, aparecen [capacidades que no fueron entrenadas explícitamente]{.alert}
+- Ejemplos de capacidades emergentes:
+    - [Razonamiento matemático:]{.alert} resolver problemas paso a paso
+    - [Traducción zero-shot:]{.alert} traducir entre idiomas que nunca vio juntos
+    - [Programación:]{.alert} escribir código funcional en múltiples lenguajes
+    - [Seguimiento de instrucciones:]{.alert} entender y ejecutar indicaciones complejas
+- Nadie diseñó estas capacidades: [emergieron del entrenamiento a escala]{.alert}
+- Esto genera tanto entusiasmo como preocupación: [no siempre sabemos qué puede hacer un modelo hasta que lo probamos]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**¿Por qué ocurre esto?**
+
+Los modelos grandes ven tantos ejemplos durante el entrenamiento que [internalizan patrones abstractos]{.alert} sin que nadie se los enseñe explícitamente.
+
+<br>
+
+**Implicancia para investigadores:**
+
+- No podemos predecir exactamente qué hará un modelo nuevo
+- La evaluación post-hoc es necesaria
+- Nuevas capacidades pueden aparecer (o desaparecer) con cambios de escala
+
+<br>
+
+[Es un área de investigación activa: ¿cómo predecir y controlar capacidades emergentes?]{.alert}
+:::
+:::
+:::
+:::
+
 # Tipos de aprendizaje automático {background-color="#2d4563"}
 
 ## Aprendizaje supervisado
@@ -514,18 +588,18 @@ Fuente: [Tarun Sharma](https://www.linkedin.com/pulse/multimodal-generative-ai-t
 - El modelo [aprende de ejemplos etiquetados]{.alert}
 - Tenemos datos de entrada (features) y la respuesta correcta (label)
 - Dos tipos principales:
-    - [Clasificación:]{.alert} predecir una categoría
-        - ¿Este correo es spam o no?
-        - ¿Este tumor es benigno o maligno?
-    - [Regresión:]{.alert} predecir un número continuo
-        - ¿Cuál será el precio de esta vivienda?
-        - ¿Cuántos productos venderemos el próximo mes?
+- [Clasificación:]{.alert} predecir una categoría
+    - ¿Este correo es spam o no?
+    - ¿Este tumor es benigno o maligno?
+- [Regresión:]{.alert} predecir un número continuo
+    - ¿Cuál será el precio de esta vivienda?
+    - ¿Cuántos productos venderemos el próximo mes?
 - [Es el tipo de aprendizaje más usado en la práctica]{.alert}
 - Lo veremos en detalle en el [Día 2]{.alert}
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Ejemplo: clasificación de spam**
 
 ```
@@ -564,18 +638,18 @@ características y precio.
 - El modelo [busca patrones sin etiquetas]{.alert}
 - No hay respuestas "correctas": el modelo descubre la estructura por sí mismo
 - Técnicas principales:
-    - [Clustering:]{.alert} agrupar elementos similares
-        - Segmentación de clientes
-        - Agrupación de noticias por tema
-    - [Reducción de dimensionalidad (PCA):]{.alert} simplificar datos con muchas variables
-        - Visualizar datos de alta dimensión en 2D/3D
-        - Identificar las variables más informativas
+- [Clustering:]{.alert} agrupar elementos similares
+    - Segmentación de clientes
+    - Agrupación de noticias por tema
+- [Reducción de dimensionalidad (PCA):]{.alert} simplificar datos con muchas variables
+    - Visualizar datos de alta dimensión en 2D/3D
+    - Identificar las variables más informativas
 - Útil cuando [no sabemos qué estamos buscando]{.alert}
 - Lo veremos en el [Día 3]{.alert}
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 24px;"}
 **Ejemplo: segmentación de clientes**
 
 ```
@@ -614,25 +688,7 @@ el algoritmo los encontró solo.
 :::{style="text-align: center; font-size: 20px;"}
 **El ciclo del aprendizaje por refuerzo**
 
-```
-   ┌──────────────┐
-   │    Agente     │
-   │  (el modelo)  │
-   └──────┬───────┘
-          │ Acción
-          ▼
-   ┌──────────────┐
-   │   Entorno    │
-   │  (el mundo)  │
-   └──────┬───────┘
-          │ Recompensa + nuevo estado
-          ▼
-   ┌──────────────┐
-   │    Agente     │
-   │  (actualiza   │
-   │   estrategia) │
-   └──────────────┘
-```
+[![Ciclo de aprendizaje por refuerzo](figures/rl-cycle.png){width="95%"}](#){data-modal-type="image" data-modal-url="figures/rl-cycle.png"}
 
 El agente aprende qué acciones
 llevan a mejores resultados.
@@ -643,27 +699,25 @@ llevan a mejores resultados.
 
 ## Tabla comparativa
 
-:::{style="margin-top: 30px; font-size: 22px; text-align: center;"}
+:::{style="margin-top: 30px; font-size: 28px; text-align: center;"}
 
 | | Supervisado | No supervisado | Por refuerzo |
 |---|---|---|---|
-| [Datos]{.alert} | Etiquetados | Sin etiquetar | Interacción con entorno |
+| [Datos]{.alert} | Etiquetados | Sin etiquetar | Entorno interactivo |
 | [Objetivo]{.alert} | Predecir etiqueta | Encontrar patrones | Maximizar recompensa |
 | [Ejemplos]{.alert} | Spam, diagnóstico | Clustering, PCA | Juegos, robótica |
-| [Retroalimentación]{.alert} | La respuesta correcta | Ninguna | Recompensas/penalizaciones |
-| [Analogía]{.alert} | Estudiar con solucionario | Explorar sin mapa | Aprender a andar en bici |
+| [Analogía]{.alert} | Con solucionario | Explorar sin mapa | Andar en bici |
+:::
 
-<br>
-
-[En la práctica, muchos sistemas combinan varios tipos.]{.alert} Por ejemplo, ChatGPT usa aprendizaje auto-supervisado (pre-entrenamiento con predicción del siguiente token), luego ajuste supervisado con instrucciones, y finalmente aprendizaje por refuerzo (RLHF).
-
+:::{style="margin-top: 30px; font-size: 28px;"}
+[En la práctica, muchos sistemas combinan varios tipos.]{.alert} ChatGPT usa pre-entrenamiento auto-supervisado, ajuste con instrucciones (supervisado) y RLHF (refuerzo).
 :::
 
 # Ética básica de la IA {background-color="#2d4563"}
 
 ## Sesgo algorítmico
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - Los modelos de IA pueden [amplificar los sesgos]{.alert} presentes en los datos de entrenamiento
@@ -701,8 +755,6 @@ Fuente: [Joy Buolamwini / Medium](https://medium.com/@Joy.Buolamwini/ibm-leads-m
 - ¿Por qué ocurre? Porque los modelos están entrenados para predecir [texto probable]{.alert}, no [texto verdadero]{.alert}:
 
 $$P(\text{siguiente palabra} | \text{contexto}) \neq P(\text{afirmación verdadera})$$
-
-- [Siempre verifiquen las fuentes ustedes mismos]{.alert}
 :::
 
 :::{.column width=45%}
@@ -766,31 +818,31 @@ Siempre mantengan el pensamiento crítico.
 
 ## Verdadero o falso
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 :::{.columns}
 :::{.column width=50%}
 :::{.incremental}
-- [La IA entiende el lenguaje como los humanos]{.alert}
-    - [Falso.]{.alert} La IA predice los siguientes tokens (unidades de texto) con base en probabilidades
+- [Un modelo con 95% de accuracy siempre es mejor que uno con 80%]{.alert}
+    - [Falso.]{.alert} Si el 95% de los casos son de una clase, predecir siempre esa clase da 95% sin aprender nada. Las métricas dependen del contexto y del balance de clases
 
-- [La IA reemplazará todos los trabajos]{.alert}
-    - [Probablemente no.]{.alert} La IA transforma los trabajos más de lo que los elimina
+- [Los LLMs "entienden" el significado de las palabras como los humanos]{.alert}
+    - [Falso.]{.alert} Procesan patrones estadísticos de co-ocurrencia de tokens. No tienen comprensión semántica ni conciencia
 
-- [Las alucinaciones de la IA son fáciles de detectar]{.alert}
-    - [Falso.]{.alert} La IA a veces afirma cosas incorrectas con mucha confianza
+- [Si un modelo funciona bien en el conjunto de entrenamiento, funcionará bien en datos nuevos]{.alert}
+    - [Falso.]{.alert} Esto describe el sobreajuste (overfitting). El modelo puede memorizar el training set sin generalizar
 :::
 :::
 
 :::{.column width=50%}
 :::{.incremental}
-- [Existen sistemas de IA que aprenden sin etiquetas humanas]{.alert}
-    - [Verdadero.]{.alert} El aprendizaje no supervisado encuentra patrones automáticamente
+- [El código postal puede ser una variable discriminatoria aunque no incluya raza]{.alert}
+    - [Verdadero.]{.alert} El código postal actúa como proxy de raza debido a la segregación residencial histórica. Los sesgos persisten a través de correlaciones
 
-- [Los sistemas de IA siempre pueden explicar por qué tomaron una decisión]{.alert}
-    - [Depende del modelo.]{.alert} Modelos simples (regresión, árboles) sí son interpretables. Las redes neuronales profundas son "cajas negras", aunque hay métodos post hoc (SHAP, LIME) que ayudan parcialmente
+- [BERT y GPT usan la misma arquitectura transformer pero para tareas diferentes]{.alert}
+    - [Verdadero.]{.alert} BERT es encoder (comprensión), GPT es decoder (generación). Ambos usan atención, pero con objetivos distintos
 
-- [El mismo modelo de IA se puede ajustar para muchas tareas diferentes]{.alert}
-    - [Verdadero.]{.alert} Este es uno de los aspectos más poderosos de la IA moderna (fine-tuning)
+- [La validación cruzada sirve para elegir hiperparámetros sin "contaminar" el test set]{.alert}
+    - [Verdadero.]{.alert} Permite evaluar múltiples configuraciones usando solo datos de entrenamiento, reservando el test set para la evaluación final
 :::
 :::
 :::
@@ -844,4 +896,4 @@ Siempre mantengan el pensamiento crítico.
 - Nos vemos después del descanso
 :::
 
-# Nos vemos en la próxima sesión {background-color="#2d4563"}
+# Nos vemos en la próxima sesión! 🤓 {background-color="#2d4563"}
