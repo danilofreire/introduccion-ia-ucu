@@ -557,7 +557,7 @@ vignettes/*.pdf
 .Renviron
 
 # pkgdown site
-docs/
+# docs/ — removed: Quarto uses docs/ as output-dir for GitHub Pages
 
 # translation temp files
 po/*~
