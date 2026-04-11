@@ -1,0 +1,677 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 1.4: Laboratorio - Exploración avanzada y comparación de modelos"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 1.4](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/04-laboratorio-02.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 2: Exploración avanzada {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Trabajar con un nuevo dataset
+2. Análisis exploratorio detallado
+3. Feature engineering básico
+4. Comparar múltiples modelos
+5. Visualizar resultados
+6. Discutir interpretaciones
+:::
+
+:::{.column width=50%}
+**Lo que vamos a practicar:**
+
+- Decisiones de [preprocesamiento]{.alert}
+- [Comparación]{.alert} sistemática de modelos
+- [Visualización]{.alert} de resultados
+- [Interpretación]{.alert} de modelos
+
+<br>
+
+[Este laboratorio es más abierto: ustedes toman las decisiones.]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Nuevo dataset y exploración | ~30 min |
+| 2 | Feature engineering | ~25 min |
+| 3 | Comparación de modelos | ~35 min |
+| 4 | Mini-proyecto guiado | ~30 min |
+
+<br>
+
+[Hay menos código predefinido. Ustedes van a escribir más.]{.alert}
+:::
+
+# Parte 1: Nuevo dataset {background-color="#2d4563"}
+
+## Cargar los paquetes
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+```{r lab2-setup, message=FALSE, warning=FALSE, prompt=FALSE}
+# Cargar paquetes
+library(tidymodels)
+library(tidyverse)
+
+# Configurar tema de ggplot
+theme_set(theme_minimal(base_size = 14))
+```
+
+Si no tienen los paquetes instalados, ejecuten primero:
+
+```{r lab2-install, eval=FALSE, prompt=FALSE}
+install.packages(c("tidymodels", "tidyverse"))
+```
+:::
+
+## El dataset: satisfacción democrática
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Vamos a trabajar con datos simulados de [satisfacción con la democracia]{.alert} en América Latina:
+
+```{r lab2-datos, message=FALSE, warning=FALSE, prompt=FALSE}
+# Cargar datos
+satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
+
+# Ver estructura
+glimpse(satisfaccion)
+```
+
+**Variable objetivo:** `satisfecho` (sí/no) - ¿El encuestado está satisfecho con la democracia?
+:::
+
+## Descripción de las variables
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+| Variable | Descripción | Tipo |
+|----------|-------------|------|
+| `satisfecho` | Satisfacción con la democracia (sí/no) | Categórica |
+| `edad` | Edad del encuestado | Numérica |
+| `educacion_anos` | Años de educación formal | Numérica |
+| `ingreso_hogar` | Ingreso mensual del hogar (USD) | Numérica |
+| `confianza_gobierno` | Confianza en el gobierno (1-10) | Numérica |
+| `consumo_noticias` | Horas semanales de noticias | Numérica |
+| `participacion_politica` | Índice de participación (0-100) | Numérica |
+| `zona` | Urbano/Rural | Categórica |
+| `genero` | Masculino/Femenino/Otro | Categórica |
+| `pais` | País de residencia | Categórica |
+
+:::
+
+## Ejercicio 1: Exploración inicial
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Tarea:** Exploren el dataset y respondan estas preguntas.
+
+1. ¿Cuántas observaciones hay? ¿Cuántas variables?
+2. ¿Cómo está distribuida la variable objetivo?
+3. ¿Hay valores faltantes?
+4. ¿Cómo se distribuyen las variables numéricas?
+
+```{r ej1-exploracion, eval=FALSE, prompt=FALSE}
+# Código para empezar (completen ustedes)
+dim(satisfaccion)
+satisfaccion |> count(satisfecho)
+sum(is.na(satisfaccion))
+# ... más exploración
+```
+
+[Tómense 10 minutos para explorar.]{.alert}
+:::
+
+## Visualizar distribuciones
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab2-histogramas, prompt=FALSE, fig.width=10, fig.height=5}
+# Histogramas de variables numéricas
+satisfaccion |>
+  select(where(is.numeric)) |>
+  pivot_longer(everything(), names_to = "variable", values_to = "valor") |>
+  ggplot(aes(x = valor)) +
+  geom_histogram(bins = 30, fill = "#2d4563", alpha = 0.7) +
+  facet_wrap(~variable, scales = "free") +
+  labs(title = "Distribución de variables numéricas")
+```
+:::
+
+## Relación con la variable objetivo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab2-boxplots, prompt=FALSE, fig.width=10, fig.height=5}
+# Boxplots por satisfacción
+satisfaccion |>
+  select(satisfecho, confianza_gobierno, participacion_politica, edad) |>
+  pivot_longer(-satisfecho, names_to = "variable", values_to = "valor") |>
+  ggplot(aes(x = satisfecho, y = valor, fill = satisfecho)) +
+  geom_boxplot(alpha = 0.7) +
+  facet_wrap(~variable, scales = "free_y") +
+  scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
+  labs(title = "Variables numéricas por nivel de satisfacción") +
+  theme(legend.position = "none")
+```
+:::
+
+## Ejercicio 2: Más visualizaciones
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Tarea:** Creen visualizaciones adicionales para entender los datos.
+
+1. ¿Cómo varía la satisfacción por [zona]{.alert} (urbano/rural)?
+2. ¿Cómo varía por [país]{.alert}?
+3. ¿Hay diferencias por [género]{.alert}?
+4. ¿Qué relación hay entre [ingreso]{.alert} y [educación]{.alert}?
+
+```{r ej2-visualizacion, eval=FALSE, prompt=FALSE}
+# Ejemplo: satisfacción por zona
+satisfaccion |>
+  count(zona, satisfecho) |>
+  group_by(zona) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = zona, y = prop, fill = satisfecho)) +
+  geom_col(position = "dodge")
+
+# Completen con más visualizaciones...
+```
+
+[Tómense 10 minutos.]{.alert}
+:::
+
+# Parte 2: Feature engineering {background-color="#2d4563"}
+
+## Preparar los datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Primero, preparemos los datos básicos:
+
+```{r lab2-preparar, prompt=FALSE}
+# Convertir variables categóricas a factores
+satisfaccion <- satisfaccion |>
+  mutate(
+    satisfecho = factor(satisfecho, levels = c("no", "si")),
+    zona = factor(zona),
+    genero = factor(genero),
+    pais = factor(pais)
+  )
+
+# Verificar
+glimpse(satisfaccion)
+```
+:::
+
+## Crear nuevas variables
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+El [feature engineering]{.alert} puede mejorar el rendimiento del modelo:
+
+```{r lab2-features, prompt=FALSE}
+# Crear nuevas variables
+satisfaccion <- satisfaccion |>
+  mutate(
+    # Grupos de edad
+    grupo_edad = cut(edad,
+                     breaks = c(0, 30, 50, 70, 100),
+                     labels = c("joven", "adulto", "mayor", "anciano")),
+
+    # Ingreso per cápita (asumiendo hogar promedio de 3.5 personas)
+    ingreso_percapita = ingreso_hogar / 3.5,
+
+    # Indicador de alta participación
+    alta_participacion = if_else(participacion_politica > 50, "alta", "baja"),
+
+    # Interacción: confianza × participación
+    confianza_x_participacion = confianza_gobierno * participacion_politica / 100
+  )
+
+# Ver las nuevas variables
+satisfaccion |> select(grupo_edad, ingreso_percapita, alta_participacion, confianza_x_participacion) |> head()
+```
+:::
+
+## Ejercicio 3: Crear más features
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Tarea:** Piensen en otras variables que podrían ser útiles.
+
+Ideas para explorar:
+- ¿Un indicador de "educación alta" (más de 12 años)?
+- ¿Una variable que combine zona y género?
+- ¿Grupos de ingreso (bajo, medio, alto)?
+- ¿Consumidor de noticias alto vs. bajo?
+
+```{r ej3-features, eval=FALSE, prompt=FALSE}
+# Ejemplo
+satisfaccion <- satisfaccion |>
+  mutate(
+    educacion_alta = if_else(educacion_anos > 12, "alta", "baja"),
+    # ... más variables
+  )
+```
+
+[Creen al menos 2 variables nuevas.]{.alert}
+:::
+
+## Dividir los datos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+```{r lab2-split, prompt=FALSE}
+# Fijar semilla
+set.seed(2026)
+
+# Dividir datos
+datos_split <- initial_split(satisfaccion, prop = 0.75, strata = satisfecho)
+datos_train <- training(datos_split)
+datos_test <- testing(datos_split)
+
+# Crear folds para validación cruzada
+folds <- vfold_cv(datos_train, v = 5, strata = satisfecho)
+
+cat("Train:", nrow(datos_train), "| Test:", nrow(datos_test))
+```
+:::
+
+# Parte 3: Comparación de modelos {background-color="#2d4563"}
+
+## Definir los modelos a comparar
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Vamos a comparar tres modelos diferentes:
+
+```{r lab2-modelos, prompt=FALSE}
+# 1. Regresión logística
+modelo_logistico <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+# 2. Árbol de decisión
+modelo_arbol <- decision_tree() |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+# 3. K-Nearest Neighbors (k vecinos más cercanos)
+modelo_knn <- nearest_neighbor(neighbors = 5) |>
+  set_engine("kknn") |>
+  set_mode("classification")
+
+# Lista de modelos
+modelos <- list(
+  logistico = modelo_logistico,
+  arbol = modelo_arbol,
+  knn = modelo_knn
+)
+```
+:::
+
+## Crear una fórmula
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+Decidamos qué variables usar:
+
+```{r lab2-formula, prompt=FALSE}
+# Fórmula con variables originales
+formula_basica <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
+                               confianza_gobierno + consumo_noticias +
+                               participacion_politica + zona
+
+# Fórmula con features nuevas
+formula_extendida <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
+                                  confianza_gobierno + consumo_noticias +
+                                  participacion_politica + zona +
+                                  confianza_x_participacion
+```
+
+[Vamos a probar ambas fórmulas.]{.alert}
+:::
+
+## Función para evaluar un modelo
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+Creemos una función que facilite la evaluación:
+
+```{r lab2-funcion-evaluar, prompt=FALSE}
+evaluar_modelo <- function(modelo, formula, folds, nombre = "modelo") {
+  # Validación cruzada
+  resultados <- fit_resamples(
+    modelo,
+    formula,
+    resamples = folds,
+    metrics = metric_set(accuracy, precision, recall, roc_auc)
+  )
+
+  # Extraer métricas
+  collect_metrics(resultados) |>
+    mutate(modelo = nombre)
+}
+```
+
+```{r lab2-evaluar-logistico, prompt=FALSE}
+# Evaluar regresión logística
+eval_logistico <- evaluar_modelo(modelo_logistico, formula_basica, folds, "Logístico")
+eval_logistico
+```
+:::
+
+## Evaluar todos los modelos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab2-evaluar-todos, prompt=FALSE}
+# Evaluar todos los modelos con la fórmula básica
+eval_arbol <- evaluar_modelo(modelo_arbol, formula_basica, folds, "Árbol")
+eval_knn <- evaluar_modelo(modelo_knn, formula_basica, folds, "KNN")
+
+# Combinar resultados
+resultados <- bind_rows(eval_logistico, eval_arbol, eval_knn)
+
+# Mostrar comparación
+resultados |>
+  select(modelo, .metric, mean, std_err) |>
+  pivot_wider(names_from = .metric, values_from = c(mean, std_err))
+```
+:::
+
+## Visualizar la comparación
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab2-visualizar-comparacion, prompt=FALSE, fig.width=10, fig.height=5}
+# Gráfico de barras con error estándar
+resultados |>
+  ggplot(aes(x = modelo, y = mean, fill = modelo)) +
+  geom_col(alpha = 0.8) +
+  geom_errorbar(aes(ymin = mean - std_err, ymax = mean + std_err),
+                width = 0.2) +
+  facet_wrap(~.metric, scales = "free_y") +
+  scale_fill_manual(values = c("#2d4563", "#e74c3c", "#27ae60")) +
+  labs(title = "Comparación de modelos", y = "Valor", x = "") +
+  theme(legend.position = "none")
+```
+:::
+
+## Ejercicio 4: Comparar con features nuevos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Tarea:** Evalúen los modelos con la fórmula extendida.
+
+1. ¿Mejora algún modelo al agregar las nuevas variables?
+2. ¿Cuál modelo es más sensible a los features nuevos?
+3. ¿Vale la pena el esfuerzo del feature engineering?
+
+```{r ej4-features-nuevos, eval=FALSE, prompt=FALSE}
+# Evaluar con fórmula extendida
+eval_log_ext <- evaluar_modelo(modelo_logistico, formula_extendida, folds, "Logístico (ext)")
+# ... evaluar los otros modelos
+
+# Comparar resultados
+# ...
+```
+
+[Tómense 15 minutos para experimentar.]{.alert}
+:::
+
+## Modelo final en datos de test
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Una vez elegido el mejor modelo, evaluamos en test:
+
+```{r lab2-test-final, prompt=FALSE}
+# Elegimos el modelo logístico (por ejemplo)
+ajuste_final <- modelo_logistico |>
+  fit(formula_basica, data = datos_train)
+
+# Predicciones en test
+pred_test <- ajuste_final |>
+  predict(datos_test, type = "prob") |>
+  bind_cols(predict(ajuste_final, datos_test)) |>
+  bind_cols(datos_test)
+
+# Métricas finales
+pred_test |>
+  metrics(truth = satisfecho, estimate = .pred_class)
+
+# AUC-ROC
+pred_test |>
+  roc_auc(truth = satisfecho, .pred_si)
+```
+:::
+
+# Parte 4: Mini-proyecto guiado {background-color="#2d4563"}
+
+## El desafío
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+**Escenario:** Un organismo regional quiere identificar qué factores predicen mejor la [insatisfacción]{.alert} con la democracia para diseñar políticas públicas.
+
+**Su tarea:**
+
+1. Elegir las variables más relevantes (justifiquen)
+2. Crear al menos una variable derivada útil
+3. Entrenar y comparar al menos 2 modelos
+4. Presentar resultados con [recomendaciones de política]{.alert}
+
+[Tienen 30 minutos. Trabajen en grupos de 2-3.]{.alert}
+:::
+
+## Guía para el mini-proyecto
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Paso 1: Definir la pregunta**
+
+- ¿Qué queremos predecir exactamente?
+- ¿Qué métricas son más relevantes para el organismo?
+
+**Paso 2: Seleccionar variables**
+
+- ¿Qué variables tienen sentido teórico?
+- ¿Cuáles mostraron relación en la exploración?
+
+**Paso 3: Modelar y evaluar**
+
+- Entrenar modelos con validación cruzada
+- Comparar métricas
+
+**Paso 4: Interpretar y recomendar**
+
+- ¿Qué variables son más importantes?
+- ¿Qué recomiendanción dar al organismo?
+:::
+
+## Estructura sugerida para el código
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r mini-proyecto-estructura, eval=FALSE, prompt=FALSE}
+# 1. Seleccionar y preparar variables
+datos_proyecto <- satisfaccion |>
+  select(satisfecho, ...) |>  # Sus variables elegidas
+  mutate(...)                  # Sus variables derivadas
+
+# 2. Dividir datos
+set.seed(2026)
+split_proy <- initial_split(datos_proyecto, prop = 0.75, strata = satisfecho)
+train_proy <- training(split_proy)
+test_proy <- testing(split_proy)
+folds_proy <- vfold_cv(train_proy, v = 5, strata = satisfecho)
+
+# 3. Definir y evaluar modelos
+# ...
+
+# 4. Evaluar en test
+# ...
+
+# 5. Interpretar coeficientes (si es regresión logística)
+ajuste_final |> tidy() |> arrange(p.value)
+```
+:::
+
+## Presentación de resultados
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+Al final del laboratorio, cada grupo presentará (3 minutos):
+
+1. **Variables seleccionadas:** ¿Por qué eligieron esas?
+2. **Modelo elegido:** ¿Cuál funcionó mejor?
+3. **Hallazgos principales:** ¿Qué factores predicen insatisfacción?
+4. **Recomendación de política:** ¿Qué debería hacer el organismo?
+
+[Preparen 2-3 diapositivas o un resumen verbal.]{.alert}
+:::
+
+# Cierre del Día 1 {background-color="#2d4563"}
+
+## Lo que cubrimos hoy
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Sesión 1.1: ¿Qué es la IA?**
+
+- Definición y tipos de IA
+- Historia: de Turing a GPT
+- Tipos de aprendizaje automático
+- Ética básica
+
+**Sesión 1.2: Fundamentos de ML**
+
+- Flujo de trabajo de ML
+- División y validación
+- Sobreajuste y regularización
+- Métricas de evaluación
+:::
+
+:::{.column width=50%}
+**Sesión 1.3: Laboratorio 1**
+
+- Ecosistema tidymodels
+- Primer modelo de clasificación
+- Matriz de confusión y métricas
+
+**Sesión 1.4: Laboratorio 2**
+
+- Exploración avanzada
+- Feature engineering
+- Comparación de modelos
+- Mini-proyecto aplicado
+:::
+:::
+:::
+
+## Para mañana
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+**Día 2: Aprendizaje supervisado**
+
+- Sesión 2.1: Métodos de clasificación
+    - Regresión logística en detalle
+    - Árboles de decisión
+    - Random Forests
+
+- Sesión 2.2: Regresión y predicción
+    - Regularización: LASSO, Ridge, Elastic Net
+    - Ingeniería de variables para datos sociales
+
+- Sesiones 2.3 y 2.4: Laboratorios con datos de Latinobarómetro
+
+[Descansen y vengan con energía mañana.]{.alert}
+:::
+
+## Recursos adicionales
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Documentación oficial:**
+
+- [tidymodels.org](https://www.tidymodels.org/)
+- [Tidy Modeling with R](https://www.tmwr.org/) (libro gratuito)
+- [parsnip models](https://parsnip.tidymodels.org/reference/index.html)
+:::
+
+:::{.column width=50%}
+**Tutoriales recomendados:**
+
+- [Get Started with tidymodels](https://www.tidymodels.org/start/)
+- [Julia Silge's blog](https://juliasilge.com/)
+- [R for Data Science](https://r4ds.hadley.nz/)
+:::
+:::
+
+<br>
+
+[Todos estos recursos están disponibles gratuitamente en línea.]{.alert}
+:::
+
+# Fin del Día 1 {background-color="#2d4563"}
