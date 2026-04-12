@@ -5,7 +5,6 @@ project:
 website:
   title: "IA para Científicos Sociales"
   description: "Curso intensivo. Escuela en Métodos, Universidad Católica del Uruguay"
-  favicon: figuras/favicon.ico
   page-navigation: true
   back-to-top-navigation: true
   reader-mode: true

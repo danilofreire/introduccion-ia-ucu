@@ -1,0 +1,728 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 3.4: Laboratorio - Análisis de texto"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 3.4](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-03/08-laboratorio-06.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 6: Análisis de texto {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Cargar y explorar un corpus
+2. Tokenizar y limpiar texto
+3. Calcular frecuencias de palabras
+4. Aplicar TF-IDF
+5. Ejecutar Topic Modeling (LDA)
+6. Interpretar y visualizar temas
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- Flujo de trabajo con [tidytext]{.alert}
+- Preprocesamiento de texto en español
+- [TF-IDF]{.alert} para identificar palabras distintivas
+- [LDA]{.alert} para descubrir temas latentes
+
+<br>
+
+[El corpus contiene 60 textos políticos simulados sobre 5 temas.]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Tokenización y limpieza | ~25 min |
+| 2 | Frecuencias y TF-IDF | ~30 min |
+| 3 | Topic Modeling (LDA) | ~35 min |
+| 4 | Interpretación y ejercicios | ~30 min |
+
+<br>
+
+[Los textos están etiquetados por tema. Vamos a ver si los métodos recuperan esas etiquetas.]{.alert}
+:::
+
+# Parte 1: Tokenización y limpieza {background-color="#2d4563"}
+
+## Cargar paquetes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cargar-paquetes
+#| message: false
+#| warning: false
+#| eval: true
+
+# Instalar si es necesario
+paquetes <- c("tidyverse", "tidytext", "topicmodels", "tm", "wordcloud", "ggwordcloud")
+
+for (pkg in paquetes) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+
+library(tidyverse)
+library(tidytext)      # Análisis de texto tidy
+library(topicmodels)   # LDA
+library(tm)            # Para stopwords en español
+library(ggwordcloud)   # Nubes de palabras
+
+set.seed(2026)
+```
+:::
+
+## Cargar el corpus
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cargar-corpus
+#| eval: true
+
+# Cargar textos políticos
+textos <- read_csv("datos/textos_politicos.csv", show_col_types = FALSE)
+
+# Explorar estructura
+glimpse(textos)
+```
+:::
+
+## Distribución de textos por tema
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: dist-temas
+#| eval: true
+#| fig-width: 8
+#| fig-height: 4
+
+# Contar textos por tema
+textos |>
+  count(tema) |>
+  ggplot(aes(x = reorder(tema, n), y = n, fill = tema)) +
+  geom_col() +
+  coord_flip() +
+  labs(title = "Número de textos por tema",
+       x = "Tema", y = "Cantidad") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+:::
+
+## Ver un texto de ejemplo
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: ejemplo-texto
+#| eval: true
+
+# Un texto de cada tema
+textos |>
+  group_by(tema) |>
+  slice(1) |>
+  select(tema, texto) |>
+  ungroup()
+```
+:::
+
+## Tokenizar
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: tokenizar
+#| eval: true
+
+# Tokenizar: una fila por palabra
+tokens <- textos |>
+  unnest_tokens(palabra, texto)
+
+# Ver resultado
+tokens |>
+  head(20)
+```
+
+`unnest_tokens()` automáticamente convierte a minúsculas y elimina puntuación.
+:::
+
+## Stopwords en español
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: stopwords
+#| eval: true
+
+# Obtener stopwords en español
+stopwords_es <- tibble(palabra = tm::stopwords("spanish"))
+
+# Ver algunas
+head(stopwords_es, 20)
+
+# ¿Cuántas hay?
+nrow(stopwords_es)
+```
+:::
+
+## Eliminar stopwords
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: eliminar-stopwords
+#| eval: true
+
+# Eliminar stopwords y números
+tokens_limpios <- tokens |>
+  anti_join(stopwords_es, by = "palabra") |>
+  filter(!str_detect(palabra, "^[0-9]+$")) |>
+  filter(nchar(palabra) > 2)  # Palabras de al menos 3 letras
+
+# Comparar
+cat("Tokens antes:", nrow(tokens), "\n")
+cat("Tokens después:", nrow(tokens_limpios), "\n")
+cat("Reducción:", round((1 - nrow(tokens_limpios)/nrow(tokens)) * 100, 1), "%\n")
+```
+:::
+
+## Palabras más frecuentes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: frecuencias
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Top 20 palabras
+tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  head(20) |>
+  mutate(palabra = reorder(palabra, n)) |>
+  ggplot(aes(x = n, y = palabra)) +
+  geom_col(fill = "#2d4563") +
+  labs(title = "20 palabras más frecuentes (sin stopwords)",
+       x = "Frecuencia", y = NULL) +
+  theme_minimal()
+```
+:::
+
+## Nube de palabras
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: wordcloud
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+
+# Contar frecuencias
+freq <- tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  head(100)
+
+# Nube de palabras
+ggplot(freq, aes(label = palabra, size = n, color = n)) +
+  geom_text_wordcloud(rm_outside = TRUE) +
+  scale_size_area(max_size = 15) +
+  scale_color_gradient(low = "#457b9d", high = "#e63946") +
+  theme_minimal() +
+  labs(title = "Nube de palabras del corpus")
+```
+:::
+
+# Parte 2: TF-IDF {background-color="#2d4563"}
+
+## ¿Qué es TF-IDF?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+- [TF]{.alert} (Term Frequency): frecuencia del término en el documento
+- [IDF]{.alert} (Inverse Document Frequency): penaliza palabras muy comunes
+
+$$\text{TF-IDF} = \text{TF} \times \log\left(\frac{\text{Total documentos}}{\text{Documentos con el término}}\right)$$
+
+- Palabras [distintivas]{.alert}: frecuentes en pocos documentos → TF-IDF alto
+- Palabras [comunes]{.alert}: frecuentes en muchos documentos → TF-IDF bajo
+
+[TF-IDF identifica qué palabras caracterizan a cada documento o grupo.]{.alert}
+:::
+
+## Calcular TF-IDF por tema
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: tfidf-calc
+#| eval: true
+
+# Contar palabras por tema
+palabras_tema <- tokens_limpios |>
+  count(tema, palabra, sort = TRUE)
+
+# Calcular TF-IDF
+tfidf <- palabras_tema |>
+  bind_tf_idf(palabra, tema, n)
+
+# Ver resultado
+tfidf |>
+  arrange(desc(tf_idf)) |>
+  head(15)
+```
+:::
+
+## Visualizar TF-IDF por tema
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: tfidf-viz
+#| eval: true
+#| fig-width: 12
+#| fig-height: 7
+
+# Top 6 palabras por tema
+tfidf |>
+  group_by(tema) |>
+  slice_max(tf_idf, n = 6) |>
+  ungroup() |>
+  mutate(palabra = reorder_within(palabra, tf_idf, tema)) |>
+  ggplot(aes(x = tf_idf, y = palabra, fill = tema)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~tema, scales = "free_y", ncol = 3) +
+  scale_y_reordered() +
+  labs(title = "Palabras más distintivas por tema (TF-IDF)",
+       x = "TF-IDF", y = NULL) +
+  theme_minimal()
+```
+:::
+
+## Interpretación del TF-IDF
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**¿Las palabras tienen sentido?**
+
+- Economía: crecimiento, inflación, empleo
+- Educación: estudiantes, docentes, escuelas
+- Salud: hospitales, vacunación, pandemia
+- Seguridad: violencia, crimen, policía
+- Medioambiente: deforestación, biodiversidad, bosque
+:::
+
+:::{.column width=50%}
+**Limitaciones:**
+
+- Depende de la [limpieza]{.alert} del texto
+- No captura [sinónimos]{.alert}
+- No captura [contexto]{.alert}
+
+<br>
+
+[TF-IDF es simple pero efectivo para identificar palabras clave.]{.alert}
+:::
+:::
+:::
+
+# Parte 3: Topic Modeling (LDA) {background-color="#2d4563"}
+
+## Preparar la Document-Term Matrix
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: dtm
+#| eval: true
+
+# Contar palabras por documento
+palabras_doc <- tokens_limpios |>
+  count(id, palabra, sort = TRUE)
+
+# Crear Document-Term Matrix
+dtm <- palabras_doc |>
+  cast_dtm(id, palabra, n)
+
+# Inspeccionar
+dtm
+```
+
+La DTM tiene 60 documentos y varias miles de términos únicos.
+:::
+
+## Ejecutar LDA
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: lda-fit
+#| eval: true
+#| cache: true
+
+# Ajustar LDA con K=5 temas (sabemos que hay 5)
+lda_model <- LDA(dtm, k = 5, control = list(seed = 2026))
+
+# Ver las palabras principales de cada tema
+terms(lda_model, 10)
+```
+:::
+
+## Extraer probabilidades palabra-tema (beta)
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: lda-beta
+#| eval: true
+
+# Extraer beta: P(palabra | tema)
+lda_beta <- tidy(lda_model, matrix = "beta")
+
+# Ver estructura
+head(lda_beta, 10)
+
+# Top palabras por tema
+lda_beta |>
+  group_by(topic) |>
+  slice_max(beta, n = 8) |>
+  ungroup()
+```
+:::
+
+## Visualizar temas
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: lda-viz
+#| eval: true
+#| fig-width: 12
+#| fig-height: 7
+
+# Top 8 palabras por tema
+lda_beta |>
+  group_by(topic) |>
+  slice_max(beta, n = 8) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(x = beta, y = term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~topic, scales = "free_y", ncol = 3,
+             labeller = labeller(topic = function(x) paste("Tema", x))) +
+  scale_y_reordered() +
+  labs(title = "Palabras más probables por tema (LDA)",
+       x = "Probabilidad (beta)", y = NULL) +
+  theme_minimal()
+```
+:::
+
+## Interpretar los temas
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Observando las palabras clave:**
+
+| Tema LDA | Palabras clave | Etiqueta probable |
+|----------|----------------|-------------------|
+| 1 | ? | ? |
+| 2 | ? | ? |
+| 3 | ? | ? |
+| 4 | ? | ? |
+| 5 | ? | ? |
+
+[Ejercicio: basándose en las palabras, ¿a qué tema real corresponde cada tema LDA?]{.alert}
+:::
+
+## Extraer probabilidades documento-tema (gamma)
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: lda-gamma
+#| eval: true
+
+# Extraer gamma: P(tema | documento)
+lda_gamma <- tidy(lda_model, matrix = "gamma") |>
+  mutate(document = as.integer(document))
+
+# Ver estructura
+head(lda_gamma, 10)
+```
+
+Gamma indica la proporción de cada tema en cada documento.
+:::
+
+## Validar contra los temas reales
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: validar
+#| eval: true
+
+# Unir con temas reales
+validacion <- lda_gamma |>
+  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
+  group_by(tema, topic) |>
+  summarise(gamma_promedio = mean(gamma), .groups = "drop") |>
+  pivot_wider(names_from = topic, values_from = gamma_promedio,
+              names_prefix = "Tema_LDA_")
+
+validacion
+```
+
+Si LDA funciona bien, cada tema real debería tener un gamma alto en un solo tema LDA.
+:::
+
+## Visualizar la validación
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: validar-viz
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Formato largo para graficar
+validacion_long <- lda_gamma |>
+  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
+  group_by(tema, topic) |>
+  summarise(gamma_promedio = mean(gamma), .groups = "drop")
+
+# Heatmap
+ggplot(validacion_long, aes(x = factor(topic), y = tema, fill = gamma_promedio)) +
+  geom_tile() +
+  geom_text(aes(label = round(gamma_promedio, 2)), color = "white", size = 4) +
+  scale_fill_gradient(low = "#457b9d", high = "#e63946") +
+  labs(title = "Correspondencia entre temas reales y temas LDA",
+       x = "Tema LDA", y = "Tema real",
+       fill = "Gamma\npromedio") +
+  theme_minimal()
+```
+:::
+
+## Asignar tema dominante a cada documento
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: tema-dominante
+#| eval: true
+
+# Asignar cada documento al tema con mayor gamma
+clasificacion <- lda_gamma |>
+  group_by(document) |>
+  slice_max(gamma, n = 1) |>
+  ungroup() |>
+  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
+  rename(tema_real = tema, tema_lda = topic)
+
+# Tabla de confusión
+table(Real = clasificacion$tema_real, LDA = clasificacion$tema_lda)
+```
+
+¿Cuántos documentos fueron clasificados correctamente?
+:::
+
+# Parte 4: Ejercicios {background-color="#2d4563"}
+
+## Ejercicio 1: Probar diferentes K
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Ejecutar LDA con K=3 y K=7
+2. Comparar los temas resultantes
+3. ¿Con K=3 se mezclan algunos temas?
+4. ¿Con K=7 hay temas redundantes?
+
+```{r}
+#| label: ejercicio-1
+#| eval: false
+
+# Tu código aquí
+lda_k3 <- LDA(dtm, k = 3, control = list(seed = 2026))
+lda_k7 <- LDA(dtm, k = 7, control = list(seed = 2026))
+
+# Comparar palabras principales
+terms(lda_k3, 8)
+terms(lda_k7, 8)
+```
+:::
+
+## Ejercicio 2: TF-IDF por país
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Calcular TF-IDF agrupando por país (no por tema)
+2. ¿Hay palabras distintivas para algún país?
+3. Visualizar los top 5 para algunos países
+
+```{r}
+#| label: ejercicio-2
+#| eval: false
+
+# Tu código aquí
+tfidf_pais <- tokens_limpios |>
+  count(pais, palabra) |>
+  bind_tf_idf(palabra, pais, n)
+
+# Top palabras por país
+tfidf_pais |>
+  group_by(pais) |>
+  slice_max(tf_idf, n = 5)
+```
+:::
+
+## Ejercicio 3: Análisis de sentimiento simple
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Crear una lista de palabras positivas y negativas (5-10 cada una)
+2. Contar cuántas de cada tipo aparecen en cada texto
+3. Calcular un "score" de sentimiento
+4. ¿Correlaciona con el tema?
+
+```{r}
+#| label: ejercicio-3
+#| eval: false
+
+# Tu código aquí
+positivas <- c("crecimiento", "mejora", "éxito", "avance", "beneficio")
+negativas <- c("crisis", "problema", "violencia", "pobreza", "amenaza")
+
+# Contar en cada documento
+sentimiento <- tokens_limpios |>
+  mutate(
+    positivo = palabra %in% positivas,
+    negativo = palabra %in% negativas
+  ) |>
+  group_by(id, tema) |>
+  summarise(
+    n_pos = sum(positivo),
+    n_neg = sum(negativo),
+    score = n_pos - n_neg
+  )
+```
+:::
+
+## Resumen del laboratorio
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que practicamos:**
+
+- Tokenización con `unnest_tokens()`
+- Limpieza: stopwords, números
+- Frecuencias y nubes de palabras
+- TF-IDF con `bind_tf_idf()`
+- LDA con `topicmodels`
+- Validación contra etiquetas reales
+:::
+
+:::{.column width=50%}
+**Funciones clave:**
+
+- `unnest_tokens()`: tokenizar
+- `anti_join()`: eliminar stopwords
+- `bind_tf_idf()`: calcular TF-IDF
+- `cast_dtm()`: crear DTM
+- `LDA()`: topic modeling
+- `tidy()`: extraer resultados
+:::
+:::
+
+<br>
+
+[Mañana veremos cómo los LLMs superan estas limitaciones.]{.alert}
+:::
+
+## Resumen del Día 3
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Aprendizaje no supervisado:**
+
+- [K-means]{.alert} y [jerárquico]{.alert}: agrupar observaciones similares
+- [PCA]{.alert}: reducir dimensionalidad, visualizar, crear índices
+- [Silueta]{.alert}: evaluar calidad de clusters
+
+**Análisis de texto:**
+
+- [Tokenización]{.alert}: dividir texto en palabras
+- [TF-IDF]{.alert}: identificar palabras distintivas
+- [LDA]{.alert}: descubrir temas latentes
+
+[Estos métodos son exploratorios. Los LLMs (Día 4) los superan en precisión y flexibilidad.]{.alert}
+:::
+
+# Fin del Día 3 {background-color="#2d4563"}

@@ -1,0 +1,807 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 5.2: Detección de sesgo y regulación"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 5.2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-05/10-sesgo-regulacion.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# De los tipos de sesgo a la acción {background-color="#2d4563"}
+
+## Repaso de la sesión anterior
+
+:::{style="margin-top: 20px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Tipos de sesgo que vimos:**
+
+- [Histórico]{.alert}: discriminación codificada
+- [Representación]{.alert}: grupos ausentes
+- [Medición]{.alert}: proxies problemáticos
+- [Agregación]{.alert}: un modelo para todos
+- [Evaluación]{.alert}: benchmarks sesgados
+- [Despliegue]{.alert}: contexto equivocado
+
+El sesgo puede entrar en cualquier etapa y se amplifica con bucles de retroalimentación.
+:::
+
+:::{.column width=50%}
+**Hoy: ¿qué hacemos al respecto?**
+
+- ¿Cómo [medimos]{.alert} la equidad?
+- ¿Cómo [detectamos]{.alert} el sesgo?
+- ¿Cómo [mitigamos]{.alert} el sesgo?
+- ¿Qué dice el [teorema de imposibilidad]{.alert}?
+- ¿Cómo se [regula]{.alert} la IA?
+- ¿El sesgo es [solucionable]{.alert}?
+:::
+:::
+:::
+
+# Métricas de equidad {background-color="#2d4563"}
+
+## ¿Cómo medimos si un modelo es justo?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Métricas basadas en grupos:**
+
+Comparan el rendimiento del modelo entre grupos (por ejemplo, hombres vs. mujeres, o por etnicidad).
+
+| Métrica | Pregunta que responde |
+|---------|----------------------|
+| **Paridad demográfica** | ¿Los grupos reciben resultados positivos a tasas similares? |
+| **Igualdad de oportunidades** | ¿Los verdaderos positivos tienen la misma tasa entre grupos? |
+| **Odds equalizados** | ¿FPR y TPR son iguales entre grupos? |
+| **Calibración** | ¿Una predicción de 70% significa lo mismo para todos los grupos? |
+| **Predictive parity** | ¿El valor predictivo positivo es igual entre grupos? |
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Métricas de equidad](figures/fairness-metrics.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/fairness-metrics.png"}
+
+Fuente: [Google AI](https://developers.google.com/machine-learning/crash-course/fairness/video-lecture)
+
+:::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
+[Cada métrica captura una noción diferente de "justo".]{.alert}
+:::
+:::
+:::
+:::
+:::
+
+## Paridad demográfica
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Definición:**
+
+> La proporción de resultados positivos debe ser [igual entre grupos]{.alert}.
+
+$$P(\hat{Y} = 1 | A = a) = P(\hat{Y} = 1 | A = b)$$
+
+**Ejemplo: contratación**
+
+- Si el 30% de los hombres son contratados, el 30% de las mujeres también deben serlo
+- No importa si los candidatos son diferentes
+
+**Ventaja:**
+
+- Fácil de medir y comunicar
+- Garantiza representación
+
+**Desventaja:**
+
+- Ignora si los grupos tienen diferentes tasas base
+- Puede requerir contratar candidatos menos cualificados
+- No garantiza que los individuos sean tratados justamente
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; margin-top: 30px;"}
+```{r, echo=FALSE, fig.width=5, fig.height=4}
+library(ggplot2)
+df <- data.frame(
+  Grupo = c("Hombres", "Mujeres"),
+  Contratados = c(30, 30),
+  NoContratados = c(70, 70)
+)
+df_long <- tidyr::pivot_longer(df, cols = c("Contratados", "NoContratados"),
+                                names_to = "Estado", values_to = "Porcentaje")
+ggplot(df_long, aes(x = Grupo, y = Porcentaje, fill = Estado)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_manual(values = c("Contratados" = "#2d4563", "NoContratados" = "#cccccc"),
+                    labels = c("Contratados", "No contratados")) +
+  labs(title = "Paridad demográfica", y = "%", fill = "") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+[Misma tasa de contratación = paridad demográfica.]{.alert}
+:::
+:::
+:::
+:::
+
+## Igualdad de oportunidades
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Definición:**
+
+> Entre quienes [merecen]{.alert} un resultado positivo, la tasa de acierto debe ser igual entre grupos.
+
+$$P(\hat{Y} = 1 | Y = 1, A = a) = P(\hat{Y} = 1 | Y = 1, A = b)$$
+
+**Ejemplo: préstamos**
+
+- Entre las personas que [pagarían]{.alert} el préstamo, ambos grupos deben tener la misma probabilidad de ser aprobados
+- Mide si el modelo deja pasar a los "buenos" por igual
+
+**Ventaja:**
+
+- Más intuitiva que paridad demográfica
+- No requiere igualar tasas de aprobación
+
+**Desventaja:**
+
+- Requiere conocer el "verdadero" resultado (Y)
+- Solo mira falsos negativos, ignora falsos positivos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; margin-top: 20px;"}
+```{r, echo=FALSE, fig.width=5, fig.height=4}
+df2 <- data.frame(
+  Grupo = c("Grupo A\n(buenos)", "Grupo B\n(buenos)"),
+  Aprobados = c(85, 85),
+  Rechazados = c(15, 15)
+)
+df2_long <- tidyr::pivot_longer(df2, cols = c("Aprobados", "Rechazados"),
+                                 names_to = "Estado", values_to = "Porcentaje")
+ggplot(df2_long, aes(x = Grupo, y = Porcentaje, fill = Estado)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_manual(values = c("Aprobados" = "#2d4563", "Rechazados" = "#e63946"),
+                    labels = c("Aprobados", "Rechazados")) +
+  labs(title = "Igualdad de oportunidades",
+       subtitle = "Entre quienes pagarían el préstamo",
+       y = "%", fill = "") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+[Mismo TPR entre grupos.]{.alert}
+:::
+:::
+:::
+:::
+
+## Calibración
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Definición:**
+
+> Una predicción de X% debe significar [lo mismo]{.alert} para todos los grupos.
+
+$$P(Y = 1 | \hat{Y} = p, A = a) = P(Y = 1 | \hat{Y} = p, A = b) = p$$
+
+**Ejemplo: riesgo de reincidencia**
+
+- Si el modelo dice "70% de probabilidad de reincidencia", entonces el 70% de las personas con esa puntuación deberían reincidir
+- Esto debe cumplirse tanto para blancos como para negros
+
+**Ventaja:**
+
+- Las predicciones son [interpretables]{.alert}
+- Permite comparar individuos de diferentes grupos
+
+**Desventaja:**
+
+- No garantiza igualdad en tasas de error
+- Un modelo puede estar calibrado pero ser injusto en otros sentidos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Calibración](figures/calibration-plot.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/calibration-plot.png"}
+
+Fuente: [ProPublica](https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing)
+
+:::{style="margin-top: 10px; background: rgba(45, 69, 99, 0.1); padding: 10px; border-radius: 10px;"}
+COMPAS estaba [calibrado]{.alert} pero tenía diferentes tasas de falsos positivos por raza.
+:::
+:::
+:::
+:::
+:::
+
+# El teorema de imposibilidad {background-color="#2d4563"}
+
+## No se puede tener todo
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=55%}
+**Tres criterios de equidad (simplificados):**
+
+1. **Calibración**: entre quienes reciben la misma puntuación, los resultados deben ser similares entre grupos
+
+2. **Igualdad de falsos positivos**: los grupos deben tener tasas iguales de ser señalados erróneamente
+
+3. **Igualdad de falsos negativos**: los grupos deben tener tasas iguales de ser ignorados erróneamente
+
+**El teorema de imposibilidad** ([Chouldechova, 2017](https://doi.org/10.1089/big.2016.0047); [Kleinberg, Mullainathan y Raghavan, 2016](https://arxiv.org/abs/1609.05807)):
+
+> Si las tasas base difieren entre grupos, [no se pueden satisfacer los tres criterios]{.alert} simultáneamente.
+
+**En simple**: si el Grupo A reincide al 40% y el Grupo B al 20%, hay que [elegir]{.alert} qué tipo de error igualar.
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Teorema de imposibilidad](figures/impossibility-theorem.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/impossibility-theorem.png"}
+
+Fuente: [Fairness and Machine Learning Book](https://fairmlbook.org/)
+
+:::{style="margin-top: 15px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
+[No existe una solución matemáticamente "justa".]{.alert} Ningún algoritmo puede decidir qué errores importan más.
+:::
+:::
+:::
+:::
+:::
+
+## ¿Quién define "justo"?
+
+:::{style="margin-top: 30px; font-size: 24px; text-align: center;"}
+**Lo que cuenta como justo depende de lo que valoramos:**
+
+:::{style="margin-top: 20px;"}
+| Definición | Prioriza | Desventaja |
+|------------|----------|------------|
+| **Igual trato** | Consistencia | Ignora el contexto |
+| **Igualdad de resultados** | Equidad | Puede requerir trato diferenciado |
+| **Igual tasa de error** | Paridad entre grupos | Puede sacrificar precisión |
+| **Calibración** | Precisión individual | Oculta disparidades |
+:::
+
+:::{style="margin-top: 30px;"}
+- No existe un [valor por defecto neutral]{.alert}
+- Quien elige la definición de equidad [determina quién se beneficia]{.alert}
+- Decir "solo usamos los datos" es en sí mismo una elección
+- Esta es una [pregunta política y moral]{.alert}, no técnica
+:::
+:::
+
+## Actividad: el dilema del préstamo
+
+:::{style="margin-top: 30px; font-size: 21px;"}
+:::{.columns}
+:::{.column width=50%}
+**Están diseñando un algoritmo de aprobación de préstamos**
+
+**Los datos muestran:**
+
+- Grupo A: 80% paga los préstamos
+- Grupo B: 60% paga los préstamos (debido a desventaja económica histórica)
+
+**Deben elegir UNO de estos enfoques:**
+
+1. **Mismo umbral para todos**: 70% de probabilidad de pago = aprobado
+    - Resultado: más rechazos del Grupo B
+
+2. **Misma tasa de aprobación**: ajustar umbrales para que ambos grupos tengan 50% de aprobación
+    - Resultado: más impagos, mayor riesgo
+
+3. **Misma tasa de rechazo injusto**: asegurar que el mismo % de buenos pagadores sea rechazado en ambos grupos
+    - Resultado: diferentes tasas de aprobación
+:::
+
+:::{.column width=50%}
+**Preguntas para discutir:**
+
+- ¿Cuál enfoque es "más justo"?
+- ¿Quién se beneficia y quién se perjudica con cada uno?
+- ¿Cambiaría su respuesta si la menor tasa del Grupo B se debe a discriminación (no a capacidad)?
+- ¿Debería el algoritmo intentar [corregir]{.alert} la injusticia histórica, o solo [no perpetuarla]{.alert}?
+
+:::{style="margin-top: 20px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
+**Debatan en grupos de 3-4 personas (10 min) y presenten su decisión.**
+:::
+:::
+:::
+:::
+
+# Detección y mitigación {background-color="#2d4563"}
+
+## ¿Cómo detectamos el sesgo?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Paso 1: Definir los grupos protegidos**
+
+- ¿Qué grupos queremos proteger?
+- Género, etnicidad, edad, discapacidad, ubicación...
+- A veces la variable no está en los datos (proxies)
+
+**Paso 2: Calcular métricas por grupo**
+
+- Tasa de predicción positiva
+- Tasa de verdaderos positivos (TPR)
+- Tasa de falsos positivos (FPR)
+- Valor predictivo positivo (PPV)
+
+**Paso 3: Comparar entre grupos**
+
+- ¿Las diferencias son significativas?
+- ¿Superan un umbral aceptable?
+- Regla del 80%: si un grupo tiene menos del 80% de la tasa del otro, hay disparidad
+:::
+
+:::{.column width=50%}
+**Herramientas disponibles:**
+
+| Herramienta | Lenguaje | Descripción |
+|------------|----------|-------------|
+| [AI Fairness 360](https://aif360.res.ibm.com/) | Python | IBM, 70+ métricas |
+| [Fairlearn](https://fairlearn.org/) | Python | Microsoft |
+| [fairmodels](https://fairmodels.drwhy.ai/) | R | Integra con tidymodels |
+| [What-If Tool](https://pair-code.github.io/what-if-tool/) | Web | Google, visual |
+| [Aequitas](http://aequitas.dssg.io/) | Python | U. Chicago |
+
+:::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
+En el laboratorio usaremos [fairmodels]{.alert} para auditar un modelo de clasificación.
+:::
+:::
+:::
+:::
+
+## Estrategias de mitigación
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=33%}
+**Pre-procesamiento**
+
+Modificar los [datos]{.alert} antes de entrenar.
+
+- Rebalancear grupos
+- Eliminar variables sensibles
+- Transformar datos para reducir correlación con atributo protegido
+
+**Ejemplo:** reponderar muestras para que grupos estén representados igualmente.
+
+**Ventaja:** modelo agnóstico
+
+**Desventaja:** puede perder información útil
+:::
+
+:::{.column width=33%}
+**In-procesamiento**
+
+Modificar el [algoritmo]{.alert} durante el entrenamiento.
+
+- Agregar restricciones de equidad a la función de pérdida
+- Regularización adversarial
+- Aprendizaje justo (fair learning)
+
+**Ejemplo:** penalizar predicciones que violen paridad demográfica.
+
+**Ventaja:** solución integrada
+
+**Desventaja:** más complejo, específico del algoritmo
+:::
+
+:::{.column width=33%}
+**Post-procesamiento**
+
+Modificar las [predicciones]{.alert} después de entrenar.
+
+- Ajustar umbrales por grupo
+- Rechazar predicciones con alta incertidumbre
+- Calibración por grupo
+
+**Ejemplo:** usar umbral de 0.6 para Grupo A y 0.5 para Grupo B.
+
+**Ventaja:** modelo agnóstico, fácil de implementar
+
+**Desventaja:** puede parecer discriminación inversa
+:::
+:::
+
+:::{style="margin-top: 20px; text-align: center;"}
+[Ninguna técnica es perfecta. La mitigación implica trade-offs.]{.alert}
+:::
+:::
+
+## El caso COMPAS
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=55%}
+**¿Qué es COMPAS?**
+
+- Correctional Offender Management Profiling for Alternative Sanctions
+- Sistema de scoring de riesgo de reincidencia usado en EE.UU.
+- Usado para decisiones de fianza, sentencia, libertad condicional
+
+**El análisis de ProPublica (2016):**
+
+- COMPAS tenía [tasas de falsos positivos desiguales]{.alert}:
+    - Negros: 44,9% señalados como alto riesgo pero no reincidieron
+    - Blancos: 23,5% señalados como alto riesgo pero no reincidieron
+- ProPublica concluyó: el sistema es [racialmente sesgado]{.alert}
+
+**La respuesta de Northpointe (creadores de COMPAS):**
+
+- COMPAS está [calibrado]{.alert}: una puntuación de 7 significa lo mismo para blancos y negros
+- Si las tasas base de reincidencia difieren, no se pueden igualar FPR y calibración a la vez
+- El teorema de imposibilidad en acción
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![COMPAS](figures/compas-bias.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/compas-bias.png"}
+
+Fuente: [ProPublica](https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing)
+
+:::{style="margin-top: 15px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
+**¿Quién tiene razón?**
+
+Ambos. El debate no es sobre [hechos]{.alert} sino sobre [valores]{.alert}: ¿qué tipo de error importa más?
+:::
+:::
+:::
+:::
+:::
+
+# Regulación de la IA {background-color="#2d4563"}
+
+## EU AI Act (2024)
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=55%}
+**Primera ley integral sobre IA en el mundo**
+
+Clasifica sistemas por [nivel de riesgo]{.alert}:
+
+| Nivel | Ejemplos | Requisitos |
+|-------|----------|------------|
+| [Inaceptable]{.alert} | Scoring social masivo, manipulación subliminal, vigilancia biométrica en tiempo real | Prohibido |
+| [Alto riesgo]{.alert} | Salud, justicia, empleo, migración, educación, crédito | Evaluación de conformidad, auditoría, registro |
+| [Riesgo limitado]{.alert} | Chatbots, deepfakes | Transparencia (informar que es IA) |
+| [Riesgo mínimo]{.alert} | Filtros de spam, videojuegos | Sin restricciones |
+
+**Multas:** hasta 35 millones de euros o 7% de la facturación global
+
+**Aplicación:** gradual desde 2024 hasta 2027
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![EU AI Act](figures/eu-ai-act.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/eu-ai-act.png"}
+
+Fuente: [European Commission](https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai)
+
+:::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
+**Implicaciones para investigadores:**
+
+- Sistemas de IA para investigación están [exentos]{.alert}
+- Pero si el sistema se despliega, aplica la regulación
+:::
+:::
+:::
+:::
+:::
+
+## Regulación en Estados Unidos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Sin ley federal integral**
+
+- Enfoque [sectorial]{.alert} y descentralizado
+- Agencias regulan sus dominios: FDA (salud), FTC (consumidores), EEOC (empleo)
+
+**Regulación estatal:**
+
+- [California]{.alert}: SB 1047 (2024) propuso regulación de modelos grandes, vetada por el gobernador
+- [Nueva York]{.alert}: Local Law 144 (2023) requiere auditoría de IA en contratación
+- [Colorado]{.alert}: ley de gobernanza de IA (2024)
+
+**Orden ejecutiva de Biden (octubre 2023):**
+
+- Requisitos de seguridad para modelos grandes
+- Estándares de watermarking para contenido generado por IA
+- [Revocada]{.alert} por la administración Trump en enero de 2025
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Regulación de IA en EE.UU.](figures/us-ai-regulation.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/us-ai-regulation.png"}
+
+Fuente: [Brookings](https://www.brookings.edu/articles/the-current-state-of-ai-regulation-in-the-us/)
+
+:::{style="margin-top: 15px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
+**Situación actual:**
+
+- Sin marco federal unificado
+- Fragmentación regulatoria
+- Autorregulación de la industria
+:::
+:::
+:::
+:::
+:::
+
+## Regulación en América Latina
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=50%}
+**Uruguay**
+
+- [Ley 18.331]{.alert} de Protección de Datos Personales
+- [Estrategia Nacional de IA]{.alert} (2019)
+- URCDP como órgano de control
+- Referente regional en gobierno digital
+- Proyecto de ley específica de IA en discusión
+
+**Brasil**
+
+- [LGPD]{.alert} (2018) para protección de datos
+- [PL 2338/2023]{.alert}: proyecto de ley de IA aprobado por el Senado en diciembre de 2024
+- Ahora en la Cámara de Diputados
+- Inspirado en el EU AI Act con adaptaciones locales
+
+**Chile**
+
+- Primera [Política Nacional de IA]{.alert} (2021) en la región
+- Proyecto de ley de [neuroderechos]{.alert} (pionero global)
+- Protección de datos mentales y libertad cognitiva
+:::
+
+:::{.column width=50%}
+**Colombia**
+
+- [Marco ético de IA]{.alert} (2019)
+- [Sandbox regulatorio]{.alert} para innovación
+- Énfasis en ética y derechos humanos
+
+**Argentina**
+
+- [Plan Nacional de IA]{.alert} (2019)
+- Ley de datos personales en actualización
+- Debate sobre regulación específica
+
+**Desafíos comunes en la región:**
+
+- Marcos regulatorios [en construcción]{.alert}
+- Brecha entre [legislación y aplicación]{.alert}
+- [Dependencia]{.alert} de infraestructura extranjera
+- Necesidad de [capacidad técnica]{.alert} en agencias reguladoras
+- Pocos recursos para [auditoría]{.alert} y fiscalización
+
+:::{style="margin-top: 10px; background: rgba(45, 69, 99, 0.1); padding: 10px; border-radius: 10px;"}
+[Uruguay está bien posicionado, pero falta ley específica de IA.]{.alert}
+:::
+:::
+:::
+:::
+
+## Autorregulación y estándares
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Estándares técnicos:**
+
+- [ISO/IEC 42001]{.alert}: sistema de gestión de IA
+- [IEEE P7000]{.alert}: diseño ético de sistemas
+- [NIST AI RMF]{.alert}: marco de gestión de riesgos
+
+**Principios de la industria:**
+
+- Google: AI Principles (2018)
+- Microsoft: Responsible AI Standard
+- IBM: Principles for Trust and Transparency
+- OpenAI: preparedness framework
+- Anthropic: responsible scaling policy
+
+**Iniciativas académicas:**
+
+- [Montreal Declaration]{.alert} (2018)
+- [Asilomar AI Principles]{.alert} (2017)
+- [OECD AI Principles]{.alert} (2019)
+:::
+
+:::{.column width=50%}
+**Críticas a la autorregulación:**
+
+- Sin [poder de aplicación]{.alert}
+- [Conflicto de intereses]{.alert}: quien desarrolla, audita
+- Principios [vagos]{.alert} y no vinculantes
+- [Ética-washing]{.alert}: apariencia sin sustancia
+- Las empresas [abandonan]{.alert} compromisos cuando son inconvenientes
+    - Google: despido del equipo de IA ética (2020)
+    - OpenAI: restructuración y salidas (2024)
+
+:::{style="margin-top: 20px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
+**Consenso emergente:**
+
+La autorregulación [no es suficiente]{.alert}. Se necesita regulación vinculante con supervisión externa.
+:::
+:::
+:::
+:::
+
+# Perspectivas {background-color="#2d4563"}
+
+## ¿Es solucionable el sesgo en la IA?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Los optimistas**
+
+- El sesgo de la IA es un [problema técnico]{.alert} con soluciones técnicas
+- Mejores datos, mejores algoritmos, mejores auditorías
+- La IA podría ser [menos sesgada]{.alert} que los humanos:
+    - Los humanos son inconsistentes; la IA es consistente
+    - Las decisiones de la IA se pueden auditar; las intuiciones humanas no
+- Los datasets están mejorando, la regulación avanza
+
+> "Un algoritmo sesgado se puede reentrenar. Un gerente de contratación sesgado es más difícil de arreglar."
+:::
+
+:::{.column width=50%}
+**Los escépticos**
+
+- El sesgo de la IA refleja [problemas sociales]{.alert} que no se solucionan con código
+- Hablar de "IA justa" distrae de las causas raíz
+- ¿Quién define la equidad? Generalmente quienes ya tienen poder
+- La IA oculta la responsabilidad humana
+- Algunas decisiones no deberían automatizarse
+
+> "No se puede arreglar un mercado inmobiliario discriminatorio ajustando un modelo de scoring crediticio."
+
+:::{style="margin-top: 20px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
+**¿Dónde se ubican ustedes?**
+:::
+:::
+:::
+:::
+
+## ¿Qué pueden hacer los investigadores?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**En su propia investigación:**
+
+- [Documentar]{.alert} las limitaciones del modelo
+- [Reportar]{.alert} métricas por subgrupos
+- [Transparentar]{.alert} los datos y el código
+- [Considerar]{.alert} quién puede ser afectado
+- [Evitar]{.alert} claims exagerados de equidad
+
+**En la sociedad:**
+
+- [Auditar]{.alert} sistemas existentes
+- [Comunicar]{.alert} hallazgos al público
+- [Participar]{.alert} en debates de política pública
+- [Formar]{.alert} a la próxima generación
+:::
+
+:::{.column width=50%}
+**Preguntas para cada proyecto:**
+
+1. ¿Qué [daños]{.alert} podría causar este sistema?
+2. ¿Quiénes son los [grupos afectados]{.alert}?
+3. ¿Cómo [mediría]{.alert} si el sistema es justo?
+4. ¿Qué [variables]{.alert} podrían ser proxies de atributos sensibles?
+5. ¿Quién [decidió]{.alert} la definición de éxito?
+6. ¿Hay [supervisión humana]{.alert} de las decisiones?
+7. ¿Existe un mecanismo de [apelación]{.alert}?
+8. ¿Cómo se [actualizará]{.alert} el sistema?
+
+:::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 10px; border-radius: 10px;"}
+[La ética no es un paso final; es parte del diseño desde el inicio.]{.alert}
+:::
+:::
+:::
+:::
+
+## Resumen de la sesión
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Métricas de equidad:**
+
+- [Paridad demográfica]{.alert}: misma tasa de positivos
+- [Igualdad de oportunidades]{.alert}: mismo TPR
+- [Calibración]{.alert}: predicciones significan lo mismo
+- El [teorema de imposibilidad]{.alert}: no se pueden tener todas
+
+**Detección y mitigación:**
+
+- Pre-procesamiento, in-procesamiento, post-procesamiento
+- Herramientas: AI Fairness 360, Fairlearn, fairmodels
+- El caso COMPAS: calibrado pero con FPR desiguales
+:::
+
+:::{.column width=50%}
+**Regulación:**
+
+- [EU AI Act]{.alert}: clasificación por riesgo
+- [EE.UU.]{.alert}: fragmentado, sin ley federal
+- [América Latina]{.alert}: Uruguay bien posicionado, leyes en construcción
+- Autorregulación [no es suficiente]{.alert}
+
+**Para reflexionar:**
+
+- El sesgo es parcialmente técnico, parcialmente social
+- La equidad es una [elección de valores]{.alert}, no solo de algoritmos
+- Los investigadores tienen [responsabilidad]{.alert}
+:::
+:::
+
+:::{style="margin-top: 20px; text-align: center;"}
+[En el laboratorio: auditoría práctica de sesgo con fairmodels.]{.alert}
+:::
+:::
+
+# Nos vemos en el laboratorio {background-color="#2d4563"}

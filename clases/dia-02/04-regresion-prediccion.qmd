@@ -53,26 +53,29 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 32px;"}
+:::{style="margin-top: 20px; font-size: 28px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Parte teórica (~50 min)**
+**Primera parte**
 
-- Predicción vs. explicación
-- Regresión lineal (repaso)
-- El problema del sobreajuste en regresión
+- Predicción vs. explicación: el debate
+- Regresión lineal y sus limitaciones
+- El problema del sobreajuste
 - Regularización: LASSO, Ridge, Elastic Net
-- Ingeniería de variables
+
+**Segunda parte**
+
+- Ajuste de hiperparámetros (tuning)
+- Ingeniería de variables para datos sociales
+- Aplicaciones en América Latina
+- Comparación con otros métodos
 :::
 
 :::{.column width=50%}
-**Laboratorio práctico (~60-70 min)**
-
-- Datos de Latinobarómetro (simulados)
-- Clasificación: logística vs. RF
-- Regresión: lineal vs. regularizada
-- Comparación de modelos
+:::{style="text-align: center;"}
+[![](figures/overfit-underfit.png){width="90%"}](#){data-modal-type="image" data-modal-url="figures/overfit-underfit.png"}
+:::
 :::
 :::
 :::
@@ -380,270 +383,359 @@ receta <- recipe(voto ~ ., data = datos_train) |>
 :::
 :::
 
-## Resumen teórico
+# Ajuste de hiperparámetros para regularización {background-color="#2d4563"}
 
-:::{style="margin-top: 30px; font-size: 26px;"}
-
-- [Predicción y explicación]{.alert} son objetivos diferentes, y el ML aporta herramientas poderosas para la predicción
-- La regresión OLS tiende a [sobreajustar]{.alert} con muchas variables
-- La [regularización]{.alert} penaliza la complejidad: LASSO selecciona variables, Ridge reduce coeficientes, Elastic Net combina ambos
-- La [ingeniería de variables]{.alert} es clave para que los modelos funcionen bien con datos de encuestas
-- Ahora vamos a poner todo en práctica en el [laboratorio]{.alert}
-:::
-
-# Laboratorio 2: Clasificación y predicción con datos de Latinobarómetro {background-color="#2d4563"}
-
-## Configuración del entorno
+## ¿Cómo elegir λ (penalty)?
 
 :::{style="margin-top: 30px; font-size: 24px;"}
-
-```{r lab-setup, eval=FALSE, prompt=FALSE}
-# Instalar paquetes (si no los tienen)
-install.packages(c("tidymodels", "tidyverse", "ranger", "glmnet"))
-
-# Cargar
-library(tidymodels)
-library(tidyverse)
-```
-
-```{r lab-load, echo=FALSE, message=FALSE, warning=FALSE}
-library(tidymodels)
-library(tidyverse)
-```
-
-- `ranger`: implementación rápida de Random Forest
-- `glmnet`: implementación eficiente de LASSO, Ridge y Elastic Net
-- tidymodels los usa como [motores]{.alert} (engines) de forma transparente
+:::{.columns}
+:::{.column width=55%}
+- El hiperparámetro $\lambda$ (penalty) controla la [fuerza de la regularización]{.alert}
+- $\lambda = 0$: sin penalización (OLS)
+- $\lambda$ grande: coeficientes muy pequeños (o cero en LASSO)
+- [No hay un valor "correcto" universal]{.alert}: depende de los datos
+- Solución: [validación cruzada]{.alert}
+    1. Probar muchos valores de $\lambda$
+    2. Para cada uno, evaluar con CV
+    3. Elegir el que minimice el error de validación
 :::
 
-## Cargar y explorar los datos
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Curva de selección de λ:**
 
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-cargar, message=FALSE, warning=FALSE, prompt=FALSE}
-# Cargar datos simulados de Latinobarómetro
-datos <- read_csv("datos/latinobarometro_sim.csv")
-
-# Vista rápida
-glimpse(datos)
 ```
-:::
-
-## Preparar los datos
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-preparar, message=FALSE, warning=FALSE, prompt=FALSE}
-# Convertir variables categóricas a factores
-datos <- datos |>
-  mutate(
-    voto = factor(voto, levels = c("no", "si")),
-    zona = factor(zona),
-    genero = factor(genero),
-    uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario"))
-  )
-
-# Seleccionar variables para el modelo
-datos_modelo <- datos |>
-  select(-pais)  # Excluir país (demasiadas categorías)
-
-# Dividir: 75% entrenamiento, 25% prueba
-set.seed(2026)
-datos_split <- initial_split(datos_modelo, prop = 0.75, strata = voto)
-datos_train <- training(datos_split)
-datos_test  <- testing(datos_split)
-
-cat("Entrenamiento:", nrow(datos_train), "| Prueba:", nrow(datos_test), "\n")
-```
-:::
-
-## Parte A: Clasificación (predecir voto)
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-Vamos a comparar tres modelos para predecir si una persona votó:
-
-```{r lab-clasif-modelos, message=FALSE, warning=FALSE, prompt=FALSE}
-# Modelo 1: Regresión logística
-mod_log <- logistic_reg() |>
-  set_engine("glm") |>
-  set_mode("classification")
-
-# Modelo 2: Árbol de decisión
-mod_arbol <- decision_tree(tree_depth = 5, min_n = 10) |>
-  set_engine("rpart") |>
-  set_mode("classification")
-
-# Modelo 3: Random Forest
-mod_rf <- rand_forest(trees = 500, min_n = 5) |>
-  set_engine("ranger") |>
-  set_mode("classification")
+Error CV
+    │
+    │ \
+    │  \        Subajuste
+    │   \      ╱
+    │    \    ╱
+    │     \  ╱
+    │      \/  ← λ óptimo
+    │      /\
+    │     ╱  \
+    │    ╱    \
+    │         Sobreajuste
+    └──────────────────────▶
+            log(λ)
 ```
 
-Noten lo fácil que es definir tres modelos distintos con [la misma interfaz]{.alert}.
+El error de CV tiene forma de U: hay un [punto óptimo]{.alert} entre sobreajuste y subajuste.
+:::
+:::
+:::
 :::
 
-## Ajustar y comparar
+## Tuning de LASSO con tidymodels
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
-```{r lab-clasif-ajustar, message=FALSE, warning=FALSE, prompt=FALSE}
-# Ajustar los tres modelos
-fit_log   <- fit(mod_log,   voto ~ ., data = datos_train)
-fit_arbol <- fit(mod_arbol, voto ~ ., data = datos_train)
-fit_rf    <- fit(mod_rf,    voto ~ ., data = datos_train)
-
-# Predecir en datos de prueba
-pred_log   <- predict(fit_log,   datos_test) |> bind_cols(datos_test)
-pred_arbol <- predict(fit_arbol, datos_test) |> bind_cols(datos_test)
-pred_rf    <- predict(fit_rf,    datos_test) |> bind_cols(datos_test)
-
-# Comparar accuracy (exactitud)
-bind_rows(
-  accuracy(pred_log,   truth = voto, estimate = .pred_class) |> mutate(modelo = "Logística"),
-  accuracy(pred_arbol, truth = voto, estimate = .pred_class) |> mutate(modelo = "Árbol"),
-  accuracy(pred_rf,    truth = voto, estimate = .pred_class) |> mutate(modelo = "Random Forest")
-) |>
-  select(modelo, .metric, .estimate)
-```
-:::
-
-## Coeficientes de la regresión logística
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-clasif-coefs, message=FALSE, warning=FALSE, prompt=FALSE}
-# Ver los coeficientes (solo regresión logística tiene coeficientes interpretables)
-tidy(fit_log) |>
-  arrange(desc(abs(estimate)))
-```
-
-- ¿Qué variables son las más importantes?
-- ¿Los signos tienen sentido?
-:::
-
-## Parte B: Regresión (predecir satisfacción con la vida)
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-Ahora cambiamos a un problema de [regresión]{.alert}: predecir `satisfaccion_vida` (1-10).
-
-```{r lab-reg-modelos, message=FALSE, warning=FALSE, prompt=FALSE}
-# Preparar datos para regresión (excluir voto, que es una variable de respuesta)
-datos_reg <- datos_modelo |> select(-voto)
-
-set.seed(2026)
-reg_split <- initial_split(datos_reg, prop = 0.75)
-reg_train <- training(reg_split)
-reg_test  <- testing(reg_split)
-
-# Modelo 1: Regresión lineal (OLS)
-mod_ols <- linear_reg() |>
-  set_engine("lm") |>
-  set_mode("regression")
-
-# Modelo 2: LASSO
-mod_lasso <- linear_reg(penalty = 0.1, mixture = 1) |>
+```r
+# 1. Modelo con penalty a ajustar
+modelo_lasso_tune <- linear_reg(penalty = tune(), mixture = 1) |>
   set_engine("glmnet") |>
   set_mode("regression")
 
-# Modelo 3: Elastic Net
-mod_enet <- linear_reg(penalty = 0.1, mixture = 0.5) |>
+# 2. Grilla de valores de penalty
+grilla_lambda <- grid_regular(penalty(range = c(-4, 0)), levels = 30)
+
+# 3. Validación cruzada
+folds <- vfold_cv(datos_train, v = 5)
+
+# 4. Ajustar
+resultados <- tune_grid(
+  modelo_lasso_tune,
+  satisfaccion_vida ~ .,
+  resamples = folds,
+  grid = grilla_lambda,
+  metrics = metric_set(rmse, rsq)
+)
+
+# 5. Visualizar
+autoplot(resultados)
+
+# 6. Seleccionar mejor λ
+mejor_lambda <- select_best(resultados, metric = "rmse")
+modelo_final <- finalize_model(modelo_lasso_tune, mejor_lambda)
+```
+:::
+
+## Dos criterios para elegir λ
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**λ mínimo (lambda.min)**
+
+- El valor que [minimiza el error de CV]{.alert}
+- Mejor rendimiento predictivo
+- Modelo más complejo (más variables)
+
+```r
+select_best(resultados, metric = "rmse")
+```
+:::
+
+:::{.column width=50%}
+**λ 1SE (lambda.1se)**
+
+- El valor más grande dentro de [1 error estándar]{.alert} del mínimo
+- Modelo más [parsimonioso]{.alert}
+- Sacrifica un poco de rendimiento por simplicidad
+
+```r
+select_by_one_std_err(
+  resultados,
+  metric = "rmse",
+  desc(penalty)  # preferir λ más grande
+)
+```
+:::
+:::
+
+<br>
+
+[En ciencias sociales, el λ 1SE suele preferirse por producir modelos más interpretables.]{.alert}
+:::
+
+## Tuning de Elastic Net (dos hiperparámetros)
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+Elastic Net tiene dos hiperparámetros: `penalty` (λ) y `mixture` (α)
+
+```r
+# Modelo con ambos a ajustar
+modelo_enet_tune <- linear_reg(penalty = tune(), mixture = tune()) |>
   set_engine("glmnet") |>
   set_mode("regression")
+
+# Grilla de combinaciones
+grilla_enet <- grid_regular(
+  penalty(range = c(-4, 0)),
+  mixture(range = c(0, 1)),    # 0 = Ridge, 1 = LASSO
+  levels = c(20, 5)            # 20 valores de λ, 5 de α
+)
+
+# Ajustar (igual que antes)
+resultados_enet <- tune_grid(
+  modelo_enet_tune,
+  satisfaccion_vida ~ .,
+  resamples = folds,
+  grid = grilla_enet,
+  metrics = metric_set(rmse)
+)
+
+# Ver mejores combinaciones
+show_best(resultados_enet, metric = "rmse", n = 5)
 ```
 :::
 
-## Ajustar y comparar modelos de regresión
+# Aplicaciones en América Latina {background-color="#2d4563"}
+
+## Ejemplo: Predicción de pobreza con datos de encuestas
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**El problema:**
+
+- Los censos de pobreza son costosos y poco frecuentes
+- Las encuestas de hogares tienen más detalle pero menos cobertura
+- ¿Podemos [predecir]{.alert} la pobreza en áreas sin datos usando características observables?
+
+**Enfoque con LASSO:**
+
+- Variable objetivo: ingreso per cápita (o indicador de pobreza)
+- Predictores: características del hogar, vivienda, acceso a servicios
+- LASSO selecciona las variables más predictivas
+- El modelo se aplica a censos o registros administrativos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Variables típicas seleccionadas:**
+
+```
+Variable              Coef LASSO
+─────────────────────────────────
+años_educacion_jefe    0.42 ***
+material_piso          0.28 ***
+acceso_agua_potable    0.22 ***
+num_habitaciones       0.18 **
+tiene_refrigerador     0.15 **
+material_techo         0.11 *
+tiene_vehiculo         0.09
+zona_urbana            0.00  ← eliminada
+genero_jefe            0.00  ← eliminada
+```
+
+LASSO identifica automáticamente qué variables [realmente predicen]{.alert} la pobreza.
+:::
+:::
+:::
+:::
+
+## Ejemplo: Satisfacción con la democracia
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Pregunta de investigación:**
+
+¿Qué factores predicen la satisfacción con la democracia en América Latina?
+
+**Datos:** Latinobarómetro (simulados)
+
+**Enfoque:**
+
+1. OLS como [baseline]{.alert}
+2. LASSO para [selección de variables]{.alert}
+3. Random Forest para [mejor predicción]{.alert}
+4. Comparar resultados
+
+**Hallazgos típicos:**
+
+- Confianza en instituciones es el mejor predictor
+- La percepción económica importa más que el ingreso real
+- Hay interacciones que LASSO no captura pero RF sí
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Comparación de modelos:**
+
+```
+Modelo          RMSE    R²
+──────────────────────────
+OLS             1.82    0.31
+LASSO           1.78    0.33
+Ridge           1.80    0.32
+Elastic Net     1.77    0.34
+Random Forest   1.62    0.42
+
+RF tiene mejor R², pero...
+¿podemos interpretar el efecto
+de cada variable?
+```
+
+<br>
+
+[El trade-off interpretabilidad-rendimiento es real. La elección depende del objetivo.]{.alert}
+:::
+:::
+:::
+:::
+
+## Regularización para datos de alta dimensionalidad
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+**¿Cuándo es especialmente útil la regularización?**
+
+- [Muchas variables, pocas observaciones]{.alert} (p >> n)
+- Variables altamente [correlacionadas]{.alert}
+- Sospecha de que [solo algunas variables importan]{.alert}
+- Queremos [evitar sobreajuste]{.alert} sin hacer selección manual
+
+**Ejemplos en ciencias sociales:**
+
+- Análisis de texto (miles de palabras como variables)
+- Datos genómicos (pocos individuos, muchos genes)
+- Encuestas con muchas preguntas
+- Datos administrativos con muchos campos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**La regla del pulgar:**
+
+```
+Si  n >> p  (muchos datos, pocas variables)
+    → OLS probablemente está bien
+
+Si  n ≈ p  (datos y variables similares)
+    → Regularización ayuda
+
+Si  n << p  (pocas observaciones, muchas variables)
+    → Regularización es NECESARIA
+    → OLS no funciona (matriz singular)
+```
+
+<br>
+
+[LASSO funciona incluso cuando p > n, lo cual es imposible con OLS clásico.]{.alert}
+:::
+:::
+:::
+:::
+
+## Comparación: Regularización vs. Random Forest
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-```{r lab-reg-ajustar, message=FALSE, warning=FALSE, prompt=FALSE}
-# Ajustar
-fit_ols   <- fit(mod_ols,   satisfaccion_vida ~ ., data = reg_train)
-fit_lasso <- fit(mod_lasso, satisfaccion_vida ~ ., data = reg_train)
-fit_enet  <- fit(mod_enet,  satisfaccion_vida ~ ., data = reg_train)
+:::{style="text-align: center;"}
 
-# Predecir
-pred_ols   <- predict(fit_ols,   reg_test) |> bind_cols(reg_test)
-pred_lasso <- predict(fit_lasso, reg_test) |> bind_cols(reg_test)
-pred_enet  <- predict(fit_enet,  reg_test) |> bind_cols(reg_test)
+| Criterio | LASSO/Ridge | Random Forest |
+|----------|-------------|---------------|
+| [Interpretabilidad]{.alert} | Alta (coeficientes) | Baja (importancia) |
+| [Relaciones no lineales]{.alert} | No | Sí |
+| [Interacciones]{.alert} | Manual | Automáticas |
+| [Selección de variables]{.alert} | Sí (LASSO) | No (pero da importancia) |
+| [Velocidad]{.alert} | Muy rápido | Moderado |
+| [Ajuste de hiperparámetros]{.alert} | 1-2 parámetros | Varios parámetros |
+| [Extrapolación]{.alert} | Lineal | No extrapola bien |
 
-# Comparar RMSE y R²
-bind_rows(
-  metrics(pred_ols,   truth = satisfaccion_vida, estimate = .pred) |> mutate(modelo = "OLS"),
-  metrics(pred_lasso, truth = satisfaccion_vida, estimate = .pred) |> mutate(modelo = "LASSO"),
-  metrics(pred_enet,  truth = satisfaccion_vida, estimate = .pred) |> mutate(modelo = "Elastic Net")
-) |>
-  filter(.metric %in% c("rmse", "rsq")) |>
-  select(modelo, .metric, .estimate)
-```
 :::
 
-## ¿Qué variables seleccionó LASSO?
+<br>
+
+[En la práctica, es útil probar ambos enfoques y comparar.]{.alert} La regularización es mejor cuando las relaciones son aproximadamente lineales y queremos interpretabilidad. RF es mejor cuando hay no linealidades e interacciones complejas.
+:::
+
+## Resumen de la sesión
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Conceptos clave:**
 
-```{r lab-reg-lasso-coefs, message=FALSE, warning=FALSE, prompt=FALSE}
-# Coeficientes del LASSO
-tidy(fit_lasso) |>
-  filter(estimate != 0) |>
-  arrange(desc(abs(estimate)))
-```
-
-- LASSO eliminó automáticamente las variables menos importantes
-- Comparen con los coeficientes de OLS: ¿cuáles fueron eliminadas?
-- ¿Tiene sentido desde un punto de vista teórico?
+- [Predicción vs. explicación]{.alert}: objetivos diferentes, herramientas complementarias
+- [Regularización]{.alert}: LASSO selecciona, Ridge reduce, Elastic Net combina
+- [Ajuste de λ]{.alert}: siempre con validación cruzada, nunca con datos de test
+- [λ mínimo vs. λ 1SE]{.alert}: rendimiento vs. parsimonia
 :::
 
-## Visualizar predicciones vs. valores reales
+:::{.column width=50%}
+**Cuándo usar cada método:**
 
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-reg-plot, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=8, fig.height=4}
-# Gráfico de predicciones vs. valores reales (OLS)
-pred_ols |>
-  ggplot(aes(x = satisfaccion_vida, y = .pred)) +
-  geom_point(alpha = 0.5, colour = "#2d4563") +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed", colour = "red") +
-  labs(
-    x = "Satisfacción real",
-    y = "Satisfacción predicha",
-    title = "Predicción vs. valor real (regresión lineal)"
-  ) +
-  theme_minimal()
-```
+- [OLS:]{.alert} pocos predictores, relaciones lineales, foco en explicación
+- [LASSO:]{.alert} muchos predictores, queremos selección automática
+- [Ridge:]{.alert} predictores correlacionados, no queremos eliminar ninguno
+- [Elastic Net:]{.alert} no estamos seguros, queremos lo mejor de ambos
+- [Random Forest:]{.alert} mejor predicción posible, relaciones complejas
+:::
+:::
 :::
 
-## Discusión
+## Próximos pasos
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 40px; font-size: 26px;"}
 
-Reflexionemos sobre los resultados:
+- [Laboratorios (2.3 y 2.4):]{.alert}
+    - Clasificación con datos de Latinobarómetro
+    - Regresión con datos socioeconómicos
+    - Tuning de hiperparámetros en la práctica
+    - Comparación e interpretación de modelos
 
-- **Clasificación**: ¿qué modelo funcionó mejor para predecir el voto? ¿Random Forest mejoró mucho respecto a la regresión logística?
+- [Mañana (Día 3):]{.alert} Aprendizaje no supervisado y análisis de texto
+    - Clustering (K-means) y reducción de dimensionalidad (PCA)
+    - Análisis computacional de texto
+    - Topic modeling
 
-- **Regresión**: ¿la regularización (LASSO, Elastic Net) mejoró respecto a OLS? ¿Qué variables fueron eliminadas por LASSO?
-
-- **Predicción vs. explicación**: si el objetivo fuera [explicar]{.alert} qué factores causan mayor participación electoral, ¿usaríamos Random Forest? ¿Por qué?
-
-- **Limitaciones**: ¿qué le falta a este análisis para ser un estudio "real"?
-    - Datos simulados vs. datos reales
-    - Variables omitidas
-    - Validación cruzada para elegir hiperparámetros
+[Nos vemos en el laboratorio.]{.alert}
 :::
 
-## Resumen del Día 2
-
-:::{style="margin-top: 30px; font-size: 26px;"}
-
-- [Regresión logística]{.alert}: interpretable, buena para explicación, pero puede ser limitada para predicción
-- [Árboles de decisión]{.alert}: intuitivos pero inestables
-- [Random Forest]{.alert}: mejor predicción, pero más difícil de interpretar
-- [Predicción vs. explicación]{.alert}: el ML complementa los métodos causales
-- [Regularización]{.alert}: LASSO selecciona variables, Ridge reduce coeficientes, Elastic Net combina ambos
-- tidymodels permite [comparar modelos con la misma sintaxis]{.alert}
-- Mañana: [aprendizaje no supervisado y análisis de texto]{.alert}
-:::
-
-# Fin del Día 2 {background-color="#2d4563"}
+# Nos vemos en el laboratorio {background-color="#2d4563"}

@@ -72,30 +72,29 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::
 :::
 
-## Agenda de hoy
+## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 32px;"}
+:::{style="margin-top: 20px; font-size: 28px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Sesión 3.1: Clustering y PCA (~2 h)**
+**Primera parte**
 
 - ¿Qué es el aprendizaje no supervisado?
-- K-means: conceptos e intuición
-- PCA: reducción de dimensionalidad
-- Laboratorio: segmentación de países
-
+- Clustering: K-means
+- Elegir el número de clusters
+- Evaluación con silueta
+- Clustering jerárquico (intro)
 :::
 
 :::{.column width=50%}
-**Sesión 3.2: Análisis de texto (~2 h)**
+**Segunda parte**
 
-- Texto como datos
-- Tokenización y bag-of-words
-- TF-IDF
-- Análisis de sentimiento
-- Topic Modeling (LDA)
-- Laboratorio con tidytext
+- Reducción de dimensionalidad: PCA
+- Interpretación de componentes
+- ¿Cuántos componentes conservar?
+- Aplicaciones en América Latina
+- Comparación con otros métodos
 :::
 :::
 :::
@@ -301,161 +300,499 @@ Fuente: [Medium](https://muhammadtaha01.medium.com/dimensionality-reduction-in-m
 :::
 :::
 
-# Laboratorio: Segmentación de países latinoamericanos {background-color="#2d4563"}
+# Evaluación de clusters {background-color="#2d4563"}
 
-## Cargar y explorar
+## Coeficiente de silueta
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- El [coeficiente de silueta]{.alert} mide qué tan bien cada observación encaja en su cluster
+- Para cada punto $i$:
+    - $a(i)$ = distancia promedio a otros puntos [del mismo cluster]{.alert}
+    - $b(i)$ = distancia promedio al cluster [más cercano diferente]{.alert}
+
+$$s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}$$
+
+- Valores de $s(i)$:
+    - Cerca de [+1]{.alert}: el punto está bien clasificado
+    - Cerca de [0]{.alert}: el punto está en el borde entre clusters
+    - Cerca de [-1]{.alert}: el punto probablemente está en el cluster equivocado
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Interpretación del promedio de silueta:**
+
+| Valor | Interpretación |
+|-------|----------------|
+| 0.71 - 1.00 | Estructura fuerte |
+| 0.51 - 0.70 | Estructura razonable |
+| 0.26 - 0.50 | Estructura débil |
+| < 0.25 | Sin estructura clara |
+
+<br>
+
+Podemos usar la silueta promedio para [elegir K]{.alert}: el K con mayor silueta indica clusters mejor definidos.
+:::
+:::
+:::
+:::
+
+## Método de la silueta para elegir K
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Calcular la [silueta promedio]{.alert} para cada valor de K
+- Elegir el K que [maximice la silueta]{.alert}
+- Más informativo que el método del codo porque mide [calidad]{.alert} de los clusters, no solo compacidad
+- Combinar con:
+    - [Conocimiento del dominio]{.alert}: ¿tiene sentido este número de grupos?
+    - [Interpretabilidad]{.alert}: ¿podemos explicar qué distingue cada cluster?
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Ejemplo**
+
+```
+Silueta promedio por K:
+
+K=2:  0.52
+K=3:  0.58  ← máximo
+K=4:  0.51
+K=5:  0.44
+K=6:  0.38
+
+La silueta sugiere K=3.
+El método del codo podría
+sugerir otro valor.
+
+Usar ambos + teoría para decidir.
+```
+:::
+:::
+:::
+:::
+
+## K-means en R: ejemplo básico
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-```{r lab-load, message=FALSE, warning=FALSE, prompt=FALSE}
+```r
 library(tidyverse)
+library(cluster)  # Para silhouette()
 
-# Cargar indicadores por país
-paises <- read_csv("datos/indicadores_paises.csv")
-glimpse(paises)
-```
-:::
+# Escalar los datos (siempre antes de K-means)
+datos_scaled <- datos |>
+  select(where(is.numeric)) |>
+  scale()
 
-## Preparar los datos
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-preparar, message=FALSE, warning=FALSE, prompt=FALSE}
-# Guardar los nombres de los países
-nombres <- paises$pais
-
-# Seleccionar solo las variables numéricas y escalar
-datos_scaled <- paises |>
-  select(-pais) |>
-  scale() |>
-  as.data.frame()
-
-rownames(datos_scaled) <- nombres
-
-head(datos_scaled, 5)
-```
-
-[Siempre escalar las variables antes de K-means y PCA]{.alert}: si no lo hacemos, las variables con valores más altos (como PIB) dominarán el análisis.
-:::
-
-## K-means: agrupar países
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-kmeans, message=FALSE, warning=FALSE, prompt=FALSE}
-# Ejecutar K-means con K=3
+# Ejecutar K-means
 set.seed(2026)
 km <- kmeans(datos_scaled, centers = 3, nstart = 25)
 
-# Ver los clusters
-paises$cluster <- factor(km$cluster)
+# Ver asignaciones
+km$cluster
 
-paises |>
-  select(pais, cluster) |>
-  arrange(cluster)
+# Calcular silueta
+sil <- silhouette(km$cluster, dist(datos_scaled))
+mean(sil[, 3])  # Silueta promedio
+
+# Visualizar
+fviz_cluster(km, data = datos_scaled)  # Con factoextra
 ```
 
-- `nstart = 25` ejecuta el algoritmo 25 veces con diferentes puntos iniciales y elige el mejor resultado
+- `nstart = 25` ejecuta el algoritmo 25 veces con diferentes inicializaciones
 :::
 
-## Método del codo
+# Clustering jerárquico {background-color="#2d4563"}
+
+## ¿Qué es el clustering jerárquico?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Clustering jerárquico]{.alert}: crea una jerarquía de clusters anidados
+- No requiere [especificar K de antemano]{.alert}
+- Dos enfoques:
+    - [Aglomerativo]{.alert} (bottom-up): empieza con cada punto como cluster, va fusionando los más cercanos
+    - [Divisivo]{.alert} (top-down): empieza con todos los puntos en un cluster, va dividiendo
+- El resultado se visualiza como un [dendrograma]{.alert}
+- El usuario "corta" el dendrograma al nivel deseado para obtener K clusters
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Dendrograma**
+
+```
+        ┌────────────────┐
+        │    Todos       │ Altura
+        ├───────┬────────┤ alta
+        │       │        │
+    ┌───┤   ┌───┴───┐    │
+    │   │   │       │    │
+  ┌─┴─┐ │ ┌─┴─┐   ┌─┴─┐  │
+  A   B C D   E   F   G  │ Altura
+                         │ baja
+
+Si cortamos a altura media:
+Cluster 1: {A, B}
+Cluster 2: {C}
+Cluster 3: {D, E}
+Cluster 4: {F, G}
+```
+:::
+:::
+:::
+:::
+
+## Métodos de enlace (linkage)
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+:::{style="text-align: center;"}
+
+| Método | Distancia entre clusters | Características |
+|--------|--------------------------|-----------------|
+| [Single]{.alert} (mínimo) | Puntos más cercanos | Puede crear cadenas largas |
+| [Complete]{.alert} (máximo) | Puntos más lejanos | Clusters compactos |
+| [Average]{.alert} (promedio) | Promedio de todas las distancias | Balance entre ambos |
+| [Ward]{.alert} | Minimiza varianza interna | Similar a K-means, muy usado |
+
+:::
+
+<br>
+
+:::{style="font-size: 22px;"}
+- [Ward]{.alert} es el más usado en ciencias sociales porque tiende a crear clusters de tamaño similar
+- En R: `hclust(dist(datos), method = "ward.D2")`
+:::
+:::
+
+## Clustering jerárquico en R
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-```{r lab-codo, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=7, fig.height=3.5}
-# Calcular la suma de distancias internas para K=1 a K=8
-wss <- map_dbl(1:8, function(k) {
-  kmeans(datos_scaled, centers = k, nstart = 25)$tot.withinss
-})
+```r
+# Calcular matriz de distancias
+d <- dist(datos_scaled, method = "euclidean")
 
-tibble(k = 1:8, wss = wss) |>
-  ggplot(aes(x = k, y = wss)) +
-  geom_line(colour = "#2d4563") +
-  geom_point(colour = "#2d4563", size = 3) +
-  labs(x = "Número de clusters (K)", y = "Suma de distancias internas",
-       title = "Método del codo") +
-  scale_x_continuous(breaks = 1:8) +
-  theme_minimal()
+# Clustering jerárquico con método Ward
+hc <- hclust(d, method = "ward.D2")
+
+# Visualizar dendrograma
+plot(hc, hang = -1, cex = 0.8)
+
+# Cortar para obtener K clusters
+grupos <- cutree(hc, k = 3)
+
+# O cortar a cierta altura
+grupos <- cutree(hc, h = 5)
+
+# Agregar al dataframe
+datos$cluster <- factor(grupos)
 ```
 :::
 
-## PCA: reducir dimensiones
+## K-means vs. Jerárquico
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
-```{r lab-pca, message=FALSE, warning=FALSE, prompt=FALSE}
+:::{style="text-align: center;"}
+
+| Criterio | K-means | Jerárquico |
+|----------|---------|------------|
+| [Elegir K]{.alert} | Antes de ejecutar | Después (cortando) |
+| [Forma de clusters]{.alert} | Esféricos | Cualquier forma |
+| [Escalabilidad]{.alert} | Muy rápido | Lento para n grande |
+| [Reproducibilidad]{.alert} | Depende de inicialización | Determinístico |
+| [Visualización]{.alert} | Scatter plot | Dendrograma |
+| [Jerarquía]{.alert} | No | Sí (anidamiento) |
+
+:::
+
+<br>
+
+:::{style="font-size: 22px;"}
+- Use [K-means]{.alert} para datasets grandes cuando tiene una idea del número de grupos
+- Use [jerárquico]{.alert} para explorar la estructura de los datos y visualizar relaciones entre observaciones
+:::
+:::
+
+# Más sobre PCA {background-color="#2d4563"}
+
+## ¿Cuántos componentes conservar?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- PCA produce tantos componentes como variables originales
+- Pero queremos [conservar solo los primeros]{.alert} (los más informativos)
+- Criterios para elegir:
+    - [Varianza explicada acumulada]{.alert}: conservar los que expliquen ~80%
+    - [Método del codo]{.alert} (scree plot): buscar el "codo" donde la varianza adicional es pequeña
+    - [Regla de Kaiser]{.alert}: conservar componentes con eigenvalue > 1
+- En la práctica, si el objetivo es [visualización]{.alert}, usamos 2-3 componentes
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Scree plot**
+
+```
+Varianza explicada (%)
+  50│ ■
+    │
+  30│   ■
+    │
+  15│     ■
+    │       ■
+   5│         ■  ■  ■  ■
+    └─────────────────────
+       PC1 PC2 PC3 PC4 ...
+
+El "codo" está en PC3:
+conservamos PC1-PC3 (~95% varianza).
+PC4 en adelante agregan poco.
+```
+:::
+:::
+:::
+:::
+
+## Interpretación de los loadings
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los [loadings]{.alert} (cargas) indican cuánto contribuye cada variable a cada componente
+- Valores absolutos altos = variable importante para ese componente
+- El signo indica la dirección:
+    - Si PIB y educación tienen loadings positivos altos en PC1 → PC1 mide "desarrollo"
+    - Un país con PC1 alto tiene alto PIB Y alta educación
+- Loadings cercanos a cero = variable no relevante para ese componente
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Ejemplo de loadings**
+
+```
+           PC1     PC2
+PIB       0.45   -0.12
+educación 0.42    0.08
+salud     0.38    0.15
+internet  0.40   -0.05
+desigualdad -0.35  0.62
+rural    -0.28    0.55
+
+PC1 = "desarrollo general"
+(PIB, educación, salud, internet
+ cargan positivo)
+
+PC2 = "ruralidad/desigualdad"
+(desigualdad y rural cargan positivo)
+```
+:::
+:::
+:::
+:::
+
+## Biplot: visualización combinada
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Un [biplot]{.alert} muestra simultáneamente:
+    - Las [observaciones]{.alert} (como puntos)
+    - Las [variables]{.alert} (como flechas/vectores)
+- La dirección de las flechas indica cómo las variables contribuyen a cada componente
+- Flechas largas = variables con alta varianza
+- Flechas cercanas = variables correlacionadas
+- Observaciones en la dirección de una flecha tienen valores altos en esa variable
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**En R:**
+
+```r
 # Ejecutar PCA
-pca_result <- prcomp(datos_scaled)
+pca <- prcomp(datos_scaled)
 
-# Varianza explicada por cada componente
-summary(pca_result)
+# Biplot básico
+biplot(pca)
+
+# Con factoextra (más bonito)
+library(factoextra)
+fviz_pca_biplot(pca,
+  repel = TRUE,
+  col.var = "contrib",
+  col.ind = "cos2"
+)
 ```
-
-- Los dos primeros componentes explican la mayor parte de la varianza
-- Podemos [visualizar los 18 países en 2 dimensiones]{.alert}
+:::
+:::
+:::
 :::
 
-## Visualizar PCA + clusters
+# Aplicaciones en ciencias sociales {background-color="#2d4563"}
+
+## Ejemplo: Tipología de países latinoamericanos
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**El problema:**
 
-```{r lab-pca-plot, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=8, fig.height=4.5}
-# Combinar PCA con clusters
-pca_df <- as.data.frame(pca_result$x[, 1:2])
-pca_df$pais <- nombres
-pca_df$cluster <- paises$cluster
+- Tenemos 18 países con 8 indicadores cada uno
+- ¿Existen "tipos" de países según su perfil de desarrollo?
+- ¿Qué dimensiones latentes resumen mejor la variación?
 
-ggplot(pca_df, aes(x = PC1, y = PC2, colour = cluster, label = pais)) +
-  geom_point(size = 3) +
-  geom_text(vjust = -0.8, size = 3, show.legend = FALSE) +
-  labs(x = "Componente Principal 1", y = "Componente Principal 2",
-       title = "Países latinoamericanos: PCA coloreado por cluster K-means",
-       colour = "Cluster") +
-  theme_minimal() +
-  scale_colour_manual(values = c("#2d4563", "#e63946", "#457b9d"))
-```
+**Enfoque:**
+
+1. [Escalar]{.alert} todas las variables
+2. [K-means]{.alert} para encontrar grupos
+3. [PCA]{.alert} para visualizar en 2D
+4. Interpretar los [clusters y componentes]{.alert}
 :::
 
-## Interpretar los componentes
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Posibles hallazgos:**
+
+```
+Cluster 1: "Alto desarrollo"
+- Uruguay, Chile, Costa Rica
+- Alto PIB, educación, internet
+
+Cluster 2: "Desarrollo medio"
+- México, Brasil, Colombia
+- Industrializados pero desiguales
+
+Cluster 3: "En desarrollo"
+- Honduras, Nicaragua, Bolivia
+- Más rurales, menor PIB
+
+PC1 captura "desarrollo general"
+PC2 captura "desigualdad/ruralidad"
+```
+:::
+:::
+:::
+:::
+
+## Ejemplo: Segmentación de votantes
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**El problema:**
 
-```{r lab-pca-loadings, message=FALSE, warning=FALSE, prompt=FALSE}
-# ¿Qué variables contribuyen a cada componente?
-pca_result$rotation[, 1:2] |>
-  as.data.frame() |>
-  mutate(variable = rownames(pca_result$rotation)) |>
-  arrange(desc(abs(PC1)))
-```
+- Encuesta con 1000 respondentes y 20 preguntas de opinión
+- ¿Existen "tipos" de votantes con perfiles similares?
+- ¿Qué dimensiones ideológicas estructuran las opiniones?
 
-- Si PC1 carga positivamente en PIB, educación e internet, lo podemos interpretar como un [eje de desarrollo]{.alert}
-- Los países a la derecha del gráfico son "más desarrollados" en este sentido compuesto
+**Enfoque:**
+
+1. [PCA]{.alert} para reducir las 20 preguntas a 2-3 dimensiones
+2. Interpretar: ¿PC1 es izquierda-derecha? ¿PC2 es autoritarismo-libertad?
+3. [K-means]{.alert} en el espacio reducido para encontrar grupos
+4. Caracterizar cada grupo por sus respuestas típicas
 :::
 
-## Discusión
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Aplicaciones reales:**
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+- [Latinobarómetro]{.alert}: tipologías de opinión pública
+- [LAPOP]{.alert}: perfiles de apoyo democrático
+- [Encuestas electorales]{.alert}: segmentos de votantes
+- [Análisis de partidos]{.alert}: posiciones ideológicas
 
-- ¿Los clusters tienen [sentido teórico]{.alert}? ¿Corresponden a categorías que ya conocemos (alto desarrollo, desarrollo medio, bajo desarrollo)?
-- ¿Qué [variables]{.alert} diferencian más a los grupos?
-- ¿El PCA nos dice algo [nuevo]{.alert} o confirma lo que ya sabíamos?
-- ¿Qué [limitaciones]{.alert} tiene este análisis?
-    - Solo 18 observaciones (un punto por país)
-    - Las variables son solo un subconjunto de los posibles indicadores
-    - K-means asume clusters esféricos
-- [El valor de estas técnicas está en la exploración]{.alert}, no en la confirmación causal
+<br>
+
+[Estas técnicas son exploratorias.]{.alert} Generan hipótesis sobre cómo se estructuran las opiniones, no confirman teorías causales.
+:::
+:::
+:::
+:::
+
+## Otras aplicaciones en América Latina
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**Clustering:**
+
+- [Segmentación de municipios]{.alert} por indicadores socioeconómicos
+- [Clasificación de conflictos]{.alert} por características
+- [Tipología de movimientos sociales]{.alert}
+- [Agrupación de respuestas abiertas]{.alert} en encuestas
+:::
+
+:::{.column width=50%}
+**PCA:**
+
+- [Índices compuestos]{.alert} de desarrollo, gobernanza, calidad institucional
+- [Mapas ideológicos]{.alert} de partidos políticos
+- [Análisis de encuestas]{.alert} con muchas preguntas
+- [Preprocesamiento]{.alert} antes de regresión cuando hay multicolinealidad
+:::
+:::
+
+<br>
+
+[En el laboratorio (Sesión 3.3) aplicaremos estas técnicas a datos reales de países latinoamericanos.]{.alert}
 :::
 
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Clustering:**
 
-- El [aprendizaje no supervisado]{.alert} descubre patrones sin etiquetas
-- [K-means]{.alert} agrupa observaciones similares en K clusters. El usuario elige K
-- [PCA]{.alert} reduce la dimensionalidad preservando la mayor varianza posible. Útil para visualización e índices compuestos
-- Ambas técnicas requieren [escalar las variables]{.alert} antes de aplicarlas
-- Son herramientas de [exploración]{.alert}: generan hipótesis, no las confirman
-- Próximo: [análisis computacional de texto]{.alert}
+- [K-means]{.alert}: rápido, asume clusters esféricos, requiere elegir K
+- [Jerárquico]{.alert}: produce dendrograma, no requiere K de antemano
+- [Silueta]{.alert}: mide calidad de los clusters
+- [Escalar siempre]{.alert} antes de aplicar
 :::
 
-# Nos vemos en la próxima sesión {background-color="#2d4563"}
+:::{.column width=50%}
+**PCA:**
+
+- Reduce [dimensionalidad]{.alert} preservando varianza
+- Los [loadings]{.alert} indican qué variables contribuyen a cada componente
+- [Scree plot]{.alert} ayuda a elegir cuántos componentes conservar
+- [Biplot]{.alert} visualiza observaciones y variables juntas
+:::
+:::
+
+<br>
+
+[Son herramientas de exploración: generan hipótesis, no las confirman.]{.alert}
+:::
+
+## Próximos pasos
+
+:::{style="margin-top: 40px; font-size: 26px;"}
+
+- [Sesión 3.2:]{.alert} Análisis computacional de texto
+    - Tokenización y preprocesamiento
+    - TF-IDF y bag-of-words
+    - Topic Modeling (LDA)
+    - Introducción a embeddings
+
+- [Laboratorios (3.3 y 3.4):]{.alert}
+    - Clustering y PCA con datos de países
+    - Análisis de textos políticos latinoamericanos
+
+[Nos vemos en la próxima sesión.]{.alert}
+:::
+
+# Nos vemos en la sesión de análisis de texto {background-color="#2d4563"}

@@ -1,0 +1,898 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 2.3: Laboratorio - Clasificación avanzada"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 2.3](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-02/05-laboratorio-03.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 3: Clasificación avanzada {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Predecir participación electoral
+2. Comparar múltiples clasificadores
+3. Ajustar hiperparámetros con CV
+4. Interpretar la importancia de variables
+5. Visualizar Partial Dependence Plots
+6. Evaluar con múltiples métricas
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- [Random Forest]{.alert} y Gradient Boosting
+- [Tuning]{.alert} de hiperparámetros
+- Interpretación de modelos complejos
+- Cuándo usar cada clasificador
+
+<br>
+
+[Trabajen en sus computadoras y pregunten si tienen dudas.]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Preparación de datos y baseline | ~25 min |
+| 2 | Random Forest con tuning | ~35 min |
+| 3 | Interpretación y visualización | ~30 min |
+| 4 | Comparación de modelos | ~30 min |
+
+<br>
+
+[El dataset contiene datos simulados de opinión pública en América Latina (Latinobarómetro).]{.alert}
+:::
+
+# Parte 1: Preparación y baseline {background-color="#2d4563"}
+
+## Cargar los paquetes necesarios
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cargar-paquetes
+#| message: false
+#| warning: false
+#| eval: true
+
+# Instalar si es necesario
+paquetes <- c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "xgboost")
+
+for (pkg in paquetes) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+
+# Cargar tidymodels (carga varios paquetes a la vez)
+library(tidymodels)
+library(ranger)      # Motor rápido para Random Forest
+library(vip)         # Variable Importance Plots
+library(pdp)         # Partial Dependence Plots
+
+# Configurar semilla para reproducibilidad
+set.seed(2026)
+```
+:::
+
+## Cargar y explorar los datos
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: cargar-datos
+#| eval: true
+
+# Cargar el dataset
+datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+
+# Convertir variables categóricas a factores
+datos <- datos |>
+  mutate(
+    pais = factor(pais),
+    zona = factor(zona),
+    genero = factor(genero),
+    uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
+    voto = factor(voto, levels = c("no", "si"))
+  )
+
+# Exploración inicial
+glimpse(datos)
+```
+:::
+
+## Explorar la variable objetivo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: explorar-voto
+#| eval: true
+#| fig-width: 10
+#| fig-height: 4
+
+# Distribución del voto
+datos |>
+  count(voto) |>
+  mutate(proporcion = n / sum(n))
+
+# Visualización
+ggplot(datos, aes(x = voto, fill = voto)) +
+  geom_bar() +
+  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5) +
+  scale_fill_manual(values = c("no" = "#E74C3C", "si" = "#27AE60")) +
+  labs(title = "Distribución de la participación electoral",
+       x = "¿Votó en la última elección?", y = "Frecuencia") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+:::
+
+## Dividir los datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: dividir-datos
+#| eval: true
+
+# División estratificada (mantiene proporciones de voto)
+division <- initial_split(datos, prop = 0.75, strata = voto)
+
+datos_train <- training(division)
+datos_test <- testing(division)
+
+# Verificar proporciones
+cat("Proporción en train:\n")
+prop.table(table(datos_train$voto))
+
+cat("\nProporción en test:\n")
+prop.table(table(datos_test$voto))
+```
+:::
+
+## Preprocesamiento con recipes
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: crear-receta
+#| eval: true
+
+# Definir la receta de preprocesamiento
+receta <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +
+                 genero + confianza_gobierno + confianza_justicia +
+                 satisfaccion_democracia + percepcion_economia +
+                 uso_internet + interes_politica,
+                 data = datos_train) |>
+  # Convertir categóricas a dummies (para algunos modelos)
+  step_dummy(all_nominal_predictors()) |>
+  # Normalizar numéricas
+  step_normalize(all_numeric_predictors()) |>
+  # Eliminar variables con varianza cero
+  step_zv(all_predictors())
+
+# Ver qué hace la receta
+receta |> prep() |> juice() |> glimpse()
+```
+:::
+
+## Modelo baseline: Regresión logística
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: modelo-baseline
+#| eval: true
+
+# Definir el modelo
+modelo_logit <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+# Crear workflow
+wf_logit <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_logit)
+
+# Ajustar
+ajuste_logit <- fit(wf_logit, data = datos_train)
+
+# Predicciones en test
+pred_logit <- predict(ajuste_logit, datos_test) |>
+  bind_cols(predict(ajuste_logit, datos_test, type = "prob")) |>
+  bind_cols(datos_test |> select(voto))
+
+# Métricas
+metricas_logit <- pred_logit |>
+  metrics(truth = voto, estimate = .pred_class, .pred_si)
+
+metricas_logit
+```
+:::
+
+## Matriz de confusión del baseline
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: confusion-baseline
+#| eval: true
+#| fig-width: 6
+#| fig-height: 5
+
+# Matriz de confusión
+conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
+  autoplot(type = "heatmap") +
+  scale_fill_gradient(low = "white", high = "#2d4563") +
+  labs(title = "Matriz de confusión - Regresión logística")
+```
+:::
+
+# Parte 2: Random Forest con tuning {background-color="#2d4563"}
+
+## Definir Random Forest con hiperparámetros a ajustar
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: rf-tune-spec
+#| eval: true
+
+# Modelo con hiperparámetros a ajustar
+modelo_rf_tune <- rand_forest(
+  mtry = tune(),       # Número de variables a considerar en cada split
+  trees = 500,         # Número de árboles (fijo)
+  min_n = tune()       # Mínimo de observaciones en nodo terminal
+) |>
+  set_engine("ranger", importance = "impurity") |>
+  set_mode("classification")
+
+# Workflow
+wf_rf_tune <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_rf_tune)
+
+# Ver qué hiperparámetros vamos a ajustar
+modelo_rf_tune |> extract_parameter_set_dials()
+```
+:::
+
+## Crear la grilla de búsqueda
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: crear-grilla
+#| eval: true
+
+# Grilla regular de combinaciones
+grilla_rf <- grid_regular(
+  mtry(range = c(2, 8)),    # De 2 a 8 variables
+  min_n(range = c(5, 30)),  # De 5 a 30 obs mínimas
+  levels = c(4, 4)          # 4 valores de cada uno = 16 combinaciones
+)
+
+# Ver la grilla
+grilla_rf
+
+# Alternativa: grilla aleatoria (más eficiente para muchos hiperparámetros)
+# grilla_rf <- grid_random(
+#   mtry(range = c(2, 8)),
+#   min_n(range = c(5, 30)),
+#   size = 20  # 20 combinaciones aleatorias
+# )
+```
+:::
+
+## Configurar validación cruzada
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: crear-folds
+#| eval: true
+
+# 5-fold CV estratificada
+folds <- vfold_cv(datos_train, v = 5, strata = voto)
+
+# Ver los folds
+folds
+
+# Cada fold tiene ~300 obs en training y ~75 en assessment
+```
+
+<br>
+
+:::{.callout-note}
+Usamos 5 folds para equilibrar entre precisión de la estimación y tiempo de cómputo. Con más folds (10) las estimaciones son más estables pero toma más tiempo.
+:::
+:::
+
+## Ejecutar el tuning
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: ejecutar-tuning
+#| eval: true
+#| cache: true
+
+# Ajustar todas las combinaciones de hiperparámetros
+# Esto puede tomar unos minutos
+resultados_tune <- tune_grid(
+  wf_rf_tune,
+  resamples = folds,
+  grid = grilla_rf,
+  metrics = metric_set(accuracy, roc_auc, f_meas),
+  control = control_grid(verbose = FALSE)
+)
+
+# Ver los resultados
+resultados_tune |>
+  collect_metrics() |>
+  filter(.metric == "roc_auc") |>
+  arrange(desc(mean))
+```
+:::
+
+## Visualizar los resultados del tuning
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: viz-tuning
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Visualización automática
+autoplot(resultados_tune) +
+  theme_minimal() +
+  labs(title = "Resultados del tuning de Random Forest")
+```
+:::
+
+## Seleccionar el mejor modelo
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: seleccionar-mejor
+#| eval: true
+
+# Mejor combinación según ROC-AUC
+mejor_rf <- select_best(resultados_tune, metric = "roc_auc")
+mejor_rf
+
+# Alternativa: modelo más simple dentro de 1 SE del mejor
+mejor_rf_1se <- select_by_one_std_err(
+  resultados_tune,
+  metric = "roc_auc",
+  desc(min_n)  # Preferir más observaciones por nodo (modelo más simple)
+)
+mejor_rf_1se
+
+# Finalizar el workflow con los mejores hiperparámetros
+wf_rf_final <- finalize_workflow(wf_rf_tune, mejor_rf)
+```
+:::
+
+## Ajustar el modelo final
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: ajustar-final
+#| eval: true
+
+# Ajustar con todos los datos de training
+ajuste_rf <- fit(wf_rf_final, data = datos_train)
+
+# Predicciones en test
+pred_rf <- predict(ajuste_rf, datos_test) |>
+  bind_cols(predict(ajuste_rf, datos_test, type = "prob")) |>
+  bind_cols(datos_test |> select(voto))
+
+# Comparar con baseline
+metricas_rf <- pred_rf |>
+  metrics(truth = voto, estimate = .pred_class, .pred_si)
+
+# Mostrar comparación
+cat("Regresión logística:\n")
+print(metricas_logit)
+cat("\nRandom Forest:\n")
+print(metricas_rf)
+```
+:::
+
+## Curva ROC comparativa
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: curva-roc
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+
+# Preparar datos para comparación
+roc_logit <- pred_logit |>
+  roc_curve(truth = voto, .pred_si) |>
+  mutate(modelo = "Regresión logística")
+
+roc_rf <- pred_rf |>
+  roc_curve(truth = voto, .pred_si) |>
+  mutate(modelo = "Random Forest")
+
+# Combinar y graficar
+bind_rows(roc_logit, roc_rf) |>
+  ggplot(aes(x = 1 - specificity, y = sensitivity, color = modelo)) +
+  geom_path(linewidth = 1.2) +
+  geom_abline(linetype = "dashed", color = "gray50") +
+  coord_equal() +
+  labs(title = "Comparación de curvas ROC",
+       x = "1 - Especificidad (Tasa de falsos positivos)",
+       y = "Sensibilidad (Tasa de verdaderos positivos)",
+       color = "Modelo") +
+  theme_minimal()
+```
+:::
+
+# Parte 3: Interpretación {background-color="#2d4563"}
+
+## Importancia de variables (Gini)
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: vip-gini
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Extraer el modelo ajustado
+modelo_extraido <- extract_fit_parsnip(ajuste_rf)
+
+# Gráfico de importancia
+vip(modelo_extraido, num_features = 15) +
+  labs(title = "Importancia de variables (Gini)",
+       subtitle = "Random Forest para predicción de voto") +
+  theme_minimal()
+```
+:::
+
+## Interpretación de la importancia
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+**¿Qué nos dice el gráfico?**
+
+- Las variables más importantes para [predecir el voto]{.alert} son:
+  - Edad
+  - Interés en la política
+  - Educación
+  - Ingreso del hogar
+  - Confianza en el gobierno
+
+- Zona (urbana/rural) y género tienen [menor importancia]{.alert} predictiva
+
+- La confianza en la justicia importa menos que la confianza en el gobierno
+:::
+
+:::{.column width=45%}
+:::{.callout-warning}
+**Cuidado con la interpretación**
+
+La importancia de Gini mide [predictibilidad]{.alert}, no [efecto causal]{.alert}.
+
+Que la edad sea importante no significa que "envejecer causa votar más", solo que la edad ayuda a predecir quién votará.
+:::
+:::
+:::
+:::
+
+## Partial Dependence Plots
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: pdp-edad
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Necesitamos el modelo ranger directamente
+modelo_ranger <- extract_fit_engine(ajuste_rf)
+
+# Preparar datos preprocesados
+datos_prep <- bake(prep(receta), new_data = datos_train)
+
+# PDP para edad
+pdp_edad <- partial(
+  modelo_ranger,
+  pred.var = "edad",
+  train = datos_prep,
+  prob = TRUE,
+  which.class = 2  # Clase "si"
+)
+
+# Graficar
+autoplot(pdp_edad) +
+  labs(title = "Partial Dependence Plot: Edad",
+       subtitle = "Efecto marginal sobre P(voto = sí)",
+       x = "Edad (normalizada)", y = "Probabilidad predicha de votar") +
+  theme_minimal()
+```
+:::
+
+## PDP para interés político
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: pdp-interes
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# PDP para interés político
+pdp_interes <- partial(
+  modelo_ranger,
+  pred.var = "interes_politica",
+  train = datos_prep,
+  prob = TRUE,
+  which.class = 2
+)
+
+autoplot(pdp_interes) +
+  labs(title = "Partial Dependence Plot: Interés en política",
+       subtitle = "Efecto marginal sobre P(voto = sí)",
+       x = "Interés en política (normalizado)", y = "Probabilidad predicha de votar") +
+  theme_minimal()
+```
+:::
+
+## Interpretación de los PDPs
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Edad:**
+
+- La probabilidad de votar [aumenta con la edad]{.alert}
+- El efecto es más fuerte entre los jóvenes
+- A partir de cierta edad, se estabiliza
+
+**Interés en política:**
+
+- Relación [monotónica positiva]{.alert}
+- Mayor interés → mayor probabilidad de votar
+- El efecto es aproximadamente lineal
+:::
+
+:::{.column width=50%}
+:::{.callout-tip}
+**PDPs vs. coeficientes**
+
+Los PDPs muestran relaciones [no lineales]{.alert} que la regresión logística no captura.
+
+Si el PDP es aproximadamente lineal, la regresión logística podría ser suficiente.
+
+Si el PDP tiene curvas o mesetas, Random Forest captura patrones que otros modelos pierden.
+:::
+:::
+:::
+:::
+
+# Parte 4: Comparación de modelos {background-color="#2d4563"}
+
+## Agregar Gradient Boosting
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: xgboost
+#| eval: true
+#| cache: true
+
+# Modelo XGBoost
+modelo_xgb <- boost_tree(
+  trees = 500,
+  tree_depth = tune(),
+  learn_rate = tune(),
+  min_n = 10
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+
+# Workflow
+wf_xgb <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_xgb)
+
+# Grilla de búsqueda
+grilla_xgb <- grid_regular(
+  tree_depth(range = c(3, 8)),
+  learn_rate(range = c(-3, -1)),  # 0.001 a 0.1
+  levels = c(3, 3)
+)
+
+# Tuning
+resultados_xgb <- tune_grid(
+  wf_xgb,
+  resamples = folds,
+  grid = grilla_xgb,
+  metrics = metric_set(roc_auc),
+  control = control_grid(verbose = FALSE)
+)
+
+# Mejor modelo
+mejor_xgb <- select_best(resultados_xgb, metric = "roc_auc")
+wf_xgb_final <- finalize_workflow(wf_xgb, mejor_xgb)
+ajuste_xgb <- fit(wf_xgb_final, data = datos_train)
+```
+:::
+
+## Comparación final de modelos
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: comparacion-final
+#| eval: true
+
+# Predicciones de todos los modelos
+pred_xgb <- predict(ajuste_xgb, datos_test) |>
+  bind_cols(predict(ajuste_xgb, datos_test, type = "prob")) |>
+  bind_cols(datos_test |> select(voto))
+
+# Calcular métricas para todos
+metricas_todos <- bind_rows(
+  pred_logit |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "Regresión logística"),
+  pred_rf |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "Random Forest"),
+  pred_xgb |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "XGBoost")
+)
+
+# Tabla resumen
+metricas_todos |>
+  select(modelo, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  arrange(desc(roc_auc))
+```
+:::
+
+## Visualización comparativa
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: comparacion-viz
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Curvas ROC de todos los modelos
+roc_xgb <- pred_xgb |>
+  roc_curve(truth = voto, .pred_si) |>
+  mutate(modelo = "XGBoost")
+
+bind_rows(roc_logit, roc_rf, roc_xgb) |>
+  ggplot(aes(x = 1 - specificity, y = sensitivity, color = modelo)) +
+  geom_path(linewidth = 1.2) +
+  geom_abline(linetype = "dashed", color = "gray50") +
+  coord_equal() +
+  scale_color_manual(values = c("Regresión logística" = "#3498DB",
+                                "Random Forest" = "#27AE60",
+                                "XGBoost" = "#9B59B6")) +
+  labs(title = "Comparación de curvas ROC",
+       x = "1 - Especificidad", y = "Sensibilidad") +
+  theme_minimal()
+```
+:::
+
+## Discusión: ¿Cuál modelo elegir?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Si el objetivo es [predicción pura]{.alert}:**
+
+- Elegir el modelo con mejor AUC
+- XGBoost o Random Forest suelen ganar
+- La interpretabilidad es secundaria
+
+**Si el objetivo es [entender los factores]{.alert}:**
+
+- Regresión logística da coeficientes interpretables
+- Random Forest con VIP + PDP es un compromiso
+:::
+
+:::{.column width=50%}
+**Consideraciones prácticas:**
+
+- [Complejidad]{.alert}: XGBoost requiere más tuning
+- [Tiempo]{.alert}: RF y XGBoost son más lentos
+- [Explicabilidad]{.alert}: ¿Podemos justificar las predicciones?
+- [Mejora marginal]{.alert}: ¿Vale la pena 2% más de AUC?
+
+<br>
+
+[En ciencias sociales, la interpretabilidad suele ser tan importante como el rendimiento.]{.alert}
+:::
+:::
+:::
+
+# Ejercicios adicionales {background-color="#2d4563"}
+
+## Ejercicio 1: Ajustar un árbol de decisión
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Crear un modelo `decision_tree()` con costo de complejidad (`cost_complexity`) a ajustar
+2. Usar validación cruzada para encontrar el mejor valor
+3. Comparar con Random Forest: ¿cuánto se pierde en rendimiento?
+4. Visualizar el árbol resultante
+
+```{r}
+#| label: ejercicio-1
+#| eval: false
+
+# Tu código aquí
+modelo_arbol <- decision_tree(
+  cost_complexity = tune(),
+  tree_depth = 10,
+  min_n = 10
+) |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+# ... completar el workflow y tuning
+```
+:::
+
+## Ejercicio 2: Análisis por país
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Filtrar los datos para Uruguay solamente
+2. Entrenar el mismo modelo de Random Forest
+3. ¿Cambia la importancia de las variables?
+4. ¿La edad sigue siendo el predictor más importante?
+
+```{r}
+#| label: ejercicio-2
+#| eval: false
+
+# Tu código aquí
+datos_uruguay <- datos |>
+  filter(pais == "Uruguay")
+
+# ... entrenar y comparar
+```
+:::
+
+## Ejercicio 3: Threshold óptimo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Por defecto, clasificamos como "sí" si P(sí) > 0.5
+2. Pero este threshold puede no ser óptimo
+3. Calcular sensibilidad y especificidad para distintos thresholds
+4. ¿Cuál threshold maximiza el F1-score?
+
+```{r}
+#| label: ejercicio-3
+#| eval: false
+
+# Probar diferentes thresholds
+thresholds <- seq(0.3, 0.7, by = 0.05)
+
+resultados_thresh <- map_df(thresholds, function(t) {
+  pred_rf |>
+    mutate(.pred_class_nuevo = factor(ifelse(.pred_si > t, "si", "no"),
+                                       levels = c("no", "si"))) |>
+    f_meas(truth = voto, estimate = .pred_class_nuevo) |>
+    mutate(threshold = t)
+})
+
+# Encontrar el mejor
+resultados_thresh |> arrange(desc(.estimate))
+```
+:::
+
+## Resumen del laboratorio
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que practicamos:**
+
+- Flujo completo de clasificación
+- Tuning de hiperparámetros con CV
+- Interpretación con VIP y PDP
+- Comparación de múltiples modelos
+:::
+
+:::{.column width=50%}
+**Conceptos clave:**
+
+- [tune()]{.alert} marca hiperparámetros a ajustar
+- [grid_regular()]{.alert} crea combinaciones
+- [tune_grid()]{.alert} evalúa con CV
+- [select_best()]{.alert} elige la mejor combinación
+- [finalize_workflow()]{.alert} aplica los valores
+:::
+:::
+
+<br>
+
+[En el próximo laboratorio aplicaremos estos conceptos a regresión.]{.alert}
+:::
+
+# Continuar con el laboratorio de regresión {background-color="#2d4563"}

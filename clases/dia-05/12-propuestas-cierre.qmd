@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 5.2: Mini-propuestas de investigación y cierre"
+subtitle: "Sesión 5.4: Mini-propuestas de investigación y cierre"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
@@ -9,7 +9,7 @@ author:
 format:
   clean-revealjs:
     self-contained: true
-    footer: "[Sesión 5.2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-05/10-propuestas-cierre.html)"
+    footer: "[Sesión 5.4](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-05/12-propuestas-cierre.html)"
     transition: slide
     transition-speed: default
     scrollable: true

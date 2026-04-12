@@ -368,14 +368,14 @@
     "href": "clases/dia-01/02-fundamentos-ml.html#agenda-de-la-sesión",
     "title": "IA para Científicos Sociales",
     "section": "Agenda de la sesión",
-    "text": "Agenda de la sesión\n\n\n\nParte teórica (~80 min)\n\nEl flujo de trabajo de ML\nDivisión train/test\nSobreajuste y sesgo-varianza\nMétricas de evaluación\n\nLaboratorio práctico (~35-40 min)\n\nPrimer flujo de trabajo con tidymodels\nClasificación con regresión logística\nEvaluación del modelo\n\n\n\n\n\n\nElegir la métrica correcta\n\n\nFuente: Medium"
+    "text": "Agenda de la sesión\n\n\n\nPrimera parte\n\nEl flujo de trabajo de ML\nCalidad de datos y preprocesamiento\nFeature engineering\nDivisión train/test y validación cruzada\n\nSegunda parte\n\nSobreajuste y sesgo-varianza\nRegularización\nMétricas de evaluación\nSelección de modelos\nReproducibilidad en ML\n\n\n\n\n\n\nElegir la métrica correcta\n\n\nFuente: Medium"
   },
   {
     "objectID": "clases/dia-01/02-fundamentos-ml.html#el-flujo-de-trabajo-de-ml-1",
     "href": "clases/dia-01/02-fundamentos-ml.html#el-flujo-de-trabajo-de-ml-1",
     "title": "IA para Científicos Sociales",
     "section": "El flujo de trabajo de ML",
-    "text": "El flujo de trabajo de ML\nDel problema a la solución\n\n\n┌───────────┐    ┌────────────────┐    ┌──────────┐    ┌───────────┐    ┌──────────┐\n│  1. Datos  │───▶│ 2. Preprocesar │───▶│ 3. Dividir│───▶│ 4. Entrenar│───▶│ 5. Evaluar│\n│  (recoger) │    │ (limpiar)      │    │ (train/   │    │ (ajustar   │    │ (métricas,│\n│            │    │                │    │  test)    │    │  modelo)   │    │  validar) │\n└───────────┘    └────────────────┘    └──────────┘    └───────────┘    └──────────┘\n\n\n\n\n\nPaso 1: Recoger datos: obtener observaciones relevantes al problema\nPaso 2: Preprocesar: limpiar valores faltantes, transformar variables, codificar categorías\nPaso 3: Dividir: separar en entrenamiento y prueba\n\n\n\nPaso 4: Entrenar: ajustar un modelo a los datos de entrenamiento\nPaso 5: Evaluar: medir el rendimiento en datos que el modelo nunca vio\nEn la práctica, este proceso es iterativo: volvemos a pasos anteriores cuando algo falla"
+    "text": "El flujo de trabajo de ML\nDel problema a la solución\n\n\n\n\n\nFlujo de trabajo de ML\n\n\n\n\n\n\n\nPaso 1: Recoger datos: obtener observaciones relevantes al problema\nPaso 2: Preprocesar: limpiar valores faltantes, transformar variables, codificar categorías\nPaso 3: Dividir: separar en entrenamiento y prueba\n\n\n\nPaso 4: Entrenar: ajustar un modelo a los datos de entrenamiento\nPaso 5: Evaluar: medir el rendimiento en datos que el modelo nunca vio\nEn la práctica, este proceso es iterativo: volvemos a pasos anteriores cuando algo falla"
   },
   {
     "objectID": "clases/dia-01/02-fundamentos-ml.html#pasos-1-2-recolección-y-preprocesamiento",
@@ -389,14 +389,14 @@
     "href": "clases/dia-01/02-fundamentos-ml.html#paso-3-por-qué-dividir-los-datos",
     "title": "IA para Científicos Sociales",
     "section": "Paso 3: ¿por qué dividir los datos?",
-    "text": "Paso 3: ¿por qué dividir los datos?\n\n\n\n\nQueremos saber si el modelo funciona con datos nuevos, no solo con los datos que ya vio\nAnalogía: un estudiante que memoriza las respuestas del examen pasado puede sacar 100%, pero ¿qué pasa si las preguntas cambian?\nSi evaluamos el modelo con los mismos datos que usamos para entrenarlo, no sabemos si realmente aprendió\nPor eso dividimos:\n\nEntrenamiento (~70-80%): el modelo aprende de estos datos\nPrueba (~20-30%): evaluamos el rendimiento con datos que el modelo nunca vio\n\nRegla de oro: nunca mirar los datos de prueba hasta el final\n\n\n\n\n\n\nDivisión train/test"
+    "text": "Paso 3: ¿por qué dividir los datos?\n\n\n\n\nQueremos saber si el modelo funciona con datos nuevos, no solo con los datos que ya vio\nSi evaluamos el modelo con los mismos datos que usamos para entrenarlo, no sabemos si realmente aprendió\nPor eso dividimos:\n\nEntrenamiento (~70-80%): el modelo aprende de estos datos\nPrueba (~20-30%): evaluamos el rendimiento con datos que el modelo nunca vio\n\nRegla de oro: nunca mirar los datos de prueba hasta el final\n\n\n\n\n\n\nDivisión train/test"
   },
   {
     "objectID": "clases/dia-01/02-fundamentos-ml.html#división-traintest",
     "href": "clases/dia-01/02-fundamentos-ml.html#división-traintest",
     "title": "IA para Científicos Sociales",
     "section": "División train/test",
-    "text": "División train/test\n\n\n\n\nLa forma más simple de evaluar un modelo\nDividimos los datos aleatoriamente en dos conjuntos\nEl modelo solo ve los datos de entrenamiento durante el ajuste\nEvaluamos con los datos de prueba al final\nProblemas potenciales:\n\nCon pocos datos, una sola división puede no ser representativa\nEl resultado depende de qué observaciones cayeron en cada conjunto\n\nPara datasets pequeños, necesitamos algo más: validación cruzada\n\n\n\nDataset completo (180 observaciones)\n┌──────────────────────────────────┐\n│ ○ ○ ● ○ ● ○ ○ ● ○ ○ ● ● ○ ○ ● │\n│ ○ ● ○ ○ ○ ● ○ ● ● ○ ○ ● ○ ○ ● │\n│ ● ○ ○ ● ○ ○ ● ○ ○ ● ○ ● ○ ○ ○ │\n└──────────────────────────────────┘\n         │ Dividir aleatoriamente\n         ▼\n┌────────────────────────┐ ┌───────┐\n│   Entrenamiento (75%)  │ │Test   │\n│   ○ ● ○ ○ ● ○ ● ○ ○ ● │ │(25%)  │\n│   ○ ○ ● ○ ○ ● ○ ● ○ ○ │ │● ○ ○ ●│\n│   ● ○ ○ ● ○ ○ ● ○ ○   │ │○ ● ○ ○│\n└────────────────────────┘ └───────┘"
+    "text": "División train/test\n\n\n\n\nLa forma más simple de evaluar un modelo\nDividimos los datos aleatoriamente en dos conjuntos\nEl modelo solo ve los datos de entrenamiento durante el ajuste\nEvaluamos con los datos de prueba al final\nProblemas potenciales:\n\nCon pocos datos, una sola división puede no ser representativa\nEl resultado depende de qué observaciones cayeron en cada conjunto\n\nPara datasets pequeños, necesitamos algo más: validación cruzada\n\n\n\n\n\n\nDivisión train/test"
   },
   {
     "objectID": "clases/dia-01/02-fundamentos-ml.html#validación-cruzada-k-fold",
@@ -424,7 +424,7 @@
     "href": "clases/dia-01/02-fundamentos-ml.html#el-compromiso-sesgo-varianza",
     "title": "IA para Científicos Sociales",
     "section": "El compromiso sesgo-varianza",
-    "text": "El compromiso sesgo-varianza\n\n\n\n\nSesgo (bias): error por suposiciones simplificadoras del modelo. Un modelo con alto sesgo “no presta atención” a los datos\nVarianza: error por sensibilidad excesiva a los datos de entrenamiento. Un modelo con alta varianza cambia mucho con cada muestra\nNo se pueden minimizar ambos al mismo tiempo: al reducir uno, el otro tiende a aumentar\nEl objetivo es encontrar el punto medio donde el error total es mínimo\nEn la práctica:\n\nModelos simples (regresión lineal): alto sesgo, baja varianza\nModelos complejos (redes neuronales profundas): bajo sesgo, alta varianza\nRegularización ayuda a controlar la varianza sin aumentar demasiado el sesgo\n\n\n\n\nError\n  │\n  │ \\          ╱  ← Error total\n  │  \\        ╱\n  │   \\      ╱\n  │    \\    ╱\n  │     \\  ╱\n  │      \\/  ← Punto óptimo\n  │      /\\\n  │     ╱  \\\n  │    ╱    ────── ← Varianza\n  │   ╱\n  │  ╱\n  │─────────────── ← Sesgo²\n  └──────────────────▶\n       Complejidad del modelo\nA medida que el modelo se vuelve más complejo, el sesgo disminuye (la curva baja) pero la varianza aumenta (la curva sube)."
+    "text": "El compromiso sesgo-varianza\n\n\n\n\nSesgo (bias): error por suposiciones simplificadoras del modelo. Un modelo con alto sesgo “no presta atención” a los datos\nVarianza: error por sensibilidad excesiva a los datos de entrenamiento. Un modelo con alta varianza cambia mucho con cada muestra\nNo se pueden minimizar ambos al mismo tiempo: al reducir uno, el otro tiende a aumentar\nEl objetivo es encontrar el punto medio donde el error total es mínimo\nEn la práctica:\n\nModelos simples (regresión lineal): alto sesgo, baja varianza\nModelos complejos (redes neuronales profundas): bajo sesgo, alta varianza\nRegularización ayuda a controlar la varianza sin aumentar demasiado el sesgo\n\n\n\n\n\n\n\nCompromiso sesgo-varianza\n\n\nA medida que el modelo se vuelve más complejo, el sesgo disminuye (la curva baja) pero la varianza aumenta (la curva sube)."
   },
   {
     "objectID": "clases/dia-01/02-fundamentos-ml.html#la-paradoja-de-la-precisión",
@@ -452,7 +452,7 @@
     "href": "clases/dia-01/02-fundamentos-ml.html#métricas-de-regresión",
     "title": "IA para Científicos Sociales",
     "section": "Métricas de regresión",
-    "text": "Métricas de regresión\n\n\nPara regresión (predecir números), necesitamos métricas diferentes:\n\n\n\n\n\n\n\n\n\nMétrica\nFórmula\nIntuición\n\n\n\n\nMAE\nMedia de\nreal - predicho\n\n\nMSE\nMedia de (real - predicho)²\nError cuadrado promedio (penaliza errores grandes)\n\n\nRMSE\n\\(\\sqrt{\\text{MSE}}\\)\nLo mismo que MSE, pero en unidades originales\n\n\nR²\n1 - (SS_res / SS_tot)\nProporción de varianza explicada\n\n\n\n\nEjemplos sencillos:\n\nMAE: predigo 10 pizzas, llegan 12, error de 2. Predigo 10, llegan 8, error de 2. MAE = 2 pizzas\nRMSE: un día me equivoco por 2, otro día por 10. RMSE penaliza mucho más el error de 10 que el de 2\nR²: R² = 0,8 significa que el modelo explica el 80% de la variación; el 20% queda sin explicar"
+    "text": "Métricas de regresión\n\n\nPara regresión (predecir números), necesitamos métricas diferentes:\n\n\n\n\nMétrica\nFórmula\nIntuición\n\n\n\n\nMAE\nMedia de\nreal - predicho\n\n\nMSE\nMedia de (real - predicho)²\nError cuadrado promedio (penaliza errores grandes)\n\n\nRMSE\n\\(\\sqrt{\\text{MSE}}\\)\nLo mismo que MSE, pero en unidades originales\n\n\nR²\n1 - (SS_res / SS_tot)\nProporción de varianza explicada\n\n\n\n\nEjemplos sencillos:\n\nMAE: predigo 10 pizzas, llegan 12, error de 2. Predigo 10, llegan 8, error de 2. MAE = 2 pizzas\nRMSE: un día me equivoco por 2, otro día por 10. RMSE penaliza mucho más el error de 10 que el de 2\nR²: R² = 0,8 significa que el modelo explica el 80% de la variación; el 20% queda sin explicar"
   },
   {
     "objectID": "clases/dia-01/02-fundamentos-ml.html#qué-métrica-elegir",
@@ -473,14 +473,14 @@
     "href": "clases/dia-01/02-fundamentos-ml.html#resumen-de-la-sesión",
     "title": "IA para Científicos Sociales",
     "section": "Resumen de la sesión",
-    "text": "Resumen de la sesión\n\n\nEl flujo de trabajo de ML tiene 5 pasos: recoger, preprocesar, dividir, entrenar, evaluar\nDividimos los datos en entrenamiento y prueba para saber si el modelo generaliza\nLa validación cruzada es más confiable que una sola división, especialmente con pocos datos\nEl sobreajuste ocurre cuando el modelo memoriza en lugar de aprender\nLa accuracy no es suficiente: necesitamos métricas como precisión, recall y matrices de confusión\nLa elección de la métrica depende del problema: el costo de los errores varía según el contexto\nAhora vamos a poner todo esto en práctica con tidymodels"
+    "text": "Resumen de la sesión\n\n\n\nConceptos fundamentales:\n\nEl flujo de trabajo de ML tiene 5 pasos: recoger, preprocesar, dividir, entrenar, evaluar\nLa calidad de los datos determina la calidad del modelo\nEl feature engineering puede mejorar mucho un modelo simple\nDividimos los datos en entrenamiento y prueba para evaluar generalización\nLa validación cruzada es más confiable que una sola división\n\n\nProblemas y soluciones:\n\nEl sobreajuste ocurre cuando el modelo memoriza en lugar de aprender\nLa regularización controla la complejidad del modelo\nLa accuracy no es suficiente: necesitamos precisión, recall, AUC-ROC\nLos hiperparámetros se ajustan con validación, no con test\nLa reproducibilidad es necesaria para verificar y colaborar"
   },
   {
     "objectID": "clases/dia-01/02-fundamentos-ml.html#próximos-pasos",
     "href": "clases/dia-01/02-fundamentos-ml.html#próximos-pasos",
     "title": "IA para Científicos Sociales",
     "section": "Próximos pasos",
-    "text": "Próximos pasos\n\n\nMañana (Día 2): aprendizaje supervisado\n\nSesión 2.1: clasificación (regresión logística, árboles de decisión, random forest)\nSesión 2.2: regresión y predicción (LASSO, Ridge, Elastic Net)\n\nVamos a aplicar todo lo que vimos hoy con modelos más sofisticados\nAhora: Laboratorio 1"
+    "text": "Próximos pasos\n\n\nAhora: Laboratorio práctico (Sesiones 1.3 y 1.4)\n\nPrimer flujo de trabajo con tidymodels\nClasificación con regresión logística\nEvaluación y comparación de modelos\n\nMañana (Día 2): Aprendizaje supervisado\n\nSesión 2.1: Clasificación (regresión logística, árboles de decisión, random forest)\nSesión 2.2: Regresión y predicción (LASSO, Ridge, Elastic Net)\n\nVamos a aplicar todo lo que vimos hoy con modelos más sofisticados"
   },
   {
     "objectID": "clases/dia-01/02-fundamentos-ml.html#configuración-del-entorno",
@@ -1538,5 +1538,96 @@
     "title": "IA para Científicos Sociales",
     "section": "Capacidades emergentes",
     "text": "Capacidades emergentes\n\n\n\n\nA medida que los modelos crecen, aparecen capacidades que no fueron entrenadas explícitamente\nEjemplos de capacidades emergentes:\n\nRazonamiento matemático: resolver problemas paso a paso\nTraducción zero-shot: traducir entre idiomas que nunca vio juntos\nProgramación: escribir código funcional en múltiples lenguajes\nSeguimiento de instrucciones: entender y ejecutar indicaciones complejas\n\nNadie diseñó estas capacidades: emergieron del entrenamiento a escala\nEsto genera tanto entusiasmo como preocupación: no siempre sabemos qué puede hacer un modelo hasta que lo probamos\n\n\n\n¿Por qué ocurre esto?\nLos modelos grandes ven tantos ejemplos durante el entrenamiento que internalizan patrones abstractos sin que nadie se los enseñe explícitamente.\n\nImplicancia para investigadores:\n\nNo podemos predecir exactamente qué hará un modelo nuevo\nLa evaluación post-hoc es necesaria\nNuevas capacidades pueden aparecer (o desaparecer) con cambios de escala\n\n\nEs un área de investigación activa: ¿cómo predecir y controlar capacidades emergentes?"
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#calidad-de-datos-el-factor-más-ignorado",
+    "href": "clases/dia-01/02-fundamentos-ml.html#calidad-de-datos-el-factor-más-ignorado",
+    "title": "IA para Científicos Sociales",
+    "section": "Calidad de datos: el factor más ignorado",
+    "text": "Calidad de datos: el factor más ignorado\n\n\n\nProblemas comunes en datos reales:\n\nValores faltantes: ¿aleatorios o sistemáticos?\n\nMCAR: faltantes completamente al azar\nMAR: faltantes que dependen de otras variables observadas\nMNAR: faltantes que dependen de la variable misma (más difícil)\n\nErrores de medición: datos mal cargados, unidades inconsistentes\nDuplicados: registros repetidos que sesgan el modelo\nDesbalance de clases: mucho más de una categoría que de otra\nData leakage: información del futuro que “se filtra” al entrenamiento\n\n\n\nEjemplo de data leakage:\nQuieren predecir si un paciente será hospitalizado.\nVariable: \"días_en_hospital\"\n\nSi incluyen esta variable,\nel modelo \"aprende\" que\ndías_en_hospital &gt; 0 → hospitalizado\n\n¡Pero esta información no existe\nal momento de la predicción!\n\nEl data leakage es uno de los errores más difíciles de detectar y puede inflar artificialmente las métricas."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#feature-engineering",
+    "href": "clases/dia-01/02-fundamentos-ml.html#feature-engineering",
+    "title": "IA para Científicos Sociales",
+    "section": "Feature engineering",
+    "text": "Feature engineering\nEl arte de crear variables predictivas\n\n\n\n\nFeature engineering: crear nuevas variables a partir de las existentes\nPuede mejorar mucho el rendimiento de un modelo simple\nEjemplos comunes:\n\nTransformaciones: log(ingreso), raíz cuadrada, bins\nInteracciones: edad × educación\nAgregaciones: promedio de compras últimos 3 meses\nVariables temporales: día de la semana, mes, año\nVariables de texto: largo del texto, cantidad de palabras\n\nEl conocimiento del dominio es clave: ¿qué variables tienen sentido para el problema?\n\n\n\nEjemplo: predicción de abandono\nVariables originales:\nfecha_registro, ultima_compra,\nmonto_total, cantidad_compras\nVariables derivadas:\ndias_desde_registro\ndias_sin_comprar         ← predictor fuerte\npromedio_por_compra\nfrecuencia_compras\ntendencia_reciente       ← ¿aumenta o baja?\n\nUn buen feature engineering puede valer más que un modelo complejo."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#estratificación-y-otras-estrategias",
+    "href": "clases/dia-01/02-fundamentos-ml.html#estratificación-y-otras-estrategias",
+    "title": "IA para Científicos Sociales",
+    "section": "Estratificación y otras estrategias",
+    "text": "Estratificación y otras estrategias\n\n\n\nEstratificación\n\nAsegura que cada fold tenga la misma proporción de clases que el dataset completo\nNecesaria cuando las clases están desbalanceadas\nEn tidymodels: initial_split(datos, strata = variable_respuesta)\n\nValidación temporal (time series split)\n\nPara datos con estructura temporal (series de tiempo)\nNunca entrenar con datos del futuro para predecir el pasado\nSe entrena con datos anteriores, se valida con datos posteriores\n\nLeave-One-Out (LOO)\n\nK = N (cada observación es un fold)\nÚtil con muy pocos datos, pero costoso computacionalmente\n\n\n\nValidación temporal\nDatos: ene feb mar abr may jun jul ago\n\nFold 1:\n  Train: ene feb mar\n  Test:  abr\n\nFold 2:\n  Train: ene feb mar abr\n  Test:  may\n\nFold 3:\n  Train: ene feb mar abr may\n  Test:  jun\n\n... y así sucesivamente\n\nLa validación temporal es necesaria para datos con dependencia temporal."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#cuántos-datos-necesito",
+    "href": "clases/dia-01/02-fundamentos-ml.html#cuántos-datos-necesito",
+    "title": "IA para Científicos Sociales",
+    "section": "¿Cuántos datos necesito?",
+    "text": "¿Cuántos datos necesito?\n\n\n\n\nPregunta frecuente sin respuesta universal\nDepende de:\n\nComplejidad del problema: ¿cuántas variables? ¿relaciones lineales o no lineales?\nRuido en los datos: datos limpios necesitan menos observaciones\nComplejidad del modelo: modelos complejos necesitan más datos\nNúmero de clases: más clases = más datos por clase\n\nReglas prácticas (muy aproximadas):\n\nClasificación: al menos 50-100 por clase minoritaria\nDeep learning: miles a millones de ejemplos\n\n\n\n\nCurvas de aprendizaje\n\nCon más datos, el rendimiento mejora, pero con rendimientos decrecientes.\nA veces más datos ayudan más que un modelo más complejo."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#regularización-controlando-la-complejidad",
+    "href": "clases/dia-01/02-fundamentos-ml.html#regularización-controlando-la-complejidad",
+    "title": "IA para Científicos Sociales",
+    "section": "Regularización: controlando la complejidad",
+    "text": "Regularización: controlando la complejidad\n\n\n\n\nRegularización: técnica para penalizar la complejidad del modelo\nAgrega un término de penalización a la función de pérdida\nObliga al modelo a mantener coeficientes pequeños\nReduce la varianza a costa de un pequeño aumento en el sesgo\n\nTipos principales:\n\nL1 (LASSO): puede llevar coeficientes a exactamente cero (selección de variables)\nL2 (Ridge): reduce coeficientes pero no los elimina\nElastic Net: combinación de L1 y L2\n\nLo veremos en detalle en el Día 2 cuando trabajemos con regresión.\n\n\nIntuición de la regularización\nSin regularización:\nModelo: y = 15.3x₁ - 42.7x₂ + 89.1x₃\n\nCoeficientes grandes = modelo sensible\na pequeños cambios en los datos\nCon regularización:\nModelo: y = 2.1x₁ - 1.8x₂ + 0.5x₃\n\nCoeficientes pequeños = modelo más\nestable y generalizable\n\nLa regularización es como pedirle al modelo que sea “parsimonioso”."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#cómo-detectar-sobreajuste-en-la-práctica",
+    "href": "clases/dia-01/02-fundamentos-ml.html#cómo-detectar-sobreajuste-en-la-práctica",
+    "title": "IA para Científicos Sociales",
+    "section": "Cómo detectar sobreajuste en la práctica",
+    "text": "Cómo detectar sobreajuste en la práctica\n\n\n\nSeñales de alarma:\n\nGran brecha entre rendimiento en train y test\nEl modelo mejora en train pero empeora en validación\nCoeficientes o pesos muy grandes\nEl modelo es muy sensible a pequeños cambios en los datos\n\nEstrategias para combatirlo:\n\nMás datos (si es posible)\nRegularización (L1, L2, Elastic Net)\nReducir complejidad del modelo\nValidación cruzada para evaluar de forma más robusta\n\n\n\nCurvas de entrenamiento\n\nCuando las curvas se separan, el modelo está sobreajustando.\nEl punto donde se cruzan es donde deberíamos detenernos."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#f1-score-y-auc-roc",
+    "href": "clases/dia-01/02-fundamentos-ml.html#f1-score-y-auc-roc",
+    "title": "IA para Científicos Sociales",
+    "section": "F1-Score y AUC-ROC",
+    "text": "F1-Score y AUC-ROC\n\n\n\nF1-Score\n\nMedia armónica de precisión y recall\nF1 = 2 × (precision × recall) / (precision + recall)\nUn solo número que balancea ambas métricas\nF1 = 1 es perfecto; F1 = 0 es el peor caso\nÚtil cuando no podés priorizar una métrica sobre la otra\n\nMacro vs. Micro F1:\n\nMacro F1: promedio simple de F1 por clase (trata todas las clases igual)\nMicro F1: calcula F1 global (favorece clases mayoritarias)\n\n\nAUC-ROC\n\nCurva ROC: grafica tasa de verdaderos positivos vs. falsos positivos\nAUC: área bajo la curva ROC (0.5 = azar, 1.0 = perfecto)\nMide qué tan bien el modelo separa las clases en general\nIndependiente del umbral: evalúa todas las probabilidades\nMuy usado para comparar clasificadores\n\n\n\n\nAUC\nInterpretación\n\n\n\n\n0.5\nNo mejor que azar\n\n\n0.7-0.8\nAceptable\n\n\n0.8-0.9\nBueno\n\n\n&gt;0.9\nExcelente"
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#qué-son-los-hiperparámetros",
+    "href": "clases/dia-01/02-fundamentos-ml.html#qué-son-los-hiperparámetros",
+    "title": "IA para Científicos Sociales",
+    "section": "¿Qué son los hiperparámetros?",
+    "text": "¿Qué son los hiperparámetros?\n\n\n\nParámetros vs. hiperparámetros:\n\nParámetros: los aprende el modelo durante el entrenamiento (coeficientes, pesos)\nHiperparámetros: los definimos nosotros antes de entrenar\n\nEjemplos de hiperparámetros:\n\n\n\nModelo\nHiperparámetros\n\n\n\n\nRegresión regularizada\nλ (fuerza de regularización)\n\n\nÁrbol de decisión\nProfundidad máxima, mínimo de observaciones por hoja\n\n\nRandom Forest\nNúmero de árboles, variables por split\n\n\nK-NN\nNúmero de vecinos (k)\n\n\nRed neuronal\nTasa de aprendizaje, capas, neuronas\n\n\n\nElegir bien los hiperparámetros puede mejorar mucho el rendimiento.\n\n\nAjuste de hiperparámetros (tuning)\nPara cada combinación de hiperparámetros:\n  1. Entrenar modelo con train\n  2. Evaluar en validación\n  3. Guardar rendimiento\n\nElegir la combinación con mejor rendimiento\n\nEvaluar modelo final en test\n\nEstrategias de búsqueda:\n\nGrid search: probar todas las combinaciones\nRandom search: probar combinaciones aleatorias\nBayesian optimization: búsqueda inteligente\n\n\nNunca ajustar hiperparámetros usando los datos de test."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#selección-de-modelos",
+    "href": "clases/dia-01/02-fundamentos-ml.html#selección-de-modelos",
+    "title": "IA para Científicos Sociales",
+    "section": "Selección de modelos",
+    "text": "Selección de modelos\n\n\n\n¿Qué modelo usar?\n\nNo existe un modelo “mejor” para todos los problemas\nDepende de:\n\nCantidad de datos disponibles\nInterpretabilidad requerida\nTiempo de entrenamiento aceptable\nTipo de relaciones en los datos\n\n\nPrincipio de parsimonia:\n\nEmpezar con modelos simples (regresión, árboles)\nAumentar complejidad solo si es necesario\nUn modelo simple que funciona bien es mejor que uno complejo que funciona igual\n\n\n\nGuía práctica\n\n\n\nSituación\nModelo sugerido\n\n\n\n\nPocos datos, interpretabilidad alta\nRegresión logística/lineal\n\n\nDatos moderados, interpretabilidad media\nÁrboles, Random Forest\n\n\nMuchos datos, rendimiento máximo\nGradient Boosting, Redes\n\n\nRelaciones muy no lineales\nRandom Forest, XGBoost\n\n\nTexto\nTransformers, BERT\n\n\n\n\nEn la práctica, probar varios modelos y comparar con validación cruzada."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#el-ciclo-de-vida-de-un-modelo",
+    "href": "clases/dia-01/02-fundamentos-ml.html#el-ciclo-de-vida-de-un-modelo",
+    "title": "IA para Científicos Sociales",
+    "section": "El ciclo de vida de un modelo",
+    "text": "El ciclo de vida de un modelo\n\n\n┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐\n│  Definir    │───▶│  Recoger    │───▶│  Entrenar   │───▶│  Desplegar  │───▶│  Monitorear │\n│  problema   │    │  datos      │    │  y evaluar  │    │  (deploy)   │    │  y mantener │\n└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘\n                                                                                    │\n                                                                                    ▼\n                                                                            ┌─────────────┐\n                                                                            │  Reentrenar │\n                                                                            │  si es      │\n                                                                            │  necesario  │\n                                                                            └─────────────┘\n\n\n\n\nEl entrenamiento es solo una parte del ciclo\nDespués de desplegar, el modelo puede degradarse (model drift)\nLos datos del mundo real cambian con el tiempo\nHay que monitorear el rendimiento en producción\n\n\n\nCausas de degradación:\n\nData drift: la distribución de los datos cambia\nConcept drift: la relación entre variables cambia\nCambios en el negocio: nuevos productos, mercados\n\nUn modelo no es “listo y olvidado”"
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#por-qué-importa-la-reproducibilidad",
+    "href": "clases/dia-01/02-fundamentos-ml.html#por-qué-importa-la-reproducibilidad",
+    "title": "IA para Científicos Sociales",
+    "section": "¿Por qué importa la reproducibilidad?",
+    "text": "¿Por qué importa la reproducibilidad?\n\n\n\n\nReproducibilidad: poder obtener los mismos resultados con los mismos datos y código\nNecesaria para:\n\nVerificar resultados propios y ajenos\nColaborar con otros investigadores\nDebugging: entender qué salió mal\nProducción: desplegar el mismo modelo que probamos\n\n\nProblemas comunes:\n\nDiferentes versiones de paquetes\nSemillas aleatorias no fijadas\nDatos no versionados\nCódigo no documentado\nHiperparámetros no registrados\n\n\n\nBuenas prácticas\n\nFijar semillas aleatorias\nset.seed(2026)\nDocumentar versiones\nsessionInfo()\nUsar control de versiones\n\nGit para código\nDVC para datos (si son grandes)\n\nRegistrar experimentos\n\nQué modelo, qué hiperparámetros\nQué datos, qué preprocesamiento\nQué métricas obtuvieron"
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#herramientas-para-reproducibilidad",
+    "href": "clases/dia-01/02-fundamentos-ml.html#herramientas-para-reproducibilidad",
+    "title": "IA para Científicos Sociales",
+    "section": "Herramientas para reproducibilidad",
+    "text": "Herramientas para reproducibilidad\n\n\n\nEn R:\n\nrenv: gestión de dependencias (versiones de paquetes)\ntargets: pipelines reproducibles\nQuarto/RMarkdown: código + documentación juntos\nGit: control de versiones\n\nEn general:\n\nDocker: contenedores con ambiente completo\nMLflow: tracking de experimentos\nDVC: versionado de datos\n\n\n\nEjemplo: estructura de proyecto reproducible\nmi_proyecto/\n├── README.md           ← descripción\n├── renv.lock           ← versiones de paquetes\n├── data/\n│   ├── raw/            ← datos originales\n│   └── processed/      ← datos procesados\n├── scripts/\n│   ├── 01-preprocess.R\n│   ├── 02-train.R\n│   └── 03-evaluate.R\n├── models/             ← modelos guardados\n└── reports/            ← resultados\n\nInvertir en reproducibilidad ahorra tiempo a futuro."
+  },
+  {
+    "objectID": "clases/dia-01/02-fundamentos-ml.html#auc-roc",
+    "href": "clases/dia-01/02-fundamentos-ml.html#auc-roc",
+    "title": "IA para Científicos Sociales",
+    "section": "AUC-ROC",
+    "text": "AUC-ROC\n\n\n\nAUC-ROC\n\nCurva ROC: grafica tasa de verdaderos positivos vs. falsos positivos\nAUC: área bajo la curva ROC (0.5 = azar, 1.0 = perfecto)\nMide qué tan bien el modelo separa las clases en general\nIndependiente del umbral: evalúa todas las probabilidades\nMuy usado para comparar clasificadores\n\n\n\n\n\nAUC\nInterpretación\n\n\n\n\n0.5\nNo mejor que azar\n\n\n0.7-0.8\nAceptable\n\n\n0.8-0.9\nBueno\n\n\n&gt;0.9\nExcelente\n\n\n\n\n\n\n\n\n\nÁrea bajo la curva ROC (AUC). El modelo perfecto (verde, AUC = 1) llega directamente a la esquina superior izquierda sin falsos positivos; el modelo aleatorio sigue la diagonal (rojo, AUC = 0,5). Cuanto más se aleja la curva azul de la diagonal, mejor distingue el modelo entre positivos y negativos."
   }
 ]

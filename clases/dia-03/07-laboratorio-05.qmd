@@ -1,0 +1,820 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 3.3: Laboratorio - Clustering y PCA"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 3.3](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-03/07-laboratorio-05.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 5: Clustering y PCA {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Explorar indicadores de países
+2. Aplicar K-means y evaluar clusters
+3. Usar el método del codo y silueta
+4. Aplicar clustering jerárquico
+5. Ejecutar PCA e interpretar componentes
+6. Visualizar con biplot
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- Flujo completo de [clustering]{.alert}
+- Comparar K-means vs. jerárquico
+- Interpretar [componentes principales]{.alert}
+- Combinar PCA + clustering para visualización
+
+<br>
+
+[El dataset contiene 18 países latinoamericanos con 8 indicadores socioeconómicos.]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Exploración de datos | ~20 min |
+| 2 | K-means y evaluación | ~35 min |
+| 3 | Clustering jerárquico | ~25 min |
+| 4 | PCA e interpretación | ~40 min |
+
+<br>
+
+[Trabajen en sus computadoras. Intenten resolver los ejercicios antes de mirar la solución.]{.alert}
+:::
+
+# Parte 1: Exploración de datos {background-color="#2d4563"}
+
+## Cargar paquetes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cargar-paquetes
+#| message: false
+#| warning: false
+#| eval: true
+
+# Instalar si es necesario
+paquetes <- c("tidyverse", "cluster", "factoextra", "dendextend", "corrplot")
+
+for (pkg in paquetes) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+
+library(tidyverse)
+library(cluster)      # Para silhouette()
+library(factoextra)   # Para fviz_cluster() y fviz_pca()
+library(dendextend)   # Para dendrogramas bonitos
+library(corrplot)     # Para matriz de correlación
+
+set.seed(2026)
+```
+:::
+
+## Cargar y explorar los datos
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: cargar-datos
+#| eval: true
+
+# Cargar indicadores por país
+paises <- read_csv("datos/indicadores_paises.csv", show_col_types = FALSE)
+
+# Vista general
+glimpse(paises)
+```
+:::
+
+## Variables del dataset
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+| Variable | Descripción |
+|----------|-------------|
+| `pib_per_capita` | PIB per cápita en USD |
+| `esperanza_vida` | Esperanza de vida al nacer (años) |
+| `anios_educacion` | Años promedio de escolaridad |
+| `acceso_internet` | % de población con acceso a internet |
+| `gasto_salud_pib` | Gasto en salud como % del PIB |
+| `indice_gini` | Índice de Gini (desigualdad, 0-100) |
+| `urbanizacion` | % de población urbana |
+| `indice_democracia` | Índice de democracia (0-10) |
+
+[Todas las variables son numéricas. Ideal para clustering y PCA.]{.alert}
+:::
+
+## Estadísticas descriptivas
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: estadisticas
+#| eval: true
+
+# Resumen de cada variable
+paises |>
+  select(-pais) |>
+  summary()
+```
+
+Las variables tienen [escalas muy diferentes]{.alert} (PIB en miles vs. índices de 0-10). Es crucial escalar antes de aplicar K-means o PCA.
+:::
+
+## Matriz de correlación
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: correlacion
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+
+# Calcular correlaciones
+cor_matrix <- paises |>
+  select(-pais) |>
+  cor()
+
+# Visualizar
+corrplot(cor_matrix, method = "color", type = "upper",
+         addCoef.col = "black", number.cex = 0.7,
+         tl.col = "black", tl.srt = 45,
+         col = colorRampPalette(c("#E74C3C", "white", "#2d4563"))(200))
+```
+:::
+
+## Interpretación de correlaciones
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Correlaciones positivas fuertes:**
+
+- PIB ↔ esperanza de vida
+- PIB ↔ educación
+- PIB ↔ internet
+- Internet ↔ educación
+
+Estas variables "van juntas": países con alto PIB tienden a tener mejor educación, salud e internet.
+:::
+
+:::{.column width=50%}
+**Correlaciones negativas:**
+
+- Gini ↔ democracia
+- (Posiblemente) Gini ↔ desarrollo
+
+Países más desiguales tienden a tener índices democráticos más bajos.
+
+<br>
+
+[Esto sugiere que PCA encontrará un "eje de desarrollo" que combine varias variables.]{.alert}
+:::
+:::
+:::
+
+## Preparar datos para clustering
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: preparar-datos
+#| eval: true
+
+# Guardar nombres de países
+nombres <- paises$pais
+
+# Seleccionar solo variables numéricas
+datos_num <- paises |>
+  select(-pais)
+
+# Escalar (media = 0, sd = 1)
+datos_scaled <- scale(datos_num) |>
+  as.data.frame()
+
+# Asignar nombres de países como rownames
+rownames(datos_scaled) <- nombres
+
+# Verificar
+head(datos_scaled, 5)
+```
+:::
+
+# Parte 2: K-means y evaluación {background-color="#2d4563"}
+
+## Ejecutar K-means con K=3
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: kmeans-basico
+#| eval: true
+
+# K-means con 3 clusters
+km3 <- kmeans(datos_scaled, centers = 3, nstart = 25)
+
+# Ver resultados
+km3$cluster
+
+# Agregar al dataframe original
+paises$cluster_km3 <- factor(km3$cluster)
+```
+:::
+
+## Visualizar los clusters
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: viz-kmeans
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Visualización con factoextra (usa PCA automáticamente)
+fviz_cluster(km3, data = datos_scaled,
+             palette = c("#2d4563", "#e63946", "#457b9d"),
+             geom = "point",
+             ellipse.type = "convex",
+             ggtheme = theme_minimal()) +
+  geom_text(aes(label = nombres), vjust = -1, size = 3) +
+  labs(title = "K-means con K=3")
+```
+:::
+
+## ¿Qué países están en cada cluster?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: paises-cluster
+#| eval: true
+
+# Listar países por cluster
+paises |>
+  select(pais, cluster_km3) |>
+  arrange(cluster_km3) |>
+  group_by(cluster_km3) |>
+  summarise(paises = paste(pais, collapse = ", "))
+```
+:::
+
+## Perfil de cada cluster
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: perfil-cluster
+#| eval: true
+
+# Medias por cluster (datos originales, no escalados)
+paises |>
+  group_by(cluster_km3) |>
+  summarise(
+    n = n(),
+    pib_mean = round(mean(pib_per_capita)),
+    vida_mean = round(mean(esperanza_vida), 1),
+    educ_mean = round(mean(anios_educacion), 1),
+    inet_mean = round(mean(acceso_internet), 1),
+    gini_mean = round(mean(indice_gini), 1),
+    demo_mean = round(mean(indice_democracia), 1)
+  )
+```
+
+¿Los clusters corresponden a niveles de desarrollo? ¿Alto, medio, bajo?
+:::
+
+## Método del codo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: metodo-codo
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+# Calcular WSS para K=1 a K=8
+fviz_nbclust(datos_scaled, kmeans,
+             method = "wss",
+             k.max = 8,
+             nstart = 25) +
+  labs(title = "Método del codo",
+       subtitle = "¿Dónde se 'aplana' la curva?") +
+  theme_minimal()
+```
+:::
+
+## Método de la silueta
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: metodo-silueta
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+# Calcular silueta promedio para K=2 a K=8
+fviz_nbclust(datos_scaled, kmeans,
+             method = "silhouette",
+             k.max = 8,
+             nstart = 25) +
+  labs(title = "Método de la silueta",
+       subtitle = "K óptimo maximiza la silueta promedio") +
+  theme_minimal()
+```
+:::
+
+## Silueta detallada para K=3
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: silueta-detalle
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Calcular silueta para cada observación
+sil <- silhouette(km3$cluster, dist(datos_scaled))
+
+# Visualizar
+fviz_silhouette(sil, palette = c("#2d4563", "#e63946", "#457b9d")) +
+  labs(title = "Silueta por observación (K=3)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8))
+```
+:::
+
+## Interpretación de la silueta
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Silueta promedio:**
+
+```{r}
+#| label: silueta-promedio
+#| eval: true
+#| echo: true
+
+mean(sil[, 3])
+```
+
+Un valor de ~0.35-0.45 indica estructura [moderada]{.alert}.
+
+**Observaciones con silueta negativa:**
+
+Están mal clasificadas (más cerca de otro cluster).
+:::
+
+:::{.column width=50%}
+**Regla de interpretación:**
+
+| Valor | Significado |
+|-------|-------------|
+| > 0.7 | Fuerte |
+| 0.5 - 0.7 | Razonable |
+| 0.25 - 0.5 | Débil |
+| < 0.25 | Sin estructura |
+
+<br>
+
+[Con solo 18 países, es difícil obtener siluetas muy altas.]{.alert}
+:::
+:::
+:::
+
+# Parte 3: Clustering jerárquico {background-color="#2d4563"}
+
+## Calcular distancias y clustering
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: hclust-basico
+#| eval: true
+
+# Matriz de distancias
+d <- dist(datos_scaled, method = "euclidean")
+
+# Clustering jerárquico con método Ward
+hc <- hclust(d, method = "ward.D2")
+
+# Resumen
+print(hc)
+```
+:::
+
+## Dendrograma básico
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: dendrograma-basico
+#| eval: true
+#| fig-width: 12
+#| fig-height: 6
+
+# Dendrograma básico
+plot(hc, hang = -1, cex = 0.9,
+     main = "Dendrograma: Países latinoamericanos",
+     xlab = "País", ylab = "Altura")
+
+# Agregar rectángulos para K=3
+rect.hclust(hc, k = 3, border = c("#2d4563", "#e63946", "#457b9d"))
+```
+:::
+
+## Dendrograma con dendextend
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: dendrograma-bonito
+#| eval: true
+#| fig-width: 12
+#| fig-height: 6
+
+# Convertir a dendrograma
+dend <- as.dendrogram(hc)
+
+# Colorear por clusters
+dend <- dend |>
+  set("branches_k_color", k = 3,
+      value = c("#2d4563", "#e63946", "#457b9d")) |>
+  set("labels_cex", 0.8)
+
+# Graficar
+plot(dend, main = "Dendrograma coloreado por cluster")
+```
+:::
+
+## Cortar el dendrograma
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cortar-dendrograma
+#| eval: true
+
+# Cortar para obtener K=3 clusters
+grupos_hc <- cutree(hc, k = 3)
+
+# Comparar con K-means
+table(K_means = km3$cluster, Jerarquico = grupos_hc)
+```
+
+:::{.callout-note}
+K-means y jerárquico no siempre dan los mismos resultados. Los números de cluster son arbitrarios (cluster 1 en K-means puede ser cluster 2 en jerárquico).
+:::
+:::
+
+## Comparar asignaciones
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: comparar-metodos
+#| eval: true
+
+# Agregar clusters jerárquicos al dataframe
+paises$cluster_hc <- factor(grupos_hc)
+
+# Ver diferencias
+paises |>
+  select(pais, cluster_km3, cluster_hc) |>
+  filter(cluster_km3 != cluster_hc)
+```
+
+Si hay diferencias, ¿cuál método tiene más sentido según el conocimiento del dominio?
+:::
+
+# Parte 4: PCA e interpretación {background-color="#2d4563"}
+
+## Ejecutar PCA
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: pca-basico
+#| eval: true
+
+# PCA sobre datos escalados
+pca <- prcomp(datos_scaled)
+
+# Resumen de varianza explicada
+summary(pca)
+```
+:::
+
+## Scree plot
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: scree-plot
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+# Varianza explicada por componente
+fviz_eig(pca, addlabels = TRUE,
+         barfill = "#2d4563", barcolor = "#2d4563") +
+  labs(title = "Scree plot: varianza explicada por componente") +
+  theme_minimal()
+```
+:::
+
+## Loadings: ¿qué mide cada componente?
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: loadings
+#| eval: true
+
+# Loadings de los primeros 3 componentes
+loadings <- pca$rotation[, 1:3] |>
+  as.data.frame() |>
+  rownames_to_column("variable") |>
+  arrange(desc(abs(PC1)))
+
+loadings
+```
+:::
+
+## Interpretación de PC1 y PC2
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**PC1 (≈50% varianza):**
+
+- Carga positiva en: PIB, educación, internet, esperanza de vida
+- Carga negativa en: (ver datos)
+
+→ [Eje de desarrollo general]{.alert}
+
+Países a la derecha: más desarrollados.
+:::
+
+:::{.column width=50%}
+**PC2 (≈15-20% varianza):**
+
+- Analizar qué variables cargan alto
+- Posiblemente: desigualdad, ruralidad
+
+→ [Segunda dimensión de variación]{.alert}
+
+Captura diferencias no explicadas por PC1.
+:::
+:::
+
+<br>
+
+[Los loadings nos dicen qué significa cada componente.]{.alert}
+:::
+
+## Biplot
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: biplot
+#| eval: true
+#| fig-width: 10
+#| fig-height: 7
+
+# Biplot con factoextra
+fviz_pca_biplot(pca,
+                repel = TRUE,
+                col.var = "#e63946",
+                col.ind = "#2d4563",
+                label = "all") +
+  labs(title = "Biplot: países y variables") +
+  theme_minimal()
+```
+:::
+
+## PCA coloreado por cluster
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: pca-cluster
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+# Extraer coordenadas PCA
+pca_coords <- pca$x[, 1:2] |>
+  as.data.frame() |>
+  mutate(
+    pais = nombres,
+    cluster = paises$cluster_km3
+  )
+
+# Graficar
+ggplot(pca_coords, aes(x = PC1, y = PC2, color = cluster, label = pais)) +
+  geom_point(size = 3) +
+  geom_text(vjust = -0.8, size = 3, show.legend = FALSE) +
+  scale_color_manual(values = c("#2d4563", "#e63946", "#457b9d")) +
+  labs(title = "PCA coloreado por cluster K-means",
+       x = paste0("PC1 (", round(summary(pca)$importance[2,1]*100, 1), "%)"),
+       y = paste0("PC2 (", round(summary(pca)$importance[2,2]*100, 1), "%)")) +
+  theme_minimal()
+```
+:::
+
+## Contribución de variables a cada PC
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: contrib-var
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Contribución a PC1
+fviz_contrib(pca, choice = "var", axes = 1, fill = "#2d4563") +
+  labs(title = "Contribución de variables a PC1") +
+  theme_minimal()
+```
+:::
+
+# Ejercicios adicionales {background-color="#2d4563"}
+
+## Ejercicio 1: Probar K=4
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Ejecutar K-means con K=4
+2. Visualizar los clusters
+3. Calcular la silueta
+4. ¿Mejora respecto a K=3?
+
+```{r}
+#| label: ejercicio-1
+#| eval: false
+
+# Tu código aquí
+km4 <- kmeans(datos_scaled, centers = 4, nstart = 25)
+
+# Visualizar
+fviz_cluster(km4, data = datos_scaled)
+
+# Silueta
+sil4 <- silhouette(km4$cluster, dist(datos_scaled))
+mean(sil4[, 3])
+```
+:::
+
+## Ejercicio 2: Comparar métodos de linkage
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Ejecutar clustering jerárquico con método "complete" y "average"
+2. Comparar los dendrogramas
+3. ¿Cambian mucho los clusters?
+
+```{r}
+#| label: ejercicio-2
+#| eval: false
+
+# Tu código aquí
+hc_complete <- hclust(d, method = "complete")
+hc_average <- hclust(d, method = "average")
+
+# Comparar dendrogramas
+par(mfrow = c(1, 2))
+plot(hc_complete, main = "Complete")
+plot(hc_average, main = "Average")
+```
+:::
+
+## Ejercicio 3: PCA con 3 componentes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Extraer los primeros 3 componentes
+2. Crear un gráfico 3D (opcional) o dos gráficos 2D (PC1-PC2, PC1-PC3)
+3. ¿El tercer componente agrega información útil?
+
+```{r}
+#| label: ejercicio-3
+#| eval: false
+
+# Tu código aquí
+pca_3d <- pca$x[, 1:3] |>
+  as.data.frame() |>
+  mutate(pais = nombres, cluster = paises$cluster_km3)
+
+# Gráfico PC1 vs PC3
+ggplot(pca_3d, aes(x = PC1, y = PC3, color = cluster, label = pais)) +
+  geom_point(size = 3) +
+  geom_text(vjust = -0.8, size = 3) +
+  theme_minimal()
+```
+:::
+
+## Resumen del laboratorio
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que practicamos:**
+
+- Exploración y escalado de datos
+- K-means con evaluación (codo, silueta)
+- Clustering jerárquico con dendrograma
+- PCA con interpretación de loadings
+- Combinación de PCA + clustering
+:::
+
+:::{.column width=50%}
+**Funciones clave:**
+
+- `scale()`: normalizar datos
+- `kmeans()`: clustering
+- `silhouette()`: evaluar clusters
+- `hclust()`: jerárquico
+- `prcomp()`: PCA
+- `fviz_*()`: visualizaciones
+:::
+:::
+
+<br>
+
+[En el próximo laboratorio aplicaremos análisis de texto.]{.alert}
+:::
+
+# Continuar con el laboratorio de texto {background-color="#2d4563"}
