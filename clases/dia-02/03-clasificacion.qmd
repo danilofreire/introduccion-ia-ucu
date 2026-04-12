@@ -74,25 +74,28 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 32px;"}
+:::{style="margin-top: 20px; font-size: 28px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Sesión 2.1: Clasificación (~2 h)**
+**Primera parte**
 
-- Regresión logística (repaso y profundización)
+- Regresión logística (profundización)
 - Árboles de decisión
 - Random Forests
-- Comparación de modelos
-- Aplicaciones en ciencias sociales
+- Interpretación de importancia de variables
+
+**Segunda parte**
+
+- Ajuste de hiperparámetros (tuning)
+- Comparación sistemática de modelos
+- Aplicaciones en América Latina
 :::
 
 :::{.column width=50%}
-**Sesión 2.2: Regresión y predicción (~2 h)**
-
-- Predicción vs. explicación
-- Regularización: LASSO, Ridge, Elastic Net
-- Laboratorio práctico con `ranger` y `glmnet`
+:::{style="text-align: center;"}
+[![](figures/supervised-learning.png){width="90%"}](#){data-modal-type="image" data-modal-url="figures/supervised-learning.png"}
+:::
 :::
 :::
 :::
@@ -209,6 +212,99 @@ tidy(ajuste)
 # educacion:  0.085 (más edu → más voto)
 # ingreso:    0.041 (más ingreso → más voto)
 ```
+:::
+:::
+:::
+:::
+
+## Ejemplo: Apoyo a la democracia en Uruguay
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Pregunta de investigación:**
+
+¿Qué factores predicen si un uruguayo apoya la democracia como forma de gobierno?
+
+**Datos:** Latinobarómetro Uruguay (simulados)
+
+**Variables predictoras:**
+
+- Edad, educación, ingreso
+- Confianza en instituciones (gobierno, congreso, justicia)
+- Percepción económica
+- Zona (urbano/rural), género
+
+**Variable objetivo:** `apoya_democracia` (sí/no)
+
+[La regresión logística nos dice qué factores aumentan o disminuyen la probabilidad de apoyo.]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Resultados típicos:**
+
+```
+Variable              Coef    Odds Ratio
+─────────────────────────────────────────
+Intercept            -1.20    0.30
+edad                  0.02    1.02
+educacion_anos        0.08    1.08 ***
+ingreso_log           0.15    1.16 *
+confianza_gobierno    0.25    1.28 ***
+percepcion_economia   0.18    1.20 **
+zona_urbano           0.12    1.13
+
+*** p < 0.001, ** p < 0.01, * p < 0.05
+```
+
+[Interpretación:]{.alert} Por cada año adicional de educación, la probabilidad de apoyar la democracia aumenta un 8%.
+:::
+:::
+:::
+:::
+
+## Odds ratios: interpretación práctica
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los coeficientes de regresión logística están en escala [log-odds]{.alert}
+- Para interpretarlos, usamos el [odds ratio]{.alert} = $e^{\beta}$
+
+**Interpretación del odds ratio:**
+
+- OR = 1: sin efecto
+- OR > 1: aumenta la probabilidad
+- OR < 1: disminuye la probabilidad
+
+**Ejemplo:** OR = 1.28 para confianza en el gobierno
+
+- Por cada punto adicional de confianza (escala 1-10), las chances de apoyar la democracia se multiplican por 1.28
+- Es decir, [aumentan un 28%]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Cálculo en R:**
+
+```r
+# Obtener coeficientes
+coefs <- tidy(ajuste)
+
+# Calcular odds ratios
+coefs |>
+  mutate(
+    odds_ratio = exp(estimate),
+    # Intervalo de confianza
+    or_lower = exp(estimate - 1.96*std.error),
+    or_upper = exp(estimate + 1.96*std.error)
+  )
+```
+
+<br>
+
+[Siempre reportar intervalos de confianza para los odds ratios.]{.alert}
 :::
 :::
 :::
@@ -341,6 +437,95 @@ pred_arbol <- predict(ajuste_arbol, datos_test) |>
 - Noten que la [interfaz es idéntica]{.alert}: solo cambiamos `logistic_reg()` por `decision_tree()`
 - `tree_depth` y `min_n` son [hiperparámetros]{.alert}: controlan la complejidad del modelo
 - Esta es la gran ventaja de tidymodels: [misma sintaxis para todos los modelos]{.alert}
+:::
+
+## Visualizar un árbol de decisión
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Una de las grandes ventajas de los árboles es que [se pueden visualizar]{.alert}
+- Con el paquete `rpart.plot`:
+
+```r
+library(rpart.plot)
+
+# Extraer el modelo rpart del ajuste
+arbol_rpart <- extract_fit_engine(ajuste_arbol)
+
+# Visualizar
+rpart.plot(arbol_rpart,
+           type = 4,
+           extra = 104,
+           roundint = FALSE)
+```
+
+- El gráfico muestra:
+    - Las [reglas de decisión]{.alert} en cada nodo
+    - La [proporción de clases]{.alert} en cada hoja
+    - El [camino]{.alert} que sigue cada observación
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Ejemplo de visualización:**
+
+```
+                [voto]
+               /      \
+         edad < 35   edad >= 35
+           /              \
+      [no votó]      educacion < 12
+       65%              /        \
+                  [no votó]    [votó]
+                    55%         78%
+```
+
+[Cualquier persona puede entender este modelo]{.alert}, incluso sin conocimientos técnicos.
+
+Es ideal para [comunicar resultados]{.alert} a tomadores de decisiones.
+:::
+:::
+:::
+:::
+
+## Poda (pruning): controlando la complejidad
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Un árbol sin restricciones crece hasta [memorizar]{.alert} los datos
+- [Poda]{.alert} (pruning): técnica para reducir la complejidad del árbol
+- Dos estrategias:
+    - [Pre-poda:]{.alert} detener el crecimiento antes (limitar profundidad, mínimo de observaciones)
+    - [Post-poda:]{.alert} dejar crecer el árbol completo y luego recortar ramas que no mejoran
+- En tidymodels, usamos hiperparámetros para pre-poda:
+    - `tree_depth`: profundidad máxima
+    - `min_n`: mínimo de observaciones por nodo
+    - `cost_complexity`: penalización por complejidad
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**El trade-off:**
+
+```
+Profundidad     Error train    Error test
+─────────────────────────────────────────
+1               0.35           0.36
+3               0.22           0.25
+5               0.15           0.23
+10              0.08           0.28  ←
+15              0.03           0.35  ←
+20              0.01           0.42  ←
+```
+
+A partir de cierta profundidad, el error en test [empeora]{.alert} mientras el error en train sigue bajando.
+
+[La poda previene el sobreajuste.]{.alert}
+:::
+:::
+:::
 :::
 
 # Random Forests {background-color="#2d4563"}
@@ -496,6 +681,246 @@ importance(rf_fit) |>
 :::
 :::
 
+## Tipos de importancia de variables
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Importancia por permutación**
+
+- Mezclar los valores de una variable y ver cuánto empeora el modelo
+- [Independiente del modelo]{.alert}: se puede usar con cualquier algoritmo
+- Más [confiable]{.alert} pero más lenta
+- Es la que usamos con `importance = "permutation"`
+
+**Importancia por impureza (Gini)**
+
+- Suma de las reducciones de impureza en todos los nodos donde se usa la variable
+- [Rápida]{.alert} pero puede ser [sesgada]{.alert} hacia variables con muchas categorías
+- Es la opción por defecto en muchas implementaciones
+:::
+
+:::{.column width=50%}
+**SHAP values (más avanzado)**
+
+- [SHapley Additive exPlanations]{.alert}
+- Basado en teoría de juegos cooperativos
+- Mide la [contribución de cada variable para cada predicción individual]{.alert}
+- Permite ver no solo qué variables importan, sino [cómo afectan cada caso]{.alert}
+- Disponible en R con el paquete `shapr` o `DALEX`
+
+<br>
+
+[Para este curso usaremos importancia por permutación, que es la más robusta.]{.alert}
+:::
+:::
+:::
+:::
+
+## Visualizar la importancia de variables
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```r
+library(vip)  # Variable Importance Plots
+
+# Graficar importancia
+vip(ajuste_rf, num_features = 10) +
+  labs(title = "Importancia de variables (Random Forest)")
+```
+
+:::{.columns}
+:::{.column width=50%}
+:::{style="font-size: 20px;"}
+**Interpretación del gráfico:**
+
+- Las barras muestran la [importancia relativa]{.alert}
+- Variables arriba = más importantes
+- Pero [no indica la dirección]{.alert} del efecto
+- Para eso necesitamos gráficos de dependencia parcial (PDP)
+:::
+:::
+
+:::{.column width=50%}
+:::{style="font-size: 20px;"}
+**Ejemplo de resultado:**
+
+```
+edad              ████████████████ 0.042
+educacion_anos    ██████████████   0.038
+interes_politica  ███████████      0.031
+ingreso_hogar     █████████        0.025
+confianza_gob     ███████          0.019
+zona              ████             0.012
+genero            ██               0.006
+```
+:::
+:::
+:::
+:::
+
+## Gráficos de dependencia parcial (PDP)
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- La importancia nos dice [qué]{.alert} variables importan
+- Los [Partial Dependence Plots (PDP)]{.alert} nos dicen [cómo]{.alert} afectan
+- Muestran el [efecto marginal]{.alert} de una variable sobre la predicción
+- Útiles para entender relaciones no lineales
+
+```r
+library(DALEX)
+
+# Crear explicador
+explainer <- explain(
+  ajuste_rf,
+  data = datos_train,
+  y = datos_train$voto
+)
+
+# PDP para edad
+pdp_edad <- model_profile(explainer,
+                          variables = "edad")
+plot(pdp_edad)
+```
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Ejemplo de PDP:**
+
+```
+Prob(voto)
+    │
+0.7 │           ┌────────────
+    │          ╱
+0.6 │        ╱
+    │      ╱
+0.5 │    ╱
+    │  ╱
+0.4 │╱
+    └──────────────────────▶
+     20  30  40  50  60  70  edad
+```
+
+[Interpretación:]{.alert} La probabilidad de votar aumenta con la edad, pero se estabiliza después de los 50 años.
+
+Esto es algo que la regresión logística no captura automáticamente.
+:::
+:::
+:::
+:::
+
+# Ajuste de hiperparámetros (tuning) {background-color="#2d4563"}
+
+## ¿Por qué ajustar hiperparámetros?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los [hiperparámetros]{.alert} son decisiones que tomamos antes de entrenar
+- Ejemplos:
+    - Árbol: `tree_depth`, `min_n`
+    - Random Forest: `trees`, `mtry`, `min_n`
+- Los valores por defecto [suelen funcionar]{.alert}, pero no siempre son óptimos
+- El [tuning]{.alert} busca la mejor combinación de hiperparámetros
+- [Nunca usar datos de test para tuning]{.alert}: usamos validación cruzada
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**El proceso:**
+
+```
+1. Definir grilla de valores a probar
+   mtry: [2, 3, 4, 5]
+   min_n: [5, 10, 20]
+
+2. Para cada combinación:
+   - Validación cruzada (5 folds)
+   - Calcular métrica promedio
+
+3. Elegir la mejor combinación
+
+4. Entrenar modelo final con
+   todos los datos de train
+```
+
+[Este proceso se llama "grid search".]{.alert}
+:::
+:::
+:::
+:::
+
+## Tuning con tidymodels
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```r
+# 1. Especificar modelo con parámetros a ajustar (tune())
+modelo_rf_tune <- rand_forest(
+  trees = 500,
+  mtry = tune(),      # <- ajustar este
+
+  min_n = tune()      # <- y este
+) |>
+  set_engine("ranger") |>
+  set_mode("classification")
+
+# 2. Crear grilla de valores
+grilla <- grid_regular(
+  mtry(range = c(2, 6)),
+  min_n(range = c(5, 20)),
+  levels = 4
+)
+
+# 3. Validación cruzada
+folds <- vfold_cv(datos_train, v = 5, strata = voto)
+
+# 4. Ajustar
+resultados <- tune_grid(
+  modelo_rf_tune,
+  voto ~ .,
+  resamples = folds,
+  grid = grilla,
+  metrics = metric_set(accuracy, roc_auc)
+)
+
+# 5. Ver mejores combinaciones
+show_best(resultados, metric = "roc_auc")
+```
+:::
+
+## Seleccionar y finalizar el modelo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```r
+# Seleccionar la mejor combinación
+mejor <- select_best(resultados, metric = "roc_auc")
+mejor
+
+# Finalizar el modelo con los mejores hiperparámetros
+modelo_final <- finalize_model(modelo_rf_tune, mejor)
+
+# Entrenar con todos los datos de entrenamiento
+ajuste_final <- fit(modelo_final, voto ~ ., data = datos_train)
+
+# Evaluar en datos de test
+pred_final <- predict(ajuste_final, datos_test) |>
+  bind_cols(datos_test)
+
+metrics(pred_final, truth = voto, estimate = .pred_class)
+```
+
+:::{style="margin-top: 20px;"}
+- El [tuning puede mejorar significativamente]{.alert} el rendimiento
+- Pero también [toma tiempo]{.alert}: con muchas combinaciones y folds, puede ser lento
+- En la práctica, empezar con valores por defecto y hacer tuning si es necesario
+:::
+:::
+
 # Comparación de modelos {background-color="#2d4563"}
 
 ## El poder de parsnip: misma interfaz, diferentes modelos
@@ -554,53 +979,169 @@ ajuste_3 <- fit(modelo_3, voto ~ ., data = datos_train)
 :::
 :::
 
-## Aplicaciones en ciencias sociales
+## Más allá de Random Forest: Gradient Boosting
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
-:::{.column width=50%}
-**[Muchlinski et al. (2016)](https://doi.org/10.1093/pan/mpv024)**
+:::{.column width=55%}
+- Random Forest es un [ensemble]{.alert} (muchos modelos juntos)
+- Otra familia de ensembles: [Gradient Boosting]{.alert}
+- En lugar de entrenar árboles en paralelo, los entrena [secuencialmente]{.alert}
+- Cada árbol nuevo intenta corregir los errores del anterior
+- Implementaciones populares:
+    - [XGBoost]{.alert}: muy usado en competencias de Kaggle
+    - [LightGBM]{.alert}: rápido para datasets grandes
+    - [CatBoost]{.alert}: bueno con variables categóricas
 
-- Pregunta: ¿podemos predecir guerras civiles?
+[Suele tener mejor rendimiento que RF, pero es más difícil de ajustar.]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Random Forest vs. Gradient Boosting:**
+
+| | RF | Boosting |
+|---|---|---|
+| Entrenamiento | Paralelo | Secuencial |
+| Hiperparámetros | Pocos | Muchos |
+| Riesgo de sobreajuste | Bajo | Más alto |
+| Velocidad | Rápido | Variable |
+| Rendimiento típico | Muy bueno | Excelente |
+
+<br>
+
+En tidymodels:
+```r
+modelo_xgb <- boost_tree() |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+```
+
+[Lo veremos con más detalle en los laboratorios.]{.alert}
+:::
+:::
+:::
+:::
+
+## Aplicaciones en América Latina
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=50%}
+**[Muchlinski et al. (2016)](https://doi.org/10.1093/pan/mpv024): Predicción de guerras civiles**
+
 - Compararon regresión logística con Random Forest
 - RF tuvo mejor rendimiento predictivo
-- Pero: [Wang (2019)](https://doi.org/10.1093/pan/mpz004) replicó el estudio y encontró errores en el código; con datos corregidos, la ventaja de RF era menor
-- La lección sigue siendo válida: RF puede capturar interacciones complejas que la regresión logística no capta
+- [Wang (2019)](https://doi.org/10.1093/pan/mpz004) replicó y encontró errores, pero la lección se mantiene
+- RF captura interacciones complejas que la regresión no capta
+
+**[Jean et al. (2016)](https://doi.org/10.1126/science.aaf7894): Pobreza desde el espacio**
+
+- Predijeron pobreza en África usando imágenes satelitales
+- Random Forest + redes neuronales
+- Aplicable a América Latina donde los censos son menos frecuentes
 :::
 
 :::{.column width=50%}
-**Otras aplicaciones**
+**Aplicaciones regionales:**
 
-- [Ciencia política:]{.alert} predicción de resultados electorales, análisis de riesgo de conflicto, clasificación de textos legislativos
-- [Sociología:]{.alert} predicción de movilidad social, detección de discursos de odio en redes sociales
-- [Economía:]{.alert} scoring crediticio, predicción de pobreza a partir de datos satelitales (Jean et al., 2016)
-- [Salud pública:]{.alert} predicción de brotes epidémicos, triaje automático
-- [El ML complementa, no reemplaza, la teoría social]{.alert}
+- [Predicción de deserción escolar]{.alert} (Chile, Colombia): identificar estudiantes en riesgo antes de que abandonen
+- [Scoring crediticio alternativo]{.alert} (México, Brasil): Nubank y otras fintech usan ML para evaluar clientes sin historial bancario
+- [Detección de fraude electoral]{.alert}: análisis de patrones anómalos en resultados
+- [Predicción de violencia]{.alert}: modelos para anticipar zonas de riesgo (Colombia, México)
+- [Análisis de opinión pública]{.alert}: clasificación de tweets y comentarios sobre políticas
+
+[En todos estos casos, RF es un punto de partida común.]{.alert}
+:::
+:::
+:::
+
+## Ejemplo: Deserción escolar en Chile
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**El problema:**
+
+- El Ministerio de Educación de Chile quiere identificar estudiantes en riesgo de abandonar la escuela
+- Datos disponibles: asistencia, notas, información socioeconómica, historia escolar
+- Objetivo: intervenir [antes]{.alert} de que abandonen
+
+**Enfoque con Random Forest:**
+
+1. Entrenar modelo con datos históricos (estudiantes que abandonaron vs. los que no)
+2. Predecir probabilidad de abandono para estudiantes actuales
+3. Priorizar intervenciones en los de mayor riesgo
+4. Usar importancia de variables para entender factores de riesgo
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Variables importantes (ejemplo):**
+
+```
+Variable              Importancia
+─────────────────────────────────
+dias_ausencia_mes     ████████ 0.15
+promedio_notas        ██████   0.11
+repitencia_previa     █████    0.09
+ingreso_hogar         ████     0.07
+distancia_escuela     ███      0.05
+educacion_madre       ██       0.04
+...
+```
+
+[La ausencia escolar es el mejor predictor]{.alert}: los estudiantes empiezan a faltar antes de abandonar definitivamente.
+
+Esto sugiere intervenciones tempranas cuando aumenta el ausentismo.
+:::
 :::
 :::
 :::
 
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Modelos de clasificación:**
 
-- La [regresión logística]{.alert} es interpretable y produce probabilidades, ideal cuando queremos entender las relaciones causales
-- Los [árboles de decisión]{.alert} son intuitivos y capturan no linealidades, pero sobreajustan con facilidad
-- Los [Random Forests]{.alert} combinan muchos árboles para reducir la varianza y mejorar la predicción
-- La elección del modelo depende del [objetivo]{.alert}: ¿explicar o predecir?
-- tidymodels nos permite [comparar modelos fácilmente]{.alert} con la misma sintaxis
-- En la próxima sesión: regresión, regularización y el laboratorio práctico
+- [Regresión logística:]{.alert} interpretable, produce probabilidades, ideal para entender relaciones
+- [Árboles de decisión:]{.alert} intuitivos, visualizables, pero sobreajustan
+- [Random Forests:]{.alert} combinan muchos árboles, excelente rendimiento, menos interpretables
+- [Gradient Boosting:]{.alert} aún mejor rendimiento, más difícil de ajustar
 :::
 
-## Próximo: Regresión y predicción
+:::{.column width=50%}
+**Herramientas aprendidas:**
 
-:::{style="margin-top: 40px; font-size: 28px;"}
+- [Importancia de variables:]{.alert} permutación, Gini, SHAP
+- [Gráficos de dependencia parcial:]{.alert} entender el efecto de cada variable
+- [Tuning de hiperparámetros:]{.alert} grid search con validación cruzada
+- [Comparación de modelos:]{.alert} misma interfaz para todos en tidymodels
+:::
+:::
 
-- Predicción vs. explicación: el debate de Mullainathan y Spiess (2017)
-- Regularización: LASSO, Ridge, Elastic Net
-- ¿Cómo evitar el sobreajuste en modelos de regresión?
-- Laboratorio práctico con datos de Latinobarómetro
-- Nos vemos después del descanso
+<br>
+
+[La elección del modelo depende del objetivo: ¿explicar o predecir?]{.alert}
+:::
+
+## Próximos pasos
+
+:::{style="margin-top: 40px; font-size: 26px;"}
+
+- [Próxima sesión (2.2):]{.alert} Regresión y regularización
+    - Predicción vs. explicación
+    - LASSO, Ridge, Elastic Net
+    - Selección automática de variables
+
+- [Laboratorios (2.3 y 2.4):]{.alert}
+    - Clasificación con datos de Latinobarómetro
+    - Regresión con datos socioeconómicos
+    - Tuning, comparación e interpretación
+
+[Nos vemos después del descanso.]{.alert}
 :::
 
 # Nos vemos en la próxima sesión {background-color="#2d4563"}

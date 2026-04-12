@@ -81,29 +81,28 @@ Pero: ¿cómo funcionan por dentro?
 :::
 :::
 
-## Agenda de hoy
+## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 32px;"}
+:::{style="margin-top: 20px; font-size: 28px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Sesión 4.1: Entendiendo los LLMs (~2 h)**
+**Primera parte**
 
 - ¿Qué es un LLM?
-- Tokenización para LLMs
-- Embeddings y atención
-- Transformers (intuición)
-- Prompt engineering
+- Tokenización por subpalabras (BPE)
+- Ventana de contexto
+- Embeddings y significado semántico
 :::
 
 :::{.column width=50%}
-**Sesión 4.2: LLMs como herramientas (~2 h)**
+**Segunda parte**
 
-- Alucinaciones y RAG
-- Anotación automática de textos
-- Generación de datos sintéticos
-- Uso de APIs desde R con ellmer
-- Laboratorio práctico
+- El mecanismo de atención
+- Arquitectura de los transformers
+- Tipos de modelos: encoder, decoder, encoder-decoder
+- Entrenamiento: pre-training y fine-tuning
+- El ecosistema actual de LLMs
 :::
 :::
 :::
@@ -402,45 +401,325 @@ Reglas:
 :::
 :::
 
-## Agentes de IA
+# Tipos de modelos {background-color="#2d4563"}
+
+## Encoder, Decoder, Encoder-Decoder
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los transformers tienen dos componentes principales:
+    - [Encoder]{.alert}: "lee" y comprende el texto de entrada
+    - [Decoder]{.alert}: "genera" texto de salida
+- Tres arquitecturas principales:
+    - [Solo encoder]{.alert} (BERT): para clasificación, NER, similaridad
+    - [Solo decoder]{.alert} (GPT, Claude, Llama): para generación de texto
+    - [Encoder-decoder]{.alert} (T5, BART): para traducción, resumen
+- ¿Por qué importa?
+    - Los modelos de [solo decoder]{.alert} (GPT, Claude) son los que usamos en chat
+    - Los modelos de [encoder]{.alert} (BERT) son mejores para obtener embeddings de documentos completos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+
+| Modelo | Tipo | Uso principal |
+|--------|------|---------------|
+| BERT | Encoder | Clasificación, NER |
+| RoBERTa | Encoder | Clasificación |
+| GPT-4 | Decoder | Generación, chat |
+| Claude | Decoder | Generación, chat |
+| Llama | Decoder | Generación |
+| T5 | Enc-Dec | Traducción |
+| BART | Enc-Dec | Resumen |
+
+<br>
+
+[Para investigación social, usaremos principalmente modelos decoder (generativos).]{.alert}
+:::
+:::
+:::
+:::
+
+## BERT vs. GPT: dos filosofías
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**BERT** ([Devlin et al., 2019](https://arxiv.org/abs/1810.04805))
+
+- [Bidireccional]{.alert}: ve el contexto antes Y después de cada palabra
+- Entrenamiento: [Masked Language Model]{.alert}
+    - "El [MASK] se sentó en la silla" → predice "gato"
+- Bueno para [entender]{.alert} texto
+- Aplicaciones: clasificación, extracción de entidades, búsqueda semántica
+- No genera texto fluido
+:::
+
+:::{.column width=50%}
+**GPT** ([Radford et al., 2019](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf))
+
+- [Unidireccional]{.alert}: solo ve el contexto anterior (izquierda a derecha)
+- Entrenamiento: [predecir siguiente token]{.alert}
+    - "El gato se sentó en la" → "silla"
+- Bueno para [generar]{.alert} texto
+- Aplicaciones: chat, escritura, código, razonamiento
+- La arquitectura detrás de ChatGPT, Claude, etc.
+:::
+:::
+
+<br>
+
+:::{style="text-align: center; font-size: 22px;"}
+[GPT y sus variantes dominan el mercado actual porque la generación de texto es más versátil.]{.alert}
+:::
+:::
+
+# Entrenamiento de LLMs {background-color="#2d4563"}
+
+## Pre-training: aprender el lenguaje
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- La última frontera: [agentes de IA]{.alert}
-- Un agente es un LLM que puede [usar herramientas]{.alert} y [tomar acciones]{.alert}
-- En lugar de solo generar texto, el agente puede:
-    - [Buscar en internet]{.alert}
-    - [Ejecutar código]{.alert}
-    - [Leer y escribir archivos]{.alert}
-    - [Interactuar con APIs]{.alert}
-    - [Navegar sitios web]{.alert}
-- Patrón [ReAct]{.alert} ([Yao et al., 2023](https://arxiv.org/abs/2210.03629); Reasoning + Acting):
-    1. El agente piensa sobre qué hacer (reasoning)
-    2. Ejecuta una acción (acting)
-    3. Observa el resultado
-    4. Repite hasta completar la tarea
+- El [pre-training]{.alert} es la fase donde el modelo aprende el lenguaje
+- Se entrena con [cantidades masivas de texto]{.alert}:
+    - Internet (Common Crawl): ~60% del texto
+    - Libros digitalizados
+    - Wikipedia
+    - Código fuente (GitHub)
+    - Papers científicos
+- GPT-3 se entrenó con [~300 mil millones de tokens]{.alert}
+- El modelo aprende:
+    - Gramática y sintaxis
+    - Hechos del mundo (con fecha de corte)
+    - Patrones de razonamiento
+    - Múltiples idiomas
 :::
 
 :::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Costo del pre-training:**
+
+| Modelo | Costo estimado |
+|--------|----------------|
+| GPT-3 (2020) | ~USD 4 millones |
+| GPT-4 (2023) | ~USD 100 millones |
+| Llama 3 (2024) | ~USD 30 millones |
+
+<br>
+
+El pre-training requiere [miles de GPUs]{.alert} durante semanas o meses.
+
+Por eso solo las empresas grandes pueden entrenar modelos desde cero.
+
+[Nosotros usamos modelos pre-entrenados.]{.alert}
+:::
+:::
+:::
+:::
+
+## Fine-tuning: especializar el modelo
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- El [fine-tuning]{.alert} ajusta un modelo pre-entrenado para una tarea específica
+- Mucho más barato que pre-training:
+    - Menos datos necesarios
+    - Menos tiempo de entrenamiento
+    - Se puede hacer con una sola GPU
+- Tipos de fine-tuning:
+    - [Supervised fine-tuning]{.alert}: con ejemplos etiquetados
+    - [RLHF]{.alert}: con feedback humano (lo que hace a ChatGPT "amable")
+    - [LoRA]{.alert}: ajuste eficiente de parámetros
+- Alternativa: [prompt engineering]{.alert}
+    - No requiere entrenamiento
+    - Usamos el modelo tal cual, con instrucciones bien diseñadas
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Ejemplo de fine-tuning:**
+
+```
+Modelo base: Llama 3
+
+Fine-tuning para clasificación:
+- 1000 textos etiquetados
+- 2 horas de entrenamiento
+- 1 GPU
+
+Resultado: modelo especializado
+en clasificar textos políticos
+latinoamericanos
+```
+
+<br>
+
+[En este curso usaremos prompt engineering, no fine-tuning. Es más accesible y suficiente para la mayoría de tareas.]{.alert}
+:::
+:::
+:::
+:::
+
+# El ecosistema actual {background-color="#2d4563"}
+
+## Modelos comerciales vs. abiertos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
 :::{style="text-align: center;"}
-[![Agentes de IA](figures/agents.webp){width="100%"}](#){data-modal-type="image" data-modal-url="figures/agents.webp"}
+
+| Modelo | Empresa | Tipo | Contexto | Costo |
+|--------|---------|------|----------|-------|
+| GPT-4o | OpenAI | Cerrado | 128K tokens | ~USD 5/M tokens |
+| GPT-4o-mini | OpenAI | Cerrado | 128K tokens | ~USD 0.15/M tokens |
+| Claude 3.5 Opus | Anthropic | Cerrado | 200K tokens | ~USD 15/M tokens |
+| Claude 3.5 Sonnet | Anthropic | Cerrado | 200K tokens | ~USD 3/M tokens |
+| Gemini 1.5 Pro | Google | Cerrado | 1M tokens | ~USD 3.5/M tokens |
+| Llama 3.1 405B | Meta | Abierto | 128K tokens | Gratis (hosting propio) |
+| Mistral Large | Mistral | Abierto | 32K tokens | Gratis (hosting propio) |
+
+:::
+
+<br>
+
+:::{style="font-size: 20px;"}
+- [Cerrado]{.alert}: acceso solo por API, no se puede ver el código
+- [Abierto]{.alert}: pesos disponibles, se puede ejecutar localmente con [Ollama]{.alert}
 :::
 :::
+
+## Modelos multimodales
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los LLMs modernos son [multimodales]{.alert}: procesan más que solo texto
+- [GPT-4V]{.alert}, [Claude 3]{.alert}, [Gemini]{.alert}: texto + imágenes
+- Pueden:
+    - [Describir]{.alert} imágenes
+    - [Extraer texto]{.alert} de documentos (OCR)
+    - [Analizar gráficos]{.alert} y tablas
+    - [Comparar]{.alert} múltiples imágenes
+- Aplicaciones en investigación:
+    - Digitalizar archivos históricos
+    - Analizar propaganda visual
+    - Extraer datos de PDFs complejos
+    - Codificar imágenes de redes sociales
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo de prompt multimodal:**
+
+```
+[Imagen de un afiche político]
+
+User: Describe este afiche de
+campaña. ¿Qué partido representa?
+¿Qué mensaje transmite?
+¿Qué colores y símbolos usa?
+
+Claude: El afiche muestra...
+[análisis detallado]
+```
+
+<br>
+
+[Los modelos multimodales abren nuevas posibilidades para el análisis de contenido visual.]{.alert}
+:::
+:::
+:::
+:::
+
+## Elegir el modelo adecuado
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Para tareas simples:**
+
+- Clasificación básica
+- Resumen de textos cortos
+- Extracción de entidades
+
+→ [gpt-4o-mini]{.alert} o [Claude 3.5 Haiku]{.alert}
+
+- Rápido y muy barato
+- Suficiente precisión para la mayoría de tareas
+:::
+
+:::{.column width=50%}
+**Para tareas complejas:**
+
+- Razonamiento multi-paso
+- Análisis de documentos largos
+- Tareas que requieren matices
+
+→ [GPT-4o]{.alert} o [Claude 3.5 Sonnet]{.alert}
+
+- Más caro pero más capaz
+- Menos alucinaciones
+- Mejor comprensión del contexto
+:::
+:::
+
+<br>
+
+:::{style="text-align: center; font-size: 22px;"}
+[Regla general: empezar con el modelo más barato y escalar si es necesario.]{.alert}
 :::
 :::
 
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Conceptos clave:**
 
-- Los [LLMs]{.alert} predicen el siguiente token, pero esta tarea simple genera capacidades complejas
-- La [tokenización por subpalabras]{.alert} (BPE) permite un vocabulario finito para cualquier texto
-- Los [embeddings]{.alert} capturan significado semántico como vectores
-- La [autoatención]{.alert} permite entender el contexto y las relaciones entre palabras
-- El [prompt engineering]{.alert} es clave para obtener buenos resultados: persona, tarea, contexto, formato
-- [Temperatura baja]{.alert} para investigación; [CoT]{.alert} para tareas complejas
-- En la próxima sesión: cómo usar los LLMs como [herramientas de investigación]{.alert}
+- [LLM]{.alert}: predice el siguiente token a gran escala
+- [BPE]{.alert}: tokenización por subpalabras
+- [Embeddings]{.alert}: palabras como vectores semánticos
+- [Atención]{.alert}: entender qué palabras son relevantes para cada contexto
+- [Transformers]{.alert}: arquitectura que combina todo
 :::
 
-# Nos vemos en la próxima sesión {background-color="#2d4563"}
+:::{.column width=50%}
+**Tipos de modelos:**
+
+- [Encoder]{.alert} (BERT): para entender
+- [Decoder]{.alert} (GPT, Claude): para generar
+- [Pre-training]{.alert}: aprender el lenguaje general
+- [Fine-tuning]{.alert}: especializar para una tarea
+- [Multimodales]{.alert}: texto + imágenes
+:::
+:::
+
+<br>
+
+[En la próxima sesión veremos cómo usar estos modelos de forma práctica: prompt engineering, RAG, y aplicaciones para investigación.]{.alert}
+:::
+
+## Próximos pasos
+
+:::{style="margin-top: 40px; font-size: 26px;"}
+
+- [Sesión 4.2:]{.alert} LLMs como herramientas de investigación
+    - Prompt engineering en profundidad
+    - Alucinaciones y cómo mitigarlas
+    - RAG (Retrieval-Augmented Generation)
+    - Aplicaciones prácticas
+
+- [Laboratorios (4.3 y 4.4):]{.alert}
+    - Configurar y usar ellmer desde R
+    - Clasificación de textos con LLMs
+    - Análisis de sentimiento estructurado
+    - Auditoría de sesgos
+
+[Nos vemos en la próxima sesión.]{.alert}
+:::
+
+# Nos vemos en la sesión de aplicaciones {background-color="#2d4563"}

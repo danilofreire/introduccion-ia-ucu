@@ -1,0 +1,933 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 2.4: Laboratorio - Regresión y regularización"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 2.4](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-02/06-laboratorio-04.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 4: Regresión y regularización {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Predecir satisfacción con la vida
+2. Comparar OLS vs. regularización
+3. Ajustar λ con validación cruzada
+4. Comparar LASSO, Ridge y Elastic Net
+5. Interpretar coeficientes y selección
+6. Comparar con Random Forest
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- Cuándo usar [regularización]{.alert}
+- Diferencias prácticas entre LASSO y Ridge
+- [Tuning]{.alert} de penalty y mixture
+- Trade-off interpretabilidad vs. rendimiento
+
+<br>
+
+[Usaremos el mismo dataset de Latinobarómetro.]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Preparación y modelo OLS baseline | ~25 min |
+| 2 | LASSO con tuning de λ | ~30 min |
+| 3 | Ridge y Elastic Net | ~25 min |
+| 4 | Comparación final | ~40 min |
+
+<br>
+
+[La variable objetivo es satisfacción con la vida (escala 1-10).]{.alert}
+:::
+
+# Parte 1: Preparación y baseline {background-color="#2d4563"}
+
+## Cargar los paquetes necesarios
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cargar-paquetes
+#| message: false
+#| warning: false
+#| eval: true
+
+# Paquetes necesarios
+paquetes <- c("tidyverse", "tidymodels", "glmnet", "ranger", "vip")
+
+for (pkg in paquetes) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+
+library(tidymodels)
+library(glmnet)   # Motor para LASSO, Ridge, Elastic Net
+
+set.seed(2026)
+```
+:::
+
+## Cargar y explorar los datos
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: cargar-datos
+#| eval: true
+
+# Cargar el dataset
+datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+
+# Convertir variables categóricas
+datos <- datos |>
+  mutate(
+    pais = factor(pais),
+    zona = factor(zona),
+    genero = factor(genero),
+    uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario"))
+  )
+
+# Nuestra variable objetivo
+summary(datos$satisfaccion_vida)
+
+# Histograma
+ggplot(datos, aes(x = satisfaccion_vida)) +
+  geom_histogram(binwidth = 1, fill = "#2d4563", color = "white") +
+  labs(title = "Distribución de satisfacción con la vida",
+       x = "Satisfacción (1-10)", y = "Frecuencia") +
+  theme_minimal()
+```
+:::
+
+## Dividir los datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: dividir-datos
+#| eval: true
+
+# División train/test
+division <- initial_split(datos, prop = 0.75)
+
+datos_train <- training(division)
+datos_test <- testing(division)
+
+cat("Observaciones en train:", nrow(datos_train), "\n")
+cat("Observaciones en test:", nrow(datos_test), "\n")
+
+# Media de la variable objetivo
+cat("\nMedia satisfacción (train):", mean(datos_train$satisfaccion_vida))
+cat("\nMedia satisfacción (test):", mean(datos_test$satisfaccion_vida))
+```
+:::
+
+## Receta de preprocesamiento
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: crear-receta
+#| eval: true
+
+# Definir predictores (excluimos voto y pais)
+receta <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
+                 zona + genero + confianza_gobierno + confianza_justicia +
+                 satisfaccion_democracia + percepcion_economia +
+                 uso_internet + interes_politica,
+                 data = datos_train) |>
+  # Dummies para categóricas
+  step_dummy(all_nominal_predictors()) |>
+  # Normalizar (importante para regularización)
+  step_normalize(all_numeric_predictors()) |>
+  # Eliminar varianza cero
+  step_zv(all_predictors())
+
+# Verificar
+receta |> prep() |> juice() |> glimpse()
+```
+:::
+
+## Modelo baseline: OLS
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: modelo-ols
+#| eval: true
+
+# Regresión lineal simple
+modelo_ols <- linear_reg() |>
+  set_engine("lm") |>
+  set_mode("regression")
+
+# Workflow
+wf_ols <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_ols)
+
+# Ajustar
+ajuste_ols <- fit(wf_ols, data = datos_train)
+
+# Coeficientes
+tidy(ajuste_ols) |>
+  arrange(desc(abs(estimate)))
+```
+:::
+
+## Evaluar OLS en test
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: evaluar-ols
+#| eval: true
+
+# Predicciones en test
+pred_ols <- predict(ajuste_ols, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+
+# Métricas
+metricas_ols <- pred_ols |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+
+metricas_ols
+
+# Visualizar predicciones vs. reales
+ggplot(pred_ols, aes(x = satisfaccion_vida, y = .pred)) +
+  geom_point(alpha = 0.5) +
+  geom_abline(color = "red", linetype = "dashed") +
+  labs(title = "Predicciones OLS vs. valores reales",
+       x = "Satisfacción real", y = "Satisfacción predicha") +
+  theme_minimal()
+```
+:::
+
+# Parte 2: LASSO con tuning {background-color="#2d4563"}
+
+## ¿Por qué regularizar?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+**Nuestro caso:**
+
+- 11 predictores, ~375 observaciones en train
+- La ratio n/p no es tan extrema
+- Pero algunas variables podrían ser irrelevantes
+
+**¿Cuándo regularizar?**
+
+- Muchos predictores relativos a las observaciones
+- Sospecha de multicolinealidad
+- Queremos [selección automática]{.alert} de variables
+- Prevenir sobreajuste
+:::
+
+:::{.column width=45%}
+:::{.callout-note}
+**En este ejemplo**
+
+Usamos regularización principalmente para:
+
+1. [Demostrar el método]{.alert}
+2. Identificar variables que no aportan
+3. Comparar con OLS
+
+En la práctica, con p = 11 y n = 375, OLS probablemente está bien.
+:::
+:::
+:::
+:::
+
+## Definir LASSO con penalty a ajustar
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: lasso-spec
+#| eval: true
+
+# LASSO: mixture = 1
+modelo_lasso <- linear_reg(
+  penalty = tune(),   # λ a ajustar
+  mixture = 1         # 1 = LASSO puro
+) |>
+  set_engine("glmnet") |>
+  set_mode("regression")
+
+# Workflow
+wf_lasso <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_lasso)
+
+# Grilla de valores de penalty (escala logarítmica)
+grilla_lambda <- grid_regular(
+  penalty(range = c(-4, 0)),  # 10^-4 a 10^0 = 0.0001 a 1
+  levels = 30
+)
+
+head(grilla_lambda)
+```
+:::
+
+## Validación cruzada para LASSO
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: lasso-cv
+#| eval: true
+#| cache: true
+
+# 10-fold CV
+folds <- vfold_cv(datos_train, v = 10)
+
+# Ajustar todas las lambdas
+resultados_lasso <- tune_grid(
+  wf_lasso,
+  resamples = folds,
+  grid = grilla_lambda,
+  metrics = metric_set(rmse, rsq, mae)
+)
+
+# Ver resultados
+resultados_lasso |>
+  collect_metrics() |>
+  filter(.metric == "rmse") |>
+  arrange(mean) |>
+  head(10)
+```
+:::
+
+## Visualizar el tuning de LASSO
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: lasso-viz
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Gráfico de RMSE vs. penalty
+autoplot(resultados_lasso) +
+  scale_x_log10() +
+  theme_minimal() +
+  labs(title = "Tuning de LASSO: RMSE vs. penalty (λ)")
+```
+:::
+
+## Seleccionar λ: mínimo vs. 1SE
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: lasso-seleccionar
+#| eval: true
+
+# λ que minimiza RMSE
+lambda_min <- select_best(resultados_lasso, metric = "rmse")
+cat("Lambda mínimo:\n")
+print(lambda_min)
+
+# λ más grande dentro de 1 SE
+lambda_1se <- select_by_one_std_err(
+  resultados_lasso,
+  metric = "rmse",
+  desc(penalty)  # Preferir λ más grande (modelo más simple)
+)
+cat("\nLambda 1SE:\n")
+print(lambda_1se)
+
+# Comparar
+cat("\nDiferencia:", round(lambda_1se$penalty / lambda_min$penalty, 1), "veces más grande")
+```
+:::
+
+## Ajustar LASSO con λ óptimo
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: lasso-final
+#| eval: true
+
+# Usar lambda mínimo
+wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
+
+# Ajustar en todos los datos de training
+ajuste_lasso <- fit(wf_lasso_final, data = datos_train)
+
+# Coeficientes
+coef_lasso <- tidy(ajuste_lasso) |>
+  filter(term != "(Intercept)") |>
+  arrange(desc(abs(estimate)))
+
+coef_lasso
+
+# Contar variables eliminadas (coef = 0)
+cat("\nVariables eliminadas:", sum(coef_lasso$estimate == 0), "de", nrow(coef_lasso))
+```
+:::
+
+## Comparar coeficientes OLS vs. LASSO
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: comparar-coef
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Extraer coeficientes de ambos
+coef_ols <- tidy(ajuste_ols) |>
+  filter(term != "(Intercept)") |>
+  select(term, estimate_ols = estimate)
+
+coef_lasso_comp <- tidy(ajuste_lasso) |>
+  filter(term != "(Intercept)") |>
+  select(term, estimate_lasso = estimate)
+
+# Combinar
+comparacion <- left_join(coef_ols, coef_lasso_comp, by = "term") |>
+  pivot_longer(cols = starts_with("estimate"),
+               names_to = "modelo", values_to = "coef") |>
+  mutate(modelo = ifelse(modelo == "estimate_ols", "OLS", "LASSO"))
+
+# Visualizar
+ggplot(comparacion, aes(x = reorder(term, abs(coef)), y = coef, fill = modelo)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  scale_fill_manual(values = c("OLS" = "#3498DB", "LASSO" = "#E74C3C")) +
+  labs(title = "Comparación de coeficientes: OLS vs. LASSO",
+       x = "Variable", y = "Coeficiente (normalizado)") +
+  theme_minimal()
+```
+:::
+
+## Evaluar LASSO en test
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: evaluar-lasso
+#| eval: true
+
+# Predicciones
+pred_lasso <- predict(ajuste_lasso, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+
+# Métricas
+metricas_lasso <- pred_lasso |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+
+# Comparar con OLS
+cat("OLS:\n")
+print(metricas_ols)
+cat("\nLASSO:\n")
+print(metricas_lasso)
+```
+:::
+
+# Parte 3: Ridge y Elastic Net {background-color="#2d4563"}
+
+## Ridge regression
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: ridge
+#| eval: true
+#| cache: true
+
+# Ridge: mixture = 0
+modelo_ridge <- linear_reg(
+  penalty = tune(),
+  mixture = 0  # Ridge
+) |>
+  set_engine("glmnet") |>
+  set_mode("regression")
+
+# Workflow
+wf_ridge <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_ridge)
+
+# Tuning
+resultados_ridge <- tune_grid(
+  wf_ridge,
+  resamples = folds,
+  grid = grilla_lambda,
+  metrics = metric_set(rmse)
+)
+
+# Mejor lambda
+lambda_ridge <- select_best(resultados_ridge, metric = "rmse")
+
+# Ajustar modelo final
+wf_ridge_final <- finalize_workflow(wf_ridge, lambda_ridge)
+ajuste_ridge <- fit(wf_ridge_final, data = datos_train)
+```
+:::
+
+## Coeficientes de Ridge
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: ridge-coef
+#| eval: true
+
+# Coeficientes de Ridge
+coef_ridge <- tidy(ajuste_ridge) |>
+  filter(term != "(Intercept)") |>
+  arrange(desc(abs(estimate)))
+
+coef_ridge
+
+# Ridge nunca elimina variables completamente
+cat("\nVariables con coef = 0:", sum(coef_ridge$estimate == 0))
+```
+:::
+
+## Elastic Net (tuning de dos hiperparámetros)
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: elastic-net
+#| eval: true
+#| cache: true
+
+# Elastic Net: ambos penalty y mixture a ajustar
+modelo_enet <- linear_reg(
+  penalty = tune(),
+  mixture = tune()  # 0 a 1
+) |>
+  set_engine("glmnet") |>
+  set_mode("regression")
+
+# Workflow
+wf_enet <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_enet)
+
+# Grilla 2D
+grilla_enet <- grid_regular(
+  penalty(range = c(-4, 0)),
+  mixture(range = c(0, 1)),
+  levels = c(15, 5)  # 15 λ x 5 α = 75 combinaciones
+)
+
+# Tuning
+resultados_enet <- tune_grid(
+  wf_enet,
+  resamples = folds,
+  grid = grilla_enet,
+  metrics = metric_set(rmse)
+)
+
+# Mejor combinación
+mejor_enet <- select_best(resultados_enet, metric = "rmse")
+mejor_enet
+```
+:::
+
+## Visualizar el tuning de Elastic Net
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: enet-viz
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Visualización 2D
+autoplot(resultados_enet) +
+  scale_x_log10() +
+  theme_minimal() +
+  labs(title = "Tuning de Elastic Net: RMSE vs. penalty y mixture")
+```
+:::
+
+## Ajustar Elastic Net final
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: enet-final
+#| eval: true
+
+# Finalizar workflow
+wf_enet_final <- finalize_workflow(wf_enet, mejor_enet)
+ajuste_enet <- fit(wf_enet_final, data = datos_train)
+
+# Predicciones
+pred_enet <- predict(ajuste_enet, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+
+pred_ridge <- predict(ajuste_ridge, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+
+# Métricas
+metricas_ridge <- pred_ridge |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+
+metricas_enet <- pred_enet |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+```
+:::
+
+# Parte 4: Comparación final {background-color="#2d4563"}
+
+## Agregar Random Forest
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: random-forest
+#| eval: true
+#| cache: true
+
+# Random Forest para regresión
+modelo_rf <- rand_forest(
+  trees = 500,
+  mtry = tune(),
+  min_n = tune()
+) |>
+  set_engine("ranger") |>
+  set_mode("regression")
+
+# Workflow
+wf_rf <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_rf)
+
+# Grilla
+grilla_rf <- grid_regular(
+  mtry(range = c(2, 8)),
+  min_n(range = c(5, 20)),
+  levels = c(4, 4)
+)
+
+# Tuning
+resultados_rf <- tune_grid(
+  wf_rf,
+  resamples = folds,
+  grid = grilla_rf,
+  metrics = metric_set(rmse)
+)
+
+# Mejor modelo
+mejor_rf <- select_best(resultados_rf, metric = "rmse")
+wf_rf_final <- finalize_workflow(wf_rf, mejor_rf)
+ajuste_rf <- fit(wf_rf_final, data = datos_train)
+
+# Predicciones
+pred_rf <- predict(ajuste_rf, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+
+metricas_rf <- pred_rf |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+```
+:::
+
+## Tabla comparativa final
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: tabla-final
+#| eval: true
+
+# Combinar todas las métricas
+tabla_comparacion <- bind_rows(
+  metricas_ols |> mutate(modelo = "OLS"),
+  metricas_lasso |> mutate(modelo = "LASSO"),
+  metricas_ridge |> mutate(modelo = "Ridge"),
+  metricas_enet |> mutate(modelo = "Elastic Net"),
+  metricas_rf |> mutate(modelo = "Random Forest")
+) |>
+  select(modelo, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  arrange(rmse)
+
+tabla_comparacion
+```
+:::
+
+## Visualización de predicciones
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: viz-pred
+#| eval: true
+#| fig-width: 12
+#| fig-height: 5
+
+# Combinar todas las predicciones
+todas_pred <- bind_rows(
+  pred_ols |> mutate(modelo = "OLS"),
+  pred_lasso |> mutate(modelo = "LASSO"),
+  pred_ridge |> mutate(modelo = "Ridge"),
+  pred_enet |> mutate(modelo = "Elastic Net"),
+  pred_rf |> mutate(modelo = "Random Forest")
+)
+
+# Gráfico facetado
+ggplot(todas_pred, aes(x = satisfaccion_vida, y = .pred)) +
+  geom_point(alpha = 0.4, color = "#2d4563") +
+  geom_abline(color = "red", linetype = "dashed") +
+  facet_wrap(~modelo, nrow = 1) +
+  labs(title = "Predicciones vs. valores reales por modelo",
+       x = "Satisfacción real", y = "Satisfacción predicha") +
+  theme_minimal()
+```
+:::
+
+## Comparación de coeficientes (modelos lineales)
+
+:::{style="margin-top: 30px; font-size: 16px;"}
+
+```{r}
+#| label: comparar-todos-coef
+#| eval: true
+#| fig-width: 12
+#| fig-height: 6
+
+# Extraer coeficientes de todos los modelos lineales
+coef_todos <- bind_rows(
+  tidy(ajuste_ols) |> mutate(modelo = "OLS"),
+  tidy(ajuste_lasso) |> mutate(modelo = "LASSO"),
+  tidy(ajuste_ridge) |> mutate(modelo = "Ridge"),
+  tidy(ajuste_enet) |> mutate(modelo = "Elastic Net")
+) |>
+  filter(term != "(Intercept)")
+
+# Visualizar
+ggplot(coef_todos, aes(x = reorder(term, abs(estimate)), y = estimate, fill = modelo)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Comparación de coeficientes entre modelos",
+       x = "Variable", y = "Coeficiente") +
+  theme_minimal()
+```
+:::
+
+## Discusión: ¿Qué modelo elegir?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Observaciones:**
+
+- Random Forest tiene [mejor RMSE]{.alert}
+- Los modelos lineales son muy similares entre sí
+- LASSO eliminó algunas variables
+- La mejora de regularización sobre OLS es [marginal]{.alert}
+
+**¿Por qué?**
+
+- El dataset tiene relaciones aproximadamente lineales
+- No hay muchas variables irrelevantes
+- n/p no es extremo
+:::
+
+:::{.column width=50%}
+**Recomendación:**
+
+- Si quiero [interpretabilidad]{.alert}: OLS o LASSO
+- Si quiero [mejor predicción]{.alert}: Random Forest
+- Si quiero [selección de variables]{.alert}: LASSO
+
+<br>
+
+[En este caso, la diferencia de RMSE entre OLS y RF es pequeña. La ganancia de RF puede no justificar la pérdida de interpretabilidad.]{.alert}
+:::
+:::
+:::
+
+# Ejercicios adicionales {background-color="#2d4563"}
+
+## Ejercicio 1: Agregar interacciones
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Modificar la receta para incluir interacciones (ej: edad × educación)
+2. ¿Mejora el rendimiento del modelo?
+3. ¿LASSO elimina las interacciones o las retiene?
+
+```{r}
+#| label: ejercicio-1
+#| eval: false
+
+# Tu código aquí
+receta_interact <- recipe(satisfaccion_vida ~ ., data = datos_train) |>
+  step_rm(voto, pais) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_interact(terms = ~ edad:educacion_anios) |>  # Agregar esta línea
+  step_normalize(all_numeric_predictors()) |>
+  step_zv(all_predictors())
+
+# ... ajustar LASSO con la nueva receta
+```
+:::
+
+## Ejercicio 2: Efecto del λ en la selección
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Ajustar LASSO con varios valores de λ (muy pequeño, óptimo, muy grande)
+2. Contar cuántas variables se eliminan en cada caso
+3. Visualizar la "trayectoria" de los coeficientes
+
+```{r}
+#| label: ejercicio-2
+#| eval: false
+
+# Tu código aquí
+lambdas <- c(0.001, 0.01, 0.1, 0.5, 1)
+
+# Para cada lambda, ajustar y contar variables eliminadas
+resultados <- map_df(lambdas, function(l) {
+  modelo <- linear_reg(penalty = l, mixture = 1) |>
+    set_engine("glmnet") |>
+    set_mode("regression")
+
+  ajuste <- workflow() |>
+    add_recipe(receta) |>
+    add_model(modelo) |>
+    fit(data = datos_train)
+
+  n_eliminadas <- sum(tidy(ajuste)$estimate == 0)
+  tibble(lambda = l, vars_eliminadas = n_eliminadas)
+})
+
+resultados
+```
+:::
+
+## Ejercicio 3: Comparar con países específicos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Incluir `pais` como predictor (genera muchas dummies)
+2. ¿Ayuda LASSO a seleccionar qué países importan?
+3. ¿Cuáles países tienen coeficientes distintos de cero?
+
+```{r}
+#| label: ejercicio-3
+#| eval: false
+
+# Tu código aquí
+receta_pais <- recipe(satisfaccion_vida ~ ., data = datos_train) |>
+  step_rm(voto) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_zv(all_predictors())
+
+# Ahora hay muchos más predictores (uno por país)
+# ¿Qué hace LASSO?
+```
+:::
+
+## Resumen del laboratorio
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que practicamos:**
+
+- Regularización con LASSO, Ridge, Elastic Net
+- Tuning de λ y α con CV
+- Comparación con OLS y Random Forest
+- Interpretación de coeficientes
+:::
+
+:::{.column width=50%}
+**Conceptos clave:**
+
+- [mixture = 1]{.alert}: LASSO (selecciona)
+- [mixture = 0]{.alert}: Ridge (reduce)
+- [0 < mixture < 1]{.alert}: Elastic Net
+- [Validación cruzada]{.alert} para elegir λ
+- [λ 1SE]{.alert} para modelos más simples
+:::
+:::
+
+<br>
+
+[En el próximo día veremos aprendizaje no supervisado y análisis de texto.]{.alert}
+:::
+
+# Fin del día 2 {background-color="#2d4563"}

@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 5.1: Ética y sesgo algorítmico"
+subtitle: "Sesión 5.1: Ética y tipos de sesgo algorítmico"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
@@ -81,27 +81,40 @@ Y al final: sus [mini-propuestas]{.alert} de investigación.
 
 ## Agenda del último día
 
-:::{style="margin-top: 20px; font-size: 32px;"}
+:::{style="margin-top: 20px; font-size: 26px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Sesión 5.1: Ética y sesgo (~2 h)**
+**Sesión 5.1: Tipos de sesgo (~1 h)**
 
 - Una historia para empezar
-- Tipos de sesgo algorítmico
+- Taxonomía del sesgo algorítmico
+- Casos en América Latina
 - El ciclo de vida del sesgo
 - Bucles de retroalimentación
+
+**Sesión 5.2: Detección y regulación (~1 h)**
+
+- Métricas de equidad
+- Detección y mitigación
 - El teorema de imposibilidad
-- Regulación en la región
+- Regulación (EU AI Act, región)
 :::
 
 :::{.column width=50%}
-**Sesión 5.2: Cierre (~2 h)**
+**Sesión 5.3: Laboratorio (~2 h)**
 
-- Integración de IA en investigación
-- Taller de mini-propuestas
+- Taller de auditoría de sesgo
+- Cálculo de métricas de equidad
+- Análisis de casos reales
+- Discusión grupal
+
+**Sesión 5.4: Cierre (~2 h)**
+
+- Mini-propuestas de investigación
 - Presentaciones breves (5 min)
-- Discusión y cierre del curso
+- Recursos y próximos pasos
+- Cierre del curso
 :::
 :::
 :::
@@ -326,6 +339,81 @@ Fuente: [Harvard Law Review](https://harvardlawreview.org/print/vol-138/resettin
 :::
 :::
 
+## Sesgo de agregación: un modelo no sirve para todos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+Ocurre cuando un modelo [trata a grupos diversos como si fueran homogéneos]{.alert}, ignorando diferencias que afectan los resultados.
+
+**Ejemplo: diabetes y etnicidad** ([Obermeyer et al., 2019](https://doi.org/10.1126/science.aax2342))
+
+- Modelos de riesgo de diabetes entrenados principalmente con datos de poblaciones europeas
+- La [hemoglobina glicosilada (HbA1c)]{.alert} se usa como indicador
+- Pero la HbA1c funciona diferente en poblaciones afrodescendientes e indígenas
+- Resultado: [subdiagnóstico]{.alert} en grupos no europeos
+
+**En ciencias sociales:**
+
+- Un modelo de satisfacción democrática entrenado con datos de Europa puede [fallar en América Latina]{.alert}
+- Los patrones de participación política difieren por contexto cultural
+- Las escalas de encuesta tienen [significados diferentes]{.alert} entre culturas
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; margin-top: 30px;"}
+[![Sesgo de agregación](figures/aggregation-bias.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/aggregation-bias.png"}
+
+Fuente: [AI Fairness 360](https://aif360.res.ibm.com/)
+
+:::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
+[Un modelo "global" puede ser injusto localmente.]{.alert}
+:::
+:::
+:::
+:::
+:::
+
+## Sesgo de evaluación y despliegue
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Sesgo de evaluación**
+
+Cuando los [benchmarks de prueba]{.alert} no son representativos de la población real.
+
+**Ejemplo:**
+
+- Un modelo de detección de discurso de odio en español
+- Evaluado con datos de España
+- Desplegado en [Argentina]{.alert}: no entiende "boludo", "negro" (coloquial), o el voseo
+- Las métricas de evaluación [no predijeron]{.alert} el mal desempeño
+
+**Problema:** los datasets de prueba suelen venir de los mismos lugares que los de entrenamiento
+:::
+
+:::{.column width=50%}
+**Sesgo de despliegue**
+
+Cuando un modelo se usa en un [contexto diferente]{.alert} al que fue diseñado.
+
+**Ejemplos:**
+
+| Modelo entrenado en... | Desplegado en... | Problema |
+|------------------------|------------------|----------|
+| EE.UU. | Uruguay | Diferencias culturales |
+| Adultos | Adolescentes | Lenguaje diferente |
+| 2015 | 2025 | Cambios temporales |
+| Texto formal | Redes sociales | Registro diferente |
+
+:::{style="margin-top: 15px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
+[El rendimiento del modelo no viaja bien entre contextos.]{.alert}
+:::
+:::
+:::
+:::
+
 ## Bucles de retroalimentación
 
 :::{style="margin-top: 30px; font-size: 20px;"}
@@ -368,6 +456,49 @@ Fuente: [SpotCrime](https://blog.spotcrime.com/2011/06/savanna-ga-heat-map.html)
 :::
 :::
 
+## Casos de sesgo en América Latina
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=50%}
+**Brasil: reconocimiento facial en Carnaval**
+
+- Policía de Bahía usó reconocimiento facial en el Carnaval de Salvador (2019)
+- [42 arrestos]{.alert} basados en coincidencias del sistema
+- Varios casos de [personas inocentes detenidas]{.alert}
+- El sistema tenía mayor tasa de error con [rostros afrobrasileños]{.alert}
+- Fuente: [Coding Rights](https://codingrights.org/)
+
+**Argentina: scoring social en ANSES**
+
+- Sistema de perfilado para detectar fraude en beneficios sociales
+- Usaba variables como [barrio de residencia]{.alert} y patrones de consumo
+- Críticas por [falta de transparencia]{.alert} y posible discriminación
+- Sin auditoría pública del algoritmo
+:::
+
+:::{.column width=50%}
+**Chile: algoritmo de riesgo delictivo**
+
+- Sistema de evaluación de riesgo en el sistema penal juvenil
+- Basado en [historial familiar]{.alert} y contexto socioeconómico
+- Riesgo de [perpetuar desigualdad]{.alert}: jóvenes de barrios pobres reciben peores evaluaciones
+- Debate sobre uso de variables no modificables
+
+**Colombia: VeriTran en Bogotá**
+
+- Sistema de reconocimiento facial en TransMilenio
+- Objetivo: detectar evasores de pasaje
+- Preocupaciones sobre [vigilancia masiva]{.alert} y sesgo racial
+- Falta de consentimiento informado
+
+:::{style="margin-top: 10px; background: rgba(45, 69, 99, 0.1); padding: 10px; border-radius: 10px;"}
+[Los mismos problemas de sesgo del norte global se replican en la región, a menudo con menos protecciones.]{.alert}
+:::
+:::
+:::
+:::
+
 ## El sesgo a lo largo del ciclo de vida
 
 :::{style="margin-top: 30px; font-size: 22px; text-align: center;"}
@@ -376,178 +507,78 @@ Fuente: [SpotCrime](https://blog.spotcrime.com/2011/06/savanna-ga-heat-map.html)
 Arreglar los datos de entrenamiento no sirve si el benchmark de evaluación también es sesgado. Hay que verificar [cada etapa]{.alert}.
 :::
 
-# Las preguntas difíciles {background-color="#2d4563"}
+# Para reflexionar {background-color="#2d4563"}
 
-## El teorema de imposibilidad
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-:::{.columns}
-:::{.column width=55%}
-**Tres criterios de equidad (simplificados):**
-
-1. **Calibración**: entre quienes reciben la misma puntuación, los resultados deben ser similares entre grupos
-
-2. **Igualdad de falsos positivos**: los grupos deben tener tasas iguales de ser señalados erróneamente
-
-3. **Igualdad de falsos negativos**: los grupos deben tener tasas iguales de ser ignorados erróneamente
-
-**El teorema de imposibilidad** ([Chouldechova, 2017](https://doi.org/10.1089/big.2016.0047); [Kleinberg, Mullainathan y Raghavan, 2016](https://arxiv.org/abs/1609.05807)):
-
-> Si las tasas base difieren entre grupos, [no se pueden satisfacer los tres criterios]{.alert} simultáneamente.
-
-**En simple**: si el Grupo A reincide al 40% y el Grupo B al 20%, hay que elegir qué tipo de error igualar.
-
-[No existe una solución matemáticamente "justa".]{.alert}
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center;"}
-[![Teorema de imposibilidad](figures/impossibility-theorem.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/impossibility-theorem.png"}
-
-Fuente: [Fairness and Machine Learning Book](https://fairmlbook.org/)
-
-:::{style="margin-top: 15px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
-Ningún algoritmo puede decidir qué errores importan más. Esa es una [pregunta política y moral]{.alert}.
-:::
-:::
-:::
-:::
-:::
-
-## ¿Quién define "justo"?
-
-:::{style="margin-top: 30px; font-size: 26px; text-align: center;"}
-**Lo que cuenta como justo depende de lo que valoramos:**
-
-:::{style="margin-top: 30px;"}
-| Definición | Prioriza | Desventaja |
-|------------|----------|------------|
-| **Igual trato** | Consistencia | Ignora el contexto |
-| **Igualdad de resultados** | Equidad | Puede requerir trato diferenciado |
-| **Igual tasa de error** | Paridad entre grupos | Puede sacrificar precisión |
-| **Calibración** | Precisión individual | Oculta disparidades |
-:::
-
-:::{style="margin-top: 30px;"}
-- No existe un [valor por defecto neutral]{.alert}
-- Quien elige la definición de equidad [determina quién se beneficia]{.alert}
-- Decir "solo usamos los datos" es en sí mismo una elección
-:::
-:::
-
-## Actividad: ¡hagan el trade-off!
-
-:::{style="margin-top: 30px; font-size: 21px;"}
-:::{.columns}
-:::{.column width=50%}
-**Están diseñando un algoritmo de aprobación de préstamos**
-
-**Los datos muestran:**
-
-- Grupo A: 80% paga los préstamos
-- Grupo B: 60% paga los préstamos (debido a desventaja económica histórica)
-
-**Deben elegir UNO de estos enfoques:**
-
-1. **Mismo umbral para todos**: 70% de probabilidad de pago = aprobado
-    - Resultado: más rechazos del Grupo B
-
-2. **Misma tasa de aprobación**: ajustar umbrales para que ambos grupos tengan 50% de aprobación
-    - Resultado: más impagos, mayor riesgo
-
-3. **Misma tasa de rechazo injusto**: asegurar que el mismo % de buenos pagadores sea rechazado en ambos grupos
-    - Resultado: diferentes tasas de aprobación
-:::
-
-:::{.column width=50%}
-**Preguntas para discutir:**
-
-- ¿Cuál enfoque es "más justo"?
-- ¿Quién se beneficia y quién se perjudica con cada uno?
-- ¿Cambiaría su respuesta si la menor tasa del Grupo B se debe a discriminación (no a capacidad)?
-- ¿Debería el algoritmo intentar [corregir]{.alert} la injusticia histórica, o solo [no perpetuarla]{.alert}?
-
-:::{style="margin-top: 20px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
-**Debatan en grupos de 3-4 personas y presenten su decisión.**
-:::
-:::
-:::
-:::
-
-# Regulación de la IA {background-color="#2d4563"}
-
-## Panorama regulatorio
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-:::{.columns}
-:::{.column width=50%}
-**Unión Europea: EU AI Act (2024)**
-
-- Primera ley integral sobre IA en el mundo
-- Clasifica sistemas por [nivel de riesgo]{.alert}:
-    - [Inaceptable]{.alert}: scoring social masivo, manipulación subliminal
-    - [Alto riesgo]{.alert}: salud, justicia, empleo, migración → requieren auditoría
-    - [Riesgo limitado]{.alert}: chatbots → deben informar que son IA
-    - [Riesgo mínimo]{.alert}: filtros de spam → sin restricciones
-- Multas: hasta 35 millones de euros o 7% de la facturación global
-
-**Estados Unidos**
-
-- Sin ley federal integral
-- Regulación sectorial y estatal
-- NYC: ley de auditoría de IA en contratación (Local Law 144, 2023)
-- Orden ejecutiva de Biden sobre IA (2023), revocada por la administración Trump en enero de 2025
-:::
-
-:::{.column width=50%}
-**América Latina**
-
-- [Uruguay]{.alert}: Ley 18.331 de Protección de Datos; Estrategia Nacional de IA (2019); URCDP como órgano de control. Referente regional en gobierno digital
-- [Brasil]{.alert}: LGPD (2018) para protección de datos; proyecto de ley de IA (PL 2338/2023) aprobado por el Senado en diciembre de 2024, ahora en la Cámara de Diputados
-- [Chile]{.alert}: primera Política Nacional de IA (2021) en la región; proyecto de ley de neuroderechos
-- [Colombia]{.alert}: marco ético de IA (2019); sandbox regulatorio
-- [Argentina]{.alert}: Plan Nacional de IA (2019); ley de datos personales en actualización
-
-**Desafíos comunes:**
-
-- Marcos regulatorios [en construcción]{.alert}
-- Brecha entre legislación y aplicación
-- Dependencia de infraestructura extranjera
-- Necesidad de [capacidad técnica]{.alert} en las agencias reguladoras
-:::
-:::
-:::
-
-## Perspectivas: ¿es solucionable el sesgo en la IA?
+## ¿Por qué es tan difícil detectar el sesgo?
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
-**Los optimistas**
+**Desafíos técnicos**
 
-- El sesgo de la IA es un [problema técnico]{.alert} con soluciones técnicas
-- Mejores datos, mejores algoritmos, mejores auditorías
-- La IA podría ser [menos sesgada]{.alert} que los humanos:
-    - Los humanos son inconsistentes; la IA al menos es consistente
-    - Las decisiones de la IA se pueden auditar; las intuiciones humanas no
-- Los datasets están mejorando, la regulación avanza
+- El sesgo puede estar [oculto]{.alert} en variables aparentemente neutrales
+- Los modelos de caja negra no revelan su lógica interna
+- El rendimiento agregado puede ocultar disparidades por grupo
+- Los datos de prueba pueden tener los mismos sesgos que los de entrenamiento
+- El sesgo emerge en la [interacción]{.alert} de variables, no en variables individuales
 
-> "Un algoritmo sesgado se puede reentrenar. Un gerente de contratación sesgado es más difícil de arreglar."
+**Desafíos institucionales**
+
+- Falta de [acceso]{.alert} a los algoritmos (propiedad intelectual)
+- Sin [métricas estándar]{.alert} de equidad
+- Pocos [incentivos]{.alert} para auditar
+- Quien diseña raramente es quien sufre el sesgo
 :::
 
 :::{.column width=50%}
-**Los escépticos**
+**Desafíos conceptuales**
 
-- El sesgo de la IA refleja [problemas sociales]{.alert} que no se solucionan con código
-- Hablar de "IA justa" distrae de las causas raíz
-- ¿Quién define la equidad? Generalmente quienes ya tienen poder
-- La IA oculta la responsabilidad humana
-- Algunas decisiones no deberían automatizarse
-
-> "No se puede arreglar un mercado inmobiliario discriminatorio ajustando un modelo de scoring crediticio."
+- ¿Qué [grupos]{.alert} deberían protegerse?
+- ¿Qué [variables]{.alert} nunca deberían usarse?
+- ¿Cuánta [disparidad]{.alert} es aceptable?
+- ¿Quién [decide]{.alert} las respuestas a estas preguntas?
 
 :::{style="margin-top: 20px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
-**¿Dónde se ubican ustedes?**
+**Ejemplo:**
+
+Un modelo de scoring crediticio no usa raza. Pero usa código postal, que correlaciona con raza por segregación histórica.
+
+¿El modelo es sesgado? ¿Debería prohibirse usar código postal? ¿O el problema es la segregación, no el modelo?
+:::
+:::
+:::
+:::
+
+## Actividad: identificar el sesgo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Caso para analizar:**
+
+Una universidad uruguaya quiere usar IA para predecir qué estudiantes tienen [riesgo de deserción]{.alert} y ofrecerles apoyo temprano.
+
+El modelo usa:
+- Notas del primer semestre
+- Asistencia a clases
+- Barrio de residencia
+- Si trabaja además de estudiar
+- Tipo de liceo de procedencia (público/privado)
+
+El modelo tiene [85% de precisión]{.alert} en predecir deserción.
+:::
+
+:::{.column width=50%}
+**Preguntas para discutir (10 min):**
+
+1. ¿Qué tipos de sesgo podrían estar presentes?
+2. ¿Qué variables son problemáticas y por qué?
+3. ¿El modelo [ayuda]{.alert} a los estudiantes vulnerables o los [estigmatiza]{.alert}?
+4. ¿Cómo verificarían si el modelo funciona igual para todos los grupos?
+5. ¿Qué información necesitarían para auditar este modelo?
+
+:::{style="margin-top: 20px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
+**Recuerden:** un modelo puede ser [preciso en promedio]{.alert} pero [injusto para ciertos grupos]{.alert}.
 :::
 :::
 :::
@@ -555,16 +586,33 @@ Ningún algoritmo puede decidir qué errores importan más. Esa es una [pregunta
 
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Tipos de sesgo:**
 
-- La IA aprende de datos humanos, así que [hereda sesgos humanos]{.alert}
-- El sesgo [histórico]{.alert} codifica discriminación pasada en los modelos
-- Si un grupo [falta]{.alert} de los datos de entrenamiento, el modelo falla para ellos
-- Proxies aparentemente neutrales (código postal, tests) pueden [codificar desigualdad]{.alert}
-- Los [bucles de retroalimentación]{.alert} hacen que el sesgo se amplifique con el tiempo
-- El [teorema de imposibilidad]{.alert}: no se pueden satisfacer todos los criterios de equidad a la vez
-- Elegir una definición de equidad es una [pregunta de valores]{.alert}, no técnica
-- La regulación avanza, pero la [brecha entre legislación y aplicación]{.alert} sigue siendo grande
+- [Histórico]{.alert}: discriminación pasada codificada
+- [Representación]{.alert}: grupos subrepresentados
+- [Medición]{.alert}: proxies problemáticos
+- [Agregación]{.alert}: un modelo para todos
+- [Evaluación]{.alert}: benchmarks no representativos
+- [Despliegue]{.alert}: contexto equivocado
 :::
 
-# Nos vemos en la próxima sesión {background-color="#2d4563"}
+:::{.column width=50%}
+**Ideas clave:**
+
+- La IA [hereda]{.alert} sesgos humanos de los datos
+- El sesgo puede entrar en [cualquier etapa]{.alert}
+- Los [bucles de retroalimentación]{.alert} amplifican el sesgo
+- América Latina [replica]{.alert} problemas del norte global
+- Detectar sesgo es [difícil]{.alert} técnica e institucionalmente
+:::
+:::
+
+:::{style="margin-top: 20px; text-align: center;"}
+[En la próxima sesión: ¿cómo detectamos, medimos y mitigamos el sesgo? Y, ¿cómo se regula la IA?]{.alert}
+:::
+:::
+
+# Nos vemos en la sesión 5.2 {background-color="#2d4563"}

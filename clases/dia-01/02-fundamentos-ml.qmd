@@ -53,7 +53,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 28px;"}
+:::{style="margin-top: 20px; font-size: 26px;"}
 
 :::{.columns}
 :::{.column width=50%}
@@ -74,7 +74,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::
 
 :::{.column width=50%}
-:::{style="text-align: center;"}
+:::{style="text-align: center; margin-top: 30px;"}
 [![Elegir la métrica correcta](figures/metrics-tradeoffs.png){width="95%"}](#){data-modal-type="image" data-modal-url="figures/metrics-tradeoffs.png"}
 
 Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-understanding-machine-learning-evaluation-metrics-30f199ac6a23)
@@ -88,16 +88,10 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 ## El flujo de trabajo de ML
 ### Del problema a la solución
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 
 :::{style="text-align: center; font-size: 20px;"}
-```
-┌───────────┐    ┌────────────────┐    ┌──────────┐    ┌───────────┐    ┌──────────┐
-│  1. Datos  │───▶│ 2. Preprocesar │───▶│ 3. Dividir│───▶│ 4. Entrenar│───▶│ 5. Evaluar│
-│  (recoger) │    │ (limpiar)      │    │ (train/   │    │ (ajustar   │    │ (métricas,│
-│            │    │                │    │  test)    │    │  modelo)   │    │  validar) │
-└───────────┘    └────────────────┘    └──────────┘    └───────────┘    └──────────┘
-```
+[![Flujo de trabajo de ML](figures/ml-workflow.png){width="60%"}](#){data-modal-type="image" data-modal-url="figures/ml-workflow.png"}
 :::
 
 <br>
@@ -119,26 +113,26 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 
 ## Pasos 1-2: recolección y preprocesamiento
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
 **Recolección de datos**
 
-- Encuestas, registros administrativos, sensores, APIs, web scraping
+- Encuestas, registros administrativos, sensores, APIs, [web scraping](https://es.wikipedia.org/wiki/Web_scraping)
 - La [calidad]{.alert} de los datos determina la calidad del modelo
 - "Basura entra, basura sale" (garbage in, garbage out)
 
 **Preprocesamiento**
 
 - [Valores faltantes:]{.alert} imputar, eliminar o marcar
-- [Variables categóricas:]{.alert} convertir a numéricas (one-hot encoding, label encoding)
-- [Escalado:]{.alert} normalizar o estandarizar variables numéricas
+- [Variables categóricas:]{.alert} convertir a numéricas ([one-hot encoding](https://en.wikipedia.org/wiki/One-hot), [label encoding](https://en.wikipedia.org/wiki/Feature_engineering#Categorical_data))
+- [Escalado:]{.alert} [normalizar](https://es.wikipedia.org/wiki/Normalización_(estadística)) o [estandarizar](https://es.wikipedia.org/wiki/Puntuación_estándar) variables numéricas
 - [Outliers:]{.alert} detectar y decidir qué hacer con ellos
-- [Feature engineering:]{.alert} crear nuevas variables a partir de las existentes
+- [[Feature engineering:](https://en.wikipedia.org/wiki/Feature_engineering)]{.alert} crear nuevas variables a partir de las existentes
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Ejemplo: datos de países**
 
 ```
@@ -169,17 +163,17 @@ El preprocesamiento es [la mayor parte del trabajo]{.alert} en un proyecto real 
 **Problemas comunes en datos reales:**
 
 - [Valores faltantes:]{.alert} ¿aleatorios o sistemáticos?
-    - MCAR: faltantes completamente al azar
-    - MAR: faltantes que dependen de otras variables observadas
-    - MNAR: faltantes que dependen de la variable misma (más difícil)
+    - [MCAR](https://en.wikipedia.org/wiki/Missing_data#Missing_completely_at_random): faltantes completamente al azar
+    - [MAR](https://en.wikipedia.org/wiki/Missing_data#Missing_at_random): faltantes que dependen de otras variables observadas
+    - [MNAR](https://en.wikipedia.org/wiki/Missing_data#Missing_not_at_random): faltantes que dependen de la variable misma (más difícil)
 - [Errores de medición:]{.alert} datos mal cargados, unidades inconsistentes
 - [Duplicados:]{.alert} registros repetidos que sesgan el modelo
 - [Desbalance de clases:]{.alert} mucho más de una categoría que de otra
-- [Data leakage:]{.alert} información del futuro que "se filtra" al entrenamiento
+- [[Data leakage:](https://en.wikipedia.org/wiki/Leakage_(machine_learning))]{.alert} información del futuro que "se filtra" al entrenamiento
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Ejemplo de data leakage:**
 
 Quieren predecir si un paciente será hospitalizado.
@@ -209,7 +203,7 @@ al momento de la predicción!
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- [Feature engineering:]{.alert} crear nuevas variables a partir de las existentes
+- [[Feature engineering:](https://en.wikipedia.org/wiki/Feature_engineering)]{.alert} crear nuevas variables a partir de las existentes
 - Puede mejorar mucho el rendimiento de un modelo simple
 - Ejemplos comunes:
     - [Transformaciones:]{.alert} log(ingreso), raíz cuadrada, bins
@@ -221,7 +215,7 @@ al momento de la predicción!
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Ejemplo: predicción de abandono**
 
 Variables originales:
@@ -253,7 +247,6 @@ tendencia_reciente       ← ¿aumenta o baja?
 :::{.columns}
 :::{.column width=55%}
 - Queremos saber si el modelo [funciona con datos nuevos]{.alert}, no solo con los datos que ya vio
-- Analogía: un estudiante que memoriza las respuestas del examen pasado puede sacar 100%, pero [¿qué pasa si las preguntas cambian?]{.alert}
 - Si evaluamos el modelo con los mismos datos que usamos para entrenarlo, [no sabemos si realmente aprendió]{.alert}
 - Por eso dividimos:
     - [Entrenamiento (~70-80%):]{.alert} el modelo aprende de estos datos
@@ -263,7 +256,7 @@ tendencia_reciente       ← ¿aumenta o baja?
 
 :::{.column width=45%}
 :::{style="text-align: center;"}
-[![División train/test](figures/train-val-test.png){width="85%"}](#){data-modal-type="image" data-modal-url="figures/train-val-test.png"}
+[![División train/test](figures/train-val-test.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/train-val-test.png"}
 :::
 :::
 :::
@@ -283,27 +276,12 @@ tendencia_reciente       ← ¿aumenta o baja?
 - Problemas potenciales:
     - Con pocos datos, una sola división puede [no ser representativa]{.alert}
     - El resultado depende de [qué observaciones cayeron en cada conjunto]{.alert}
-- Para datasets pequeños, necesitamos algo más: [validación cruzada]{.alert}
+- Para datasets pequeños, necesitamos algo más: [[validación cruzada](https://es.wikipedia.org/wiki/Validación_cruzada)]{.alert}
 :::
 
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 20px;"}
-```
-Dataset completo (180 observaciones)
-┌──────────────────────────────────┐
-│ ○ ○ ● ○ ● ○ ○ ● ○ ○ ● ● ○ ○ ● │
-│ ○ ● ○ ○ ○ ● ○ ● ● ○ ○ ● ○ ○ ● │
-│ ● ○ ○ ● ○ ○ ● ○ ○ ● ○ ● ○ ○ ○ │
-└──────────────────────────────────┘
-         │ Dividir aleatoriamente
-         ▼
-┌────────────────────────┐ ┌───────┐
-│   Entrenamiento (75%)  │ │Test   │
-│   ○ ● ○ ○ ● ○ ● ○ ○ ● │ │(25%)  │
-│   ○ ○ ● ○ ○ ● ○ ● ○ ○ │ │● ○ ○ ●│
-│   ● ○ ○ ● ○ ○ ● ○ ○   │ │○ ● ○ ○│
-└────────────────────────┘ └───────┘
-```
+[![División train/test](figures/train-test.png){width="80%"}](#){data-modal-type="image" data-modal-url="figures/train-val-test.png"}
 :::
 :::
 :::
@@ -325,7 +303,7 @@ Dataset completo (180 observaciones)
 
 :::{.column width=45%}
 :::{style="text-align: center;"}
-[![Validación cruzada K-fold](figures/cv.gif){width="85%"}](#){data-modal-type="image" data-modal-url="figures/cv.gif"}
+[![Validación cruzada K-fold](figures/cv.gif){width="100%"}](#){data-modal-type="image" data-modal-url="figures/cv.gif"}
 :::
 :::
 :::
@@ -333,7 +311,7 @@ Dataset completo (180 observaciones)
 
 ## Estratificación y otras estrategias
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 19px;"}
 :::{.columns}
 :::{.column width=55%}
 **Estratificación**
@@ -344,11 +322,11 @@ Dataset completo (180 observaciones)
 
 **Validación temporal (time series split)**
 
-- Para datos con [estructura temporal]{.alert} (series de tiempo)
+- Para datos con [estructura temporal]{.alert} ([series de tiempo](https://es.wikipedia.org/wiki/Serie_temporal))
 - [Nunca entrenar con datos del futuro]{.alert} para predecir el pasado
 - Se entrena con datos anteriores, se valida con datos posteriores
 
-**Leave-One-Out (LOO)**
+**[Leave-One-Out](https://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation) (LOO)**
 
 - K = N (cada observación es un fold)
 - Útil con [muy pocos datos]{.alert}, pero costoso computacionalmente
@@ -386,7 +364,7 @@ Fold 3:
 
 ## ¿Cuántos datos necesito?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 - Pregunta frecuente sin respuesta universal
@@ -396,31 +374,17 @@ Fold 3:
     - [Complejidad del modelo:]{.alert} modelos complejos necesitan más datos
     - [Número de clases:]{.alert} más clases = más datos por clase
 - Reglas prácticas (muy aproximadas):
-    - [Mínimo:]{.alert} 10 observaciones por variable predictora
     - [Clasificación:]{.alert} al menos 50-100 por clase minoritaria
-    - [Deep learning:]{.alert} miles a millones de ejemplos
+    - [[Deep learning:](https://es.wikipedia.org/wiki/Aprendizaje_profundo)]{.alert} miles a millones de ejemplos
 :::
 
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 20px;"}
-**Curvas de aprendizaje**
+**[Curvas de aprendizaje](https://en.wikipedia.org/wiki/Learning_curve_(machine_learning))**
 
-```
-Rendimiento
-     │
-     │       ┌──────────────
-     │      ╱
-     │     ╱
-     │    ╱
-     │   ╱
-     │  ╱
-     │ ╱
-     │╱
-     └──────────────────────▶
-          Cantidad de datos
-```
+[![](figures/learning-curve.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/learning-curve.png"}
 
-Con más datos, el rendimiento mejora, pero con [rendimientos decrecientes]{.alert}.
+Con más datos, el rendimiento mejora, pero con [[rendimientos decrecientes](https://es.wikipedia.org/wiki/Rendimientos_decrecientes)]{.alert}.
 
 A veces [más datos ayudan más]{.alert} que un modelo más complejo.
 :::
@@ -435,7 +399,7 @@ A veces [más datos ayudan más]{.alert} que un modelo más complejo.
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- [Sobreajuste (overfitting):]{.alert} el modelo funciona muy bien con los datos de entrenamiento pero mal con datos nuevos
+- [[Sobreajuste (overfitting):](https://es.wikipedia.org/wiki/Sobreajuste)]{.alert} el modelo funciona muy bien con los datos de entrenamiento pero mal con datos nuevos
 - El modelo ha [memorizado]{.alert} el conjunto de entrenamiento, incluyendo su ruido y particularidades
 - No ha aprendido los [patrones subyacentes]{.alert}
 - Señales de sobreajuste:
@@ -498,39 +462,22 @@ Fuente: [X.com](https://x.com/MaartenvSmeden/status/1522230905468862464)
 
 ## El compromiso sesgo-varianza
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- [Sesgo (bias):]{.alert} error por suposiciones simplificadoras del modelo. Un modelo con alto sesgo "no presta atención" a los datos
-- [Varianza:]{.alert} error por sensibilidad excesiva a los datos de entrenamiento. Un modelo con alta varianza cambia mucho con cada muestra
+- [[Sesgo (bias):](https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff)]{.alert} error por suposiciones simplificadoras del modelo. Un modelo con alto sesgo "no presta atención" a los datos
+- [[Varianza:](https://es.wikipedia.org/wiki/Varianza)]{.alert} error por sensibilidad excesiva a los datos de entrenamiento. Un modelo con alta varianza cambia mucho con cada muestra
 - [No se pueden minimizar ambos al mismo tiempo]{.alert}: al reducir uno, el otro tiende a aumentar
 - El objetivo es encontrar el [punto medio]{.alert} donde el error total es mínimo
 - En la práctica:
-    - Modelos simples (regresión lineal): alto sesgo, baja varianza
-    - Modelos complejos (redes neuronales profundas): bajo sesgo, alta varianza
+    - Modelos simples ([regresión lineal](https://es.wikipedia.org/wiki/Regresión_lineal)): alto sesgo, baja varianza
+    - Modelos complejos ([redes neuronales profundas](https://es.wikipedia.org/wiki/Aprendizaje_profundo)): bajo sesgo, alta varianza
     - [Regularización]{.alert} ayuda a controlar la varianza sin aumentar demasiado el sesgo
 :::
 
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 20px;"}
-```
-Error
-  │
-  │ \          ╱  ← Error total
-  │  \        ╱
-  │   \      ╱
-  │    \    ╱
-  │     \  ╱
-  │      \/  ← Punto óptimo
-  │      /\
-  │     ╱  \
-  │    ╱    ────── ← Varianza
-  │   ╱
-  │  ╱
-  │─────────────── ← Sesgo²
-  └──────────────────▶
-       Complejidad del modelo
-```
+[![Compromiso sesgo-varianza](figures/bias-variance.webp){width="100%"}](#){data-modal-type="image" data-modal-url="figures/bias-variance.webp"}
 
 A medida que el modelo se vuelve
 más complejo, el sesgo disminuye
@@ -546,16 +493,16 @@ aumenta (la curva sube).
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- [Regularización:]{.alert} técnica para penalizar la complejidad del modelo
-- Agrega un término de penalización a la función de pérdida
+- [[Regularización:](https://en.wikipedia.org/wiki/Regularization_(mathematics))]{.alert} técnica para penalizar la complejidad del modelo
+- Agrega un término de penalización a la [función de pérdida](https://en.wikipedia.org/wiki/Loss_function)
 - Obliga al modelo a [mantener coeficientes pequeños]{.alert}
 - Reduce la varianza a costa de un pequeño aumento en el sesgo
 
 **Tipos principales:**
 
-- [L1 (LASSO):]{.alert} puede llevar coeficientes a exactamente cero (selección de variables)
-- [L2 (Ridge):]{.alert} reduce coeficientes pero no los elimina
-- [Elastic Net:]{.alert} combinación de L1 y L2
+- [[L1 (LASSO):](https://en.wikipedia.org/wiki/Lasso_(statistics))]{.alert} puede llevar coeficientes a exactamente cero (selección de variables)
+- [[L2 (Ridge):](https://en.wikipedia.org/wiki/Ridge_regression)]{.alert} reduce coeficientes pero no los elimina
+- [[Elastic Net:](https://en.wikipedia.org/wiki/Elastic_net_regularization)]{.alert} combinación de L1 y L2
 
 Lo veremos en detalle en el [Día 2]{.alert} cuando trabajemos con regresión.
 :::
@@ -604,7 +551,6 @@ estable y generalizable
 
 - [Más datos]{.alert} (si es posible)
 - [Regularización]{.alert} (L1, L2, Elastic Net)
-- [Early stopping]{.alert} (detener el entrenamiento antes de sobreajustar)
 - [Reducir complejidad]{.alert} del modelo
 - [Validación cruzada]{.alert} para evaluar de forma más robusta
 :::
@@ -613,21 +559,7 @@ estable y generalizable
 :::{style="text-align: center; font-size: 20px;"}
 **Curvas de entrenamiento**
 
-```
-Error
-  │
-  │\
-  │ \     ← Error en test
-  │  \   ╱
-  │   \ ╱
-  │    X  ← Punto óptimo
-  │   ╱ \
-  │  ╱   \
-  │ ╱     ──── ← Error en train
-  │╱
-  └──────────────────▶
-       Épocas/Complejidad
-```
+[![](figures/learning-curve-overfit.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/learning-curve-overfit.png"}
 
 Cuando las curvas se separan, [el modelo está sobreajustando]{.alert}.
 
@@ -668,8 +600,8 @@ Piénsenlo 30 segundos...
 - Cuatro cantidades clave:
     - **Verdaderos Positivos (VP)**: correctamente predicho como positivo
     - **Verdaderos Negativos (VN)**: correctamente predicho como negativo
-    - **Falsos Positivos (FP)**: predicho como positivo, pero era negativo (Error Tipo I)
-    - **Falsos Negativos (FN)**: predicho como negativo, pero era positivo (Error Tipo II)
+    - **Falsos Positivos (FP)**: predicho como positivo, pero era negativo ([Error Tipo I](https://es.wikipedia.org/wiki/Error_de_tipo_I_y_de_tipo_II))
+    - **Falsos Negativos (FN)**: predicho como negativo, pero era positivo ([Error Tipo II](https://es.wikipedia.org/wiki/Error_de_tipo_I_y_de_tipo_II))
 - [Todas las métricas de clasificación se derivan de estos cuatro números]{.alert}
 :::
 
@@ -711,40 +643,32 @@ Fuente: [Analytics Vidhya](https://www.analyticsvidhya.com/blog/2020/10/how-to-c
 :::
 :::
 
-## F1-Score y AUC-ROC
+## AUC-ROC
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
-**F1-Score**
+**[AUC-ROC](https://es.wikipedia.org/wiki/Curva_ROC)**
 
-- [Media armónica]{.alert} de precisión y recall
-- F1 = 2 × (precision × recall) / (precision + recall)
-- Un solo número que [balancea ambas métricas]{.alert}
-- F1 = 1 es perfecto; F1 = 0 es el peor caso
-- Útil cuando [no podés priorizar]{.alert} una métrica sobre la otra
-
-**Macro vs. Micro F1:**
-
-- [Macro F1:]{.alert} promedio simple de F1 por clase (trata todas las clases igual)
-- [Micro F1:]{.alert} calcula F1 global (favorece clases mayoritarias)
-:::
-
-:::{.column width=50%}
-**AUC-ROC**
-
-- [Curva ROC:]{.alert} grafica tasa de verdaderos positivos vs. falsos positivos
-- [AUC:]{.alert} área bajo la curva ROC (0.5 = azar, 1.0 = perfecto)
+- [[Curva ROC:](https://es.wikipedia.org/wiki/Curva_ROC)]{.alert} grafica tasa de verdaderos positivos vs. falsos positivos
+- [[AUC:](https://en.wikipedia.org/wiki/Receiver_operating_characteristic#AUC)]{.alert} área bajo la curva ROC (0.5 = azar, 1.0 = perfecto)
 - Mide qué tan bien el modelo [separa las clases]{.alert} en general
 - [Independiente del umbral:]{.alert} evalúa todas las probabilidades
 - Muy usado para comparar clasificadores
 
+:::{style="text-align: center;"}
 | AUC | Interpretación |
 |-----|----------------|
 | 0.5 | No mejor que azar |
 | 0.7-0.8 | Aceptable |
 | 0.8-0.9 | Bueno |
 | >0.9 | Excelente |
+:::
+:::
+
+:::{.column width=50%}
+:::{style="text-align: center; font-size: 30px;"}
+[![Área bajo la curva ROC (AUC). El modelo perfecto (verde, AUC = 1) llega directamente a la esquina superior izquierda sin falsos positivos; el modelo aleatorio sigue la diagonal (rojo, AUC = 0,5). Cuanto más se aleja la curva azul de la diagonal, mejor distingue el modelo entre positivos y negativos.](figures/auc.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/auc.png"}
 :::
 :::
 :::
@@ -757,10 +681,10 @@ Fuente: [Analytics Vidhya](https://www.analyticsvidhya.com/blog/2020/10/how-to-c
 
 | Métrica | Fórmula | Intuición |
 |---------|---------|-----------|
-| **MAE** | Media de |real - predicho| | Error promedio (en unidades originales) |
-| **MSE** | Media de (real - predicho)² | Error cuadrado promedio (penaliza errores grandes) |
-| **RMSE** | $\sqrt{\text{MSE}}$ | Lo mismo que MSE, pero en unidades originales |
-| **R²** | 1 - (SS_res / SS_tot) | Proporción de varianza explicada |
+| **[MAE](https://es.wikipedia.org/wiki/Error_absoluto_medio)** | Media de |real - predicho| | Error promedio (en unidades originales) |
+| **[MSE](https://es.wikipedia.org/wiki/Error_cuadrático_medio)** | Media de (real - predicho)² | Error cuadrado promedio (penaliza errores grandes) |
+| **[RMSE](https://en.wikipedia.org/wiki/Root_mean_square_deviation)** | $\sqrt{\text{MSE}}$ | Lo mismo que MSE, pero en unidades originales |
+| **[R²](https://es.wikipedia.org/wiki/Coeficiente_de_determinación)** | 1 - (SS_res / SS_tot) | Proporción de varianza explicada |
 
 :::{.fragment}
 [Ejemplos sencillos:]{.alert}
@@ -801,62 +725,6 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 :::
 :::
 
-# Hiperparámetros y selección de modelos {background-color="#2d4563"}
-
-## ¿Qué son los hiperparámetros?
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-**Parámetros vs. hiperparámetros:**
-
-- [Parámetros:]{.alert} los aprende el modelo durante el entrenamiento (coeficientes, pesos)
-- [Hiperparámetros:]{.alert} los definimos nosotros antes de entrenar
-
-**Ejemplos de hiperparámetros:**
-
-| Modelo | Hiperparámetros |
-|--------|-----------------|
-| Regresión regularizada | λ (fuerza de regularización) |
-| Árbol de decisión | Profundidad máxima, mínimo de observaciones por hoja |
-| Random Forest | Número de árboles, variables por split |
-| K-NN | Número de vecinos (k) |
-| Red neuronal | Tasa de aprendizaje, capas, neuronas |
-
-[Elegir bien los hiperparámetros puede mejorar mucho el rendimiento.]{.alert}
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**Ajuste de hiperparámetros (tuning)**
-
-```
-Para cada combinación de hiperparámetros:
-  1. Entrenar modelo con train
-  2. Evaluar en validación
-  3. Guardar rendimiento
-
-Elegir la combinación con mejor rendimiento
-
-Evaluar modelo final en test
-```
-
-<br>
-
-**Estrategias de búsqueda:**
-
-- [Grid search:]{.alert} probar todas las combinaciones
-- [Random search:]{.alert} probar combinaciones aleatorias
-- [Bayesian optimization:]{.alert} búsqueda inteligente
-
-<br>
-
-[Nunca ajustar hiperparámetros usando los datos de test.]{.alert}
-:::
-:::
-:::
-:::
-
 ## Selección de modelos
 
 :::{style="margin-top: 30px; font-size: 22px;"}
@@ -884,53 +752,16 @@ Evaluar modelo final en test
 
 | Situación | Modelo sugerido |
 |-----------|-----------------|
-| Pocos datos, interpretabilidad alta | Regresión logística/lineal |
-| Datos moderados, interpretabilidad media | Árboles, Random Forest |
-| Muchos datos, rendimiento máximo | Gradient Boosting, Redes |
-| Relaciones muy no lineales | Random Forest, XGBoost |
-| Texto | Transformers, BERT |
+| Pocos datos, interpretabilidad alta | [Regresión logística](https://es.wikipedia.org/wiki/Regresión_logística)/[lineal](https://es.wikipedia.org/wiki/Regresión_lineal) |
+| Datos moderados, interpretabilidad media | Árboles, [Random Forest](https://es.wikipedia.org/wiki/Random_forest) |
+| Muchos datos, rendimiento máximo | [Gradient Boosting](https://es.wikipedia.org/wiki/Gradient_boosting), Redes |
+| Relaciones muy no lineales | Random Forest, [XGBoost](https://en.wikipedia.org/wiki/XGBoost) |
+| Texto | [Transformers](https://en.wikipedia.org/wiki/Transformer_(deep_learning_architecture)), [BERT](https://en.wikipedia.org/wiki/BERT_(language_model)) |
 
 <br>
 
 [En la práctica, probar varios modelos y comparar con validación cruzada.]{.alert}
 :::
-:::
-:::
-:::
-
-## El ciclo de vida de un modelo
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{style="text-align: center; font-size: 18px;"}
-```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│  Definir    │───▶│  Recoger    │───▶│  Entrenar   │───▶│  Desplegar  │───▶│  Monitorear │
-│  problema   │    │  datos      │    │  y evaluar  │    │  (deploy)   │    │  y mantener │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
-                                                                                    │
-                                                                                    ▼
-                                                                            ┌─────────────┐
-                                                                            │  Reentrenar │
-                                                                            │  si es      │
-                                                                            │  necesario  │
-                                                                            └─────────────┘
-```
-:::
-
-:::{.columns}
-:::{.column width=50%}
-- El entrenamiento es [solo una parte]{.alert} del ciclo
-- Después de desplegar, el modelo puede [degradarse]{.alert} (model drift)
-- Los datos del mundo real [cambian con el tiempo]{.alert}
-- Hay que [monitorear]{.alert} el rendimiento en producción
-:::
-
-:::{.column width=50%}
-- Causas de degradación:
-    - [Data drift:]{.alert} la distribución de los datos cambia
-    - [Concept drift:]{.alert} la relación entre variables cambia
-    - [Cambios en el negocio:]{.alert} nuevos productos, mercados
-- [Un modelo no es "listo y olvidado"]{.alert}
 :::
 :::
 :::
@@ -992,16 +823,16 @@ Evaluar modelo final en test
 :::{.column width=50%}
 **En R:**
 
-- [renv:]{.alert} gestión de dependencias (versiones de paquetes)
-- [targets:]{.alert} pipelines reproducibles
+- [[renv:](https://rstudio.github.io/renv/)]{.alert} gestión de dependencias (versiones de paquetes)
+- [[targets:](https://docs.ropensci.org/targets/)]{.alert} pipelines reproducibles
 - [Quarto/RMarkdown:]{.alert} código + documentación juntos
 - [Git:]{.alert} control de versiones
 
 **En general:**
 
-- [Docker:]{.alert} contenedores con ambiente completo
-- [MLflow:]{.alert} tracking de experimentos
-- [DVC:]{.alert} versionado de datos
+- [[Docker:](https://www.docker.com/)]{.alert} contenedores con ambiente completo
+- [[MLflow:](https://mlflow.org/)]{.alert} tracking de experimentos
+- [[DVC:](https://dvc.org/)]{.alert} versionado de datos
 :::
 
 :::{.column width=50%}
@@ -1039,13 +870,13 @@ mi_proyecto/
 :::{.columns}
 :::{.column width=55%}
 - [tidymodels](https://www.tidymodels.org/) es un conjunto de paquetes de R para modelado de datos
-- Sigue la filosofía del [tidyverse]{.alert}: código legible, consistente y modular
+- Sigue la filosofía del [[tidyverse](https://www.tidyverse.org/)]{.alert}: código legible, consistente y modular
 - Paquetes principales:
-    - [rsample:]{.alert} división de datos (train/test, validación cruzada)
-    - [parsnip:]{.alert} especificación de modelos (interfaz unificada)
-    - [yardstick:]{.alert} métricas de evaluación
-    - [workflows:]{.alert} combinar preprocesamiento + modelo
-    - [recipes:]{.alert} preprocesamiento de datos
+    - [[rsample:](https://rsample.tidymodels.org/)]{.alert} división de datos (train/test, validación cruzada)
+    - [[parsnip:](https://parsnip.tidymodels.org/)]{.alert} especificación de modelos (interfaz unificada)
+    - [[yardstick:](https://yardstick.tidymodels.org/)]{.alert} métricas de evaluación
+    - [[workflows:](https://workflows.tidymodels.org/)]{.alert} combinar preprocesamiento + modelo
+    - [[recipes:](https://recipes.tidymodels.org/)]{.alert} preprocesamiento de datos
 - Ventaja: [misma sintaxis]{.alert} para todos los modelos, ya sea regresión logística, random forest o redes neuronales
 :::
 
@@ -1086,7 +917,7 @@ predicciones <- predict(ajuste, testing(datos_split))
 
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=50%}
 **Conceptos fundamentales:**
@@ -1103,7 +934,7 @@ predicciones <- predict(ajuste, testing(datos_split))
 
 - El [sobreajuste]{.alert} ocurre cuando el modelo memoriza en lugar de aprender
 - La [regularización]{.alert} controla la complejidad del modelo
-- La [accuracy no es suficiente]{.alert}: necesitamos precisión, recall, F1, AUC-ROC
+- La [accuracy no es suficiente]{.alert}: necesitamos precisión, recall, AUC-ROC
 - Los [hiperparámetros]{.alert} se ajustan con validación, no con test
 - La [reproducibilidad]{.alert} es necesaria para verificar y colaborar
 :::
@@ -1112,7 +943,7 @@ predicciones <- predict(ajuste, testing(datos_split))
 
 ## Próximos pasos
 
-:::{style="margin-top: 40px; font-size: 26px;"}
+:::{style="margin-top: 40px; font-size: 30px;"}
 - [Ahora:]{.alert} Laboratorio práctico (Sesiones 1.3 y 1.4)
     - Primer flujo de trabajo con tidymodels
     - Clasificación con regresión logística
@@ -1125,4 +956,4 @@ predicciones <- predict(ajuste, testing(datos_split))
 - Vamos a aplicar todo lo que vimos hoy con [modelos más sofisticados]{.alert}
 :::
 
-# Nos vemos en el laboratorio {background-color="#2d4563"}
+# Nos vemos en el laboratorio! 🤓 {background-color="#2d4563"}

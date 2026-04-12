@@ -53,26 +53,26 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 32px;"}
+:::{style="margin-top: 20px; font-size: 28px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Parte teórica (~50 min)**
+**Primera parte**
 
 - Alucinaciones y cómo mitigarlas
 - RAG: Retrieval-Augmented Generation
-- LLMs para anotación de textos
-- Datos sintéticos
-- APIs y el paquete ellmer
+- Prompt engineering avanzado
+- Temperaturas y parámetros
 :::
 
 :::{.column width=50%}
-**Laboratorio práctico (~60-70 min)**
+**Segunda parte**
 
-- Configurar ellmer en R
-- Clasificación de textos con LLMs
-- Análisis de sentimiento con prompts
-- Auditoría de sesgos
+- LLMs para tareas de investigación
+- Anotación automática de textos
+- Generación de datos sintéticos
+- Reproducibilidad y validación
+- APIs y el paquete ellmer
 :::
 :::
 :::
@@ -350,196 +350,465 @@ Se necesita una [API key]{.alert} del proveedor (OpenAI, Anthropic, etc.)
 :::
 :::
 
-# Laboratorio 4: Usando LLMs desde R {background-color="#2d4563"}
+# Prompt engineering avanzado {background-color="#2d4563"}
 
-## Configuración
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-llm-setup, eval=FALSE, prompt=FALSE}
-# Instalar ellmer
-install.packages("ellmer")
-
-# Cargar paquetes
-library(ellmer)
-library(tidyverse)
-
-# Configurar la API key (elegir uno)
-# Opción 1: OpenAI
-Sys.setenv(OPENAI_API_KEY = "sk-...")
-
-# Opción 2: Anthropic (Claude)
-Sys.setenv(ANTHROPIC_API_KEY = "sk-ant-...")
-```
-
-- Cada estudiante necesita su propia [API key]{.alert}
-- Si no tienen una, pueden usar la key del curso (la compartiré en clase)
-- Alternativa gratuita: usar [Ollama]{.alert} con modelos locales (más lento pero sin costo)
-:::
-
-## Clasificación de textos con LLMs
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-clasificar, eval=FALSE, prompt=FALSE}
-# Crear el chat con un system prompt para clasificación
-clasificador <- chat_openai(
-  model = "gpt-4o-mini",
-  system_prompt = "Eres un clasificador de textos políticos.
-  Clasifica cada texto en UNO de estos temas:
-  economía, educación, seguridad, salud, medio ambiente.
-  Responde SOLO con el nombre del tema, sin explicación."
-)
-
-# Cargar los textos del Día 3
-textos <- read_csv("../dia-03/datos/textos_politicos.csv")
-
-# Clasificar un texto
-clasificador$chat(textos$texto[1])
-```
-
-- Usamos `gpt-4o-mini` porque es [rápido y barato]{.alert}
-- El system prompt define la tarea con precisión
-- [Responde SOLO con el tema]{.alert}: esto facilita el post-procesamiento
-:::
-
-## Clasificar múltiples textos
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-clasificar-batch, eval=FALSE, prompt=FALSE}
-# Función para clasificar un texto
-# IMPORTANTE: creamos un chat nuevo cada vez para evitar que el
-# historial de conversación acumule contexto y afecte las respuestas
-clasificar_texto <- function(texto) {
-  chat_temp <- chat_openai(
-    model = "gpt-4o-mini",
-    system_prompt = "Eres un clasificador de textos políticos.
-    Clasifica cada texto en UNO de estos temas:
-    economía, educación, seguridad, salud, medio ambiente.
-    Responde SOLO con el nombre del tema, sin explicación."
-  )
-  respuesta <- chat_temp$chat(texto)
-  return(trimws(tolower(respuesta)))
-}
-
-# Clasificar los primeros 20 textos (para no gastar mucha API)
-resultados <- textos |>
-  slice(1:20) |>
-  mutate(
-    tema_llm = map_chr(texto, clasificar_texto)
-  )
-
-# Comparar con los temas reales
-resultados |>
-  mutate(correcto = tema == tema_llm) |>
-  summarise(
-    total = n(),
-    correctos = sum(correcto),
-    accuracy = mean(correcto)
-  )
-```
-
-- ¿Qué accuracy obtuvieron? ¿Mejor o peor que LDA?
-:::
-
-## Análisis de sentimiento con prompts
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-sentimiento, eval=FALSE, prompt=FALSE}
-# Chat para análisis de sentimiento
-analista <- chat_openai(
-  model = "gpt-4o-mini",
-  system_prompt = "Analiza el sentimiento del texto.
-  Responde con un JSON: {\"sentimiento\": \"positivo/negativo/neutro\",
-  \"confianza\": 0.0-1.0, \"razon\": \"explicación breve\"}
-  Solo responde con el JSON, sin texto adicional."
-)
-
-# Analizar un texto
-texto_ejemplo <- "La inversión en educación pública ha permitido
-aumentar la cobertura escolar en las zonas rurales."
-
-respuesta <- analista$chat(texto_ejemplo)
-cat(respuesta)
-
-# Parsear el JSON
-resultado <- jsonlite::fromJSON(respuesta)
-cat("Sentimiento:", resultado$sentimiento, "\n")
-cat("Confianza:", resultado$confianza, "\n")
-cat("Razón:", resultado$razon, "\n")
-```
-:::
-
-## Auditoría de sesgos
+## El framework PTCF
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- Los LLMs pueden tener [sesgos]{.alert} en sus respuestas
-- Ejercicio: probar si el modelo responde diferente según el [país]{.alert} mencionado
+- [PTCF]{.alert}: Persona, Tarea, Contexto, Formato
+- Un buen prompt incluye los cuatro elementos:
 
-```{r lab-sesgo, eval=FALSE, prompt=FALSE}
-# Pregunta idéntica, cambiando solo el país
-paises_test <- c("Uruguay", "Bolivia",
-                 "Chile", "Venezuela")
+**[Persona]{.alert}**: ¿quién es el modelo?
 
-auditor <- chat_openai(model = "gpt-4o-mini")
+```
+Eres un investigador experto en ciencia
+política latinoamericana con 20 años
+de experiencia en análisis de discurso.
+```
 
-respuestas <- map_chr(paises_test, function(p) {
-  prompt <- paste0("En una oración breve,
-    describe las perspectivas económicas
-    de ", p, " para 2026.")
-  auditor$chat(prompt)
-})
+**[Tarea]{.alert}**: ¿qué debe hacer?
 
-tibble(pais = paises_test,
-       respuesta = respuestas)
+```
+Clasifica el siguiente texto según
+su orientación ideológica.
 ```
 :::
 
 :::{.column width=45%}
+**[Contexto]{.alert}**: información necesaria
+
+```
+El texto proviene de un discurso
+presidencial de 2023 en Uruguay.
+Las categorías son: izquierda,
+centro-izquierda, centro,
+centro-derecha, derecha.
+```
+
+**[Formato]{.alert}**: estructura de salida
+
+```
+Responde en JSON:
+{"categoria": "...",
+ "confianza": 0.0-1.0,
+ "justificacion": "..."}
+```
+:::
+:::
+:::
+
+## Zero-shot, few-shot y chain-of-thought
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**[Zero-shot]{.alert}**: sin ejemplos
+
+```
+Clasifica el sentimiento:
+"La economía ha crecido un 5%"
+```
+
+Funciona para tareas simples y comunes.
+
+**[Few-shot]{.alert}**: con ejemplos
+
+```
+Ejemplos:
+- "La inflación es alta" → negativo
+- "El empleo mejoró" → positivo
+- "Los datos son de 2023" → neutro
+
+Clasifica:
+"La pobreza ha disminuido" →
+```
+
+Mejora la precisión en tareas específicas.
+:::
+
+:::{.column width=50%}
+**[Chain-of-thought]{.alert}** (CoT)
+
+```
+Clasifica y explica paso a paso:
+
+Texto: "A pesar de la crisis, el
+gobierno logró reducir la pobreza"
+
+Análisis:
+1. "crisis" = contexto negativo
+2. "logró reducir pobreza" = resultado positivo
+3. "a pesar de" = contraste
+4. El resultado supera al contexto
+
+Clasificación: POSITIVO
+```
+
+CoT mejora el razonamiento en tareas complejas ([Wei et al., 2022](https://arxiv.org/abs/2201.11903)).
+:::
+:::
+:::
+
+## Temperatura y otros parámetros
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**[Temperatura]{.alert}** (0.0 - 2.0)
+
+- 0.0: determinístico, siempre elige el token más probable
+- 0.3: poca variación, bueno para análisis
+- 0.7: balance, bueno para escritura
+- 1.0+: muy creativo, impredecible
+
+**Para investigación: [temperatura ≤ 0.3]{.alert}**
+
+**Otros parámetros:**
+
+- [max_tokens]{.alert}: límite de tokens en respuesta
+- [top_p]{.alert}: nucleus sampling (alternativa a temperatura)
+- [presence_penalty]{.alert}: penaliza repetición
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Recomendaciones por tarea:**
+
+| Tarea | Temperatura |
+|-------|-------------|
+| Clasificación | 0.0 - 0.1 |
+| Extracción de datos | 0.0 - 0.2 |
+| Resumen | 0.2 - 0.4 |
+| Análisis abierto | 0.3 - 0.5 |
+| Escritura creativa | 0.7 - 1.0 |
+| Brainstorming | 0.8 - 1.2 |
+
+<br>
+
+[Para replicabilidad, usar temperatura 0 y fijar una semilla (seed) si el API lo permite.]{.alert}
+:::
+:::
+:::
+:::
+
+## Extracción de datos estructurados
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Pedir respuestas en [formato estructurado]{.alert} facilita el procesamiento
+- Formatos comunes:
+    - [JSON]{.alert}: el más versátil
+    - [CSV]{.alert}: para tablas simples
+    - [XML]{.alert}: para estructuras jerárquicas
+- Ejemplo de extracción:
+
+```
+Extrae las entidades del texto en JSON:
+{"personas": [...],
+ "organizaciones": [...],
+ "lugares": [...],
+ "fechas": [...]}
+
+Texto: "El presidente Lacalle Pou
+se reunió con el FMI en Montevideo
+el 15 de marzo de 2024."
+```
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 18px;"}
+**Respuesta esperada:**
+
+```json
+{
+  "personas": ["Lacalle Pou"],
+  "organizaciones": ["FMI"],
+  "lugares": ["Montevideo"],
+  "fechas": ["15 de marzo de 2024"]
+}
+```
+
+<br>
+
+**Tip**: Incluir un [ejemplo de formato]{.alert} en el prompt reduce errores de estructura.
+
+[ellmer tiene `$extract_data()` que valida el JSON automáticamente.]{.alert}
+:::
+:::
+:::
+:::
+
+# Reproducibilidad y validación {background-color="#2d4563"}
+
+## El problema de la reproducibilidad
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los LLMs plantean [desafíos de reproducibilidad]{.alert}:
+    - Los modelos se actualizan (GPT-4 de marzo ≠ GPT-4 de diciembre)
+    - Temperatura > 0 introduce aleatoriedad
+    - Las APIs pueden cambiar comportamiento
+    - Los modelos cerrados son cajas negras
+- Buenas prácticas:
+    - [Documentar]{.alert}: modelo, versión, fecha, parámetros
+    - [Guardar]{.alert} los prompts exactos usados
+    - [Temperatura 0]{.alert} cuando sea posible
+    - [Guardar]{.alert} las respuestas crudas
+    - Considerar [modelos abiertos]{.alert} (Llama) para máxima reproducibilidad
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Documentación mínima:**
+
+```yaml
+modelo: gpt-4o-mini
+version: 2024-07-18
+fecha_ejecucion: 2026-04-10
+temperatura: 0
+max_tokens: 500
+system_prompt: |
+  Eres un clasificador...
+seed: 42  # si está disponible
+
+# Guardar en archivo:
+# - prompts usados
+# - respuestas completas
+# - código de procesamiento
+```
+
+[Sin esta documentación, el análisis no es reproducible.]{.alert}
+:::
+:::
+:::
+:::
+
+## Validación de resultados
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Estrategias de validación:**
+
+1. [Muestra manual]{.alert}: revisar humana de N casos
+    - ¿El LLM clasificó correctamente?
+    - ¿Qué errores comete?
+
+2. [Gold standard]{.alert}: comparar con datos etiquetados por expertos
+    - Calcular accuracy, precision, recall, F1
+
+3. [Comparación con métodos clásicos]{.alert}
+    - ¿LLM vs. diccionario? ¿LLM vs. LDA?
+    - Los LLMs no siempre ganan
+
+4. [Múltiples modelos]{.alert}
+    - Comparar GPT vs. Claude vs. Llama
+    - Si coinciden, más confianza
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px;"}
+**Ejemplo de validación:**
+
+```
+Dataset: 100 textos políticos
+Gold standard: etiquetados por
+              2 investigadores
+
+Resultados:
+- LLM accuracy: 87%
+- Diccionario: 72%
+- LDA + supervisión: 79%
+- Inter-rater (humanos): 91%
+
+Conclusión: LLM cercano a humanos,
+supera métodos clásicos
+```
+
+[Siempre reportar métricas de validación en publicaciones.]{.alert}
+:::
+:::
+:::
+:::
+
+## LLMs vs. métodos clásicos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+:::{style="text-align: center;"}
+
+| Criterio | LLMs | Clásicos (TF-IDF, LDA) |
+|----------|------|------------------------|
+| [Precisión]{.alert} | Alta (contexto, negaciones) | Moderada |
+| [Velocidad]{.alert} | Lento (API calls) | Muy rápido |
+| [Costo]{.alert} | USD 0.01-0.10 por texto | Gratis |
+| [Reproducibilidad]{.alert} | Difícil (modelo cambia) | Alta |
+| [Transparencia]{.alert} | Caja negra | Interpretable |
+| [Escalabilidad]{.alert} | Costoso a gran escala | Escala bien |
+| [Idiomas]{.alert} | Multilingüe nativo | Requiere recursos por idioma |
+
+:::
+
+<br>
+
 :::{style="font-size: 22px;"}
-**Preguntas para reflexionar:**
+[Recomendación]{.alert}: usar LLMs para tareas donde la precisión importa más que el costo. Para grandes volúmenes, considerar [híbridos]{.alert}: LLM para etiquetar subset → entrenar clasificador clásico.
+:::
+:::
 
-- ¿El modelo es más [optimista]{.alert} sobre algunos países que otros?
-- ¿Usa [estereotipos]{.alert}?
-- ¿La respuesta cambiaría si le preguntamos en [inglés]{.alert}?
-- ¿Qué implicaciones tiene esto para la [investigación]{.alert}?
+# El paquete ellmer {background-color="#2d4563"}
 
-[Los sesgos del modelo se transfieren a cualquier análisis que hagamos con él.]{.alert}
+## ¿Qué es ellmer?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [ellmer]{.alert}: paquete de R para interactuar con LLMs
+- Desarrollado por el equipo de [Posit]{.alert} (los creadores de RStudio)
+- Interfaz unificada para múltiples proveedores:
+    - [OpenAI]{.alert}: GPT-4, GPT-4o-mini
+    - [Anthropic]{.alert}: Claude 3.5
+    - [Google]{.alert}: Gemini
+    - [Ollama]{.alert}: modelos locales (Llama, Mistral)
+- Se integra con el [tidyverse]{.alert}
+- Documentación: <https://ellmer.tidyverse.org/>
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 18px;"}
+**Instalación:**
+
+```r
+install.packages("ellmer")
+
+# Configurar API key
+Sys.setenv(OPENAI_API_KEY = "sk-...")
+# o
+Sys.setenv(ANTHROPIC_API_KEY = "sk-ant-...")
+```
+
+**Funciones principales:**
+
+- `chat_openai()`: crear chat con OpenAI
+- `chat_claude()`: crear chat con Claude
+- `$chat()`: enviar mensaje
+- `$extract_data()`: extraer datos estructurados
 :::
 :::
 :::
 :::
 
-## Discusión
+## Ejemplo básico con ellmer
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
-- ¿Los LLMs clasificaron [mejor]{.alert} que LDA y diccionarios?
-- ¿Qué [errores]{.alert} cometieron? ¿Son errores diferentes a los de los métodos clásicos?
-- ¿Detectaron [sesgos]{.alert} en las respuestas del modelo?
-- [Ventajas]{.alert} de los LLMs para investigación:
-    - Flexibilidad, velocidad, multilingüismo
-- [Riesgos]{.alert}:
-    - Alucinaciones, sesgos, falta de reproducibilidad, costo
-- [La combinación]{.alert} de métodos clásicos (TF-IDF, LDA) con LLMs suele dar los mejores resultados
+```r
+library(ellmer)
+library(tidyverse)
+
+# Crear un chat con Claude
+chat <- chat_claude(
+  model = "claude-sonnet-4-20250514",
+  system_prompt = "Eres un analista político experto en América Latina.
+                   Responde de forma concisa en español."
+)
+
+# Enviar un mensaje
+respuesta <- chat$chat("¿Cuáles son los principales desafíos
+                        democráticos en Uruguay actualmente?")
+
+# Ver la respuesta
+cat(respuesta)
+
+# El chat mantiene el historial
+chat$chat("¿Y cómo se compara con Chile?")
+```
+
+[Tip]{.alert}: crear un chat nuevo para cada tarea independiente. El historial acumulado puede sesgar las respuestas.
 :::
 
-## Resumen del Día 4
+## Extracción de datos estructurados
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
-- Los [LLMs]{.alert} predicen el siguiente token, pero a gran escala muestran capacidades que no fueron programadas explícitamente
-- [Embeddings]{.alert} y [atención]{.alert} son los mecanismos clave que permiten entender contexto
-- El [prompt engineering]{.alert} determina la calidad de los resultados: PTCF, temperatura, few-shot, CoT
-- Las [alucinaciones]{.alert} son un riesgo real; [RAG]{.alert} ayuda a mitigarlas
-- Los LLMs pueden [anotar textos]{.alert}, [generar datos sintéticos]{.alert} y automatizar tareas de investigación
-- [ellmer]{.alert} permite usar LLMs desde R de forma programática
-- Los [sesgos]{.alert} del modelo se transfieren al análisis
-- Mañana: [ética, equidad y mini-propuestas de investigación]{.alert}
+```r
+# Definir el esquema esperado
+library(ellmer)
+
+# Chat para clasificación
+clasificador <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Clasifica textos políticos.
+                   Responde SOLO en JSON válido."
+)
+
+# Usar extract_data para obtener estructura
+resultado <- clasificador$extract_data(
+  "La inflación sigue siendo un problema grave.",
+  type = type_object(
+    tema = type_string("Tema principal: economia/educacion/salud/seguridad/ambiente"),
+    sentimiento = type_string("positivo/negativo/neutro"),
+    confianza = type_number("Confianza de 0 a 1")
+  )
+)
+
+# Resultado es una lista de R
+resultado$tema        # "economia"
+resultado$sentimiento # "negativo"
+resultado$confianza   # 0.9
+```
 :::
 
-# Fin del Día 4 {background-color="#2d4563"}
+## Resumen de la sesión
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Conceptos clave:**
+
+- [Alucinaciones]{.alert}: los LLMs inventan información
+- [RAG]{.alert}: darle documentos reales al modelo
+- [PTCF]{.alert}: Persona, Tarea, Contexto, Formato
+- [Temperatura baja]{.alert} para investigación
+- [Datos estructurados]{.alert}: JSON para facilitar procesamiento
+:::
+
+:::{.column width=50%}
+**Buenas prácticas:**
+
+- [Validar]{.alert} contra gold standard
+- [Documentar]{.alert} modelo, parámetros, prompts
+- [Comparar]{.alert} con métodos clásicos
+- [Considerar]{.alert} costo y escalabilidad
+- [ellmer]{.alert} para usar LLMs desde R
+:::
+:::
+
+<br>
+
+[En los laboratorios pondremos todo esto en práctica.]{.alert}
+:::
+
+## Próximos pasos
+
+:::{style="margin-top: 40px; font-size: 26px;"}
+
+- [Laboratorio 4.3:]{.alert} Primeros pasos con ellmer
+    - Configuración y chat básico
+    - Clasificación de textos
+    - Extracción estructurada
+
+- [Laboratorio 4.4:]{.alert} Aplicaciones avanzadas
+    - Análisis de sentimiento
+    - Generación de datos sintéticos
+    - Auditoría de sesgos
+    - Comparación con métodos clásicos
+
+[Nos vemos en el laboratorio.]{.alert}
+:::
+
+# Nos vemos en el laboratorio {background-color="#2d4563"}

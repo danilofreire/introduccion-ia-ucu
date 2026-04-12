@@ -53,26 +53,27 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 32px;"}
+:::{style="margin-top: 20px; font-size: 28px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Parte teórica (~50 min)**
+**Primera parte**
 
-- ¿Por qué analizar texto?
-- Preprocesamiento de texto
-- Bag-of-words y TF-IDF
+- El texto como datos
+- Tokenización y preprocesamiento
+- Bag-of-words
+- TF-IDF
 - Análisis de sentimiento
-- Topic Modeling (LDA)
 :::
 
 :::{.column width=50%}
-**Laboratorio práctico (~60-70 min)**
+**Segunda parte**
 
-- Corpus de textos políticos latinoamericanos
-- Tokenización con tidytext
-- TF-IDF por tema
-- Extracción de tópicos con LDA
+- Topic Modeling (LDA)
+- Introducción a embeddings
+- Word2Vec y representaciones densas
+- Aplicaciones en América Latina
+- Limitaciones y próximos pasos
 :::
 :::
 :::
@@ -469,196 +470,400 @@ dado el texto, recupera los temas.
 :::
 :::
 
-# Laboratorio: Análisis de textos políticos {background-color="#2d4563"}
+# Introducción a embeddings {background-color="#2d4563"}
 
-## Configuración
+## Limitaciones de bag-of-words y TF-IDF
 
 :::{style="margin-top: 30px; font-size: 24px;"}
-
-```{r lab-texto-setup, eval=FALSE, prompt=FALSE}
-# Instalar paquetes (si no los tienen)
-install.packages(c("tidytext", "topicmodels", "SnowballC"))
-
-# Cargar
-library(tidyverse)
-library(tidytext)
-library(topicmodels)
-```
-
-```{r lab-texto-load, echo=FALSE, message=FALSE, warning=FALSE}
-library(tidyverse)
-library(tidytext)
-if (!require("topicmodels", character.only = TRUE)) {
-  install.packages("topicmodels", repos = "https://cran.rstudio.com/", quiet = TRUE)
-  library(topicmodels)
-}
-if (!require("SnowballC", character.only = TRUE)) {
-  install.packages("SnowballC", repos = "https://cran.rstudio.com/", quiet = TRUE)
-  library(SnowballC)
-}
-```
-
-- [tidytext]{.alert}: tokenización y análisis de texto al estilo tidyverse
-- [topicmodels]{.alert}: implementación de LDA
-- [SnowballC]{.alert}: stemming para español
+:::{.columns}
+:::{.column width=55%}
+- Bag-of-words y TF-IDF son [representaciones dispersas]{.alert} (sparse)
+    - Cada palabra es una dimensión independiente
+    - No capturan [significado]{.alert} ni [relaciones semánticas]{.alert}
+    - "perro" y "can" son tan diferentes como "perro" y "democracia"
+- Problemas:
+    - [Sinónimos]{.alert}: palabras diferentes, significado igual
+    - [Polisemia]{.alert}: misma palabra, significados diferentes
+    - [Orden]{.alert}: "el gato come pescado" = "el pescado come gato"
+- Solución: [representaciones densas]{.alert} que capturan significado
 :::
 
-## Cargar el corpus
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Disperso vs. Denso**
+
+```
+Bag-of-words (disperso):
+"perro" = [0,0,0,1,0,0,0,0,0,0...]
+           (10,000 dimensiones,
+            casi todas cero)
+
+Embedding (denso):
+"perro" = [0.23, -0.45, 0.12, ...]
+           (300 dimensiones,
+            todas con valores)
+
+Los embeddings codifican
+SIGNIFICADO en cada dimensión.
+```
+:::
+:::
+:::
+:::
+
+## ¿Qué son los embeddings?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Un [embedding]{.alert} es un vector denso que representa una palabra (o texto)
+- Las palabras con [significados similares]{.alert} tienen vectores [cercanos]{.alert}
+- La idea central: "una palabra se conoce por la compañía que frecuenta" (Firth, 1957)
+- Si dos palabras aparecen en [contextos similares]{.alert}, tienen significados similares
+    - "El ___ ladra fuerte" → perro, can, cachorro
+    - Estos deberían tener embeddings cercanos
+- Métodos clásicos: [Word2Vec]{.alert} (Google, 2013), GloVe (Stanford, 2014)
+- Métodos modernos: [BERT]{.alert}, GPT (veremos mañana)
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Embeddings en 3D](figures/embeddings-3d.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/embeddings-3d.png"}
+
+Las palabras similares se agrupan en el espacio de embeddings.
+:::
+:::
+:::
+:::
+
+## Word2Vec: la idea
 
 :::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab-cargar, message=FALSE, warning=FALSE, prompt=FALSE}
-# Cargar textos políticos
-textos <- read_csv("datos/textos_politicos.csv")
-
-# Vista rápida
-textos |> count(tema)
-```
-
-- Tenemos 60 textos distribuidos en 5 temas
-- Los temas son las "etiquetas verdaderas". Vamos a ver si LDA los recupera
+:::{.columns}
+:::{.column width=55%}
+- [Word2Vec]{.alert} ([Mikolov et al., 2013](https://arxiv.org/abs/1301.3781)): entrenar una red neuronal para predecir palabras a partir de su contexto
+- Dos arquitecturas:
+    - [CBOW]{.alert} (Continuous Bag of Words): predecir la palabra central dado el contexto
+    - [Skip-gram]{.alert}: predecir el contexto dada la palabra central
+- El "subproducto" del entrenamiento son los [embeddings]{.alert}
+- Propiedades emergentes:
+    - Aritmética de vectores: [rey - hombre + mujer ≈ reina]{.alert}
+    - Analogías: París:Francia :: Madrid:España
 :::
 
-## Tokenizar y limpiar
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![King - Man + Woman = Queen](figures/king-queen-vectors.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/king-queen-vectors.png"}
+
+Los embeddings capturan relaciones semánticas como operaciones vectoriales.
+:::
+:::
+:::
+:::
+
+## Embeddings preentrenados
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Entrenar embeddings requiere [muchísimos datos]{.alert} (miles de millones de palabras)
+- En la práctica, usamos [embeddings preentrenados]{.alert}:
+    - Word2Vec en Google News (inglés)
+    - [fastText]{.alert} (Facebook): disponible para español
+    - GloVe (Stanford)
+- Para español:
+    - [Spanish Billion Words Corpus]{.alert}
+    - [fastText embeddings para español]{.alert}
+- Cómo usarlos: cargar los embeddings y buscar el vector de cada palabra
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Usando embeddings en R:**
+
+```r
+# Con text2vec
+library(text2vec)
+
+# Cargar embeddings preentrenados
+embeddings <- readRDS("embeddings_es.rds")
+
+# Obtener vector de una palabra
+vec_democracia <- embeddings["democracia", ]
+
+# Encontrar palabras similares
+sim <- sim2(
+  embeddings,
+  matrix(vec_democracia, nrow = 1)
+)
+head(sort(sim[,1], decreasing = TRUE))
+```
+:::
+:::
+:::
+:::
+
+## Embeddings de documentos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los embeddings de palabras representan [palabras individuales]{.alert}
+- Pero muchas veces queremos representar [documentos completos]{.alert}
+- Enfoques simples:
+    - [Promedio]{.alert} de los embeddings de las palabras del documento
+    - [Promedio ponderado por TF-IDF]{.alert}
+- Enfoques más sofisticados:
+    - [Doc2Vec]{.alert}: extensión de Word2Vec para documentos
+    - [Sentence-BERT]{.alert}: embeddings de oraciones con transformers
+- Los embeddings de documentos permiten [medir similaridad]{.alert} entre textos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Búsqueda semántica](figures/semantic-search.webp){width="100%"}](#){data-modal-type="image" data-modal-url="figures/semantic-search.webp"}
+
+Con embeddings, podemos buscar textos por [significado]{.alert}, no solo por palabras exactas.
+:::
+:::
+:::
+:::
+
+# Aplicaciones en América Latina {background-color="#2d4563"}
+
+## Análisis de discursos políticos
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Ejemplos de investigación:**
 
-```{r lab-tokenizar, message=FALSE, warning=FALSE, prompt=FALSE}
-# Definir stopwords en español
-stopwords_es <- tibble(palabra = tm::stopwords("spanish"))
-
-# Tokenizar
-tokens <- textos |>
-  unnest_tokens(palabra, texto) |>
-  # Eliminar stopwords
-  anti_join(stopwords_es, by = "palabra") |>
-  # Eliminar números
-  filter(!str_detect(palabra, "^[0-9]+$"))
-
-# Palabras más frecuentes
-tokens |>
-  count(palabra, sort = TRUE) |>
-  head(15)
-```
+- [Análisis de discursos presidenciales]{.alert}
+    - ¿Cómo cambia el tono según el contexto económico?
+    - ¿Qué temas dominan en cada país?
+- [Comparación de programas partidarios]{.alert}
+    - Posicionamiento ideológico automático
+    - Evolución de agendas a lo largo del tiempo
+- [Debates parlamentarios]{.alert}
+    - Polarización del lenguaje
+    - Redes de co-aparición de temas
 :::
 
-## TF-IDF por tema
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Datos disponibles:**
+
+- [ParlSpeech]{.alert}: discursos parlamentarios de varios países
+- [Manifesto Project]{.alert}: programas de partidos codificados
+- [Latin American Presidential Speeches]{.alert}: colecciones académicas
+- [Repositorios gubernamentales]{.alert}: actas, leyes, decretos
+
+<br>
+
+[El desafío principal es el acceso a datos estructurados y digitalizados.]{.alert}
+:::
+:::
+:::
+:::
+
+## Análisis de redes sociales
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Aplicaciones:**
 
-```{r lab-tfidf, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=9, fig.height=4.5}
-# Calcular TF-IDF por tema
-tfidf <- tokens |>
-  count(tema, palabra) |>
-  bind_tf_idf(palabra, tema, n)
-
-# Top 5 palabras más distintivas por tema
-tfidf |>
-  group_by(tema) |>
-  slice_max(tf_idf, n = 5) |>
-  ungroup() |>
-  mutate(palabra = reorder_within(palabra, tf_idf, tema)) |>
-  ggplot(aes(x = tf_idf, y = palabra, fill = tema)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~tema, scales = "free_y") +
-  scale_y_reordered() +
-  labs(x = "TF-IDF", y = NULL,
-       title = "Palabras más distintivas por tema (TF-IDF)") +
-  theme_minimal()
-```
+- [Detección de desinformación]{.alert}
+    - Identificar narrativas falsas
+    - Mapear redes de difusión
+- [Sentimiento hacia políticas públicas]{.alert}
+    - Reacciones a anuncios gubernamentales
+    - Evolución de la opinión pública
+- [Movilización social]{.alert}
+    - Identificar hashtags emergentes
+    - Predecir protestas
 :::
 
-## Topic Modeling con LDA
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Consideraciones:**
+
+- [Sesgos de representatividad]{.alert}: los usuarios de redes no son la población general
+- [Bots y cuentas falsas]{.alert}: distorsionan el análisis
+- [Cambios en APIs]{.alert}: X (Twitter) restringió acceso
+- [Ética]{.alert}: privacidad, consentimiento
+
+<br>
+
+[Los LLMs (Día 4) están transformando este campo: pueden clasificar, resumir y extraer información mucho mejor que los métodos clásicos.]{.alert}
+:::
+:::
+:::
+:::
+
+## Análisis de medios de comunicación
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Aplicaciones:**
 
-```{r lab-lda, message=FALSE, warning=FALSE, prompt=FALSE}
-# Crear la Document-Term Matrix (DTM)
-dtm <- tokens |>
-  count(id, palabra) |>
-  cast_dtm(id, palabra, n)
+- [Agenda setting]{.alert}: ¿qué temas cubren los medios?
+- [Framing]{.alert}: ¿cómo se presenta cada tema?
+- [Sesgo mediático]{.alert}: diferencias entre medios
+- [Cobertura electoral]{.alert}: equidad y tono
 
-# Ejecutar LDA con K=5 temas
-set.seed(2026)
-lda_model <- LDA(dtm, k = 5, control = list(seed = 2026))
+**Métodos:**
 
-# Palabras más probables por tema
-terms(lda_model, 8)
-```
-
-- ¿Los temas descubiertos por LDA coinciden con los temas reales?
+- [TF-IDF]{.alert} para identificar temas distintivos
+- [LDA]{.alert} para descubrir frames
+- [Sentimiento]{.alert} para medir tono
+- [Embeddings]{.alert} para similaridad temática
 :::
 
-## Visualizar los temas de LDA
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Proyectos relevantes:**
+
+- [GDELT Project]{.alert}: noticias globales en tiempo real
+- [Media Cloud]{.alert}: análisis de ecosistemas mediáticos
+- [Observatorios de medios]{.alert}: en varios países latinoamericanos
+
+<br>
+
+**Ejemplo de pregunta:**
+
+¿La cobertura de la economía
+en medios argentinos es más
+negativa que en medios uruguayos?
+
+→ TF-IDF + sentimiento + comparación
+:::
+:::
+:::
+:::
+
+## Análisis de respuestas abiertas
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**El problema:**
 
-```{r lab-lda-plot, message=FALSE, warning=FALSE, prompt=FALSE, fig.width=9, fig.height=5}
-# Extraer probabilidades palabra-tema (beta)
-lda_topics <- tidy(lda_model, matrix = "beta")
+- Las encuestas incluyen preguntas abiertas
+- "¿Cuál es el principal problema del país?"
+- Codificar manualmente miles de respuestas es [costoso]{.alert}
 
-# Top 6 palabras por tema
-lda_topics |>
-  group_by(topic) |>
-  slice_max(beta, n = 6) |>
-  ungroup() |>
-  mutate(term = reorder_within(term, beta, topic)) |>
-  ggplot(aes(x = beta, y = term, fill = factor(topic))) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~topic, scales = "free_y", labeller = label_both) +
-  scale_y_reordered() +
-  labs(x = "Probabilidad (beta)", y = NULL,
-       title = "Palabras más probables por tema (LDA)") +
-  theme_minimal()
-```
+**Solución con NLP:**
+
+1. [Tokenizar y limpiar]{.alert} las respuestas
+2. [TF-IDF]{.alert} para identificar categorías
+3. [Clustering]{.alert} para agrupar respuestas similares
+4. [LDA]{.alert} para descubrir temas
+5. O mejor: [usar un LLM]{.alert} para clasificar automáticamente
 :::
 
-## Proporción de temas por documento
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Ejemplo:**
+
+```
+Respuestas abiertas:
+"La economía está muy mal"
+"No hay trabajo"
+"La inflación nos mata"
+"Mucha inseguridad"
+"Los políticos son corruptos"
+
+Clustering identifica:
+- Cluster 1: Economía (3)
+- Cluster 2: Seguridad (1)
+- Cluster 3: Política (1)
+
+Mucho más rápido que
+codificación manual.
+```
+:::
+:::
+:::
+:::
+
+## Limitaciones de los métodos clásicos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Bag-of-words / TF-IDF:**
+
+- No capturan [orden]{.alert} de palabras
+- No capturan [significado]{.alert}
+- Dependen de [stopwords]{.alert} predefinidas
+- Sensibles a [errores ortográficos]{.alert}
+:::
+
+:::{.column width=50%}
+**LDA:**
+
+- Elegir K es [arbitrario]{.alert}
+- Temas pueden ser [incoherentes]{.alert}
+- Malo para [textos cortos]{.alert}
+- No captura [relaciones]{.alert} entre temas
+:::
+:::
+
+<br>
+
+:::{style="text-align: center; font-size: 22px;"}
+[Los LLMs (transformers) superan estas limitaciones.]{.alert}
+
+Mañana veremos cómo BERT, GPT y otros modelos revolucionan el análisis de texto.
+:::
+:::
+
+## Resumen de la sesión
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Métodos clásicos:**
 
-```{r lab-lda-gamma, message=FALSE, warning=FALSE, prompt=FALSE}
-# Extraer probabilidades documento-tema (gamma)
-lda_docs <- tidy(lda_model, matrix = "gamma") |>
-  mutate(document = as.integer(document))
-
-# Unir con los temas reales
-lda_docs |>
-  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
-  group_by(tema, topic) |>
-  summarise(gamma_promedio = mean(gamma), .groups = "drop") |>
-  pivot_wider(names_from = topic, values_from = gamma_promedio, names_prefix = "Tema_")
-```
-
-- Cada fila muestra la proporción promedio de cada tema LDA en los documentos de un tema real
-- Si LDA funciona bien, cada tema real debería estar dominado por un solo tema LDA
+- [Tokenización]{.alert}: dividir texto en palabras
+- [Stopwords]{.alert}: eliminar palabras vacías
+- [Bag-of-words]{.alert}: contar frecuencias
+- [TF-IDF]{.alert}: ponderar por rareza
+- [LDA]{.alert}: descubrir temas latentes
 :::
 
-## Discusión
+:::{.column width=50%}
+**Representaciones:**
 
-:::{style="margin-top: 30px; font-size: 26px;"}
-
-- ¿LDA recuperó [los cinco temas]{.alert} correctamente?
-- ¿Qué [palabras]{.alert} fueron las más útiles para distinguir temas?
-- ¿TF-IDF y LDA dieron resultados [consistentes]{.alert}?
-- [Limitaciones]{.alert} de este ejercicio:
-    - Corpus pequeño (60 textos)
-    - Textos simulados (en la práctica, los textos reales son más ruidosos)
-    - LDA funciona mejor con corpus grandes
-- Mañana veremos cómo los [LLMs]{.alert} pueden hacer clasificación de texto, análisis de sentimiento y extracción de temas de forma mucho más precisa
+- [Dispersas]{.alert}: un vector enorme con casi todos ceros
+- [Densas (embeddings)]{.alert}: vectores compactos que capturan significado
+- [Word2Vec]{.alert}: embeddings de palabras
+- [Doc2Vec]{.alert}: embeddings de documentos
+:::
 :::
 
-## Resumen del Día 3
+<br>
 
-:::{style="margin-top: 30px; font-size: 26px;"}
-
-- [K-means]{.alert} agrupa observaciones similares; [PCA]{.alert} reduce dimensiones y permite visualizar datos complejos
-- El análisis de texto convierte [palabras en números]{.alert} para poder aplicar métodos cuantitativos
-- [Tokenización]{.alert} y [stopwords]{.alert} son pasos de preprocesamiento clave
-- [TF-IDF]{.alert} identifica las palabras más [distintivas]{.alert} de cada documento o grupo
-- [LDA]{.alert} descubre temas latentes en un corpus sin necesidad de etiquetas
-- Estos métodos son [herramientas de exploración]{.alert}: generan hipótesis e identifican patrones
-- Mañana: [LLMs, transformers y cómo usarlos para investigación]{.alert}
+[Estos métodos son el fundamento. Los LLMs los mejoran en casi todo, pero entender los conceptos básicos es clave.]{.alert}
 :::
 
-# Fin del Día 3 {background-color="#2d4563"}
+## Próximos pasos
+
+:::{style="margin-top: 40px; font-size: 26px;"}
+
+- [Laboratorios (3.3 y 3.4):]{.alert}
+    - Clustering y PCA con datos de países latinoamericanos
+    - Análisis de textos políticos con TF-IDF y LDA
+
+- [Mañana (Día 4):]{.alert} LLMs y aplicaciones avanzadas
+    - ¿Qué son los transformers?
+    - BERT, GPT y modelos de lenguaje
+    - Cómo usar LLMs para investigación
+    - APIs y aplicaciones prácticas
+
+[Nos vemos en el laboratorio.]{.alert}
+:::
+
+# Nos vemos en el laboratorio {background-color="#2d4563"}

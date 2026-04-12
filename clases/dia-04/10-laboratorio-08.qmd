@@ -1,0 +1,760 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 4.4: Laboratorio - Aplicaciones avanzadas de LLMs"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departamento de Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 4.4](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-04/10-laboratorio-08.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 8: Aplicaciones avanzadas {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Análisis de sentimiento estructurado
+2. Generar datos sintéticos
+3. Auditar sesgos del modelo
+4. Combinar LLMs con tidyverse
+5. Validar resultados
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- [Sentimiento]{.alert} con explicaciones
+- [Datos sintéticos]{.alert} para pilotos
+- Detectar [sesgos]{.alert} en LLMs
+- [Integrar]{.alert} LLMs en workflows de R
+- [Buenas prácticas]{.alert} para investigación
+
+<br>
+
+[Este laboratorio muestra aplicaciones prácticas para investigación social.]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Análisis de sentimiento avanzado | ~30 min |
+| 2 | Generación de datos sintéticos | ~30 min |
+| 3 | Auditoría de sesgos | ~30 min |
+| 4 | Mini-proyecto integrador | ~30 min |
+
+<br>
+
+[Usaremos los conocimientos de las sesiones anteriores.]{.alert}
+:::
+
+# Parte 1: Análisis de sentimiento {background-color="#2d4563"}
+
+## Más allá de positivo/negativo
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- El sentimiento simple (pos/neg/neutro) es limitado
+- Podemos extraer [dimensiones múltiples]{.alert}:
+    - Tono emocional
+    - Intensidad
+    - Actores mencionados
+    - Posición del autor
+- El LLM puede [explicar]{.alert} su análisis
+- Útil para [validación cualitativa]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 18px;"}
+**Ejemplo enriquecido:**
+
+```json
+{
+  "sentimiento": "negativo",
+  "intensidad": "alta",
+  "emocion_primaria": "preocupación",
+  "actores": {
+    "positivos": ["trabajadores"],
+    "negativos": ["gobierno"]
+  },
+  "citas_clave": ["crisis afecta"],
+  "justificacion": "El texto usa
+    palabras como 'crisis' y
+    'afecta' repetidamente..."
+}
+```
+:::
+:::
+:::
+:::
+
+## Configurar el analizador
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: config-sentimiento
+#| eval: false
+
+library(ellmer)
+library(tidyverse)
+library(jsonlite)
+
+# Analizador de sentimiento avanzado
+analizador <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = 'Eres un experto en análisis de discurso político.
+  Analiza el sentimiento del texto con detalle.
+
+  Responde SIEMPRE en JSON válido con esta estructura exacta:
+  {
+    "sentimiento_general": "positivo/negativo/neutro/mixto",
+    "intensidad": "baja/media/alta",
+    "emociones": ["lista de emociones detectadas"],
+    "hacia_gobierno": "favorable/desfavorable/neutro",
+    "hacia_ciudadanos": "favorable/desfavorable/neutro",
+    "confianza": 0.0-1.0,
+    "justificacion": "explicación breve del análisis"
+  }
+
+  NO incluyas texto fuera del JSON.'
+)
+```
+:::
+
+## Analizar un texto complejo
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: analizar-complejo
+#| eval: false
+
+# Texto con sentimiento mixto
+texto_mixto <- "A pesar de los esfuerzos del gobierno por controlar
+la inflación, las familias más vulnerables siguen sufriendo.
+La oposición critica las medidas como insuficientes, aunque
+reconoce algunos avances en el empleo juvenil."
+
+# Analizar
+respuesta <- analizador$chat(texto_mixto)
+cat(respuesta)
+
+# Parsear
+resultado <- fromJSON(respuesta)
+
+# Ver cada campo
+cat("\n--- Análisis ---\n")
+cat("Sentimiento:", resultado$sentimiento_general, "\n")
+cat("Intensidad:", resultado$intensidad, "\n")
+cat("Emociones:", paste(resultado$emociones, collapse = ", "), "\n")
+cat("Hacia gobierno:", resultado$hacia_gobierno, "\n")
+cat("Confianza:", resultado$confianza, "\n")
+cat("Justificación:", resultado$justificacion, "\n")
+```
+:::
+
+## Función para análisis en batch
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: sentimiento-batch
+#| eval: false
+
+# Función robusta para análisis de sentimiento
+analizar_sentimiento <- function(texto) {
+  chat_temp <- chat_openai(
+    model = "gpt-4o-mini",
+    system_prompt = 'Analiza el sentimiento. Responde en JSON:
+    {"sentimiento": "positivo/negativo/neutro/mixto",
+     "intensidad": "baja/media/alta",
+     "confianza": 0.0-1.0,
+     "razon": "explicación breve"}'
+  )
+
+  respuesta <- chat_temp$chat(texto)
+
+  # Intentar parsear, manejar errores
+tryCatch(
+    fromJSON(respuesta),
+    error = function(e) {
+      list(sentimiento = NA, intensidad = NA,
+           confianza = NA, razon = "Error de parsing")
+    }
+  )
+}
+
+# Aplicar a varios textos
+textos <- read_csv("../dia-03/datos/textos_politicos.csv",
+                   show_col_types = FALSE)
+
+resultados_sent <- textos |>
+  slice(1:15) |>
+  mutate(
+    analisis = map(texto, analizar_sentimiento)
+  ) |>
+  unnest_wider(analisis)
+```
+:::
+
+## Visualizar resultados
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: viz-sentimiento
+#| eval: false
+#| fig-width: 10
+#| fig-height: 5
+
+# Distribución de sentimientos por tema
+resultados_sent |>
+  count(tema, sentimiento) |>
+  ggplot(aes(x = tema, y = n, fill = sentimiento)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("positivo" = "#27AE60",
+                                "negativo" = "#E74C3C",
+                                "neutro" = "#95A5A6",
+                                "mixto" = "#F39C12")) +
+  labs(title = "Sentimiento por tema político",
+       x = "Tema", y = "Cantidad de textos") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+:::
+
+# Parte 2: Datos sintéticos {background-color="#2d4563"}
+
+## ¿Para qué generar datos sintéticos?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Casos de uso:**
+
+- [Pilotos]{.alert}: probar análisis antes de recoger datos
+- [Privacidad]{.alert}: datos que no exponen individuos reales
+- [Aumentación]{.alert}: expandir datasets pequeños
+- [Entrenamiento]{.alert}: ejemplos para fine-tuning
+- [Docencia]{.alert}: datasets para enseñar
+:::
+
+:::{.column width=50%}
+**Precauciones:**
+
+- [Reflejan sesgos]{.alert} del modelo
+- No son [representativos]{.alert} de poblaciones reales
+- Deben [validarse]{.alert} contra datos reales
+- [Documentar]{.alert} que son sintéticos
+- [No reemplazan]{.alert} investigación empírica
+:::
+:::
+
+<br>
+
+[Los datos sintéticos son herramientas auxiliares, no sustitutos.]{.alert}
+:::
+
+## Generar respuestas de encuesta
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: generar-encuesta
+#| eval: false
+
+# Generador de datos de encuesta
+generador <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = 'Eres un simulador de respuestas de encuesta.
+  Genera respuestas REALISTAS y DIVERSAS para encuestas
+  de opinión pública en Uruguay.
+
+  Las respuestas deben reflejar:
+  - Diversidad demográfica real
+  - Variabilidad en opiniones
+  - Patrones plausibles (ej: jóvenes más conectados)
+
+  Responde SOLO en formato CSV válido con encabezados.
+  NO incluyas texto fuera del CSV.'
+)
+
+# Generar datos
+prompt_datos <- "Genera 20 respuestas simuladas para una encuesta
+sobre confianza institucional en Uruguay.
+
+Variables:
+- id (1-20)
+- edad (18-80)
+- genero (M/F)
+- educacion (primaria/secundaria/universitaria)
+- confianza_gobierno (1=nada, 4=mucha)
+- confianza_justicia (1-4)
+- confianza_medios (1-4)
+- satisfaccion_democracia (1-4)
+- comentario (una oración breve)"
+
+csv_generado <- generador$chat(prompt_datos)
+cat(csv_generado)
+```
+:::
+
+## Convertir a dataframe
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: csv-a-df
+#| eval: false
+
+# Parsear el CSV generado
+datos_sinteticos <- read_csv(csv_generado, show_col_types = FALSE)
+
+# Explorar
+glimpse(datos_sinteticos)
+
+# Estadísticas descriptivas
+datos_sinteticos |>
+  summarise(
+    edad_media = mean(edad),
+    confianza_gob_media = mean(confianza_gobierno),
+    prop_universitarios = mean(educacion == "universitaria")
+  )
+
+# ¿Son plausibles?
+```
+:::
+
+## Validar datos sintéticos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: validar-sinteticos
+#| eval: false
+
+# Comparar con datos reales (si existen)
+# Por ejemplo, con Latinobarómetro
+
+# Verificar distribuciones
+datos_sinteticos |>
+  count(genero) |>
+  mutate(prop = n / sum(n))
+
+# ¿La distribución de edad es realista?
+ggplot(datos_sinteticos, aes(x = edad)) +
+  geom_histogram(binwidth = 10, fill = "#2d4563") +
+  labs(title = "Distribución de edad (datos sintéticos)") +
+  theme_minimal()
+
+# ¿Las correlaciones tienen sentido?
+cor(datos_sinteticos$confianza_gobierno,
+    datos_sinteticos$satisfaccion_democracia)
+```
+:::
+
+# Parte 3: Auditoría de sesgos {background-color="#2d4563"}
+
+## ¿Por qué auditar sesgos?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los LLMs aprenden de texto de internet
+- Ese texto contiene [estereotipos y sesgos]{.alert}
+- Los sesgos pueden [transferirse al análisis]{.alert}
+- Ejemplos:
+    - Descripciones más negativas de ciertos países
+    - Estereotipos de género
+    - Sesgos políticos (izquierda/derecha)
+- Es nuestra [responsabilidad]{.alert} como investigadores detectar y documentar estos sesgos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**Pregunta clave:**
+
+Si el LLM responde diferente
+según el país, género u otro
+atributo, ¿es eso un sesgo
+del modelo o un patrón real
+en los datos?
+
+<br>
+
+[Auditar nos ayuda a distinguir señal de sesgo.]{.alert}
+:::
+:::
+:::
+:::
+
+## Prueba de sesgo por país
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: sesgo-pais
+#| eval: false
+
+# Misma pregunta, diferentes países
+paises <- c("Uruguay", "Argentina", "Bolivia",
+            "Chile", "Venezuela", "Honduras")
+
+auditar_pais <- function(pais) {
+  chat_temp <- chat_openai(model = "gpt-4o-mini")
+
+  prompt <- paste0("En 2-3 oraciones, describe las perspectivas
+                    económicas de ", pais, " para los próximos años.
+                    Sé objetivo y conciso.")
+
+  respuesta <- chat_temp$chat(prompt)
+  return(respuesta)
+}
+
+# Obtener respuestas
+respuestas_pais <- tibble(
+  pais = paises,
+  respuesta = map_chr(paises, auditar_pais)
+)
+
+# Ver respuestas
+respuestas_pais
+```
+:::
+
+## Analizar el tono de las respuestas
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: analizar-tono
+#| eval: false
+
+# Usar otro LLM para analizar el tono de las respuestas
+analizar_tono <- function(texto) {
+  chat_temp <- chat_openai(
+    model = "gpt-4o-mini",
+    system_prompt = "Analiza el tono del texto.
+    Responde en JSON: {\"tono\": \"optimista/pesimista/neutro\",
+                       \"confianza\": 0.0-1.0}"
+  )
+  respuesta <- chat_temp$chat(texto)
+  fromJSON(respuesta)
+}
+
+# Analizar cada respuesta
+respuestas_pais <- respuestas_pais |>
+  mutate(
+    analisis = map(respuesta, analizar_tono)
+  ) |>
+  unnest_wider(analisis)
+
+# Ver resultados
+respuestas_pais |>
+  select(pais, tono, confianza)
+
+# ¿Hay patrones? ¿Algunos países siempre optimistas/pesimistas?
+```
+:::
+
+## Prueba de sesgo de género
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: sesgo-genero
+#| eval: false
+
+# Misma pregunta con nombres de diferente género
+nombres <- c(
+  "María García",   # Femenino
+  "Juan Rodríguez", # Masculino
+  "Andrea Pérez",   # Femenino
+  "Carlos López"    # Masculino
+)
+
+auditar_genero <- function(nombre) {
+  chat_temp <- chat_openai(model = "gpt-4o-mini")
+
+  prompt <- paste0(nombre, " es un candidato/a a un puesto de
+                    director/a de política económica.
+                    Describe brevemente qué fortalezas y debilidades
+                    podría tener para el cargo.")
+
+  respuesta <- chat_temp$chat(prompt)
+  return(respuesta)
+}
+
+# Obtener respuestas
+respuestas_genero <- tibble(
+  nombre = nombres,
+  genero = c("F", "M", "F", "M"),
+  respuesta = map_chr(nombres, auditar_genero)
+)
+
+# Comparar: ¿se mencionan las mismas cualidades?
+respuestas_genero
+```
+:::
+
+## Documentar hallazgos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Qué documentar:**
+
+- Modelo y versión usados
+- Prompts exactos
+- Respuestas completas
+- Patrones observados
+- Limitaciones del análisis
+:::
+
+:::{.column width=50%}
+**Cómo reportar:**
+
+- Sección de [limitaciones]{.alert} en papers
+- [Transparencia]{.alert} sobre el uso de LLMs
+- [Replicabilidad]{.alert}: código y datos disponibles
+- [Discusión]{.alert} de posibles sesgos
+
+[La auditoría de sesgos debería ser parte estándar de cualquier análisis con LLMs.]{.alert}
+:::
+:::
+:::
+
+# Parte 4: Mini-proyecto integrador {background-color="#2d4563"}
+
+## El proyecto
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Objetivo**: Crear un pipeline completo de análisis de textos políticos que combine métodos clásicos y LLMs.
+
+**Pasos:**
+
+1. Cargar los textos del Día 3
+2. Clasificar con TF-IDF/LDA (método clásico)
+3. Clasificar con LLM
+4. Extraer sentimiento con LLM
+5. Comparar y validar
+6. Documentar el proceso
+
+[Trabajen en grupos de 2-3 personas.]{.alert}
+:::
+
+## Paso 1: Cargar datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: proyecto-cargar
+#| eval: false
+
+# Cargar textos
+textos <- read_csv("../dia-03/datos/textos_politicos.csv",
+                   show_col_types = FALSE)
+
+# Seleccionar muestra
+muestra <- textos |>
+  group_by(tema) |>
+  slice_sample(n = 4) |>  # 4 de cada tema = 20 textos
+  ungroup()
+
+cat("Muestra:", nrow(muestra), "textos\n")
+muestra |> count(tema)
+```
+:::
+
+## Paso 2: Clasificar con LLM
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: proyecto-clasificar
+#| eval: false
+
+# Función de clasificación
+clasificar <- function(texto) {
+  chat_temp <- chat_openai(
+    model = "gpt-4o-mini",
+    system_prompt = "Clasifica en: economia, educacion,
+                     seguridad, salud, medioambiente.
+                     Responde SOLO el tema."
+  )
+  trimws(tolower(chat_temp$chat(texto)))
+}
+
+# Clasificar
+muestra <- muestra |>
+  mutate(
+    tema_llm = map_chr(texto, clasificar, .progress = TRUE)
+  )
+
+# Accuracy
+accuracy <- mean(muestra$tema == muestra$tema_llm)
+cat("Accuracy LLM:", round(accuracy * 100, 1), "%\n")
+```
+:::
+
+## Paso 3: Extraer sentimiento
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: proyecto-sentimiento
+#| eval: false
+
+# Función de sentimiento
+sentimiento <- function(texto) {
+  chat_temp <- chat_openai(
+    model = "gpt-4o-mini",
+    system_prompt = 'Responde JSON:
+    {"sentimiento": "pos/neg/neu", "confianza": 0-1}'
+  )
+  respuesta <- chat_temp$chat(texto)
+  tryCatch(fromJSON(respuesta), error = function(e) list(sentimiento = NA))
+}
+
+# Extraer
+muestra <- muestra |>
+  mutate(
+    sent_info = map(texto, sentimiento)
+  ) |>
+  unnest_wider(sent_info, names_sep = "_")
+
+# Distribución de sentimientos
+muestra |>
+  count(tema, sent_info_sentimiento) |>
+  pivot_wider(names_from = sent_info_sentimiento, values_from = n, values_fill = 0)
+```
+:::
+
+## Paso 4: Tabla resumen
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: proyecto-resumen
+#| eval: false
+
+# Crear tabla resumen
+resumen <- muestra |>
+  group_by(tema) |>
+  summarise(
+    n_textos = n(),
+    accuracy_clasif = mean(tema == tema_llm),
+    prop_positivo = mean(sent_info_sentimiento == "pos", na.rm = TRUE),
+    prop_negativo = mean(sent_info_sentimiento == "neg", na.rm = TRUE),
+    confianza_media = mean(sent_info_confianza, na.rm = TRUE)
+  )
+
+resumen
+
+# Guardar resultados
+write_csv(muestra, "resultados_analisis_llm.csv")
+```
+:::
+
+## Discusión final
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Preguntas para reflexionar:**
+
+1. ¿Qué tan [preciso]{.alert} fue el LLM comparado con tus expectativas?
+
+2. ¿El análisis de sentimiento [coincide]{.alert} con tu lectura de los textos?
+
+3. ¿Qué [errores]{.alert} sistemáticos observaste?
+
+4. ¿Cómo [documentarías]{.alert} este análisis en un paper?
+
+5. ¿Qué [limitaciones]{.alert} reportarías?
+
+[Los LLMs son herramientas poderosas pero no mágicas. Requieren validación y transparencia.]{.alert}
+:::
+
+## Resumen del Día 4
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que aprendimos:**
+
+- Cómo funcionan los [LLMs]{.alert}
+- [Prompt engineering]{.alert} efectivo
+- [Alucinaciones]{.alert} y [RAG]{.alert}
+- Usar [ellmer]{.alert} desde R
+- Clasificar y extraer [datos estructurados]{.alert}
+:::
+
+:::{.column width=50%}
+**Buenas prácticas:**
+
+- [Validar]{.alert} contra gold standard
+- [Documentar]{.alert} prompts y parámetros
+- [Auditar]{.alert} sesgos
+- [Comparar]{.alert} con métodos clásicos
+- [Ser transparentes]{.alert} sobre limitaciones
+:::
+:::
+
+<br>
+
+[Mañana: ética, equidad y mini-propuestas de investigación.]{.alert}
+:::
+
+# Fin del Día 4 {background-color="#2d4563"}
