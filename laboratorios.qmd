@@ -12,7 +12,8 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Día 1. Configuración del entorno, carga de datos, división train/test, ajuste de un modelo simple y evaluación de métricas básicas.]{.resource-meta}
 
 ::: {.resource-links}
-[Diapositivas](clases/dia-01/03-laboratorio-01.html) |
+[Diapositivas (.html)](clases/dia-01/03-laboratorio-01.html) |
+[Diapositivas (.qmd)](clases/dia-01/03-laboratorio-01.qmd) |
 [Código (.R)](clases/dia-01/laboratorio-01.R) |
 [Tarea 1](clases/dia-01/tarea-01.qmd) |
 [Respuestas Tarea 1](clases/dia-01/tarea-01-respuestas.qmd)
@@ -25,7 +26,8 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Día 1. Exploración de datos de satisfacción democrática en América Latina. Feature engineering, comparación de regresión logística, árboles de decisión y KNN con `tidymodels`.]{.resource-meta}
 
 ::: {.resource-links}
-[Diapositivas](clases/dia-01/04-laboratorio-02.html) |
+[Diapositivas (.html)](clases/dia-01/04-laboratorio-02.html) |
+[Diapositivas (.qmd)](clases/dia-01/04-laboratorio-02.qmd) |
 [Código (.R)](clases/dia-01/laboratorio-02.R) |
 [Tarea 2](clases/dia-01/tarea-02.qmd) |
 [Respuestas Tarea 2](clases/dia-01/tarea-02-respuestas.qmd)

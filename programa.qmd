@@ -28,28 +28,34 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 
 ### Día 1: Fundamentos de IA y Machine Learning
 
-**Sesión 1.1: ¿Qué es la Inteligencia Artificial?**
+**[Sesión 1.1: ¿Qué es la Inteligencia Artificial?](clases/dia-01/01-que-es-ia.html)**
 
 - Definición de IA, historia (de la IA simbólica al deep learning)
 - Tipos de aprendizaje: supervisado, no supervisado, refuerzo
 - Ética básica y contexto actual
 
-**Sesión 1.2: Fundamentos de Machine Learning**
+**[Sesión 1.2: Fundamentos de Machine Learning](clases/dia-01/02-fundamentos-ml.html)**
 
 - Flujo de trabajo: datos, entrenamiento, evaluación
 - División de datos (train/test)
 - Compromiso sesgo-varianza y métricas de evaluación
-- Laboratorio 1: configuración de RStudio y primer flujo de trabajo con `tidymodels`
-- Laboratorio 2: exploración avanzada, feature engineering y comparación de modelos
+
+**[Laboratorio 1: Primer flujo de trabajo con tidymodels](clases/dia-01/03-laboratorio-01.html)**
+
+- Configuración de RStudio y primer flujo de trabajo con `tidymodels`
+
+**[Laboratorio 2: Exploración avanzada y comparación de modelos](clases/dia-01/04-laboratorio-02.html)**
+
+- Feature engineering, comparación de modelos (logística, árboles, KNN)
 
 ### Día 2: Aprendizaje supervisado
 
-**Sesión 2.1: Métodos de clasificación**
+**[Sesión 2.1: Métodos de clasificación](clases/dia-02/03-clasificacion.html)**
 
 - Regresión logística, árboles de decisión y Random Forests
 - Aplicaciones: predicción de comportamiento político y social
 
-**Sesión 2.2: Regresión y predicción**
+**[Sesión 2.2: Regresión y predicción](clases/dia-02/04-regresion-prediccion.html)**
 
 - Predicción vs. explicación en ciencias sociales
 - Regularización: LASSO, Ridge, Elastic Net
@@ -58,12 +64,12 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 
 ### Día 3: Texto y aprendizaje no supervisado
 
-**Sesión 3.1: Clustering y reducción de dimensionalidad (versión express)**
+**[Sesión 3.1: Clustering y reducción de dimensionalidad (versión express)](clases/dia-03/05-clustering-pca.html)**
 
 - K-means y PCA: conceptos e intuición
 - Laboratorio breve: segmentación de países latinoamericanos por indicadores socioeconómicos
 
-**Sesión 3.2: Análisis computacional de texto**
+**[Sesión 3.2: Análisis computacional de texto](clases/dia-03/06-analisis-texto.html)**
 
 - Preprocesamiento, tokenización, Bag-of-words, TF-IDF
 - Análisis de sentimiento
@@ -72,13 +78,13 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 
 ### Día 4: Modelos de lenguaje extensos (LLMs) y aplicaciones
 
-**Sesión 4.1: Entendiendo los LLMs**
+**[Sesión 4.1: Entendiendo los LLMs](clases/dia-04/07-entendiendo-llms.html)**
 
 - Arquitectura Transformer: la intuición detrás de la atención
 - Capacidades de GPT-4 y Claude
 - Ingeniería de prompts: zero-shot, few-shot, chain-of-thought
 
-**Sesión 4.2: LLMs como herramientas de investigación**
+**[Sesión 4.2: LLMs como herramientas de investigación](clases/dia-04/08-llms-investigacion.html)**
 
 - Anotación automática de textos
 - Generación de datos sintéticos
@@ -87,13 +93,13 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 
 ### Día 5: Ética, sesgo algorítmico y cierre
 
-**Sesión 5.1: Ética y sesgo algorítmico**
+**[Sesión 5.1: Ética y sesgo algorítmico](clases/dia-05/09-etica-sesgo.html)**
 
 - Tipos de sesgo y cómo surgen
 - Métricas de equidad
 - Regulación: EU AI Act, legislación latinoamericana, Ley 18.331 (Uruguay)
 
-**Sesión 5.2: Mini-propuestas de investigación**
+**[Sesión 5.2: Mini-propuestas de investigación](clases/dia-05/10-propuestas-cierre.html)**
 
 - Integración de IA en el flujo de investigación
 - Taller: cada estudiante diseña una mini-propuesta aplicando una técnica del curso a una pregunta de ciencias sociales relevante para América Latina
