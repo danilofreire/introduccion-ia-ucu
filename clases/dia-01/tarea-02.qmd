@@ -1,6 +1,6 @@
 ---
-title: "Tarea 2: Comparacion de modelos con tidymodels"
-subtitle: "IA para Cientificos Sociales - UCU"
+title: "Tarea 2: Comparación de modelos con tidymodels"
+subtitle: "IA para Científicos Sociales - UCU"
 author: "Danilo Freire"
 date: "2026-04-12"
 format:
@@ -16,16 +16,16 @@ engine: knitr
 
 ## Instrucciones
 
-Esta tarea usa el dataset del Laboratorio 2 (`satisfaccion_democracia.csv`). Respondan cada pregunta escribiendo codigo R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de codigo.
+Esta tarea usa el dataset del Laboratorio 2 (`satisfaccion_democracia.csv`). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
 
 **Para trabajar en esta tarea:**
 
-1. Descarguen este archivo `.qmd` y el dataset `satisfaccion_democracia.csv` de la [pagina del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
-2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto. Si no lo tienen, instalenlo desde <https://quarto.org/docs/get-started/>
-3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de codigo con Ctrl+Enter (o Cmd+Enter en Mac)
-4. Cuando terminen, pueden renderizar el documento completo con el boton "Render" en RStudio
+1. Descarguen este archivo `.qmd` y el dataset `satisfaccion_democracia.csv` de la [página del curso](https://danilofreire.github.io/introducción-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <https://quarto.org/docs/get-started/>
+3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)
+4. Cuando terminen, pueden renderizar el documento completo con el botón "Render" en RStudio
 
-### Configuracion
+### Configuración
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(tidymodels)
@@ -42,11 +42,11 @@ satisfaccion <- satisfaccion |>
   )
 ```
 
-## Exploracion
+## Exploración
 
 ### Pregunta 1: Resumen del dataset
 
-Calculen la proporcion de satisfechos (`"si"`) por pais. Cual pais tiene la proporcion mas alta? Cual tiene la mas baja? Muestren los resultados en una tabla ordenada.
+Calculen la proporción de satisfechos (`"si"`) por país. Cuál país tiene la proporción más alta? Cuál tiene la más baja? Muestren los resultados en una tabla ordenada.
 
 ```{r p1}
 # Escriban su codigo aqui
@@ -55,9 +55,9 @@ Calculen la proporcion de satisfechos (`"si"`) por pais. Cual pais tiene la prop
 
 **Respuesta:**
 
-### Pregunta 2: Confianza y satisfaccion
+### Pregunta 2: Confianza y satisfacción
 
-Creen un boxplot que muestre la distribucion de `confianza_gobierno` separada por `satisfecho`. Agreguen `labs()` con titulo y etiquetas claras. Que observan?
+Creen un boxplot que muestre la distribución de `confianza_gobierno` separada por `satisfecho`. Agreguen `labs()` con titulo y etiquetas claras. Qué observan?
 
 ```{r p2}
 # Escriban su codigo aqui
@@ -68,7 +68,7 @@ Creen un boxplot que muestre la distribucion de `confianza_gobierno` separada po
 
 ### Pregunta 3: Correlaciones
 
-Calculen la matriz de correlaciones entre las 4 variables numericas principales: `edad`, `educacion_anos`, `ingreso_hogar` y `confianza_gobierno`. Cuales dos variables tienen la mayor correlacion? Es fuerte o debil?
+Calculen la matriz de correlaciones entre las 4 variables numéricas principales: `edad`, `educacion_anos`, `ingreso_hogar` y `confianza_gobierno`. Cuáles dos variables tienen la mayor correlación? Es fuerte o débil?
 
 ```{r p3}
 # Escriban su codigo aqui
@@ -96,7 +96,7 @@ Muestren las primeras 10 filas de las nuevas variables junto con `satisfecho`.
 
 ### Pregunta 5: Explorar las nuevas variables
 
-Calculen la proporcion de satisfechos entre personas con confianza baja vs. alta, y entre jovenes vs. no jovenes. Que variable parece mas util para predecir la satisfaccion?
+Calculen la proporción de satisfechos entre personas con confianza baja vs. alta, y entre jovenes vs. no jovenes. Qué variable parece más útil para predecir la satisfacción?
 
 ```{r p5}
 # Escriban su codigo aqui
@@ -107,18 +107,18 @@ Calculen la proporcion de satisfechos entre personas con confianza baja vs. alta
 
 ## Modelos
 
-### Pregunta 6: Division de datos
+### Pregunta 6: División de datos
 
-Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(42)` y estratificacion por `satisfecho`. Verifiquen que las proporciones del outcome son similares en ambos conjuntos.
+Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(42)` y estratificación por `satisfecho`. Verifiquen que las proporciones del outcome son similares en ambos conjuntos.
 
 ```{r p6}
 # Escriban su codigo aqui
 
 ```
 
-### Pregunta 7: Tres modelos con formula basica
+### Pregunta 7: Tres modelos con fórmula básica
 
-Definan tres modelos (regresion logistica, arbol de decision y KNN con k=5) y evaluenlos con validacion cruzada (5 folds) usando la formula: `satisfecho ~ edad + educacion_anos + ingreso_hogar + confianza_gobierno + consumo_noticias + participacion_politica + zona`. Reporten accuracy para cada uno.
+Definan tres modelos (regresión logística, árbol de decisión y KNN con k=5) y evaluenlos con validación cruzada (5 folds) usando la fórmula: `satisfecho ~ edad + educacion_anos + ingreso_hogar + confianza_gobierno + consumo_noticias + participacion_politica + zona`. Reporten accuracy para cada uno.
 
 *Pista:* usen `control_resamples(event_level = "second")` dentro de `fit_resamples()`.
 
@@ -129,9 +129,9 @@ Definan tres modelos (regresion logistica, arbol de decision y KNN con k=5) y ev
 
 **Respuesta:**
 
-### Pregunta 8: Mejor modelo con formula extendida
+### Pregunta 8: Mejor modelo con fórmula extendida
 
-Ahora evaluen el mejor modelo de la pregunta anterior con una formula que agregue `confianza_baja` y `ingreso_x_educacion`. Mejora la accuracy? Cuanto?
+Ahora evaluen el mejor modelo de la pregunta anterior con una fórmula que agregue `confianza_baja` y `ingreso_x_educacion`. Mejora la accuracy? Cuánto?
 
 ```{r p8}
 # Escriban su codigo aqui
@@ -140,11 +140,11 @@ Ahora evaluen el mejor modelo de la pregunta anterior con una formula que agregu
 
 **Respuesta:**
 
-## Evaluacion
+## Evaluación
 
-### Pregunta 9: Matriz de confusion
+### Pregunta 9: Matriz de confusión
 
-Ajusten el modelo logistico con la formula basica en los datos de entrenamiento y generen predicciones sobre el conjunto de prueba. Construyan la matriz de confusion. Cuantos errores comete el modelo en total?
+Ajusten el modelo logístico con la fórmula básica en los datos de entrenamiento y generen predicciones sobre el conjunto de prueba. Construyan la matriz de confusión. Cuántos errores comete el modelo en total?
 
 ```{r p9}
 # Escriban su codigo aqui
@@ -153,9 +153,9 @@ Ajusten el modelo logistico con la formula basica en los datos de entrenamiento 
 
 **Respuesta:**
 
-### Pregunta 10: Precision, recall y AUC
+### Pregunta 10: Precisión, recall y AUC
 
-Calculen precision, recall y AUC del modelo logistico sobre el conjunto de prueba. Recuerden usar `event_level = "second"`. Es un buen modelo segun el AUC?
+Calculen precisión, recall y AUC del modelo logístico sobre el conjunto de prueba. Recuerden usar `event_level = "second"`. Es un buen modelo según el AUC?
 
 ```{r p10}
 # Escriban su codigo aqui
@@ -166,7 +166,7 @@ Calculen precision, recall y AUC del modelo logistico sobre el conjunto de prueb
 
 ### Pregunta 11: Curva ROC
 
-Grafiquen la curva ROC del modelo logistico. Agreguen un titulo al grafico con `labs()`.
+Grafiquen la curva ROC del modelo logístico. Agreguen un titulo al gráfico con `labs()`.
 
 ```{r p11}
 # Escriban su codigo aqui
@@ -175,7 +175,7 @@ Grafiquen la curva ROC del modelo logistico. Agreguen un titulo al grafico con `
 
 ### Pregunta 12: Coeficientes del modelo
 
-Extraigan los coeficientes del modelo logistico con `tidy()` y calculen los odds ratios. Cual variable tiene el efecto mas fuerte? Cual tiene el efecto mas debil? Ordenen por p-valor.
+Extraigan los coeficientes del modelo logístico con `tidy()` y calculen los odds ratios. Cuál variable tiene el efecto más fuerte? Cuál tiene el efecto más débil? Ordenen por p-valor.
 
 ```{r p12}
 # Escriban su codigo aqui
@@ -186,8 +186,8 @@ Extraigan los coeficientes del modelo logistico con `tidy()` y calculen los odds
 
 ## Reflexion
 
-### Pregunta 13: Arbol vs. logistica
+### Pregunta 13: Árbol vs. logística
 
-Los arboles de decision y la regresion logistica tienen ventajas y desventajas distintas. Basandose en los resultados del laboratorio, discutan en que situaciones preferirian un arbol de decision sobre una regresion logistica, y viceversa. Consideren al menos dos criterios (por ejemplo, interpretabilidad, rendimiento, tipo de datos).
+Los árboles de decisión y la regresión logística tienen ventajas y desventajas distintas. Basandose en los resultados del laboratorio, discutan en que situaciones preferirían un árbol de decisión sobre una regresión logística, y viceversa. Consideren al menos dos criterios (por ejemplo, interpretabilidad, rendimiento, tipo de datos).
 
 **Respuesta:**
