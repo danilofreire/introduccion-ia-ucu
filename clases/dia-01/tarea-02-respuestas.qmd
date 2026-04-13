@@ -4,14 +4,12 @@ subtitle: "IA para Cientificos Sociales - UCU"
 author: "Danilo Freire"
 date: "2026-04-12"
 format:
-  pdf:
+  html:
     toc: true
     toc-depth: 2
     number-sections: true
-    documentclass: article
-    geometry: margin=2.5cm
-    fontsize: 11pt
-    colorlinks: true
+    code-fold: false
+    self-contained: true
 lang: es
 engine: knitr
 ---
