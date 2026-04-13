@@ -23,6 +23,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -154,8 +189,10 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones" id="toc-día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones" class="nav-link" data-scroll-target="#día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones">Día 4: Modelos de lenguaje extensos (LLMs) y aplicaciones</a></li>
   <li><a href="#día-5-ética-sesgo-algorítmico-y-cierre" id="toc-día-5-ética-sesgo-algorítmico-y-cierre" class="nav-link" data-scroll-target="#día-5-ética-sesgo-algorítmico-y-cierre">Día 5: Ética, sesgo algorítmico y cierre</a></li>
   </ul></li>
-  <li><a href="#software-necesario" id="toc-software-necesario" class="nav-link" data-scroll-target="#software-necesario">Software necesario</a></li>
-  <li><a href="#programa-completo" id="toc-programa-completo" class="nav-link" data-scroll-target="#programa-completo">Programa completo</a></li>
+  <li><a href="#software-necesario" id="toc-software-necesario" class="nav-link" data-scroll-target="#software-necesario">Software necesario</a>
+  <ul class="collapse">
+  <li><a href="#instrucciones-de-instalación" id="toc-instrucciones-de-instalación" class="nav-link" data-scroll-target="#instrucciones-de-instalación">Instrucciones de instalación</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/programa.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
     </div>
@@ -296,16 +333,29 @@ ul.task-list li input[type="checkbox"] {
 <p>Los estudiantes deben tener instalado antes del inicio del curso:</p>
 <ul>
 <li><a href="https://cran.r-project.org/">R</a> (versión 4.3 o superior)</li>
-<li><a href="https://posit.co/download/rstudio-desktop/">RStudio</a> (versión reciente)</li>
-<li>Paquetes de R: <code>tidyverse</code>, <code>tidymodels</code>, <code>ranger</code>, <code>glmnet</code>, <code>tidytext</code>, <code>topicmodels</code>, <code>ellmer</code></li>
+<li><a href="https://posit.co/download/rstudio-desktop/">RStudio</a> (versión 2022.07 o superior, que ya incluye <a href="https://quarto.org/">Quarto</a>)</li>
+<li>Paquetes de R: <a href="https://www.tidyverse.org/"><code>tidyverse</code></a>, <a href="https://www.tidymodels.org/"><code>tidymodels</code></a>, <a href="https://cran.r-project.org/package=ranger"><code>ranger</code></a>, <a href="https://cran.r-project.org/package=glmnet"><code>glmnet</code></a>, <a href="https://juliasilge.github.io/tidytext/"><code>tidytext</code></a>, <a href="https://cran.r-project.org/package=topicmodels"><code>topicmodels</code></a>, <a href="https://ellmer.tidyverse.org/"><code>ellmer</code></a></li>
 </ul>
-<p>Se proporcionarán instrucciones detalladas de instalación antes del curso.</p>
+<section id="instrucciones-de-instalación" class="level3">
+<h3 class="anchored" data-anchor-id="instrucciones-de-instalación">Instrucciones de instalación</h3>
+<p><strong>Paso 1:</strong> Instalar R desde <a href="https://cran.r-project.org/" class="uri">https://cran.r-project.org/</a>. Elijan la versión correspondiente a su sistema operativo (Windows, macOS o Linux) y sigan las instrucciones del instalador.</p>
+<p><strong>Paso 2:</strong> Instalar RStudio desde <a href="https://posit.co/download/rstudio-desktop/" class="uri">https://posit.co/download/rstudio-desktop/</a>. RStudio es el entorno de desarrollo que usaremos en el curso. Las versiones recientes ya incluyen Quarto, que necesitaremos para los laboratorios.</p>
+<p><strong>Paso 3:</strong> Abrir RStudio y ejecutar el siguiente código en la consola para instalar todos los paquetes necesarios:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"tidymodels"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ranger"</span>, <span class="st">"glmnet"</span>, <span class="st">"kknn"</span>, <span class="st">"rpart"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidytext"</span>, <span class="st">"topicmodels"</span>, <span class="st">"textrecipes"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ellmer"</span>, <span class="st">"httr2"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>La instalación puede tomar unos minutos. Si aparecen errores, asegurarse de tener una conexión a internet estable y de estar usando una versión reciente de R (4.3 o superior).</p>
+<p><strong>Paso 4:</strong> Para verificar que todo funciona, ejecutar:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Todo listo para el curso!"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Si ambos paquetes se cargan sin errores, la instalación fue exitosa.</p>
+
+
 </section>
-<section id="programa-completo" class="level2">
-<h2 class="anchored" data-anchor-id="programa-completo">Programa completo</h2>
-<p>El programa completo del curso está disponible en formato Word: <a href="programa/Introduccion-IA-Danilo-Freire.docx">Introduccion-IA-Danilo-Freire.docx</a>.</p>
-
-
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
