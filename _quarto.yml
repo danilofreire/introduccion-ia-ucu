@@ -1,6 +1,10 @@
 project:
   type: website
   output-dir: docs
+  resources:
+    - "clases/**/*.R"
+    - "clases/**/*.csv"
+    - "clases/**/tarea-*.qmd"
 
 website:
   title: "IA para Científicos Sociales"

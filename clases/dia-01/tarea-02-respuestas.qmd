@@ -1,0 +1,325 @@
+---
+title: "Tarea 2: Comparacion de modelos -- Respuestas"
+subtitle: "IA para Cientificos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-12"
+format:
+  pdf:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    documentclass: article
+    geometry: margin=2.5cm
+    fontsize: 11pt
+    colorlinks: true
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta es la clave de respuestas de la Tarea 2. Cada pregunta incluye el codigo R completo y una respuesta escrita.
+
+### Configuracion
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidymodels)
+library(tidyverse)
+
+satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
+
+satisfaccion <- satisfaccion |>
+  mutate(
+    satisfecho = factor(satisfecho, levels = c("no", "si")),
+    zona = factor(zona),
+    genero = factor(genero),
+    pais = factor(pais)
+  )
+```
+
+## Exploracion
+
+### Pregunta 1: Resumen del dataset
+
+Calculen la proporcion de satisfechos (`"si"`) por pais. Cual pais tiene la proporcion mas alta? Cual tiene la mas baja?
+
+```{r p1}
+prop_pais <- satisfaccion |>
+  count(pais, satisfecho) |>
+  group_by(pais) |>
+  mutate(prop = round(n / sum(n), 3)) |>
+  filter(satisfecho == "si") |>
+  arrange(desc(prop))
+
+prop_pais
+```
+
+**Respuesta:** La proporcion de satisfechos varia entre paises, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educacion, etc.) en cada pais. Las diferencias entre paises son en parte producto de la simulacion aleatoria, pero se observa variabilidad que podria existir en datos reales de Latinobarometro.
+
+### Pregunta 2: Confianza y satisfaccion
+
+Creen un boxplot que muestre la distribucion de `confianza_gobierno` separada por `satisfecho`.
+
+```{r p2}
+ggplot(satisfaccion, aes(x = satisfecho, y = confianza_gobierno, fill = satisfecho)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
+  labs(
+    title = "Confianza en el gobierno por nivel de satisfaccion",
+    x = "Satisfecho con la democracia",
+    y = "Confianza en el gobierno (1-10)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+**Respuesta:** Los encuestados satisfechos con la democracia tienden a tener mayor confianza en el gobierno. La mediana de confianza es visiblemente mas alta en el grupo satisfecho. Esto tiene sentido: quien confia mas en el gobierno probablemente evalua mejor el funcionamiento de la democracia.
+
+### Pregunta 3: Correlaciones
+
+Calculen la matriz de correlaciones entre las 4 variables numericas principales.
+
+```{r p3}
+mat_cor <- satisfaccion |>
+  select(edad, educacion_anos, ingreso_hogar, confianza_gobierno) |>
+  cor() |>
+  round(3)
+
+mat_cor
+```
+
+**Respuesta:** Las correlaciones entre estas variables son generalmente debiles (valores absolutos menores a 0.3). Esto indica que cada variable aporta informacion relativamente independiente, lo cual es bueno para un modelo de regresion: poca multicolinealidad. La correlacion mas alta probablemente es entre `educacion_anos` e `ingreso_hogar`, lo cual tiene sentido porque mayor educacion se asocia con mayores ingresos.
+
+## Feature engineering
+
+### Pregunta 4: Crear variables nuevas
+
+```{r p4}
+satisfaccion <- satisfaccion |>
+  mutate(
+    confianza_baja = if_else(confianza_gobierno <= 4, "si", "no"),
+    joven = if_else(edad < 30, "si", "no"),
+    ingreso_x_educacion = ingreso_hogar * educacion_anos
+  )
+
+satisfaccion |>
+  select(satisfecho, confianza_baja, joven, ingreso_x_educacion) |>
+  head(10)
+```
+
+### Pregunta 5: Explorar las nuevas variables
+
+```{r p5}
+# Proporcion de satisfechos por confianza baja/alta
+satisfaccion |>
+  count(confianza_baja, satisfecho) |>
+  group_by(confianza_baja) |>
+  mutate(prop = round(n / sum(n), 3)) |>
+  filter(satisfecho == "si")
+
+# Proporcion de satisfechos entre jovenes vs. no jovenes
+satisfaccion |>
+  count(joven, satisfecho) |>
+  group_by(joven) |>
+  mutate(prop = round(n / sum(n), 3)) |>
+  filter(satisfecho == "si")
+```
+
+**Respuesta:** La variable `confianza_baja` muestra una diferencia mucho mayor en la proporcion de satisfechos que `joven`. Las personas con confianza baja en el gobierno tienen una proporcion de satisfaccion mucho menor que las de confianza alta. La edad, en cambio, muestra diferencias mas modestas. Esto sugiere que `confianza_baja` sera un predictor mas util para el modelo.
+
+## Modelos
+
+### Pregunta 6: Division de datos
+
+```{r p6}
+set.seed(42)
+datos_split <- initial_split(satisfaccion, prop = 0.75, strata = satisfecho)
+datos_train <- training(datos_split)
+datos_test <- testing(datos_split)
+
+cat("Entrenamiento:", nrow(datos_train), "observaciones\n")
+cat("Prueba:", nrow(datos_test), "observaciones\n")
+
+# Verificar proporciones
+cat("\nProporciones en entrenamiento:\n")
+datos_train |>
+  count(satisfecho) |>
+  mutate(prop = round(n / sum(n), 3))
+
+cat("\nProporciones en prueba:\n")
+datos_test |>
+  count(satisfecho) |>
+  mutate(prop = round(n / sum(n), 3))
+```
+
+### Pregunta 7: Tres modelos con formula basica
+
+```{r p7}
+# Definir modelos
+modelo_logistico <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+modelo_arbol <- decision_tree() |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+modelo_knn <- nearest_neighbor(neighbors = 5) |>
+  set_engine("kknn") |>
+  set_mode("classification")
+
+# Folds
+set.seed(42)
+folds <- vfold_cv(datos_train, v = 5, strata = satisfecho)
+
+# Formula basica
+formula_basica <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
+                               confianza_gobierno + consumo_noticias +
+                               participacion_politica + zona
+
+# Evaluar cada modelo
+evaluar <- function(modelo, formula, folds, nombre) {
+  resultados <- fit_resamples(
+    modelo, formula, resamples = folds,
+    metrics = metric_set(accuracy),
+    control = control_resamples(event_level = "second")
+  )
+  collect_metrics(resultados) |> mutate(modelo = nombre)
+}
+
+eval_log <- evaluar(modelo_logistico, formula_basica, folds, "Logistico")
+eval_arb <- evaluar(modelo_arbol, formula_basica, folds, "Arbol")
+eval_knn <- evaluar(modelo_knn, formula_basica, folds, "KNN")
+
+bind_rows(eval_log, eval_arb, eval_knn) |>
+  select(modelo, .metric, mean, std_err) |>
+  arrange(desc(mean))
+```
+
+**Respuesta:** La regresion logistica y el KNN suelen tener accuracy similar, mientras que el arbol de decision tiende a ser ligeramente inferior. Las diferencias entre modelos son generalmente pequenas para este dataset, lo que indica que la relacion entre predictores y outcome es razonablemente lineal (favoreciendo a la regresion logistica).
+
+### Pregunta 8: Mejor modelo con formula extendida
+
+```{r p8}
+# Formula extendida
+formula_ext <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
+                            confianza_gobierno + consumo_noticias +
+                            participacion_politica + zona +
+                            confianza_baja + ingreso_x_educacion
+
+# Evaluar el mejor modelo con formula extendida
+eval_log_ext <- evaluar(modelo_logistico, formula_ext, folds, "Logistico (ext)")
+
+# Comparar
+cat("Accuracy formula basica:\n")
+eval_log |> select(modelo, mean, std_err)
+
+cat("\nAccuracy formula extendida:\n")
+eval_log_ext |> select(modelo, mean, std_err)
+
+cat("\nDiferencia:", round(eval_log_ext$mean - eval_log$mean, 4), "\n")
+```
+
+**Respuesta:** La diferencia en accuracy entre la formula basica y la extendida es generalmente pequena. Esto sugiere que las variables originales ya capturan la mayor parte de la informacion relevante. La variable `confianza_baja` es una version discretizada de `confianza_gobierno` (que ya esta en el modelo), por lo que no agrega informacion nueva. El producto `ingreso_x_educacion` podria capturar una interaccion, pero su efecto es marginal.
+
+## Evaluacion
+
+### Pregunta 9: Matriz de confusion
+
+```{r p9}
+# Ajustar modelo logistico
+ajuste <- modelo_logistico |>
+  fit(formula_basica, data = datos_train)
+
+# Predicciones
+pred_test <- ajuste |>
+  predict(datos_test) |>
+  bind_cols(datos_test)
+
+# Matriz de confusion
+mc <- conf_mat(pred_test, truth = satisfecho, estimate = .pred_class)
+mc
+
+# Total de errores
+tabla <- mc$table
+errores <- tabla["si", "no"] + tabla["no", "si"]
+cat("Total de errores:", errores, "de", nrow(datos_test), "observaciones\n")
+cat("Tasa de error:", round(errores / nrow(datos_test), 3), "\n")
+```
+
+**Respuesta:** La matriz de confusion muestra que el modelo comete errores tanto de falsos positivos como de falsos negativos. El total de errores indica que el modelo clasifica correctamente la mayoria de las observaciones, aunque no es perfecto. Los errores son esperables dado que la satisfaccion democratica depende de muchos factores que no estan en el modelo.
+
+### Pregunta 10: Precision, recall y AUC
+
+```{r p10}
+# Agregar probabilidades
+pred_probs <- ajuste |>
+  predict(datos_test, type = "prob") |>
+  bind_cols(predict(ajuste, datos_test)) |>
+  bind_cols(datos_test)
+
+# Precision
+prec <- pred_probs |>
+  precision(truth = satisfecho, estimate = .pred_class,
+            event_level = "second")
+
+# Recall
+rec <- pred_probs |>
+  recall(truth = satisfecho, estimate = .pred_class,
+         event_level = "second")
+
+# AUC
+auc <- pred_probs |>
+  roc_auc(truth = satisfecho, .pred_si, event_level = "second")
+
+cat("Precision:", round(prec$.estimate, 3), "\n")
+cat("Recall:", round(rec$.estimate, 3), "\n")
+cat("AUC:", round(auc$.estimate, 3), "\n")
+```
+
+**Respuesta:** El AUC permite evaluar la capacidad discriminativa del modelo. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente. Para un modelo con variables sociodemograficas como las nuestras, un AUC en el rango aceptable-bueno es un resultado razonable, dado que la satisfaccion democratica es un fenomeno complejo que depende de muchos factores no observados.
+
+### Pregunta 11: Curva ROC
+
+```{r p11}
+roc_data <- pred_probs |>
+  roc_curve(truth = satisfecho, .pred_si, event_level = "second")
+
+autoplot(roc_data) +
+  labs(title = "Curva ROC - Modelo logistico para satisfaccion democratica")
+```
+
+### Pregunta 12: Coeficientes del modelo
+
+```{r p12}
+coefs <- tidy(ajuste) |>
+  mutate(odds_ratio = round(exp(estimate), 3)) |>
+  arrange(p.value)
+
+coefs |>
+  select(term, estimate, std.error, p.value, odds_ratio)
+```
+
+**Respuesta:** La variable con el efecto mas fuerte es `confianza_gobierno`, con un odds ratio que indica un aumento considerable en las chances de satisfaccion por cada punto adicional de confianza. Las variables con efectos mas debiles (p-valores altos) son las que tienen menos relacion con la satisfaccion democratica. El orden de importancia de los predictores tiene sentido teorico: la confianza en el gobierno es el predictor mas directo de la satisfaccion con la democracia.
+
+## Reflexion
+
+### Pregunta 13: Arbol vs. logistica
+
+**Respuesta:** La regresion logistica y los arboles de decision tienen fortalezas complementarias:
+
+**Regresion logistica:**
+
+- Mejor cuando la relacion entre predictores y outcome es aproximadamente lineal (en la escala logit)
+- Produce coeficientes interpretables: cada variable tiene un odds ratio que se puede comunicar a audiencias no tecnicas
+- Tiende a generalizar mejor cuando hay pocos datos, porque tiene menos parametros
+- Preferible cuando el objetivo es entender *que factores* influyen y en que direccion
+
+**Arbol de decision:**
+
+- Captura relaciones no lineales e interacciones de forma automatica, sin necesidad de especificarlas
+- Muy facil de interpretar visualmente: se puede mostrar el arbol completo
+- Funciona bien con variables categoricas sin necesidad de crear dummies
+- Preferible cuando la estructura de los datos es jerarquica (por ejemplo, la edad importa solo para personas con baja educacion)
+
+En este laboratorio, la regresion logistica funciona igual o mejor que el arbol porque la relacion entre los predictores y la satisfaccion es aproximadamente lineal. El arbol tiene a sobreajustar (cortes arbitrarios) con datasets de este tamano. Para un organismo que necesita recomendaciones claras de politica, la regresion logistica es preferible porque los coeficientes indican directamente que factores modificar.

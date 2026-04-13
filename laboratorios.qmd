@@ -12,14 +12,30 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Día 1. Configuración del entorno, carga de datos, división train/test, ajuste de un modelo simple y evaluación de métricas básicas.]{.resource-meta}
 
 ::: {.resource-links}
-Código (próximamente)
+[Diapositivas](clases/dia-01/03-laboratorio-01.html) |
+[Código (.R)](clases/dia-01/laboratorio-01.R) |
+[Tarea 1](clases/dia-01/tarea-01.qmd) |
+[Respuestas Tarea 1](clases/dia-01/tarea-01-respuestas.qmd)
 :::
 :::
 
 ::: {.resource-card}
-[Lab 2: Clasificación y predicción con datos latinoamericanos]{.resource-title}
+[Lab 2: Exploración avanzada y comparación de modelos]{.resource-title}
 
-[Día 2. Clasificación de actitudes políticas con Latinobarómetro. Comparación de modelos: regresión logística, Random Forest y Elastic Net con `parsnip`.]{.resource-meta}
+[Día 1. Exploración de datos de satisfacción democrática en América Latina. Feature engineering, comparación de regresión logística, árboles de decisión y KNN con `tidymodels`.]{.resource-meta}
+
+::: {.resource-links}
+[Diapositivas](clases/dia-01/04-laboratorio-02.html) |
+[Código (.R)](clases/dia-01/laboratorio-02.R) |
+[Tarea 2](clases/dia-01/tarea-02.qmd) |
+[Respuestas Tarea 2](clases/dia-01/tarea-02-respuestas.qmd)
+:::
+:::
+
+::: {.resource-card}
+[Lab 3: Clasificación y predicción con Latinobarómetro]{.resource-title}
+
+[Día 2. Clasificación de actitudes políticas con datos de Latinobarómetro. Comparación de modelos: regresión logística, Random Forest y Elastic Net con `parsnip`.]{.resource-meta}
 
 ::: {.resource-links}
 Código (próximamente)
@@ -27,7 +43,7 @@ Código (próximamente)
 :::
 
 ::: {.resource-card}
-[Lab 3a: Clustering de países (versión express)]{.resource-title}
+[Lab 4a: Clustering de países (versión express)]{.resource-title}
 
 [Día 3, sesión 1. Segmentación de países latinoamericanos por indicadores socioeconómicos del Banco Mundial usando K-means y PCA.]{.resource-meta}
 
@@ -37,7 +53,7 @@ Código (próximamente)
 :::
 
 ::: {.resource-card}
-[Lab 3b: Análisis de texto en discursos políticos]{.resource-title}
+[Lab 4b: Análisis de texto en discursos políticos]{.resource-title}
 
 [Día 3, sesión 2. Tokenización, TF-IDF, análisis de sentimiento y extracción de tópicos (LDA) en discursos políticos latinoamericanos con `tidytext` y `topicmodels`.]{.resource-meta}
 
@@ -47,7 +63,7 @@ Código (próximamente)
 :::
 
 ::: {.resource-card}
-[Lab 4: Interacción con LLMs desde R]{.resource-title}
+[Lab 5: Interacción con LLMs desde R]{.resource-title}
 
 [Día 4. Uso de `ellmer` para interactuar con modelos de lenguaje. Anotación automática de textos, generación de datos sintéticos y auditoría de sesgos.]{.resource-meta}
 
@@ -57,7 +73,7 @@ Código (próximamente)
 :::
 
 ::: {.resource-card}
-[Lab 5: Mini-propuesta de investigación]{.resource-title}
+[Lab 6: Mini-propuesta de investigación]{.resource-title}
 
 [Día 5. Cada estudiante diseña una propuesta breve que integra una técnica del curso con una pregunta de ciencias sociales relevante para América Latina.]{.resource-meta}
 

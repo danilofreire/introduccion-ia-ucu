@@ -1,0 +1,193 @@
+---
+title: "Tarea 2: Comparacion de modelos con tidymodels"
+subtitle: "IA para Cientificos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-12"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta tarea usa el dataset del Laboratorio 2 (`satisfaccion_democracia.csv`). Respondan cada pregunta escribiendo codigo R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de codigo.
+
+**Para trabajar en esta tarea:**
+
+1. Descarguen este archivo `.qmd` y el dataset `satisfaccion_democracia.csv` de la [pagina del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto. Si no lo tienen, instalenlo desde <https://quarto.org/docs/get-started/>
+3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de codigo con Ctrl+Enter (o Cmd+Enter en Mac)
+4. Cuando terminen, pueden renderizar el documento completo con el boton "Render" en RStudio
+
+### Configuracion
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidymodels)
+library(tidyverse)
+
+satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
+
+satisfaccion <- satisfaccion |>
+  mutate(
+    satisfecho = factor(satisfecho, levels = c("no", "si")),
+    zona = factor(zona),
+    genero = factor(genero),
+    pais = factor(pais)
+  )
+```
+
+## Exploracion
+
+### Pregunta 1: Resumen del dataset
+
+Calculen la proporcion de satisfechos (`"si"`) por pais. Cual pais tiene la proporcion mas alta? Cual tiene la mas baja? Muestren los resultados en una tabla ordenada.
+
+```{r p1}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+### Pregunta 2: Confianza y satisfaccion
+
+Creen un boxplot que muestre la distribucion de `confianza_gobierno` separada por `satisfecho`. Agreguen `labs()` con titulo y etiquetas claras. Que observan?
+
+```{r p2}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+### Pregunta 3: Correlaciones
+
+Calculen la matriz de correlaciones entre las 4 variables numericas principales: `edad`, `educacion_anos`, `ingreso_hogar` y `confianza_gobierno`. Cuales dos variables tienen la mayor correlacion? Es fuerte o debil?
+
+```{r p3}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+## Feature engineering
+
+### Pregunta 4: Crear variables nuevas
+
+Creen tres variables nuevas:
+
+- `confianza_baja`: `"si"` si `confianza_gobierno <= 4`, `"no"` en caso contrario
+- `joven`: `"si"` si `edad < 30`, `"no"` en caso contrario
+- `ingreso_x_educacion`: el producto de `ingreso_hogar` y `educacion_anos`
+
+Muestren las primeras 10 filas de las nuevas variables junto con `satisfecho`.
+
+```{r p4}
+# Escriban su codigo aqui
+
+```
+
+### Pregunta 5: Explorar las nuevas variables
+
+Calculen la proporcion de satisfechos entre personas con confianza baja vs. alta, y entre jovenes vs. no jovenes. Que variable parece mas util para predecir la satisfaccion?
+
+```{r p5}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+## Modelos
+
+### Pregunta 6: Division de datos
+
+Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(42)` y estratificacion por `satisfecho`. Verifiquen que las proporciones del outcome son similares en ambos conjuntos.
+
+```{r p6}
+# Escriban su codigo aqui
+
+```
+
+### Pregunta 7: Tres modelos con formula basica
+
+Definan tres modelos (regresion logistica, arbol de decision y KNN con k=5) y evaluenlos con validacion cruzada (5 folds) usando la formula: `satisfecho ~ edad + educacion_anos + ingreso_hogar + confianza_gobierno + consumo_noticias + participacion_politica + zona`. Reporten accuracy para cada uno.
+
+*Pista:* usen `control_resamples(event_level = "second")` dentro de `fit_resamples()`.
+
+```{r p7}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+### Pregunta 8: Mejor modelo con formula extendida
+
+Ahora evaluen el mejor modelo de la pregunta anterior con una formula que agregue `confianza_baja` y `ingreso_x_educacion`. Mejora la accuracy? Cuanto?
+
+```{r p8}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+## Evaluacion
+
+### Pregunta 9: Matriz de confusion
+
+Ajusten el modelo logistico con la formula basica en los datos de entrenamiento y generen predicciones sobre el conjunto de prueba. Construyan la matriz de confusion. Cuantos errores comete el modelo en total?
+
+```{r p9}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+### Pregunta 10: Precision, recall y AUC
+
+Calculen precision, recall y AUC del modelo logistico sobre el conjunto de prueba. Recuerden usar `event_level = "second"`. Es un buen modelo segun el AUC?
+
+```{r p10}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+### Pregunta 11: Curva ROC
+
+Grafiquen la curva ROC del modelo logistico. Agreguen un titulo al grafico con `labs()`.
+
+```{r p11}
+# Escriban su codigo aqui
+
+```
+
+### Pregunta 12: Coeficientes del modelo
+
+Extraigan los coeficientes del modelo logistico con `tidy()` y calculen los odds ratios. Cual variable tiene el efecto mas fuerte? Cual tiene el efecto mas debil? Ordenen por p-valor.
+
+```{r p12}
+# Escriban su codigo aqui
+
+```
+
+**Respuesta:**
+
+## Reflexion
+
+### Pregunta 13: Arbol vs. logistica
+
+Los arboles de decision y la regresion logistica tienen ventajas y desventajas distintas. Basandose en los resultados del laboratorio, discutan en que situaciones preferirian un arbol de decision sobre una regresion logistica, y viceversa. Consideren al menos dos criterios (por ejemplo, interpretabilidad, rendimiento, tipo de datos).
+
+**Respuesta:**

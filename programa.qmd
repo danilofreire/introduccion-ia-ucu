@@ -39,7 +39,8 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 - Flujo de trabajo: datos, entrenamiento, evaluación
 - División de datos (train/test)
 - Compromiso sesgo-varianza y métricas de evaluación
-- Laboratorio: configuración de RStudio y primer flujo de trabajo con `tidymodels`
+- Laboratorio 1: configuración de RStudio y primer flujo de trabajo con `tidymodels`
+- Laboratorio 2: exploración avanzada, feature engineering y comparación de modelos
 
 ### Día 2: Aprendizaje supervisado
 
