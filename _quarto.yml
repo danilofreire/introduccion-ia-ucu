@@ -5,6 +5,7 @@ project:
     - "clases/**/*.R"
     - "clases/**/*.csv"
     - "clases/**/tarea-*.qmd"
+    - "clases/**/*laboratorio-*.qmd"
 
 website:
   title: "IA para Científicos Sociales"
@@ -23,8 +24,6 @@ website:
         text: Inicio
       - href: programa.qmd
         text: Programa
-      - href: clases.qmd
-        text: Clases
       - href: laboratorios.qmd
         text: Laboratorios
       - href: lecturas.qmd

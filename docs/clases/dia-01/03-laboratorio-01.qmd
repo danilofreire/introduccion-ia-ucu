@@ -1,0 +1,875 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 1.3: Laboratorio - Primer flujo de trabajo con tidymodels"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 1.3](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/03-laboratorio-01.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 1: Primer flujo de trabajo con tidymodels {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Configurar el entorno de trabajo
+2. Cargar y explorar datos
+3. Preprocesar variables
+4. Dividir datos (train/test)
+5. Entrenar un modelo de clasificación
+6. Evaluar el rendimiento
+7. Interpretar resultados
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- El ecosistema [tidymodels]{.alert}
+- El flujo completo de ML en R
+- Cómo evaluar un clasificador
+- Buenas prácticas de reproducibilidad
+
+<br>
+
+[Trabajen en sus computadoras y pregunten si tienen dudas.]{.alert}
+:::
+:::
+:::
+
+
+# Parte 1: Configuración y exploración {background-color="#2d4563"}
+
+## Configuración del entorno
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+Necesitamos instalar y cargar los paquetes. Ejecuten este código en R:
+
+```{r lab-setup, eval=FALSE, prompt=FALSE, echo=TRUE}
+# Instalar paquetes (solo la primera vez)
+install.packages(c("tidymodels", "tidyverse"))
+
+# Cargar paquetes
+library(tidymodels)
+library(tidyverse)
+```
+
+```{r lab-load, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidymodels)
+library(tidyverse)
+```
+
+- Si ya tienen tidyverse instalado, solo necesitan instalar [tidymodels]{.alert}
+- tidymodels carga automáticamente: rsample, parsnip, yardstick, y otros paquetes que necesitaremos
+- Si la instalación falla, intenten: 
+
+```{r lab-setup-02, eval=FALSE, prompt=FALSE, echo=TRUE}
+install.packages("tidymodels", dependencies = TRUE)
+```
+:::
+
+## Recapitulando: el ecosistema tidy
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [tidymodels](https://www.tidymodels.org/) es un conjunto de paquetes de R para modelado de datos
+- Sigue la filosofía del [tidyverse]{.alert}: código legible, consistente y modular
+- Paquetes principales:
+    - [[rsample:](https://rsample.tidymodels.org/)]{.alert} división de datos
+    - [[parsnip:](https://parsnip.tidymodels.org/)]{.alert} especificación de modelos
+    - [[yardstick:](https://yardstick.tidymodels.org/)]{.alert} métricas de evaluación
+    - [[workflows:](https://workflows.tidymodels.org/)]{.alert} combinar preprocesamiento + modelo
+    - [[recipes:](https://recipes.tidymodels.org/)]{.alert} preprocesamiento de datos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 26px; margin-top: 20px;"}
+```
+tidymodels
+├── rsample    → dividir datos
+├── recipes    → preprocesar
+├── parsnip    → especificar modelo
+├── workflows  → combinar todo
+├── tune       → ajustar hiperparámetros
+└── yardstick  → evaluar
+```
+
+<br>
+
+Ventaja: [misma sintaxis]{.alert} para todos los modelos, ya sea regresión logística, random forest o redes neuronales.
+:::
+:::
+:::
+:::
+
+## Cargar los datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Vamos a trabajar con un dataset de indicadores socioeconómicos de países de todo el mundo (datos simulados inspirados en el Banco Mundial):
+
+- Es un [corte transversal]{.alert} (cross-section): una observación por país, sin dimensión temporal
+- Los datos fueron generados a partir de un factor latente de "desarrollo" con ruido propio por indicador, lo que produce correlaciones moderadas entre predictores (r ~ 0.10-0.40)
+
+```{r lab-cargar, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
+# Cargar los datos
+datos <- read_csv("datos/indicadores_mundiales.csv")
+
+# Ver las primeras filas
+glimpse(datos)
+```
+:::
+
+## Exploración inicial
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Antes de modelar, siempre hay que [explorar los datos]{.alert}:
+
+```{r lab-explorar, prompt=FALSE, echo=TRUE}
+# Resumen estadístico
+summary(datos)
+```
+:::
+
+## Explorar la variable objetivo
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+:::{.columns}
+:::{.column width=55%}
+- **Problema**: predecir si un país tendrá [crecimiento alto del PIB]{.alert} (>= 3%) en un año dado
+- **Variable de resultado**: `crecimiento_alto` (sí/no)
+- **Predictores**: gasto en educación, acceso a internet, urbanización, gasto en salud, inflación, desempleo, inversión extranjera, índice de gobierno digital
+- Esto es un problema de [clasificación binaria]{.alert}
+- [Nota:]{.alert} |> es el operador de pipe nativo de R 4.1+ (la fuente de estas diapositivas tiene ligaduras tipográficas, por eso se ve diferente)
+:::
+
+:::{.column width=45%}
+:::{style="margin-top: 20px; font-size: 26px;"}
+```{r lab-outcome, prompt=FALSE, echo=TRUE}
+# Verificar la distribución 
+# del outcome
+datos |>
+  count(crecimiento_alto) |>
+  mutate(prop = n / sum(n))
+```
+:::
+:::
+:::
+:::
+
+## Ejercicio 1: Exploración {#sec:exercise01}
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Instrucciones:** Antes de continuar, exploren los datos ustedes mismos.
+
+1. ¿Cuántas observaciones y variables tiene el dataset?
+2. ¿Hay valores faltantes (NA)?
+3. ¿Cómo se distribuye cada variable numérica?
+4. ¿Hay correlaciones fuertes entre las variables?
+
+```{r ej1-solucion, eval=FALSE, prompt=FALSE}
+# Sugerencias de código:
+dim(datos)                    # Dimensiones
+sum(is.na(datos))             # Total de NAs
+cor(datos |> select(where(is.numeric)))  # Correlaciones
+```
+
+[Tómense 5 minutos para explorar.]{.alert}
+
+[[Apéndice 1: Solución]{.button}](#sec:appendix01)
+:::
+
+# Parte 2: Preprocesamiento y división {background-color="#2d4563"}
+
+## Preparar los datos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+Convertimos la variable de resultado a factor (necesario para clasificación) y seleccionamos las variables:
+
+```{r lab-preparar, prompt=FALSE, echo=TRUE}
+# Asegurar que el outcome sea un factor
+datos <- datos |>
+  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si")))
+
+# Seleccionar variables para el modelo (solo numéricas)
+datos_modelo <- datos |>
+  select(crecimiento_alto, gasto_educacion, acceso_internet,
+         urbanizacion, gasto_salud, inflacion, desempleo,
+         inversion_extranjera, indice_gobierno_digital)
+
+# Verificar
+glimpse(datos_modelo)
+```
+:::
+
+## ¿Por qué convertir a factor?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- En R, los modelos de [clasificación]{.alert} esperan que la variable objetivo sea un [factor]{.alert}
+- Un factor es un tipo de dato para variables categóricas
+- Tiene [niveles]{.alert} ordenados: el primer nivel es la clase "negativa"
+- En nuestro caso: `levels = c("no", "si")`
+    - "no" = clase negativa (referencia)
+    - "si" = clase positiva (la que queremos predecir)
+    - Usamos `levels(...)` para asegurarnos de que el orden es correcto
+- [El orden importa]{.alert} para interpretar métricas como precisión y recall
+:::
+
+:::{.column width=45%}
+```{r factor-ejemplo, prompt=FALSE, echo=TRUE}
+# Ver los niveles del factor
+levels(datos_modelo$crecimiento_alto)
+```
+:::
+:::
+:::
+
+## Dividir los datos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+Usamos `initial_split()` de rsample para crear la división train/test:
+
+```{r lab-dividir, prompt=FALSE, echo=TRUE}
+# Fijar semilla para reproducibilidad
+set.seed(2026)
+
+# Dividir: 75% entrenamiento, 25% prueba
+datos_split <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
+
+# Extraer los conjuntos
+datos_train <- training(datos_split)
+datos_test  <- testing(datos_split)
+
+# Verificar tamaños
+cat("Entrenamiento:", nrow(datos_train), "filas\n")
+cat("Prueba:", nrow(datos_test), "filas\n")
+```
+
+- `strata = crecimiento_alto` asegura que la proporción de sí/no sea similar en ambos conjuntos
+- [La estratificación es buena práctica]{.alert}, especialmente con clases desbalanceadas
+:::
+
+## Verificar la estratificación
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+Comprobemos que las proporciones son similares en ambos conjuntos:
+
+```{r verificar-strata, prompt=FALSE, echo=TRUE}
+# Proporciones en entrenamiento
+datos_train |>
+  count(crecimiento_alto) |>
+  mutate(prop = round(n / sum(n), 3), conjunto = "train")
+
+# Proporciones en prueba
+datos_test |>
+  count(crecimiento_alto) |>
+  mutate(prop = round(n / sum(n), 3), conjunto = "test")
+```
+
+[Las proporciones deberían ser muy similares (¡y realmente lo son en este caso!)]{.alert}
+:::
+
+## Ejercicio 2: División de datos {#sec:exercise02}
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Instrucciones:** Experimenten con diferentes configuraciones de división.
+
+1. ¿Qué pasa si cambian `prop = 0.75` a `prop = 0.50`?
+2. ¿Qué pasa si quitan `strata = crecimiento_alto`?
+3. ¿Qué pasa si cambian la semilla (`set.seed()`)?
+
+```{r ej2-solucion, eval=FALSE, prompt=FALSE, echo=TRUE}
+# Prueben diferentes configuraciones:
+set.seed(12345)
+datos_split_2 <- initial_split(datos_modelo, prop = 0.50)
+# ...
+```
+
+[Entender cómo afectan estos parámetros es importante para diseñar experimentos robustos.]{.alert}
+
+[[Apéndice 2: Solución]{.button}](#sec:appendix02)
+:::
+
+# Parte 3: Entrenamiento y evaluación {background-color="#2d4563"}
+
+## Especificar el modelo
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+Usamos `logistic_reg()` de parsnip para definir una regresión logística:
+
+```{r lab-modelo, prompt=FALSE, echo=TRUE}
+# Especificar el modelo
+modelo_log <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+modelo_log
+```
+
+- `logistic_reg()` define [qué tipo de modelo]{.alert} queremos
+- `set_engine("glm")` define [qué implementación]{.alert} usar (glm es la función base de R)
+- `set_mode("classification")` indica que es un problema de clasificación
+- Noten que aún [no hemos entrenado nada]{.alert}: solo definimos la especificación
+- Otros modelos disponibles en parsnip: [lista completa](https://www.tidymodels.org/find/parsnip/)
+:::
+
+## Ajustar el modelo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Ahora ajustamos el modelo a los datos de entrenamiento:
+
+```{r lab-ajustar, prompt=FALSE, echo=TRUE}
+# Ajustar el modelo
+ajuste <- modelo_log |>
+  fit(crecimiento_alto ~ ., data = datos_train)
+
+# Ver los coeficientes
+tidy(ajuste)
+```
+
+- `crecimiento_alto ~ .` significa: predecir `crecimiento_alto` usando [todas las demás variables]{.alert}
+- `tidy()` nos da una tabla limpia con coeficientes, errores estándar y p-valores
+:::
+
+## Interpretar los coeficientes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=45%}
+**Recordatorio: regresión logística**
+
+- Los coeficientes están en escala de [log-odds]{.alert}
+- Un coeficiente positivo aumenta la probabilidad de "sí"
+- Un coeficiente negativo la disminuye
+- Para convertir a odds ratio: `exp(coeficiente)`
+
+**Preguntas para discutir:**
+
+- ¿Qué variables tienen coeficientes significativos (p < 0.05)?
+- ¿Los signos tienen sentido teórico?
+- ¿La inflación alta se asocia con menor crecimiento?
+:::
+
+:::{.column width=55%}
+:::{style="margin-top: 20px;"}
+```{r coef-interpretacion, prompt=FALSE, echo=TRUE}
+# Ver los odds ratios
+tidy(ajuste) |>
+  mutate(odds_ratio = exp(estimate)) |>
+  select(term, estimate, odds_ratio, p.value)
+```
+:::
+:::
+:::
+:::
+
+## Generar predicciones
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Generamos predicciones en los datos de prueba:
+
+```{r lab-predecir, prompt=FALSE, echo=TRUE}
+# Predecir clases
+predicciones <- ajuste |>
+  predict(datos_test) |>
+  bind_cols(datos_test)
+
+# Ver las primeras predicciones
+predicciones |>
+  select(crecimiento_alto, .pred_class) |>
+  head(10)
+```
+
+- `.pred_class` es la clase predicha por el modelo
+- Comparamos con `crecimiento_alto` (la verdad)
+:::
+
+## Matriz de confusión
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+La matriz de confusión muestra todos los resultados posibles:
+
+```{r lab-evaluar, prompt=FALSE, echo=TRUE}
+# Matriz de confusión
+conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
+```
+
+:::{.columns}
+:::{.column width=50%}
+- **Verdaderos Negativos (VN):** predijo "no" y era "no"
+- **Falsos Positivos (FP):** predijo "sí" pero era "no"
+:::
+
+:::{.column width=50%}
+- **Falsos Negativos (FN):** predijo "no" pero era "sí"
+- **Verdaderos Positivos (VP):** predijo "sí" y era "sí"
+:::
+:::
+:::
+
+## Métricas de evaluación
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r lab-metricas-adicionales, prompt=FALSE, echo=TRUE}
+# Conjunto completo de métricas
+predicciones |>
+  conf_mat(truth = crecimiento_alto, estimate = .pred_class) |>
+  summary()
+```
+
+[Observen las diferentes métricas y piensen cuál es más relevante para este problema.]{.alert}
+:::
+
+## Ejercicio 3: Interpretación {#sec:exercise03}
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Instrucciones:** Reflexionen sobre los resultados.
+
+1. ¿El modelo tiene mejor precisión o mejor recall?
+2. ¿Qué significa eso en términos prácticos?
+    - Si predecimos "crecimiento alto" cuando no lo es, ¿qué pasa?
+    - Si no detectamos un caso de crecimiento alto, ¿qué pasa?
+3. ¿Qué métrica priorizarían ustedes y por qué?
+
+[Discutan en grupos de 2-3 personas durante 5 minutos.]{.alert}
+
+[[Apéndice 3: Reflexión]{.button}](#sec:appendix03)
+:::
+
+# Parte 4: Ejercicios adicionales {background-color="#2d4563"}
+
+## Probabilidades de predicción {#sec:exercise04}
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Los modelos de clasificación también pueden dar [probabilidades]{.alert}, no solo clases:
+
+```{r ej4-probabilidades, prompt=FALSE, echo=TRUE}
+# Obtener probabilidades
+pred_probs <- ajuste |>
+  predict(datos_test, type = "prob") |>
+  bind_cols(datos_test)
+
+# Ver las probabilidades
+pred_probs |>
+  select(crecimiento_alto, .pred_no, .pred_si) |>
+  head(10)
+```
+
+**Tarea:** ¿Qué observaciones tienen predicciones "inciertas" (probabilidades cercanas a 0.5)?
+
+[[Apéndice 4: Solución]{.button}](#sec:appendix04)
+:::
+
+## Cambiar el umbral {#sec:exercise05}
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Por defecto, el umbral es 0.5. Pero podemos cambiarlo:
+
+```{r ej5-umbral, prompt=FALSE, echo=TRUE}
+# Crear predicciones con umbral personalizado
+umbral <- 0.3  # Más sensible: predice "sí" más fácilmente
+
+pred_umbral <- pred_probs |>
+  mutate(.pred_class_nuevo = factor(
+    if_else(.pred_si >= umbral, "si", "no"),
+    levels = c("no", "si")
+  ))
+
+# Comparar métricas
+pred_umbral |>
+  precision(truth = crecimiento_alto, estimate = .pred_class_nuevo,
+            event_level = "second")
+
+pred_umbral |>
+  recall(truth = crecimiento_alto, estimate = .pred_class_nuevo,
+         event_level = "second")
+```
+
+**Tarea:** Prueben con umbrales de 0.3, 0.5 y 0.7. ¿Cómo cambian precision y recall?
+
+[[Apéndice 5: Solución]{.button}](#sec:appendix05)
+:::
+
+## Validación cruzada {#sec:exercise06}
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+En lugar de una sola división, usemos [validación cruzada]{.alert}:
+
+```{r ej6-cv, prompt=FALSE, echo=TRUE}
+# Crear folds de validación cruzada
+set.seed(2026)
+folds <- vfold_cv(datos_train, v = 5, strata = crecimiento_alto)
+
+# Ver los folds
+folds
+```
+
+```{r ej6-cv-fit, prompt=FALSE, echo=TRUE}
+# Ajustar modelo en cada fold
+cv_results <- fit_resamples(
+  modelo_log,
+  crecimiento_alto ~ .,
+  resamples = folds,
+  metrics = metric_set(accuracy, precision, recall),
+  control = control_resamples(event_level = "second")
+)
+
+# Ver resultados promedio
+collect_metrics(cv_results)
+```
+
+[[Apéndice 6: Solución]{.button}](#sec:appendix06)
+:::
+
+## Curva ROC {#sec:exercise07}
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Visualicemos el rendimiento con una [curva ROC]{.alert}:
+
+```{r ej8-roc, prompt=FALSE, fig.width=6, fig.height=4, echo=TRUE}
+# Calcular curva ROC
+roc_data <- pred_probs |>
+  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second")
+
+# Graficar
+autoplot(roc_data)
+```
+
+- `event_level = "second"` indica que el [evento positivo]{.alert} es el segundo nivel del factor (`"si"`). Por defecto, yardstick usa el primer nivel (`"no"`) como evento positivo. Sin este argumento, la curva ROC y el AUC se calculan al revés (AUC < 0.5)
+
+```{r ej8-auc, prompt=FALSE, echo=TRUE}
+# Calcular AUC
+pred_probs |>
+  roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
+```
+:::
+
+# Resumen y cierre {background-color="#2d4563"}
+
+## Lo que aprendimos
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+:::{.columns}
+:::{.column width=50%}
+**Flujo de trabajo completo:**
+
+1. Cargar y explorar datos
+2. Preprocesar (factores, selección)
+3. Dividir (train/test con estratificación)
+4. Especificar modelo (parsnip)
+5. Ajustar (fit)
+6. Predecir (predict)
+7. Evaluar (métricas, matriz de confusión)
+:::
+
+:::{.column width=50%}
+**Conceptos clave:**
+
+- [tidymodels]{.alert} unifica el modelado en R
+- La [estratificación]{.alert} mantiene proporciones de clases
+- Las [probabilidades]{.alert} dan más información que las clases
+- El [umbral]{.alert} afecta el balance precision/recall
+- La [validación cruzada]{.alert} da estimaciones más robustas
+:::
+:::
+:::
+
+## Próximo: Laboratorio 2
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+En el [Laboratorio 2 (Sesión 1.4)]{.alert} vamos a:
+
+- Trabajar con un dataset diferente
+- Explorar más a fondo el preprocesamiento
+- Comparar múltiples modelos
+- Practicar la interpretación de resultados
+
+<br>
+
+[Guarden su trabajo y tómense un descanso!]{.alert} 😉
+:::
+
+# Apéndice: Soluciones {background-color="#2d4563"}
+
+## Apéndice 1: Exploración {#sec:appendix01}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=50%}
+**Comandos para cada pregunta:**
+
+```{r ap1-sol, prompt=FALSE, echo=TRUE, eval=TRUE}
+# 1. Dimensiones del dataset
+dim(datos)            # filas y columnas
+nrow(datos)           # solo filas
+ncol(datos)           # solo columnas
+
+# 2. Valores faltantes
+sum(is.na(datos))         # total de NAs
+colSums(is.na(datos))     # NAs por columna
+
+# 3. Distribución de variables numéricas
+datos |>
+  select(where(is.numeric)) |>
+  summary()
+
+# 4. Correlaciones entre variables
+datos |>
+  select(where(is.numeric)) |>
+  cor() |>
+  round(2)
+```
+:::
+
+:::{.column width=50%}
+**Respuestas esperadas:**
+
+- [179 observaciones]{.alert} (un país por fila), 11 variables: `pais`, `continente`, 8 predictores numéricos y `crecimiento_alto`
+- [0 valores faltantes]{.alert}: datos simulados. En datos reales esto casi nunca ocurre, siempre verifiquen
+- `acceso_internet` y `urbanizacion` tienen distribuciones amplias: países con muy poco acceso vs. muy conectados
+- `indice_gobierno_digital` se correlaciona positivamente con `acceso_internet` y negativamente con `inflacion`
+
+[Pista:]{.alert} `ggplot2` permite visualizar distribuciones con `geom_histogram()` y correlaciones con el paquete `corrplot` o `ggcorrplot`.
+:::
+:::
+
+[[Volver al ejercicio]{.button}](#sec:exercise01)
+:::
+
+## Apéndice 2: División de datos {#sec:appendix02}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r ap2-sol, prompt=FALSE, echo=TRUE, eval=TRUE}
+# Pregunta 1: prop = 0.50 (menos datos de entrenamiento)
+set.seed(2026)
+split_50 <- initial_split(datos_modelo, prop = 0.50, strata = crecimiento_alto)
+cat("Train:", nrow(training(split_50)), "/ Test:", nrow(testing(split_50)))
+
+# Pregunta 2: sin estratificación
+set.seed(2026)
+split_sin <- initial_split(datos_modelo, prop = 0.75)
+training(split_sin) |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
+testing(split_sin)  |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
+# Las proporciones pueden diferir entre train y test
+
+# Pregunta 3: diferente semilla
+set.seed(999)
+split_999 <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
+training(split_999) |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
+# Los resultados del modelo varían, pero la distribución de clases
+# se mantiene gracias a la estratificación
+```
+
+- Con [menos datos de entrenamiento]{.alert} (`prop = 0.50`), el modelo puede tener peor rendimiento
+- Sin `strata`, las proporciones de clases pueden ser distintas en train y test, lo que [sesga las métricas]{.alert}
+- Cambiar la semilla produce una partición diferente; los resultados varían algo, pero no deberían ser muy distintos
+
+[[Volver al ejercicio]{.button}](#sec:exercise02)
+:::
+
+## Apéndice 3: Interpretación {#sec:appendix03}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=50%}
+**Calcular las métricas:**
+
+```{r ap3-metricas, prompt=FALSE, echo=TRUE, eval=TRUE}
+predicciones |>
+  precision(truth = crecimiento_alto,
+            estimate = .pred_class,
+            event_level = "second")
+
+predicciones |>
+  recall(truth = crecimiento_alto,
+         estimate = .pred_class,
+         event_level = "second")
+
+# O ambas a la vez:
+predicciones |>
+  conf_mat(truth = crecimiento_alto,
+           estimate = .pred_class) |>
+  summary(event_level = "second")
+```
+:::
+
+:::{.column width=50%}
+**Cómo interpretar la diferencia:**
+
+- [Precisión alta, recall bajo]{.alert}: el modelo predice "crecimiento alto" con cautela. Pocos falsos positivos, pero se pierden casos reales
+- [Recall alto, precisión baja]{.alert}: predice "sí" con frecuencia. No pierde casos, pero genera más falsas alarmas
+
+**¿Qué métrica priorizar?**
+
+- Si el [costo de perder un caso]{.alert} es alto (p. ej., decisiones de inversión): prioricen [recall]{.alert}
+- Si el [costo de una falsa alarma]{.alert} es alto (p. ej., asignar recursos mal): prioricen [precisión]{.alert}
+- Sin preferencia clara: usen [F1]{.alert}, el promedio armónico de ambas
+
+[No hay respuesta universal.]{.alert} El contexto define la métrica correcta.
+:::
+:::
+
+[[Volver al ejercicio]{.button}](#sec:exercise03)
+:::
+
+## Apéndice 4: Probabilidades {#sec:appendix04}
+
+:::{style="margin-top: 20px; font-size: 21px;"}
+
+**¿Cómo identificar predicciones inciertas?**
+
+```{r ap4-sol, prompt=FALSE, echo=TRUE, eval=TRUE}
+# Observaciones con probabilidad cercana a 0.5
+pred_probs |>
+  select(crecimiento_alto, .pred_no, .pred_si) |>
+  mutate(incertidumbre = abs(.pred_si - 0.5)) |>
+  filter(incertidumbre < 0.1) |>
+  arrange(incertidumbre)
+```
+
+- Las observaciones con `.pred_si` cercano a 0.5 son las más [difíciles de clasificar]{.alert}: pequeños cambios en los predictores pueden cambiar la clase predicha
+- En contextos reales, estas observaciones merecen [análisis adicional]{.alert} o revisión manual antes de tomar decisiones
+- Si hay muchas predicciones inciertas, puede indicar que el modelo necesita más variables o más datos
+
+[[Volver al ejercicio]{.button}](#sec:exercise04)
+:::
+
+## Apéndice 5: Cambio de umbral {#sec:appendix05}
+
+:::{style="margin-top: 20px; font-size: 21px;"}
+
+```{r ap5-sol, prompt=FALSE, echo=TRUE, eval=TRUE}
+# Comparar precisión y recall para tres umbrales
+purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
+  pred_probs |>
+    mutate(.pred_u = factor(
+      dplyr::if_else(.pred_si >= u, "si", "no"),
+      levels = c("no", "si")
+    )) |>
+    summarise(
+      umbral    = u,
+      precision = precision_vec(crecimiento_alto, .pred_u, event_level = "second"),
+      recall    = recall_vec(crecimiento_alto, .pred_u, event_level = "second")
+    )
+})
+```
+
+| Umbral | Precisión | Recall | Interpretación |
+|--------|-----------|--------|----------------|
+| [0.3]{.alert} | baja | alta | predice "sí" fácilmente, más falsos positivos |
+| [0.5]{.alert} | media | media | punto de equilibrio (por defecto) |
+| [0.7]{.alert} | alta | baja | predice "sí" con cautela, más falsos negativos |
+
+Este es el [compromiso precisión-recall]{.alert} en acción. El umbral óptimo depende del problema.
+
+[[Volver al ejercicio]{.button}](#sec:exercise05)
+:::
+
+## Apéndice 6: Validación cruzada {#sec:appendix06}
+
+:::{style="margin-top: 20px; font-size: 21px;"}
+
+```{r ap6-interpretacion, prompt=FALSE, echo=TRUE, eval=TRUE}
+# collect_metrics() devuelve media y error estándar de cada métrica
+collect_metrics(cv_results)
+
+# Comparar con las métricas de la división única
+predicciones |>
+  metrics(truth = crecimiento_alto, estimate = .pred_class)
+```
+
+- `collect_metrics()` devuelve la [media]{.alert} de cada métrica sobre los 5 folds junto con su error estándar (`std_err`)
+- Un [error estándar bajo]{.alert} indica resultados consistentes entre folds (buena señal)
+- Si las métricas de CV son [peores que las de la división única]{.alert}, la partición original fue demasiado favorable al modelo
+- La validación cruzada es más [confiable]{.alert} porque cada observación aparece exactamente una vez en validación
+
+[[Volver al ejercicio]{.button}](#sec:exercise06)
+:::
+
+## Apéndice 7: Curva ROC {#sec:appendix07}
+
+:::{style="margin-top: 20px; font-size: 22px;"}
+
+**Interpretar el AUC:**
+
+| AUC | Interpretación |
+|-----|----------------|
+| 0.5 | No mejor que el azar |
+| 0.7–0.8 | Aceptable |
+| 0.8–0.9 | Bueno |
+| > 0.9 | Excelente (verifiquen data leakage) |
+
+- Una curva que [sube rápido al inicio]{.alert} indica que el modelo identifica los positivos más claros primero
+- El AUC es [independiente del umbral]{.alert}: evalúa el rendimiento en todos los posibles umbrales a la vez
+- Es especialmente útil para [comparar modelos]{.alert} sin tener que elegir un umbral
+
+[[Volver al ejercicio]{.button}](#sec:exercise07)
+:::

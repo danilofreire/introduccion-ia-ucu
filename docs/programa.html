@@ -102,10 +102,6 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Programa</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./clases.html"> 
-<span class="menu-text">Clases</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="./laboratorios.html"> 
 <span class="menu-text">Laboratorios</span></a>
   </li>  
@@ -212,29 +208,35 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="contenido-por-día">Contenido por día</h2>
 <section id="día-1-fundamentos-de-ia-y-machine-learning" class="level3">
 <h3 class="anchored" data-anchor-id="día-1-fundamentos-de-ia-y-machine-learning">Día 1: Fundamentos de IA y Machine Learning</h3>
-<p><strong>Sesión 1.1: ¿Qué es la Inteligencia Artificial?</strong></p>
+<p><strong><a href="clases/dia-01/01-que-es-ia.html">Sesión 1.1: ¿Qué es la Inteligencia Artificial?</a></strong></p>
 <ul>
 <li>Definición de IA, historia (de la IA simbólica al deep learning)</li>
 <li>Tipos de aprendizaje: supervisado, no supervisado, refuerzo</li>
 <li>Ética básica y contexto actual</li>
 </ul>
-<p><strong>Sesión 1.2: Fundamentos de Machine Learning</strong></p>
+<p><strong><a href="clases/dia-01/02-fundamentos-ml.html">Sesión 1.2: Fundamentos de Machine Learning</a></strong></p>
 <ul>
 <li>Flujo de trabajo: datos, entrenamiento, evaluación</li>
 <li>División de datos (train/test)</li>
 <li>Compromiso sesgo-varianza y métricas de evaluación</li>
-<li>Laboratorio 1: configuración de RStudio y primer flujo de trabajo con <code>tidymodels</code></li>
-<li>Laboratorio 2: exploración avanzada, feature engineering y comparación de modelos</li>
+</ul>
+<p><strong><a href="clases/dia-01/03-laboratorio-01.html">Laboratorio 1: Primer flujo de trabajo con tidymodels</a></strong></p>
+<ul>
+<li>Configuración de RStudio y primer flujo de trabajo con <code>tidymodels</code></li>
+</ul>
+<p><strong><a href="clases/dia-01/04-laboratorio-02.html">Laboratorio 2: Exploración avanzada y comparación de modelos</a></strong></p>
+<ul>
+<li>Feature engineering, comparación de modelos (logística, árboles, KNN)</li>
 </ul>
 </section>
 <section id="día-2-aprendizaje-supervisado" class="level3">
 <h3 class="anchored" data-anchor-id="día-2-aprendizaje-supervisado">Día 2: Aprendizaje supervisado</h3>
-<p><strong>Sesión 2.1: Métodos de clasificación</strong></p>
+<p><strong><a href="clases/dia-02/03-clasificacion.html">Sesión 2.1: Métodos de clasificación</a></strong></p>
 <ul>
 <li>Regresión logística, árboles de decisión y Random Forests</li>
 <li>Aplicaciones: predicción de comportamiento político y social</li>
 </ul>
-<p><strong>Sesión 2.2: Regresión y predicción</strong></p>
+<p><strong><a href="clases/dia-02/04-regresion-prediccion.html">Sesión 2.2: Regresión y predicción</a></strong></p>
 <ul>
 <li>Predicción vs.&nbsp;explicación en ciencias sociales</li>
 <li>Regularización: LASSO, Ridge, Elastic Net</li>
@@ -244,12 +246,12 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="día-3-texto-y-aprendizaje-no-supervisado" class="level3">
 <h3 class="anchored" data-anchor-id="día-3-texto-y-aprendizaje-no-supervisado">Día 3: Texto y aprendizaje no supervisado</h3>
-<p><strong>Sesión 3.1: Clustering y reducción de dimensionalidad (versión express)</strong></p>
+<p><strong><a href="clases/dia-03/05-clustering-pca.html">Sesión 3.1: Clustering y reducción de dimensionalidad (versión express)</a></strong></p>
 <ul>
 <li>K-means y PCA: conceptos e intuición</li>
 <li>Laboratorio breve: segmentación de países latinoamericanos por indicadores socioeconómicos</li>
 </ul>
-<p><strong>Sesión 3.2: Análisis computacional de texto</strong></p>
+<p><strong><a href="clases/dia-03/06-analisis-texto.html">Sesión 3.2: Análisis computacional de texto</a></strong></p>
 <ul>
 <li>Preprocesamiento, tokenización, Bag-of-words, TF-IDF</li>
 <li>Análisis de sentimiento</li>
@@ -259,13 +261,13 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones" class="level3">
 <h3 class="anchored" data-anchor-id="día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones">Día 4: Modelos de lenguaje extensos (LLMs) y aplicaciones</h3>
-<p><strong>Sesión 4.1: Entendiendo los LLMs</strong></p>
+<p><strong><a href="clases/dia-04/07-entendiendo-llms.html">Sesión 4.1: Entendiendo los LLMs</a></strong></p>
 <ul>
 <li>Arquitectura Transformer: la intuición detrás de la atención</li>
 <li>Capacidades de GPT-4 y Claude</li>
 <li>Ingeniería de prompts: zero-shot, few-shot, chain-of-thought</li>
 </ul>
-<p><strong>Sesión 4.2: LLMs como herramientas de investigación</strong></p>
+<p><strong><a href="clases/dia-04/08-llms-investigacion.html">Sesión 4.2: LLMs como herramientas de investigación</a></strong></p>
 <ul>
 <li>Anotación automática de textos</li>
 <li>Generación de datos sintéticos</li>
@@ -275,13 +277,13 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="día-5-ética-sesgo-algorítmico-y-cierre" class="level3">
 <h3 class="anchored" data-anchor-id="día-5-ética-sesgo-algorítmico-y-cierre">Día 5: Ética, sesgo algorítmico y cierre</h3>
-<p><strong>Sesión 5.1: Ética y sesgo algorítmico</strong></p>
+<p><strong><a href="clases/dia-05/09-etica-sesgo.html">Sesión 5.1: Ética y sesgo algorítmico</a></strong></p>
 <ul>
 <li>Tipos de sesgo y cómo surgen</li>
 <li>Métricas de equidad</li>
 <li>Regulación: EU AI Act, legislación latinoamericana, Ley 18.331 (Uruguay)</li>
 </ul>
-<p><strong>Sesión 5.2: Mini-propuestas de investigación</strong></p>
+<p><strong><a href="clases/dia-05/10-propuestas-cierre.html">Sesión 5.2: Mini-propuestas de investigación</a></strong></p>
 <ul>
 <li>Integración de IA en el flujo de investigación</li>
 <li>Taller: cada estudiante diseña una mini-propuesta aplicando una técnica del curso a una pregunta de ciencias sociales relevante para América Latina</li>
