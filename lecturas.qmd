@@ -2,98 +2,162 @@
 title: "Lecturas"
 ---
 
-## Lecturas por día
+## Sobre las lecturas
 
-Las lecturas son indicativas y pueden cambiar antes del inicio del curso. Se recomienda leer los textos asignados antes de cada sesión.
+Este curso es autocontenido: todo lo necesario para seguir las clases y completar los laboratorios se cubre en las sesiones presenciales. Las lecturas que se listan a continuacion son opcionales, pensadas para quienes quieran profundizar en algun tema o explorar aplicaciones adicionales. No es necesario leerlas antes de las sesiones.
 
-### Día 1: Fundamentos de IA y Machine Learning
+## Lecturas por dia
+
+### Dia 1: Fundamentos de IA y Machine Learning
 
 ::: {.resource-card}
-[Russell, S. & Norvig, P. (2021). *Artificial Intelligence: A Modern Approach*. Capítulo 1.]{.resource-title}
+[Russell, S. & Norvig, P. (2021). *Artificial Intelligence: A Modern Approach*. Capitulo 1.]{.resource-title}
 
-[Introducción clásica a la IA: definiciones, historia y enfoques fundamentales.]{.resource-meta}
+[Introduccion clasica a la IA: definiciones, historia y enfoques fundamentales.]{.resource-meta}
 :::
 
 ::: {.resource-card}
-[James, G., Witten, D., Hastie, T. & Tibshirani, R. (2021). *An Introduction to Statistical Learning with Applications in R*. Capítulos 1-2.]{.resource-title}
+[James, G., Witten, D., Hastie, T. & Tibshirani, R. (2021). *An Introduction to Statistical Learning with Applications in R*. Capitulos 1-2.]{.resource-title}
 
-[Fundamentos de aprendizaje estadístico. Disponible gratuitamente en [statlearning.com](https://www.statlearning.com/).]{.resource-meta}
+[Fundamentos de aprendizaje estadistico. Disponible gratuitamente en [statlearning.com](https://www.statlearning.com/).]{.resource-meta}
 :::
 
-### Día 2: Aprendizaje supervisado
+::: {.resource-card}
+[Kuhn, M. & Silge, J. (2022). *Tidy Modeling with R*. O'Reilly. Capitulos 1-3.]{.resource-title}
+
+[Guia practica para modelado con `tidymodels`, el ecosistema que usamos en el curso. Disponible gratuitamente en [tmwr.org](https://www.tmwr.org/).]{.resource-meta}
+:::
+
+::: {.resource-card}
+[Wickham, H., Cetinkaya-Rundel, M. & Grolemund, G. (2023). *R for Data Science* (2da edicion). O'Reilly. Capitulos 1-4.]{.resource-title}
+
+[Referencia para `tidyverse`. Util para quienes quieran repasar manipulacion de datos y visualizacion en R. Disponible en [r4ds.hadley.nz](https://r4ds.hadley.nz/).]{.resource-meta}
+:::
+
+### Dia 2: Aprendizaje supervisado
 
 ::: {.resource-card}
 [Muchlinski, D. et al. (2016). Comparing random forest with logistic regression for predicting class-membership. *Political Analysis*, 24(2), 168-185.]{.resource-title}
 
-[Aplicación de Random Forest a la predicción de conflictos civiles. Ejemplo clásico de ML en ciencia política.]{.resource-meta}
+[Aplicacion de Random Forest a la prediccion de conflictos civiles. Ejemplo clasico de ML en ciencia politica.]{.resource-meta}
 :::
 
 ::: {.resource-card}
 [Mullainathan, S. & Spiess, J. (2017). Machine learning: An applied econometric approach. *Journal of Economic Perspectives*, 31(2), 87-106.]{.resource-title}
 
-[Discusión sobre predicción vs. explicación, relevante para científicos sociales que vienen de la tradición inferencial.]{.resource-meta}
+[Discusion sobre prediccion vs. explicacion, relevante para cientificos sociales que vienen de la tradicion inferencial.]{.resource-meta}
 :::
 
-### Día 3: Texto y aprendizaje no supervisado
+::: {.resource-card}
+[Athey, S. & Imbens, G. W. (2019). Machine learning methods that economists should know about. *Annual Review of Economics*, 11, 685-725.]{.resource-title}
+
+[Revision de metodos de ML desde una perspectiva econometrica. Cubre arboles, LASSO y bosques causales.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[James, G., Witten, D., Hastie, T. & Tibshirani, R. (2021). *An Introduction to Statistical Learning*. Capitulos 4-6 y 8.]{.resource-title}
+
+[Regresion logistica (cap. 4), regularizacion (cap. 6) y arboles de decision y bosques aleatorios (cap. 8). Disponible en [statlearning.com](https://www.statlearning.com/).]{.resource-meta}
+:::
+
+### Dia 3: Texto y aprendizaje no supervisado
 
 ::: {.resource-card}
 [Grimmer, J. & Stewart, B. (2013). Text as data: The promise and pitfalls of automatic content analysis methods for political texts. *Political Analysis*, 21(3), 267-297.]{.resource-title}
 
-[Artículo fundacional sobre el uso de métodos computacionales para analizar textos políticos.]{.resource-meta}
+[Articulo fundacional sobre el uso de metodos computacionales para analizar textos politicos.]{.resource-meta}
 :::
 
 ::: {.resource-card}
 [Silge, J. & Robinson, D. (2017). *Text Mining with R: A Tidy Approach*. O'Reilly.]{.resource-title}
 
-[Manual práctico de análisis de texto en R. Disponible gratuitamente en [tidytextmining.com](https://www.tidytextmining.com/).]{.resource-meta}
+[Manual practico de analisis de texto en R. Disponible gratuitamente en [tidytextmining.com](https://www.tidytextmining.com/).]{.resource-meta}
 :::
 
-### Día 4: LLMs y aplicaciones
+::: {.resource-card}
+[Roberts, M. E., Stewart, B. M. & Tingley, D. (2019). stm: An R package for structural topic models. *Journal of Statistical Software*, 91(2), 1-40.]{.resource-title}
+
+[Descripcion del paquete `stm` para topic models con covariables, una extension del LDA que veremos en clase.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[James, G., Witten, D., Hastie, T. & Tibshirani, R. (2021). *An Introduction to Statistical Learning*. Capitulos 10 y 12.]{.resource-title}
+
+[Clustering (cap. 10) y PCA (cap. 12). Disponible en [statlearning.com](https://www.statlearning.com/).]{.resource-meta}
+:::
+
+### Dia 4: LLMs y aplicaciones
 
 ::: {.resource-card}
 [Gilardi, F., Alizadeh, M. & Kubli, M. (2023). ChatGPT outperforms crowd workers for text-annotation tasks. *PNAS*, 120(30).]{.resource-title}
 
-[Evidencia empírica de que los LLMs pueden superar a anotadores humanos en tareas de clasificación de texto.]{.resource-meta}
+[Evidencia empirica de que los LLMs pueden superar a anotadores humanos en tareas de clasificacion de texto.]{.resource-meta}
 :::
 
 ::: {.resource-card}
 [Bail, C. A. (2024). Can generative AI improve social science? *PNAS*, 121(21).]{.resource-title}
 
-[Revisión crítica del potencial y las limitaciones de la IA generativa para la investigación en ciencias sociales.]{.resource-meta}
+[Revision critica del potencial y las limitaciones de la IA generativa para la investigacion en ciencias sociales.]{.resource-meta}
 :::
 
 ::: {.resource-card}
-[Törnberg, P. (2024). Best practices for text annotation with large language models. *Sociological Methods & Research*.]{.resource-title}
+[Tornberg, P. (2024). Best practices for text annotation with large language models. *Sociological Methods & Research*.]{.resource-title}
 
-[Guía práctica para usar LLMs en tareas de anotación, con recomendaciones metodológicas.]{.resource-meta}
+[Guia practica para usar LLMs en tareas de anotacion, con recomendaciones metodologicas.]{.resource-meta}
 :::
 
-### Día 5: Ética y sesgo algorítmico
+::: {.resource-card}
+[Argyle, L. P. et al. (2023). Out of one, many: Using language models to simulate human samples. *Political Analysis*, 31(3), 337-351.]{.resource-title}
+
+[Uso de LLMs para generar datos sinteticos que simulan respuestas de encuestas, con aplicaciones a opinion publica.]{.resource-meta}
+:::
+
+::: {.resource-card}
+[Vaswani, A. et al. (2017). Attention is all you need. *Advances in Neural Information Processing Systems*, 30.]{.resource-title}
+
+[El articulo original que propone la arquitectura Transformer. Lectura tecnica, pero la seccion 3 (atencion) es accesible.]{.resource-meta}
+:::
+
+### Dia 5: Etica y sesgo algoritmico
 
 ::: {.resource-card}
 [O'Neil, C. (2016). *Weapons of Math Destruction*. Crown.]{.resource-title}
 
-[Libro accesible sobre cómo los algoritmos pueden perpetuar y amplificar desigualdades sociales.]{.resource-meta}
+[Libro accesible sobre como los algoritmos pueden perpetuar y amplificar desigualdades sociales.]{.resource-meta}
 :::
 
 ::: {.resource-card}
 [Barocas, S., Hardt, M. & Narayanan, A. (2023). *Fairness and Machine Learning*. MIT Press.]{.resource-title}
 
-[Referencia sobre equidad algorítmica. Disponible gratuitamente en [fairmlbook.org](https://fairmlbook.org/).]{.resource-meta}
+[Referencia sobre equidad algoritmica. Disponible gratuitamente en [fairmlbook.org](https://fairmlbook.org/).]{.resource-meta}
 :::
 
-## Bibliografía complementaria
+::: {.resource-card}
+[Eubanks, V. (2018). *Automating Inequality: How High-Tech Tools Profile, Police, and Punish the Poor*. St. Martin's Press.]{.resource-title}
 
-Estas lecturas no son obligatorias pero ofrecen perspectivas valiosas para profundizar en temas específicos:
+[Casos concretos de como los sistemas automatizados afectan a comunidades vulnerables en Estados Unidos. Lectura accesible y muy relevante para cientificos sociales.]{.resource-meta}
+:::
 
-- Argyle, L. P. et al. (2023). Out of one, many: Using language models to simulate human samples. *Political Analysis*.
+::: {.resource-card}
+[Raji, I. D. et al. (2020). Closing the AI accountability gap: Defining an end-to-end framework for internal algorithmic auditing. *ACM Conference on Fairness, Accountability, and Transparency*.]{.resource-title}
+
+[Marco practico para auditar algoritmos dentro de organizaciones.]{.resource-meta}
+:::
+
+## Bibliografia complementaria
+
+Estas lecturas no son obligatorias, pero ofrecen perspectivas valiosas para profundizar en temas especificos:
+
 - Athey, S. (2017). Beyond prediction: Using big data for policy problems. *Science*, 355(6324), 483-485.
 - Breiman, L. (2001). Statistical modeling: The two cultures. *Statistical Science*, 16(3), 199-231.
 - Crawford, K. (2021). *Atlas of AI*. Yale University Press.
 - Gentzkow, M., Kelly, B. & Taddy, M. (2019). Text as data. *Journal of Economic Literature*, 57(3), 535-574.
 - Grimmer, J., Roberts, M. E. & Stewart, B. M. (2022). *Text as Data: A New Framework*. Princeton University Press.
-- Kuhn, M. & Silge, J. (2022). *Tidy Modeling with R*. O'Reilly.
 - Lazer, D. et al. (2020). Computational social science: Obstacles and opportunities. *Science*, 369(6507), 1060-1062.
 - Molina, M. & Garip, F. (2019). Machine learning for sociology. *Annual Review of Sociology*, 45, 27-45.
 - Salganik, M. J. (2018). *Bit by Bit: Social Research in the Digital Age*. Princeton University Press.
 - Ziems, C. et al. (2024). Can large language models transform computational social science? *Computational Linguistics*, 50(1), 237-291.
+- Benoit, K. et al. (2016). Crowd-sourced text analysis: Reproducible and agile production of political data. *American Political Science Review*, 110(2), 278-295.
+- Blei, D. M., Ng, A. Y. & Jordan, M. I. (2003). Latent Dirichlet Allocation. *Journal of Machine Learning Research*, 3, 993-1022.
+- Hastie, T., Tibshirani, R. & Friedman, J. (2009). *The Elements of Statistical Learning* (2da edicion). Springer. Disponible en [hastie.su.domains](https://hastie.su.domains/ElemStatLearn/).
+- Knox, D. & Lucas, C. (2021). A dynamic model of speech for the social sciences. *American Political Science Review*, 115(2), 649-666.

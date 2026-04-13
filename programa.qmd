@@ -110,11 +110,34 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 Los estudiantes deben tener instalado antes del inicio del curso:
 
 - [R](https://cran.r-project.org/) (versión 4.3 o superior)
-- [RStudio](https://posit.co/download/rstudio-desktop/) (versión reciente)
-- Paquetes de R: `tidyverse`, `tidymodels`, `ranger`, `glmnet`, `tidytext`, `topicmodels`, `ellmer`
+- [RStudio](https://posit.co/download/rstudio-desktop/) (versión 2022.07 o superior, que ya incluye [Quarto](https://quarto.org/))
+- Paquetes de R: [`tidyverse`](https://www.tidyverse.org/), [`tidymodels`](https://www.tidymodels.org/), [`ranger`](https://cran.r-project.org/package=ranger), [`glmnet`](https://cran.r-project.org/package=glmnet), [`tidytext`](https://juliasilge.github.io/tidytext/), [`topicmodels`](https://cran.r-project.org/package=topicmodels), [`ellmer`](https://ellmer.tidyverse.org/)
 
-Se proporcionarán instrucciones detalladas de instalación antes del curso.
+### Instrucciones de instalación
 
-## Programa completo
+**Paso 1:** Instalar R desde <https://cran.r-project.org/>. Elijan la versión correspondiente a su sistema operativo (Windows, macOS o Linux) y sigan las instrucciones del instalador.
 
-El programa completo del curso está disponible en formato Word: [Introduccion-IA-Danilo-Freire.docx](programa/Introduccion-IA-Danilo-Freire.docx).
+**Paso 2:** Instalar RStudio desde <https://posit.co/download/rstudio-desktop/>. RStudio es el entorno de desarrollo que usaremos en el curso. Las versiones recientes ya incluyen Quarto, que necesitaremos para los laboratorios.
+
+**Paso 3:** Abrir RStudio y ejecutar el siguiente código en la consola para instalar todos los paquetes necesarios:
+
+```r
+install.packages(c(
+  "tidyverse", "tidymodels",
+  "ranger", "glmnet", "kknn", "rpart",
+  "tidytext", "topicmodels", "textrecipes",
+  "ellmer", "httr2"
+))
+```
+
+La instalación puede tomar unos minutos. Si aparecen errores, asegurarse de tener una conexión a internet estable y de estar usando una versión reciente de R (4.3 o superior).
+
+**Paso 4:** Para verificar que todo funciona, ejecutar:
+
+```r
+library(tidyverse)
+library(tidymodels)
+cat("Todo listo para el curso!")
+```
+
+Si ambos paquetes se cargan sin errores, la instalación fue exitosa.
