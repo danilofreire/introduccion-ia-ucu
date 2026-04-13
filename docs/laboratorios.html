@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.26">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>Laboratorios – IA para Científicos Sociales</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -64,18 +67,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./figuras/favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-71972238e98d7c30817b9ff84d7616fa.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -155,7 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text"></span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/danilofreire/introduccion-ai-ucu"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/danilofreire/introduccion-ia-ucu"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -183,7 +184,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#ejercicios-prácticos" id="toc-ejercicios-prácticos" class="nav-link active" data-scroll-target="#ejercicios-prácticos">Ejercicios prácticos</a></li>
   <li><a href="#requisitos-de-software" id="toc-requisitos-de-software" class="nav-link" data-scroll-target="#requisitos-de-software">Requisitos de software</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/danilofreire/introduccion-ai-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ai-ucu/blob/main/laboratorios.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/laboratorios.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -214,39 +215,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><span class="resource-title">Lab 1: Primer flujo de trabajo con tidymodels</span></p>
 <p><span class="resource-meta">Día 1. Configuración del entorno, carga de datos, división train/test, ajuste de un modelo simple y evaluación de métricas básicas.</span></p>
 <div class="resource-links">
-<p>Código (próximamente)</p>
+<p><a href="clases/dia-01/03-laboratorio-01.html">Diapositivas</a> | <a href="clases/dia-01/laboratorio-01.R">Código (.R)</a> | <a href="./clases/dia-01/tarea-01.html">Tarea 1</a> | <a href="./clases/dia-01/tarea-01-respuestas.pdf">Respuestas Tarea 1</a></p>
 </div>
 </div>
 <div class="resource-card">
-<p><span class="resource-title">Lab 2: Clasificación y predicción con datos latinoamericanos</span></p>
-<p><span class="resource-meta">Día 2. Clasificación de actitudes políticas con Latinobarómetro. Comparación de modelos: regresión logística, Random Forest y Elastic Net con <code>parsnip</code>.</span></p>
+<p><span class="resource-title">Lab 2: Exploración avanzada y comparación de modelos</span></p>
+<p><span class="resource-meta">Día 1. Exploración de datos de satisfacción democrática en América Latina. Feature engineering, comparación de regresión logística, árboles de decisión y KNN con <code>tidymodels</code>.</span></p>
+<div class="resource-links">
+<p><a href="clases/dia-01/04-laboratorio-02.html">Diapositivas</a> | <a href="clases/dia-01/laboratorio-02.R">Código (.R)</a> | <a href="./clases/dia-01/tarea-02.html">Tarea 2</a> | <a href="./clases/dia-01/tarea-02-respuestas.pdf">Respuestas Tarea 2</a></p>
+</div>
+</div>
+<div class="resource-card">
+<p><span class="resource-title">Lab 3: Clasificación y predicción con Latinobarómetro</span></p>
+<p><span class="resource-meta">Día 2. Clasificación de actitudes políticas con datos de Latinobarómetro. Comparación de modelos: regresión logística, Random Forest y Elastic Net con <code>parsnip</code>.</span></p>
 <div class="resource-links">
 <p>Código (próximamente)</p>
 </div>
 </div>
 <div class="resource-card">
-<p><span class="resource-title">Lab 3a: Clustering de países (versión express)</span></p>
+<p><span class="resource-title">Lab 4a: Clustering de países (versión express)</span></p>
 <p><span class="resource-meta">Día 3, sesión 1. Segmentación de países latinoamericanos por indicadores socioeconómicos del Banco Mundial usando K-means y PCA.</span></p>
 <div class="resource-links">
 <p>Código (próximamente)</p>
 </div>
 </div>
 <div class="resource-card">
-<p><span class="resource-title">Lab 3b: Análisis de texto en discursos políticos</span></p>
+<p><span class="resource-title">Lab 4b: Análisis de texto en discursos políticos</span></p>
 <p><span class="resource-meta">Día 3, sesión 2. Tokenización, TF-IDF, análisis de sentimiento y extracción de tópicos (LDA) en discursos políticos latinoamericanos con <code>tidytext</code> y <code>topicmodels</code>.</span></p>
 <div class="resource-links">
 <p>Código (próximamente)</p>
 </div>
 </div>
 <div class="resource-card">
-<p><span class="resource-title">Lab 4: Interacción con LLMs desde R</span></p>
+<p><span class="resource-title">Lab 5: Interacción con LLMs desde R</span></p>
 <p><span class="resource-meta">Día 4. Uso de <code>ellmer</code> para interactuar con modelos de lenguaje. Anotación automática de textos, generación de datos sintéticos y auditoría de sesgos.</span></p>
 <div class="resource-links">
 <p>Código (próximamente)</p>
 </div>
 </div>
 <div class="resource-card">
-<p><span class="resource-title">Lab 5: Mini-propuesta de investigación</span></p>
+<p><span class="resource-title">Lab 6: Mini-propuesta de investigación</span></p>
 <p><span class="resource-meta">Día 5. Cada estudiante diseña una propuesta breve que integra una técnica del curso con una pregunta de ciencias sociales relevante para América Latina.</span></p>
 <div class="resource-links">
 <p>Plantilla (próximamente)</p>
@@ -676,7 +684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ai-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ai-ucu/blob/main/laboratorios.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/laboratorios.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Hecho con <a href="https://quarto.org">Quarto</a></p>
 </div>

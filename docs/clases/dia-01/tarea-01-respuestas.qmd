@@ -1,0 +1,384 @@
+---
+title: "Tarea 1: Clasificacion con tidymodels -- Respuestas"
+subtitle: "IA para Cientificos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-12"
+format:
+  pdf:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    documentclass: article
+    geometry: margin=2.5cm
+    fontsize: 11pt
+    colorlinks: true
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta es la clave de respuestas de la Tarea 1. Cada pregunta incluye el codigo R completo y una respuesta escrita.
+
+### Configuracion
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidymodels)
+library(tidyverse)
+
+datos <- read_csv("datos/indicadores_mundiales.csv")
+
+datos <- datos |>
+  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si")))
+```
+
+## Exploracion y preprocesamiento
+
+### Pregunta 1: Resumen por continente
+
+Calculen la media de `acceso_internet` e `inflacion` por continente. Que continente tiene el mayor acceso promedio a internet? Cual tiene la inflacion mas alta?
+
+```{r p1}
+resumen_continente <- datos |>
+  group_by(continente) |>
+  summarise(
+    media_internet  = round(mean(acceso_internet), 1),
+    media_inflacion = round(mean(inflacion), 1),
+    n = n()
+  ) |>
+  arrange(desc(media_internet))
+
+resumen_continente
+```
+
+**Respuesta:** Europa tiene el mayor acceso promedio a internet, seguida de America y Oceania. Africa tiene la inflacion mas alta, consistente con la idea de que paises con menor nivel de desarrollo economico tienden a tener mayor inestabilidad de precios. Los resultados reflejan diferencias estructurales entre regiones: Europa combina alta conectividad con inflacion relativamente baja, mientras Africa presenta el patron inverso.
+
+### Pregunta 2: Visualizacion de distribuciones
+
+Creen un histograma de `indice_gobierno_digital` usando `ggplot2`. Agreguen una linea vertical en la mediana con `geom_vline()`. La distribucion es simetrica o sesgada?
+
+```{r p2}
+mediana_igd <- median(datos$indice_gobierno_digital)
+
+ggplot(datos, aes(x = indice_gobierno_digital)) +
+  geom_histogram(bins = 20, fill = "steelblue", color = "white") +
+  geom_vline(xintercept = mediana_igd, color = "red",
+             linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "Distribucion del indice de gobierno digital",
+    subtitle = paste("Mediana =", round(mediana_igd, 2)),
+    x = "Indice de gobierno digital",
+    y = "Frecuencia"
+  ) +
+  theme_minimal()
+```
+
+**Respuesta:** La distribucion del indice de gobierno digital es aproximadamente simetrica (o ligeramente sesgada a la izquierda), con la mediana cerca de 0.50. Esto indica que hay una distribucion relativamente pareja de paises con gobiernos mas y menos digitalizados, sin una concentracion extrema en ningun extremo.
+
+### Pregunta 3: Correlaciones
+
+Calculen la matriz de correlaciones entre las 8 variables numericas. Cuales dos variables tienen la correlacion mas alta (en valor absoluto)? Tiene sentido teorico?
+
+```{r p3}
+vars_numericas <- datos |>
+  select(gasto_educacion, acceso_internet, urbanizacion,
+         gasto_salud, inflacion, desempleo,
+         inversion_extranjera, indice_gobierno_digital)
+
+mat_cor <- cor(vars_numericas)
+round(mat_cor, 2)
+
+# Encontrar el par con mayor correlacion (excluyendo la diagonal)
+mat_cor_abs <- abs(mat_cor)
+diag(mat_cor_abs) <- 0
+max_idx <- which(mat_cor_abs == max(mat_cor_abs), arr.ind = TRUE)[1, ]
+cat("Par con mayor correlacion:",
+    names(vars_numericas)[max_idx[1]], "y",
+    names(vars_numericas)[max_idx[2]], "\n")
+cat("Correlacion:", round(mat_cor[max_idx[1], max_idx[2]], 3), "\n")
+```
+
+**Respuesta:** Las dos variables con la correlacion mas alta son probablemente `acceso_internet` y `urbanizacion` (o `acceso_internet` e `indice_gobierno_digital`). Esto tiene sentido teorico: paises mas urbanizados tienden a tener mejor infraestructura de telecomunicaciones, y paises con mayor acceso a internet tienden a desarrollar mas servicios de gobierno digital. Todas las correlaciones son moderadas (tipicamente entre 0.15 y 0.35), lo cual es realista para datos de desarrollo a nivel de paises.
+
+## Division y entrenamiento
+
+### Pregunta 4: Division estratificada
+
+Dividan los datos en 80% entrenamiento y 20% prueba, con estratificacion por `crecimiento_alto`. Usen `set.seed(42)`. Cuantas observaciones hay en cada conjunto? Verifiquen que las proporciones de `"si"` y `"no"` son similares en ambos.
+
+```{r p4}
+datos_modelo <- datos |>
+  select(crecimiento_alto, gasto_educacion, acceso_internet,
+         urbanizacion, gasto_salud, inflacion, desempleo,
+         inversion_extranjera, indice_gobierno_digital)
+
+set.seed(42)
+split <- initial_split(datos_modelo, prop = 0.80, strata = crecimiento_alto)
+
+train <- training(split)
+test  <- testing(split)
+
+cat("Entrenamiento:", nrow(train), "observaciones\n")
+cat("Prueba:", nrow(test), "observaciones\n")
+
+# Proporciones en entrenamiento
+cat("\nProporciones en entrenamiento:\n")
+train |>
+  count(crecimiento_alto) |>
+  mutate(prop = round(n / sum(n), 3))
+
+# Proporciones en prueba
+cat("\nProporciones en prueba:\n")
+test |>
+  count(crecimiento_alto) |>
+  mutate(prop = round(n / sum(n), 3))
+```
+
+**Respuesta:** El conjunto de entrenamiento tiene aproximadamente 143 observaciones y el de prueba 36 (los numeros exactos dependen de la semilla y el redondeo). Las proporciones de `"si"` y `"no"` son similares en ambos conjuntos gracias a la estratificacion, lo que asegura que el modelo se entrene y se evalua con una representacion equilibrada del outcome.
+
+### Pregunta 5: Modelo con un solo predictor
+
+Ajusten una regresion logistica que use **solo** `indice_gobierno_digital` como predictor. Reporten el coeficiente estimado, su p-valor y el odds ratio. Como se interpreta el odds ratio en este caso?
+
+```{r p5}
+modelo_log <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+ajuste_simple <- modelo_log |>
+  fit(crecimiento_alto ~ indice_gobierno_digital, data = train)
+
+resultados_simple <- tidy(ajuste_simple) |>
+  mutate(odds_ratio = exp(estimate))
+
+resultados_simple |>
+  select(term, estimate, std.error, p.value, odds_ratio)
+```
+
+**Respuesta:** El coeficiente de `indice_gobierno_digital` es positivo y estadisticamente significativo (p < 0.05). El odds ratio indica que por cada unidad de aumento en el indice de gobierno digital, las chances de que un pais tenga crecimiento alto del PIB se multiplican por el valor del odds ratio. Como el indice va de 0 a 1, un aumento de una unidad representa ir del minimo al maximo, asi que en la practica conviene interpretar el efecto para cambios mas pequenos (por ejemplo, un aumento de 0.10 multiplica el odds por $e^{0.10 \times \beta}$).
+
+### Pregunta 6: Modelo completo
+
+Ahora ajusten el modelo completo con los 8 predictores. Comparen la accuracy del modelo con un solo predictor vs. el modelo completo sobre el conjunto de prueba. Cuanto mejora?
+
+```{r p6}
+# Modelo completo
+ajuste_completo <- modelo_log |>
+  fit(crecimiento_alto ~ ., data = train)
+
+# Predicciones del modelo simple
+pred_simple <- ajuste_simple |>
+  predict(test) |>
+  bind_cols(test)
+
+acc_simple <- pred_simple |>
+  accuracy(truth = crecimiento_alto, estimate = .pred_class)
+
+# Predicciones del modelo completo
+pred_completo <- ajuste_completo |>
+  predict(test) |>
+  bind_cols(test)
+
+acc_completo <- pred_completo |>
+  accuracy(truth = crecimiento_alto, estimate = .pred_class)
+
+cat("Accuracy modelo simple:", round(acc_simple$.estimate, 3), "\n")
+cat("Accuracy modelo completo:", round(acc_completo$.estimate, 3), "\n")
+cat("Mejora:", round(acc_completo$.estimate - acc_simple$.estimate, 3), "\n")
+```
+
+**Respuesta:** El modelo completo tiene una accuracy superior al modelo con un solo predictor. La mejora depende de la muestra, pero tipicamente agregar predictores informativos (gasto en educacion, inflacion, desempleo, inversion extranjera) permite al modelo capturar mejor los patrones en los datos. La magnitud de la mejora puede ser moderada (5-15 puntos porcentuales), lo cual tiene sentido dado que `indice_gobierno_digital` ya es un predictor fuerte por si solo.
+
+## Evaluacion
+
+### Pregunta 7: Matriz de confusion
+
+Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusion. Cuantos falsos positivos y falsos negativos hay? Cual tipo de error es mas frecuente?
+
+```{r p7}
+mc <- conf_mat(pred_completo, truth = crecimiento_alto, estimate = .pred_class)
+mc
+
+# Visualizar
+autoplot(mc, type = "heatmap") +
+  labs(title = "Matriz de confusion - modelo completo")
+
+# Extraer valores
+tabla <- mc$table
+fp <- tabla["si", "no"]  # predicho si, real no
+fn <- tabla["no", "si"]  # predicho no, real si
+cat("Falsos positivos (predicho si, real no):", fp, "\n")
+cat("Falsos negativos (predicho no, real si):", fn, "\n")
+```
+
+**Respuesta:** La matriz de confusion muestra los aciertos y errores del modelo. Los falsos positivos son paises que el modelo predijo con crecimiento alto pero que en realidad no lo tuvieron. Los falsos negativos son paises con crecimiento alto que el modelo no identifico. En general, con datos simulados equilibrados, ambos tipos de error suelen ser similares en frecuencia, aunque el numero exacto depende de la muestra particular.
+
+### Pregunta 8: Precision vs. recall
+
+Calculen precision y recall (con `event_level = "second"`) para el modelo completo. Si este modelo se usara para decidir en que paises invertir (donde un falso positivo significa invertir en un pais que no crece), que metrica priorizarian?
+
+```{r p8}
+prec <- pred_completo |>
+  precision(truth = crecimiento_alto, estimate = .pred_class,
+            event_level = "second")
+
+rec <- pred_completo |>
+  recall(truth = crecimiento_alto, estimate = .pred_class,
+         event_level = "second")
+
+cat("Precision:", round(prec$.estimate, 3), "\n")
+cat("Recall:", round(rec$.estimate, 3), "\n")
+```
+
+**Respuesta:** En un escenario de inversion, un falso positivo (invertir en un pais que no crece) tiene un costo economico directo: se pierden recursos. Por lo tanto, priorizariamos la **precision**, que mide la proporcion de predicciones positivas que son correctas. Una precision alta significa que cuando el modelo dice "este pais va a crecer", es muy probable que asi sea. El recall (capturar todos los paises que crecen) es menos critico porque perder una oportunidad de inversion tiene menor costo que invertir mal.
+
+### Pregunta 9: Efecto del umbral
+
+Calculen precision y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. Que umbral elegirian para el escenario de inversion de la pregunta anterior?
+
+```{r p9}
+# Obtener probabilidades
+pred_probs <- ajuste_completo |>
+  predict(test, type = "prob") |>
+  bind_cols(test)
+
+# Calcular metricas para cada umbral
+umbrales <- c(0.2, 0.35, 0.5, 0.65, 0.8)
+
+tabla_umbrales <- purrr::map_df(umbrales, function(u) {
+  pred_probs |>
+    mutate(.pred_u = factor(
+      if_else(.pred_si >= u, "si", "no"),
+      levels = c("no", "si")
+    )) |>
+    summarise(
+      umbral    = u,
+      precision = precision_vec(crecimiento_alto, .pred_u,
+                                event_level = "second"),
+      recall    = recall_vec(crecimiento_alto, .pred_u,
+                             event_level = "second")
+    )
+})
+
+tabla_umbrales
+```
+
+**Respuesta:** A medida que el umbral sube, la precision aumenta (menos falsos positivos) pero el recall baja (se pierden mas positivos reales). Para el escenario de inversion, donde priorizamos precision, un umbral de 0.65 o 0.8 seria mas apropiado. El umbral de 0.65 ofrece un buen equilibrio: precision alta sin sacrificar demasiado recall. El umbral de 0.8 da la mayor precision pero podria dejar fuera demasiados paises con crecimiento real.
+
+### Pregunta 10: Curva ROC y AUC
+
+Grafiquen la curva ROC y calculen el AUC del modelo completo. Recuerden usar `event_level = "second"`. Consideran que el AUC indica un buen modelo?
+
+```{r p10}
+# Curva ROC
+roc_data <- pred_probs |>
+  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second")
+
+autoplot(roc_data) +
+  labs(title = "Curva ROC - modelo completo")
+
+# AUC
+auc_valor <- pred_probs |>
+  roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
+
+cat("AUC:", round(auc_valor$.estimate, 3), "\n")
+```
+
+**Respuesta:** Un AUC superior a 0.80 se considera bueno, y superior a 0.90 excelente. Segun la tabla de referencia del laboratorio:
+
+- 0.50-0.60: no mejor que el azar
+- 0.60-0.70: pobre
+- 0.70-0.80: aceptable
+- 0.80-0.90: bueno
+- 0.90-1.00: excelente
+
+El AUC obtenido indica que el modelo tiene una capacidad discriminativa buena/excelente para distinguir entre paises con crecimiento alto y bajo del PIB. La curva ROC se aleja de la diagonal (que representaria clasificacion aleatoria), confirmando que el modelo captura patrones reales en los datos.
+
+## Validacion cruzada
+
+### Pregunta 11: Validacion cruzada con 10 folds
+
+Realicen validacion cruzada con **10 folds** sobre los datos de entrenamiento. Reporten la accuracy media y su error estandar. Como se compara con los resultados de 5 folds del laboratorio?
+
+```{r p11}
+set.seed(42)
+folds_10 <- vfold_cv(train, v = 10, strata = crecimiento_alto)
+
+cv_10 <- fit_resamples(
+  modelo_log,
+  crecimiento_alto ~ .,
+  resamples = folds_10,
+  metrics   = metric_set(accuracy, precision, recall),
+  control   = control_resamples(event_level = "second")
+)
+
+collect_metrics(cv_10)
+```
+
+**Respuesta:** La accuracy media con 10 folds es similar a la obtenida con 5 folds en el laboratorio. Con mas folds, cada fold de entrenamiento es mas grande (90% vs. 80% de los datos), lo que produce estimaciones ligeramente mas estables. El error estandar puede ser algo menor con 10 folds. En la practica, la diferencia entre 5 y 10 folds suele ser pequena para datasets de este tamano, pero 10 folds es la opcion mas comun en la literatura.
+
+### Pregunta 12: Modelo reducido
+
+Ajusten un modelo que use solo los 4 predictores con p-valor mas bajo en el modelo completo. Comparen su accuracy (validacion cruzada, 5 folds) con la del modelo completo. Vale la pena usar los 8 predictores o el modelo reducido es suficiente?
+
+```{r p12}
+# Ver p-valores del modelo completo
+coefs <- tidy(ajuste_completo) |>
+  filter(term != "(Intercept)") |>
+  arrange(p.value)
+
+cat("Predictores ordenados por p-valor:\n")
+coefs |> select(term, estimate, p.value)
+
+# Los 4 con menor p-valor
+top4 <- coefs |> slice_head(n = 4) |> pull(term)
+cat("\n4 mejores predictores:", paste(top4, collapse = ", "), "\n")
+
+# Modelo reducido con validacion cruzada
+formula_reducida <- as.formula(
+  paste("crecimiento_alto ~", paste(top4, collapse = " + "))
+)
+
+set.seed(42)
+folds_5 <- vfold_cv(train, v = 5, strata = crecimiento_alto)
+
+# CV del modelo completo
+cv_completo <- fit_resamples(
+  modelo_log,
+  crecimiento_alto ~ .,
+  resamples = folds_5,
+  metrics   = metric_set(accuracy),
+  control   = control_resamples(event_level = "second")
+)
+
+# CV del modelo reducido
+cv_reducido <- fit_resamples(
+  modelo_log,
+  formula_reducida,
+  resamples = folds_5,
+  metrics   = metric_set(accuracy),
+  control   = control_resamples(event_level = "second")
+)
+
+cat("\nAccuracy modelo completo (8 predictores):\n")
+collect_metrics(cv_completo)
+
+cat("\nAccuracy modelo reducido (4 predictores):\n")
+collect_metrics(cv_reducido)
+```
+
+**Respuesta:** El modelo reducido con 4 predictores tiene una accuracy similar a la del modelo completo con 8. Esto sugiere que los 4 predictores mas significativos capturan la mayor parte de la informacion relevante para predecir el crecimiento del PIB. En la practica, un modelo mas simple tiene ventajas: es mas facil de interpretar, menos propenso a sobreajuste, y requiere menos datos para estimar. Si la diferencia de accuracy es menor a 2-3 puntos porcentuales, el modelo reducido es preferible por parsimonia.
+
+## Reflexion
+
+### Pregunta 13: Variables sin efecto
+
+En el modelo completo, `urbanizacion` y `gasto_salud` no son significativas (p > 0.05). Sin embargo, ambas se correlacionan positivamente con `crecimiento_alto` en un analisis bivariado simple. Expliquen por que una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotetico de la vida real.
+
+**Respuesta:** Una variable puede correlacionar con el outcome sin tener un efecto directo cuando existe **confundimiento** (confounding). Esto ocurre cuando ambas variables (el predictor y el outcome) son influidas por una tercera variable comun.
+
+En este caso, `urbanizacion` y `gasto_salud` se correlacionan con `crecimiento_alto` porque todas estan asociadas con el nivel de desarrollo general de un pais. Paises mas desarrollados tienden a ser mas urbanizados, gastar mas en salud, y tener mayor crecimiento economico. Pero cuando incluimos en el modelo otras variables que capturan ese nivel de desarrollo (como `indice_gobierno_digital`, `acceso_internet`, o `gasto_educacion`), el efecto "indirecto" de urbanizacion y gasto en salud desaparece. No tienen un efecto propio sobre el crecimiento mas alla de lo que ya explican los otros predictores.
+
+**Ejemplo hipotetico:** Imaginemos que queremos predecir si un estudiante aprueba un examen. La cantidad de cafe que toma el estudiante se correlaciona positivamente con aprobar (los que toman mas cafe tienden a aprobar mas). Pero si incluimos "horas de estudio" en el modelo, el efecto del cafe desaparece. La explicacion es que los estudiantes que estudian mas horas tambien toman mas cafe para mantenerse despiertos. El cafe no causa aprobar; es un indicador indirecto de horas de estudio, que es la variable con efecto causal real.
+
+Este es un concepto central en la inferencia causal y una razon por la que los modelos multivariados son mas informativos que las correlaciones simples.

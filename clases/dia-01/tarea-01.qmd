@@ -1,0 +1,193 @@
+---
+title: "Tarea 1: Clasificación con tidymodels"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-12"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    self-contained: true
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta tarea usa el mismo dataset del Laboratorio 1 (`indicadores_mundiales.csv`). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
+
+**Para trabajar en esta tarea:**
+
+1. Descarguen este archivo `.qmd` y el dataset `indicadores_mundiales.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <https://quarto.org/docs/get-started/>
+3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)
+4. Cuando terminen, pueden renderizar el documento completo con el botón "Render" en RStudio
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidymodels)
+library(tidyverse)
+
+datos <- read_csv("datos/indicadores_mundiales.csv")
+
+datos <- datos |>
+  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si")))
+```
+
+## Exploración y preprocesamiento
+
+### Pregunta 1: Resumen por continente
+
+Calculen la media de `acceso_internet` y `inflacion` por continente. ¿Qué continente tiene el mayor acceso promedio a internet? ¿Cuál tiene la inflación más alta?
+
+```{r p1}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 2: Visualización de distribuciones
+
+Creen un histograma de `indice_gobierno_digital` usando `ggplot2`. Agreguen una línea vertical en la mediana con `geom_vline()`. ¿La distribución es simétrica o sesgada?
+
+```{r p2}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 3: Correlaciones
+
+Calculen la matriz de correlaciones entre las 8 variables numéricas. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)? ¿Tiene sentido teórico?
+
+```{r p3}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## División y entrenamiento
+
+### Pregunta 4: División estratificada
+
+Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `crecimiento_alto`. Usen `set.seed(42)`. ¿Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de `"si"` y `"no"` son similares en ambos.
+
+```{r p4}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 5: Modelo con un solo predictor
+
+Ajusten una regresión logística que use **solo** `indice_gobierno_digital` como predictor. Reporten el coeficiente estimado, su p-valor y el odds ratio. ¿Cómo se interpreta el odds ratio en este caso?
+
+*Pista:* usen `fit(crecimiento_alto ~ indice_gobierno_digital, data = ...)`.
+
+```{r p5}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 6: Modelo completo
+
+Ahora ajusten el modelo completo con los 8 predictores (como en el laboratorio). Comparen la accuracy del modelo con un solo predictor vs. el modelo completo sobre el conjunto de prueba. ¿Cuánto mejora?
+
+```{r p6}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Evaluación
+
+### Pregunta 7: Matriz de confusión
+
+Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. ¿Cuántos falsos positivos y falsos negativos hay? ¿Cuál tipo de error es más frecuente?
+
+```{r p7}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 8: Precisión vs. recall
+
+Calculen precisión y recall (con `event_level = "second"`) para el modelo completo. Si este modelo se usara para decidir en qué países invertir (donde un falso positivo significa invertir en un país que no crece), ¿qué métrica priorizarían? Justifiquen.
+
+```{r p8}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 9: Efecto del umbral
+
+Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de inversión de la pregunta anterior?
+
+*Pista:* adapten el código del Ejercicio 5 del laboratorio.
+
+```{r p9}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 10: Curva ROC y AUC
+
+Grafiquen la curva ROC y calculen el AUC del modelo completo. Recuerden usar `event_level = "second"`. ¿Consideran que el AUC indica un buen modelo? Justifiquen usando la tabla de referencia del laboratorio.
+
+```{r p10}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Validación cruzada
+
+### Pregunta 11: Validación cruzada con 10 folds
+
+Realicen validación cruzada con **10 folds** (en vez de 5) sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. ¿Cómo se compara con los resultados de 5 folds del laboratorio?
+
+```{r p11}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 12: Modelo reducido
+
+Ajusten un modelo que use solo los 4 predictores con p-valor más bajo en el modelo completo. Comparen su accuracy (validación cruzada, 5 folds) con la del modelo completo. ¿Vale la pena usar los 8 predictores o el modelo reducido es suficiente?
+
+*Pista:* miren los p-valores de `tidy(ajuste)` para elegir las variables.
+
+```{r p12}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Reflexión
+
+### Pregunta 13: Variables sin efecto
+
+En el modelo completo, `urbanizacion` y `gasto_salud` no son significativas (p > 0.05). Sin embargo, ambas se correlacionan positivamente con `crecimiento_alto` en un análisis bivariado simple. Expliquen por qué una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotético de la vida real.
+
+**Respuesta:**
+

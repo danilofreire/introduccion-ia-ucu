@@ -17,7 +17,9 @@ Las diapositivas de cada día se publicarán aquí a medida que avance el curso.
 
 ::: {.resource-links}
 [Sesión 1.1: ¿Qué es la IA?](clases/dia-01/01-que-es-ia.html) |
-[Sesión 1.2: Fundamentos de ML](clases/dia-01/02-fundamentos-ml.html)
+[Sesión 1.2: Fundamentos de ML](clases/dia-01/02-fundamentos-ml.html) |
+[Lab 1: tidymodels](clases/dia-01/03-laboratorio-01.html) |
+[Lab 2: Exploración y modelos](clases/dia-01/04-laboratorio-02.html)
 :::
 :::
 
