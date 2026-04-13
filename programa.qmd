@@ -124,7 +124,7 @@ Los estudiantes deben tener instalado antes del inicio del curso:
 ```r
 install.packages(c(
   "tidyverse", "tidymodels",
-  "ranger", "glmnet", "kknn", "rpart",
+  "ranger", "glmnet", "kknn", "rpart", "vip", "pdp",
   "tidytext", "topicmodels", "textrecipes",
   "ellmer", "httr2"
 ))
