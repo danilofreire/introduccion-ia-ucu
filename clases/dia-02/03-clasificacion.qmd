@@ -53,15 +53,15 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Repaso del Día 1
 
-:::{style="margin-top: 20px; font-size: 28px;"}
+:::{style="margin-top: 20px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=50%}
 - La [IA]{.alert} busca crear sistemas capaces de realizar tareas que requieren inteligencia humana
 - Tres tipos de aprendizaje: [supervisado]{.alert}, [no supervisado]{.alert} y [por refuerzo]{.alert}
 - El flujo de trabajo de ML: recoger, preprocesar, dividir, entrenar, evaluar
-- [Sobreajuste]{.alert}: memorizar en lugar de aprender
+- [Sobreajuste]{.alert} (_overfitting_): memorizar en lugar de aprender
 - La [accuracy no es suficiente]{.alert}: necesitamos precisión, recall y otras métricas
-- Ayer hicimos nuestro primer modelo con [tidymodels]{.alert}
+- Ayer hicimos nuestros primeros modelos con [tidymodels](https://www.tidymodels.org/), una interfaz unificada para ML en R
 :::
 
 :::{.column width=50%}
@@ -89,12 +89,12 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 - Ajuste de hiperparámetros (tuning)
 - Comparación sistemática de modelos
-- Aplicaciones en América Latina
+- Aplicaciones
 :::
 
 :::{.column width=50%}
 :::{style="text-align: center;"}
-[![](figures/supervised-learning.png){width="90%"}](#){data-modal-type="image" data-modal-url="figures/supervised-learning.png"}
+[![](figures/rfc_vs_dt1.webp){width="90%"}](#){data-modal-type="image" data-modal-url="figures/rfc_vs_dt1.webp"}
 :::
 :::
 :::
@@ -131,7 +131,7 @@ Fuente: [Wikipedia](https://en.wikipedia.org/wiki/Logistic_function)
 
 ## ¿Cuándo usar regresión logística?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 **Ventajas**
@@ -150,7 +150,7 @@ Fuente: [Wikipedia](https://en.wikipedia.org/wiki/Logistic_function)
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 26px;"}
 **Ejemplo en ciencias sociales**
 
 ```
@@ -177,7 +177,7 @@ de votar, y en qué magnitud.
 
 ## Regresión logística en la práctica
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - En ciencias sociales, la regresión logística se usa mucho para:
@@ -191,7 +191,7 @@ de votar, y en qué magnitud.
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Regresión logística en R (tidymodels)**
 
 ```r
@@ -241,7 +241,7 @@ tidy(ajuste)
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 25px;"}
 **Resultados típicos:**
 
 ```
@@ -258,7 +258,9 @@ zona_urbano           0.12    1.13
 *** p < 0.001, ** p < 0.01, * p < 0.05
 ```
 
-[Interpretación:]{.alert} Por cada año adicional de educación, la probabilidad de apoyar la democracia aumenta un 8%.
+:::{style="font-size: 22px;"}
+[Pregunta]{.alert}: ¿Qué significa un OR de 1.28 para confianza en el gobierno?
+:::
 :::
 :::
 :::
@@ -285,7 +287,7 @@ zona_urbano           0.12    1.13
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 22px;"}
 **Cálculo en R:**
 
 ```r
@@ -314,7 +316,7 @@ coefs |>
 
 ## ¿Qué es un árbol de decisión?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=55%}
 - Un [árbol de decisión]{.alert} aprende una jerarquía de preguntas de sí/no
@@ -355,7 +357,7 @@ Fuente: [Medium](https://medium.com/towards-data-engineering/100-days-of-machine
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 28px;"}
 **Ejemplo paso a paso**
 
 ```
@@ -379,9 +381,48 @@ separación posible.
 :::
 :::
 
+## La matemática detrás de los árboles
+
+:::{style="margin-top: 20px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- El árbol busca la división que minimice la [impureza]{.alert} de los nodos resultantes
+- La medida más común es el [índice de Gini]{.alert}:
+
+$$\text{Gini}(t) = 1 - \sum_{k=1}^{K} p_k^2$$
+
+donde $p_k$ es la proporción de la clase $k$ en el nodo $t$
+
+- Nodo puro (una sola clase): $\text{Gini} = 0$
+- Nodo 50/50 (máxima mezcla): $\text{Gini} = 0.5$
+- El algoritmo evalúa cada variable y cada punto de corte posible, y elige la división con menor Gini ponderado:
+
+$$\text{Gini}_{\text{split}} = \frac{n_L}{n} \text{Gini}(t_L) + \frac{n_R}{n} \text{Gini}(t_R)$$
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 22px;"}
+**Ejemplo con datos de votación**
+
+| Nodo | Votó | No votó | Gini |
+|------|:----:|:-------:|:----:|
+| Raíz | 265 | 235 | 0.497 |
+| Edad > 35 | 200 | 100 | 0.444 |
+| Edad ≤ 35 | 65 | 135 | 0.442 |
+
+$\text{Gini}_{\text{split}} = \frac{300}{500}(0.444) + \frac{200}{500}(0.442)$
+
+$= 0.267 + 0.177 = 0.443$
+
+Como $0.443 < 0.497$, [esta división mejora la separación]{.alert} de las clases
+:::
+:::
+:::
+:::
+
 ## Ventajas y problemas de los árboles
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
 **Ventajas**
@@ -405,7 +446,7 @@ separación posible.
 :::
 
 :::{style="text-align: center; margin-top: 20px;"}
-[![](figures/overfit-underfit.png){width="50%"}](#){data-modal-type="image" data-modal-url="figures/overfit-underfit.png"}
+[![](figures/overfit-underfit.png){width="40%"}](#){data-modal-type="image" data-modal-url="figures/overfit-underfit.png"}
 :::
 :::
 
@@ -448,26 +489,26 @@ pred_arbol <- predict(ajuste_arbol, datos_test) |>
 - Con el paquete `rpart.plot`:
 
 ```r
+# install.packages("rpart.plot")
 library(rpart.plot)
 
 # Extraer el modelo rpart del ajuste
 arbol_rpart <- extract_fit_engine(ajuste_arbol)
 
 # Visualizar
+# type=4: muestra reglas en todos los nodos
+# extra=104: clase predicha + % de observaciones
+# roundint=FALSE: evita warning con predictores 
+# no enteros
 rpart.plot(arbol_rpart,
            type = 4,
            extra = 104,
            roundint = FALSE)
 ```
-
-- El gráfico muestra:
-    - Las [reglas de decisión]{.alert} en cada nodo
-    - La [proporción de clases]{.alert} en cada hoja
-    - El [camino]{.alert} que sigue cada observación
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 26px;"}
 **Ejemplo de visualización:**
 
 ```
@@ -506,7 +547,7 @@ Es ideal para [comunicar resultados]{.alert} a tomadores de decisiones.
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 25px;"}
 **El trade-off:**
 
 ```
@@ -546,7 +587,7 @@ A partir de cierta profundidad, el error en test [empeora]{.alert} mientras el e
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 26px;"}
 ```
 Random Forest con 500 árboles:
 
@@ -581,7 +622,7 @@ Predicción final: VOTÓ
 :::{.column width=55%}
 - [Reduce la varianza]{.alert} sin aumentar mucho el sesgo
 - Cada árbol individual sobreajusta, pero al promediar, el sobreajuste se diluye
-- Analogía: si les piden a 500 personas que estimen el peso de un buey, [el promedio será sorprendentemente cercano al valor real]{.alert}. Francis Galton documentó este fenómeno en 1907; Surowiecki lo popularizó como "la sabiduría de la multitud"
+- Analogía: si les piden a 500 personas que estimen el peso de un buey, [el promedio será sorprendentemente cercano al valor real]{.alert}
 - Funciona bien [sin mucha afinación]{.alert} de hiperparámetros
 - Resistente frente a outliers y ruido
 - Es uno de los [modelos más usados en la práctica]{.alert} por su combinación de rendimiento y simplicidad
@@ -596,9 +637,11 @@ Predicción final: VOTÓ
 | `mtry` | Variables a considerar en cada división |
 | `min_n` | Mínimo de observaciones por nodo |
 
-:::{style="font-size: 20px;"}
+:::{style="font-size: 18px;"}
 - Más árboles casi siempre mejoran, pero con rendimientos decrecientes
-- `mtry` = $\sqrt{p}$ para clasificación (donde $p$ es el número de variables)
+- `mtry` = $\sqrt{p}$ para clasificación (donde $p$ = número de variables)
+    - Restringir variables por split [fuerza a los árboles a ser diferentes]{.alert}. Si todos ven todas las variables, eligen las mismas divisiones
+    - ¿Por qué $\sqrt{p}$? [Compromiso empírico]{.alert} (Breiman, 2001): pocas variables → árboles débiles; muchas → árboles demasiado similares. Para regresión se usa $p/3$
 - En la práctica, [los valores por defecto suelen funcionar bien]{.alert}
 :::
 :::
@@ -655,26 +698,27 @@ metrics(pred_rf, truth = voto, estimate = .pred_class)
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 20px;"}
 ```r
-# Con ranger directamente
-library(ranger)
+# Con tidymodels + vip
+library(tidymodels)
+library(vip) # Variable Importance Plots
 
-rf_fit <- ranger(
-  voto ~ .,
-  data = datos_train,
-  importance = "permutation"
-)
+rf_spec <- rand_forest(trees = 500) |>
+  set_engine("ranger",
+             importance = "permutation") |>
+  set_mode("classification")
+
+rf_fit <- rf_spec |>
+  fit(voto ~ ., data = datos_train)
 
 # Ver importancia
-importance(rf_fit) |>
-  sort(decreasing = TRUE)
+rf_fit |>
+  vip(num_features = 10)
 
-# Resultado típico:
-# edad                 0.042
-# educacion_anios      0.038
-# interes_politica     0.031
-# ingreso_hogar        0.025
-# confianza_gobierno   0.019
-# ...
+# edad                 ████████████ 0.042
+# educacion_anios      ██████████   0.038
+# interes_politica     ████████     0.031
+# ingreso_hogar        ██████       0.025
+# confianza_gobierno   █████        0.019
 ```
 :::
 :::
@@ -707,53 +751,11 @@ importance(rf_fit) |>
 - Basado en teoría de juegos cooperativos
 - Mide la [contribución de cada variable para cada predicción individual]{.alert}
 - Permite ver no solo qué variables importan, sino [cómo afectan cada caso]{.alert}
-- Disponible en R con el paquete `shapr` o `DALEX`
+- Disponible en R con los paquetes `shapr` o `fastshap`
 
 <br>
 
 [Para este curso usaremos importancia por permutación, que es la más robusta.]{.alert}
-:::
-:::
-:::
-:::
-
-## Visualizar la importancia de variables
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```r
-library(vip)  # Variable Importance Plots
-
-# Graficar importancia
-vip(ajuste_rf, num_features = 10) +
-  labs(title = "Importancia de variables (Random Forest)")
-```
-
-:::{.columns}
-:::{.column width=50%}
-:::{style="font-size: 20px;"}
-**Interpretación del gráfico:**
-
-- Las barras muestran la [importancia relativa]{.alert}
-- Variables arriba = más importantes
-- Pero [no indica la dirección]{.alert} del efecto
-- Para eso necesitamos gráficos de dependencia parcial (PDP)
-:::
-:::
-
-:::{.column width=50%}
-:::{style="font-size: 20px;"}
-**Ejemplo de resultado:**
-
-```
-edad              ████████████████ 0.042
-educacion_anos    ██████████████   0.038
-interes_politica  ███████████      0.031
-ingreso_hogar     █████████        0.025
-confianza_gob     ███████          0.019
-zona              ████             0.012
-genero            ██               0.006
-```
 :::
 :::
 :::
@@ -770,24 +772,16 @@ genero            ██               0.006
 - Útiles para entender relaciones no lineales
 
 ```r
-library(DALEX)
+library(pdp)
 
-# Crear explicador
-explainer <- explain(
-  ajuste_rf,
-  data = datos_train,
-  y = datos_train$voto
-)
-
-# PDP para edad
-pdp_edad <- model_profile(explainer,
-                          variables = "edad")
-plot(pdp_edad)
+ajuste_rf |>
+  partial(pred.var = "edad") |>
+  autoplot()
 ```
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 26px;"}
 **Ejemplo de PDP:**
 
 ```
@@ -816,7 +810,7 @@ Esto es algo que la regresión logística no captura automáticamente.
 
 ## ¿Por qué ajustar hiperparámetros?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=55%}
 - Los [hiperparámetros]{.alert} son decisiones que tomamos antes de entrenar
@@ -829,7 +823,7 @@ Esto es algo que la regresión logística no captura automáticamente.
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 26px;"}
 **El proceso:**
 
 ```
@@ -956,7 +950,7 @@ ajuste_3 <- fit(modelo_3, voto ~ ., data = datos_train)
 
 ## ¿Qué modelo elegir?
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 
 :::{style="text-align: center;"}
 
@@ -981,7 +975,7 @@ ajuste_3 <- fit(modelo_3, voto ~ ., data = datos_train)
 
 ## Más allá de Random Forest: Gradient Boosting
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
 - Random Forest es un [ensemble]{.alert} (muchos modelos juntos)
@@ -997,7 +991,7 @@ ajuste_3 <- fit(modelo_3, voto ~ ., data = datos_train)
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Random Forest vs. Gradient Boosting:**
 
 | | RF | Boosting |
@@ -1023,9 +1017,9 @@ modelo_xgb <- boost_tree() |>
 :::
 :::
 
-## Aplicaciones en América Latina
+## Aplicaciones en ciencias sociales
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
 **[Muchlinski et al. (2016)](https://doi.org/10.1093/pan/mpv024): Predicción de guerras civiles**
@@ -1039,69 +1033,26 @@ modelo_xgb <- boost_tree() |>
 
 - Predijeron pobreza en África usando imágenes satelitales
 - Random Forest + redes neuronales
-- Aplicable a América Latina donde los censos son menos frecuentes
+- Aplicable a contextos donde los censos son poco frecuentes o poco confiables
 :::
 
 :::{.column width=50%}
-**Aplicaciones regionales:**
+**Otros ejemplos en ciencias sociales:**
 
-- [Predicción de deserción escolar]{.alert} (Chile, Colombia): identificar estudiantes en riesgo antes de que abandonen
-- [Scoring crediticio alternativo]{.alert} (México, Brasil): Nubank y otras fintech usan ML para evaluar clientes sin historial bancario
+- [Predicción de deserción escolar]{.alert}: identificar estudiantes en riesgo antes de que abandonen
+- [Scoring crediticio alternativo]{.alert}: fintech como Nubank usan ML para evaluar clientes sin historial bancario
 - [Detección de fraude electoral]{.alert}: análisis de patrones anómalos en resultados
-- [Predicción de violencia]{.alert}: modelos para anticipar zonas de riesgo (Colombia, México)
-- [Análisis de opinión pública]{.alert}: clasificación de tweets y comentarios sobre políticas
+- [Predicción de violencia]{.alert}: modelos para anticipar zonas de riesgo
+- [Análisis de opinión pública]{.alert}: clasificación de textos sobre políticas públicas
 
 [En todos estos casos, RF es un punto de partida común.]{.alert}
 :::
 :::
 :::
 
-## Ejemplo: Deserción escolar en Chile
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-**El problema:**
-
-- El Ministerio de Educación de Chile quiere identificar estudiantes en riesgo de abandonar la escuela
-- Datos disponibles: asistencia, notas, información socioeconómica, historia escolar
-- Objetivo: intervenir [antes]{.alert} de que abandonen
-
-**Enfoque con Random Forest:**
-
-1. Entrenar modelo con datos históricos (estudiantes que abandonaron vs. los que no)
-2. Predecir probabilidad de abandono para estudiantes actuales
-3. Priorizar intervenciones en los de mayor riesgo
-4. Usar importancia de variables para entender factores de riesgo
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**Variables importantes (ejemplo):**
-
-```
-Variable              Importancia
-─────────────────────────────────
-dias_ausencia_mes     ████████ 0.15
-promedio_notas        ██████   0.11
-repitencia_previa     █████    0.09
-ingreso_hogar         ████     0.07
-distancia_escuela     ███      0.05
-educacion_madre       ██       0.04
-...
-```
-
-[La ausencia escolar es el mejor predictor]{.alert}: los estudiantes empiezan a faltar antes de abandonar definitivamente.
-
-Esto sugiere intervenciones tempranas cuando aumenta el ausentismo.
-:::
-:::
-:::
-:::
-
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=50%}
 **Modelos de clasificación:**
@@ -1141,7 +1092,7 @@ Esto sugiere intervenciones tempranas cuando aumenta el ausentismo.
     - Regresión con datos socioeconómicos
     - Tuning, comparación e interpretación
 
-[Nos vemos después del descanso.]{.alert}
+[Nos vemos después del descanso!]{.alert}
 :::
 
 # Nos vemos en la próxima sesión {background-color="#2d4563"}
