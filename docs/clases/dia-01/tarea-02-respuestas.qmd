@@ -1,6 +1,6 @@
 ---
-title: "Tarea 2: Comparacion de modelos -- Respuestas"
-subtitle: "IA para Cientificos Sociales - UCU"
+title: "Tarea 2: Comparación de modelos -- Respuestas"
+subtitle: "IA para Científicos Sociales - UCU"
 author: "Danilo Freire"
 date: "2026-04-12"
 format:
@@ -16,9 +16,9 @@ engine: knitr
 
 ## Instrucciones
 
-Esta es la clave de respuestas de la Tarea 2. Cada pregunta incluye el codigo R completo y una respuesta escrita.
+Esta es la clave de respuestas de la Tarea 2. Cada pregunta incluye el código R completo y una respuesta escrita.
 
-### Configuracion
+### Configuración
 
 ```{r setup, message=FALSE, warning=FALSE}
 library(tidymodels)
@@ -35,11 +35,11 @@ satisfaccion <- satisfaccion |>
   )
 ```
 
-## Exploracion
+## Exploración
 
 ### Pregunta 1: Resumen del dataset
 
-Calculen la proporcion de satisfechos (`"si"`) por pais. Cual pais tiene la proporcion mas alta? Cual tiene la mas baja?
+Calculen la proporción de satisfechos (`"si"`) por país. Cuál país tiene la proporción más alta? Cuál tiene la más baja?
 
 ```{r p1}
 prop_pais <- satisfaccion |>
@@ -52,11 +52,11 @@ prop_pais <- satisfaccion |>
 prop_pais
 ```
 
-**Respuesta:** La proporcion de satisfechos varia entre paises, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educacion, etc.) en cada pais. Las diferencias entre paises son en parte producto de la simulacion aleatoria, pero se observa variabilidad que podria existir en datos reales de Latinobarometro.
+**Respuesta:** La proporción de satisfechos varia entre países, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educación, etc.) en cada país. Las diferencias entre países son en parte producto de la simulación aleatoria, pero se observa variabilidad que podría existir en datos reales de Latinobarometro.
 
-### Pregunta 2: Confianza y satisfaccion
+### Pregunta 2: Confianza y satisfacción
 
-Creen un boxplot que muestre la distribucion de `confianza_gobierno` separada por `satisfecho`.
+Creen un boxplot que muestre la distribución de `confianza_gobierno` separada por `satisfecho`.
 
 ```{r p2}
 ggplot(satisfaccion, aes(x = satisfecho, y = confianza_gobierno, fill = satisfecho)) +
@@ -71,11 +71,11 @@ ggplot(satisfaccion, aes(x = satisfecho, y = confianza_gobierno, fill = satisfec
   theme(legend.position = "none")
 ```
 
-**Respuesta:** Los encuestados satisfechos con la democracia tienden a tener mayor confianza en el gobierno. La mediana de confianza es visiblemente mas alta en el grupo satisfecho. Esto tiene sentido: quien confia mas en el gobierno probablemente evalua mejor el funcionamiento de la democracia.
+**Respuesta:** Los encuestados satisfechos con la democracia tienden a tener mayor confianza en el gobierno. La mediana de confianza es visiblemente más alta en el grupo satisfecho. Esto tiene sentido: quien confía más en el gobierno probablemente evalúa mejor el funcionamiento de la democracia.
 
 ### Pregunta 3: Correlaciones
 
-Calculen la matriz de correlaciones entre las 4 variables numericas principales.
+Calculen la matriz de correlaciones entre las 4 variables numéricas principales.
 
 ```{r p3}
 mat_cor <- satisfaccion |>
@@ -86,7 +86,7 @@ mat_cor <- satisfaccion |>
 mat_cor
 ```
 
-**Respuesta:** Las correlaciones entre estas variables son generalmente debiles (valores absolutos menores a 0.3). Esto indica que cada variable aporta informacion relativamente independiente, lo cual es bueno para un modelo de regresion: poca multicolinealidad. La correlacion mas alta probablemente es entre `educacion_anos` e `ingreso_hogar`, lo cual tiene sentido porque mayor educacion se asocia con mayores ingresos.
+**Respuesta:** Las correlaciones entre estas variables son generalmente debiles (valores absolutos menores a 0.3). Esto indica que cada variable aporta información relativamente independiente, lo cual es bueno para un modelo de regresión: poca multicolinealidad. La correlación más alta probablemente es entre `educacion_anos` e `ingreso_hogar`, lo cual tiene sentido porque mayor educación se asocia con mayores ingresos.
 
 ## Feature engineering
 
@@ -123,11 +123,11 @@ satisfaccion |>
   filter(satisfecho == "si")
 ```
 
-**Respuesta:** La variable `confianza_baja` muestra una diferencia mucho mayor en la proporcion de satisfechos que `joven`. Las personas con confianza baja en el gobierno tienen una proporcion de satisfaccion mucho menor que las de confianza alta. La edad, en cambio, muestra diferencias mas modestas. Esto sugiere que `confianza_baja` sera un predictor mas util para el modelo.
+**Respuesta:** La variable `confianza_baja` muestra una diferencia mucho mayor en la proporción de satisfechos que `joven`. Las personas con confianza baja en el gobierno tienen una proporción de satisfacción mucho menor que las de confianza alta. La edad, en cambio, muestra diferencias más modestas. Esto sugiere que `confianza_baja` sera un predictor más útil para el modelo.
 
 ## Modelos
 
-### Pregunta 6: Division de datos
+### Pregunta 6: División de datos
 
 ```{r p6}
 set.seed(42)
@@ -150,7 +150,7 @@ datos_test |>
   mutate(prop = round(n / sum(n), 3))
 ```
 
-### Pregunta 7: Tres modelos con formula basica
+### Pregunta 7: Tres modelos con fórmula básica
 
 ```{r p7}
 # Definir modelos
@@ -194,9 +194,9 @@ bind_rows(eval_log, eval_arb, eval_knn) |>
   arrange(desc(mean))
 ```
 
-**Respuesta:** La regresion logistica y el KNN suelen tener accuracy similar, mientras que el arbol de decision tiende a ser ligeramente inferior. Las diferencias entre modelos son generalmente pequenas para este dataset, lo que indica que la relacion entre predictores y outcome es razonablemente lineal (favoreciendo a la regresion logistica).
+**Respuesta:** La regresión logística y el KNN suelen tener accuracy similar, mientras que el árbol de decisión tiende a ser ligeramente inferior. Las diferencias entre modelos son generalmente pequenas para este dataset, lo que indica que la relación entre predictores y outcome es razonablemente lineal (favoreciendo a la regresión logística).
 
-### Pregunta 8: Mejor modelo con formula extendida
+### Pregunta 8: Mejor modelo con fórmula extendida
 
 ```{r p8}
 # Formula extendida
@@ -218,11 +218,11 @@ eval_log_ext |> select(modelo, mean, std_err)
 cat("\nDiferencia:", round(eval_log_ext$mean - eval_log$mean, 4), "\n")
 ```
 
-**Respuesta:** La diferencia en accuracy entre la formula basica y la extendida es generalmente pequena. Esto sugiere que las variables originales ya capturan la mayor parte de la informacion relevante. La variable `confianza_baja` es una version discretizada de `confianza_gobierno` (que ya esta en el modelo), por lo que no agrega informacion nueva. El producto `ingreso_x_educacion` podria capturar una interaccion, pero su efecto es marginal.
+**Respuesta:** La diferencia en accuracy entre la fórmula básica y la extendida es generalmente pequeña. Esto sugiere que las variables originales ya capturan la mayor parte de la información relevante. La variable `confianza_baja` es una versión discretizada de `confianza_gobierno` (que ya está en el modelo), por lo que no agrega información nueva. El producto `ingreso_x_educacion` podría capturar una interacción, pero su efecto es marginal.
 
-## Evaluacion
+## Evaluación
 
-### Pregunta 9: Matriz de confusion
+### Pregunta 9: Matriz de confusión
 
 ```{r p9}
 # Ajustar modelo logistico
@@ -245,9 +245,9 @@ cat("Total de errores:", errores, "de", nrow(datos_test), "observaciones\n")
 cat("Tasa de error:", round(errores / nrow(datos_test), 3), "\n")
 ```
 
-**Respuesta:** La matriz de confusion muestra que el modelo comete errores tanto de falsos positivos como de falsos negativos. El total de errores indica que el modelo clasifica correctamente la mayoria de las observaciones, aunque no es perfecto. Los errores son esperables dado que la satisfaccion democratica depende de muchos factores que no estan en el modelo.
+**Respuesta:** La matriz de confusión muestra que el modelo comete errores tanto de falsos positivos como de falsos negativos. El total de errores indica que el modelo clasifica correctamente la mayoría de las observaciones, aunque no es perfecto. Los errores son esperables dado que la satisfacción democrática depende de muchos factores que no están en el modelo.
 
-### Pregunta 10: Precision, recall y AUC
+### Pregunta 10: Precisión, recall y AUC
 
 ```{r p10}
 # Agregar probabilidades
@@ -275,7 +275,7 @@ cat("Recall:", round(rec$.estimate, 3), "\n")
 cat("AUC:", round(auc$.estimate, 3), "\n")
 ```
 
-**Respuesta:** El AUC permite evaluar la capacidad discriminativa del modelo. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente. Para un modelo con variables sociodemograficas como las nuestras, un AUC en el rango aceptable-bueno es un resultado razonable, dado que la satisfaccion democratica es un fenomeno complejo que depende de muchos factores no observados.
+**Respuesta:** El AUC permite evaluar la capacidad discriminativa del modelo. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente. Para un modelo con variables sociodemograficas como las nuestras, un AUC en el rango aceptable-bueno es un resultado razonable, dado que la satisfacción democrática es un fenómeno complejo que depende de muchos factores no observados.
 
 ### Pregunta 11: Curva ROC
 
@@ -298,26 +298,26 @@ coefs |>
   select(term, estimate, std.error, p.value, odds_ratio)
 ```
 
-**Respuesta:** La variable con el efecto mas fuerte es `confianza_gobierno`, con un odds ratio que indica un aumento considerable en las chances de satisfaccion por cada punto adicional de confianza. Las variables con efectos mas debiles (p-valores altos) son las que tienen menos relacion con la satisfaccion democratica. El orden de importancia de los predictores tiene sentido teorico: la confianza en el gobierno es el predictor mas directo de la satisfaccion con la democracia.
+**Respuesta:** La variable con el efecto más fuerte es `confianza_gobierno`, con un odds ratio que indica un aumento considerable en las chances de satisfacción por cada punto adicional de confianza. Las variables con efectos más debiles (p-valores altos) son las que tienen menos relación con la satisfacción democrática. El orden de importancia de los predictores tiene sentido teórico: la confianza en el gobierno es el predictor más directo de la satisfacción con la democracia.
 
 ## Reflexion
 
-### Pregunta 13: Arbol vs. logistica
+### Pregunta 13: Árbol vs. logística
 
-**Respuesta:** La regresion logistica y los arboles de decision tienen fortalezas complementarias:
+**Respuesta:** La regresión logística y los árboles de decisión tienen fortalezas complementarias:
 
-**Regresion logistica:**
+**Regresión logística:**
 
-- Mejor cuando la relacion entre predictores y outcome es aproximadamente lineal (en la escala logit)
-- Produce coeficientes interpretables: cada variable tiene un odds ratio que se puede comunicar a audiencias no tecnicas
-- Tiende a generalizar mejor cuando hay pocos datos, porque tiene menos parametros
-- Preferible cuando el objetivo es entender *que factores* influyen y en que direccion
+- Mejor cuando la relación entre predictores y outcome es aproximadamente lineal (en la escala logit)
+- Produce coeficientes interpretables: cada variable tiene un odds ratio que se puede comunicar a audiencias no técnicas
+- Tiende a generalizar mejor cuando hay pocos datos, porque tiene menos parámetros
+- Preferible cuando el objetivo es entender *qué factores* influyen y en qué dirección
 
-**Arbol de decision:**
+**Árbol de decisión:**
 
-- Captura relaciones no lineales e interacciones de forma automatica, sin necesidad de especificarlas
-- Muy facil de interpretar visualmente: se puede mostrar el arbol completo
+- Captura relaciones no lineales e interacciones de forma automática, sin necesidad de especificarlas
+- Muy facil de interpretar visualmente: se puede mostrar el árbol completo
 - Funciona bien con variables categoricas sin necesidad de crear dummies
-- Preferible cuando la estructura de los datos es jerarquica (por ejemplo, la edad importa solo para personas con baja educacion)
+- Preferible cuando la estructura de los datos es jerárquica (por ejemplo, la edad importa solo para personas con baja educación)
 
-En este laboratorio, la regresion logistica funciona igual o mejor que el arbol porque la relacion entre los predictores y la satisfaccion es aproximadamente lineal. El arbol tiene a sobreajustar (cortes arbitrarios) con datasets de este tamano. Para un organismo que necesita recomendaciones claras de politica, la regresion logistica es preferible porque los coeficientes indican directamente que factores modificar.
+En este laboratorio, la regresión logística funciona igual o mejor que el árbol porque la relación entre los predictores y la satisfacción es aproximadamente lineal. El árbol tiene a sobreajustar (cortes arbitrarios) con datasets de este tamaño. Para un organismo que necesita recomendaciones claras de política, la regresión logística es preferible porque los coeficientes indican directamente qué factores modificar.
