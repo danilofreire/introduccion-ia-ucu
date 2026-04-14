@@ -677,6 +677,7 @@ el algoritmo los encontró solo.
     - [Robots]{.alert} que aprenden a caminar cayéndose miles de veces
     - [RLHF]{.alert} en ChatGPT: humanos califican respuestas, el modelo aprende qué es "útil"
 - [No necesita ejemplos etiquetados]{.alert}: aprende de la experiencia
+- Seramos más específicos sobre RLHF en el [Día 4]{.alert}
 :::
 
 :::{.column width=45%}
@@ -761,7 +762,7 @@ Siempre mantengan el pensamiento crítico.
 
 ## Verdadero o falso
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=50%}
 :::{.incremental}
