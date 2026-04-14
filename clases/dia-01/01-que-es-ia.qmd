@@ -149,20 +149,15 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 :::
 
 ## Objetivos de aprendizaje
+### Al finalizar este curso, serán capaces de:
 
 :::{style="margin-top: 40px; font-size: 30px;"}
 
-Al finalizar este curso, serán capaces de:
-
-- `r fa('comment-dots')` [Explicar]{.alert} las ideas principales detrás de los sistemas de IA contemporáneos en un lenguaje claro
-
-- `r fa('triangle-exclamation')` [Identificar]{.alert} los modos de fallo más comunes de los sistemas de IA y los problemas de datos que los causan
-
-- `r fa('newspaper')` [Evaluar]{.alert} afirmaciones sobre IA en noticias, documentos de política y productos tecnológicos
-
-- `r fa('pencil-ruler')` [Diseñar]{.alert} un plan realista para una aplicación de IA, incluyendo necesidades de datos, evaluación y mitigación de riesgos
-
-- `r fa('scale-balanced')` [Reflexionar críticamente]{.alert} sobre las cuestiones éticas, legales y sociales que plantea la IA
+- `r fa('comment-dots')` [Explicar]{.alert} cómo funcionan los sistemas de IA actuales
+- `r fa('triangle-exclamation')` [Identificar]{.alert} fallos comunes y problemas de datos
+- `r fa('newspaper')` [Evaluar]{.alert} afirmaciones sobre IA en noticias y políticas públicas
+- `r fa('pencil-ruler')` [Diseñar]{.alert} un plan realista para una aplicación de IA
+- `r fa('scale-balanced')` [Reflexionar]{.alert} sobre las cuestiones éticas y sociales de la IA
 :::
 
 # ¿Qué es la Inteligencia Artificial? {background-color="#2d4563"}
@@ -697,22 +692,6 @@ llevan a mejores resultados.
 :::
 :::
 
-## Tabla comparativa
-
-:::{style="margin-top: 30px; font-size: 28px; text-align: center;"}
-
-| | Supervisado | No supervisado | Por refuerzo |
-|---|---|---|---|
-| [Datos]{.alert} | Etiquetados | Sin etiquetar | Entorno interactivo |
-| [Objetivo]{.alert} | Predecir etiqueta | Encontrar patrones | Maximizar recompensa |
-| [Ejemplos]{.alert} | Spam, diagnóstico | Clustering, PCA | Juegos, robótica |
-| [Analogía]{.alert} | Con solucionario | Explorar sin mapa | Andar en bici |
-:::
-
-:::{style="margin-top: 30px; font-size: 28px;"}
-[En la práctica, muchos sistemas combinan varios tipos.]{.alert} ChatGPT usa pre-entrenamiento auto-supervisado, ajuste con instrucciones (supervisado) y RLHF (refuerzo).
-:::
-
 # Ética básica de la IA {background-color="#2d4563"}
 
 ## Sesgo algorítmico
@@ -778,42 +757,6 @@ Siempre mantengan el pensamiento crítico.
 :::
 :::
 
-## Regulación: EU AI Act, Uruguay y la región
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=50%}
-**Unión Europea**
-
-- El [EU AI Act](https://artificialintelligenceact.eu/) (2024) es la primera ley integral sobre IA
-- Clasifica los sistemas de IA por [nivel de riesgo]{.alert}: inaceptable, alto, limitado, mínimo
-- Prohíbe usos como scoring social masivo y manipulación subliminal
-
-**Uruguay**
-
-- [Ley 18.331](https://www.impo.com.uy/bases/leyes/18331-2008) de Protección de Datos Personales y la [URCDP](https://www.gub.uy/unidad-reguladora-control-datos-personales/) como órgano de control
-- [Estrategia Nacional de IA](https://www.gub.uy/agencia-gobierno-electronico-sociedad-informacion-conocimiento/politicas-y-gestion/estrategia-inteligencia-artificial-gobierno-digital) desde 2019
-- Uruguay es un [referente regional]{.alert} en gobierno digital y datos abiertos
-:::
-
-:::{.column width=50%}
-**Brasil**
-
-- [Marco Civil da Internet](https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm) (2014) y [LGPD](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm) (2018, protección de datos)
-- Proyecto de ley de IA en debate en el Senado (PL 2338/2023)
-
-**Chile**
-
-- [Política Nacional de IA](https://minciencia.gob.cl/politicaIA) (2021), primer país de la región con una política formal
-- Proyecto de ley de neuroderechos (protección del cerebro frente a la IA)
-
-<br>
-
-[La regulación está en construcción en toda la región.]{.alert} La pregunta es cómo equilibrar innovación con protección de derechos.
-:::
-:::
-:::
-
 # Actividad: verdadero o falso {background-color="#2d4563"}
 
 ## Verdadero o falso
@@ -823,26 +766,26 @@ Siempre mantengan el pensamiento crítico.
 :::{.column width=50%}
 :::{.incremental}
 - [Un modelo con 95% de accuracy siempre es mejor que uno con 80%]{.alert}
-    - [Falso.]{.alert} Si el 95% de los casos son de una clase, predecir siempre esa clase da 95% sin aprender nada. Las métricas dependen del contexto y del balance de clases
+    - [Falso.]{.alert} Con clases desbalanceadas, predecir siempre la clase mayoritaria da 95% sin aprender nada
 
 - [Los LLMs "entienden" el significado de las palabras como los humanos]{.alert}
-    - [Falso.]{.alert} Procesan patrones estadísticos de co-ocurrencia de tokens. No tienen comprensión semántica ni conciencia
+    - [Falso.]{.alert} Procesan patrones estadísticos de co-ocurrencia, sin comprensión real
 
 - [Si un modelo funciona bien en el conjunto de entrenamiento, funcionará bien en datos nuevos]{.alert}
-    - [Falso.]{.alert} Esto describe el sobreajuste (overfitting). El modelo puede memorizar el training set sin generalizar
+    - [Falso.]{.alert} Eso es sobreajuste: memoriza sin generalizar
 :::
 :::
 
 :::{.column width=50%}
 :::{.incremental}
 - [El código postal puede ser una variable discriminatoria aunque no incluya raza]{.alert}
-    - [Verdadero.]{.alert} El código postal actúa como proxy de raza debido a la segregación residencial histórica. Los sesgos persisten a través de correlaciones
+    - [Verdadero.]{.alert} El código postal es proxy de raza por la segregación residencial histórica
 
 - [BERT y GPT usan la misma arquitectura transformer pero para tareas diferentes]{.alert}
-    - [Verdadero.]{.alert} BERT es encoder (comprensión), GPT es decoder (generación). Ambos usan atención, pero con objetivos distintos
+    - [Verdadero.]{.alert} BERT es encoder (comprensión), GPT es decoder (generación)
 
 - [La validación cruzada sirve para elegir hiperparámetros sin "contaminar" el test set]{.alert}
-    - [Verdadero.]{.alert} Permite evaluar múltiples configuraciones usando solo datos de entrenamiento, reservando el test set para la evaluación final
+    - [Verdadero.]{.alert} Evalúa configuraciones solo con datos de entrenamiento, reservando el test set
 :::
 :::
 :::
@@ -873,13 +816,13 @@ Siempre mantengan el pensamiento crítico.
 
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 28px;"}
 
-- La [IA]{.alert} es un campo amplio que busca crear sistemas capaces de realizar tareas que requieren inteligencia humana
-- La historia de la IA es un ciclo de [entusiasmo y decepción]{.alert}, pero cada ciclo dejó avances que prepararon el siguiente
-- Los tres grandes tipos de aprendizaje automático son: [supervisado]{.alert} (con etiquetas), [no supervisado]{.alert} (sin etiquetas) y [por refuerzo]{.alert} (con recompensas)
-- La IA tiene problemas reales de [sesgo]{.alert}, [alucinaciones]{.alert} y [regulación]{.alert} que debemos entender como usuarios y como investigadores
-- América Latina enfrenta desafíos concretos (pocos datasets en español, infraestructura desigual) pero ya tiene aplicaciones reales en fintech, salud pública y agricultura
+- [IA:]{.alert} sistemas que realizan tareas que requieren inteligencia humana
+- [Historia:]{.alert} ciclos de entusiasmo y decepción, cada uno con avances reales
+- [Tres tipos de ML:]{.alert} supervisado, no supervisado y por refuerzo
+- [Problemas reales:]{.alert} sesgo, alucinaciones, regulación incompleta
+- [América Latina:]{.alert} desafíos de datos e infraestructura, pero aplicaciones concretas en fintech, salud y agricultura
 :::
 
 ## Próximo: Fundamentos de Machine Learning
