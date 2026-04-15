@@ -1,0 +1,965 @@
+---
+title: "Referencia rápida: tidymodels en R"
+toc: true
+toc-depth: 3
+number-sections: true
+code-fold: false
+lang: es
+engine: knitr
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4,
+  cache = TRUE
+)
+```
+
+Esta página es una referencia rápida de los comandos de `tidymodels` y `tidyverse` que usamos en el curso. Cada sección incluye ejemplos ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.
+
+La página sigue el flujo de trabajo típico de un proyecto de Machine Learning:
+
+1. Cargar y explorar los datos
+2. Dividir en entrenamiento y prueba
+3. Preprocesar con `recipe()`
+4. Especificar el modelo
+5. Combinar en un `workflow()`
+6. Ajustar y predecir
+7. Evaluar el rendimiento
+8. Validación cruzada y tuning
+9. Interpretar el modelo
+
+## Paquetes y datos simulados
+
+### Cargar paquetes
+
+```{r paquetes}
+library(tidyverse)   # manipulación de datos y visualización
+library(tidymodels)  # ecosistema de ML: rsample, recipes, parsnip, workflows, tune, yardstick
+library(ranger)      # motor para Random Forest
+library(xgboost)     # motor para Gradient Boosting
+library(kknn)        # motor para K-Nearest Neighbors
+library(glmnet)      # motor para regresión regularizada (LASSO, Ridge)
+library(rpart)       # motor para árboles de decisión
+library(vip)         # importancia de variables
+library(pdp)         # gráficos de dependencia parcial
+
+set.seed(2026)       # fijar semilla para reproducibilidad
+```
+
+### Crear datos simulados
+
+Simulamos un dataset de 800 personas en 4 países latinoamericanos. La variable objetivo es `voto` (si la persona votó o no en la última elección).
+
+```{r datos-simulados}
+n <- 800
+
+datos <- tibble(
+  edad              = round(rnorm(n, mean = 40, sd = 14)),
+  educacion_anios   = round(pmin(pmax(rnorm(n, 11, 3), 0), 20)),
+  ingreso_hogar     = round(rnorm(n, 1500, 600), 0),
+  confianza_gob     = round(pmin(pmax(rnorm(n, 3, 1.2), 1), 7)),
+  interes_politica  = round(pmin(pmax(rnorm(n, 3.5, 1.5), 1), 7)),
+  satisf_democracia = round(pmin(pmax(rnorm(n, 3.2, 1.3), 1), 7)),
+  pais              = factor(sample(c("Uruguay", "Chile", "Colombia", "Mexico"),
+                                    n, replace = TRUE)),
+  zona              = factor(sample(c("urbana", "rural"), n,
+                                    replace = TRUE, prob = c(0.7, 0.3))),
+  genero            = factor(sample(c("mujer", "hombre"), n, replace = TRUE))
+)
+
+# Generar la variable objetivo con una relación realista
+prob_voto <- plogis(
+  -2.5 +
+    0.02 * datos$edad +
+    0.06 * datos$educacion_anios +
+    0.12 * datos$interes_politica +
+    0.08 * datos$satisf_democracia +
+    0.0002 * datos$ingreso_hogar +
+    ifelse(datos$zona == "urbana", 0.2, 0) +
+    rnorm(n, 0, 0.5)
+)
+
+datos$voto <- factor(
+  ifelse(prob_voto > 0.5, "si", "no"),
+  levels = c("si", "no")
+)
+
+# Ver las primeras filas
+head(datos)
+```
+
+## Exploración de datos
+
+### Inspeccionar la estructura
+
+```{r explorar-estructura}
+# Dimensiones: filas x columnas
+dim(datos)
+
+# Resumen compacto de tipos y valores
+glimpse(datos)
+
+# Resumen estadístico
+summary(datos)
+```
+
+### Tablas de frecuencia
+
+```{r explorar-frecuencia}
+# Contar observaciones por grupo
+datos |> count(voto)
+
+datos |> count(pais, voto)
+
+# Proporción por grupo
+datos |>
+  group_by(zona) |>
+  summarise(
+    n          = n(),
+    prop_voto  = mean(voto == "si"),
+    .groups    = "drop"
+  )
+```
+
+### Estadísticos por grupo
+
+```{r explorar-estadisticos}
+datos |>
+  group_by(voto) |>
+  summarise(
+    edad_media     = mean(edad),
+    edad_sd        = sd(edad),
+    educ_media     = mean(educacion_anios),
+    ingreso_medio  = mean(ingreso_hogar),
+    .groups = "drop"
+  )
+```
+
+### Matriz de correlaciones
+
+```{r explorar-correlaciones}
+datos |>
+  select(where(is.numeric)) |>
+  cor() |>
+  round(2)
+```
+
+### Valores faltantes
+
+```{r explorar-na}
+# Contar NAs por columna
+colSums(is.na(datos))
+```
+
+## Visualización con ggplot2
+
+### Histograma
+
+```{r viz-histograma}
+ggplot(datos, aes(x = edad, fill = voto)) +
+  geom_histogram(bins = 25, alpha = 0.6, position = "identity") +
+  scale_fill_manual(values = c("si" = "#1E3A5F", "no" = "#D4A843")) +
+  labs(title = "Distribución de edad por voto",
+       x = "Edad", y = "Frecuencia", fill = "Votó") +
+  theme_minimal()
+```
+
+### Boxplot
+
+```{r viz-boxplot}
+ggplot(datos, aes(x = voto, y = interes_politica, fill = voto)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_manual(values = c("si" = "#1E3A5F", "no" = "#D4A843")) +
+  labs(title = "Interés político por voto",
+       x = "Votó", y = "Interés político (1-7)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+### Barras agrupadas
+
+```{r viz-barras}
+datos |>
+  count(pais, voto) |>
+  ggplot(aes(x = pais, y = n, fill = voto)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("si" = "#1E3A5F", "no" = "#D4A843")) +
+  labs(title = "Voto por país",
+       x = "País", y = "Frecuencia", fill = "Votó") +
+  theme_minimal()
+```
+
+### Scatter plot con línea de tendencia
+
+```{r viz-scatter}
+ggplot(datos, aes(x = educacion_anios, y = ingreso_hogar)) +
+  geom_point(alpha = 0.4, colour = "#1E3A5F") +
+  geom_smooth(method = "lm", se = FALSE, colour = "#D4A843", linewidth = 1) +
+  labs(title = "Relación entre educación e ingreso",
+       x = "Años de educación", y = "Ingreso del hogar") +
+  theme_minimal()
+```
+
+### Facetas
+
+```{r viz-facetas}
+ggplot(datos, aes(x = edad, fill = voto)) +
+  geom_histogram(bins = 20, alpha = 0.6, position = "identity") +
+  facet_wrap(~pais) +
+  scale_fill_manual(values = c("si" = "#1E3A5F", "no" = "#D4A843")) +
+  labs(title = "Distribución de edad por país y voto",
+       x = "Edad", y = "Frecuencia", fill = "Votó") +
+  theme_minimal()
+```
+
+## Manipulación de datos con tidyverse
+
+### select, filter, mutate
+
+```{r tidyverse-basico}
+# Seleccionar columnas
+datos |> select(edad, voto, pais)
+
+# Filtrar filas
+datos |> filter(edad > 30, pais == "Uruguay")
+
+# Crear nuevas variables
+datos |>
+  mutate(
+    grupo_edad = cut(edad, breaks = c(0, 30, 50, 100),
+                     labels = c("joven", "adulto", "mayor")),
+    ingreso_log = log(ingreso_hogar + 1)
+  ) |>
+  select(edad, grupo_edad, ingreso_hogar, ingreso_log) |>
+  head()
+```
+
+### group_by + summarise
+
+```{r tidyverse-grupo}
+datos |>
+  group_by(pais, zona) |>
+  summarise(
+    n             = n(),
+    edad_media    = mean(edad),
+    interes_medio = mean(interes_politica),
+    .groups       = "drop"
+  )
+```
+
+### arrange, rename, case_when
+
+```{r tidyverse-otros}
+# Ordenar
+datos |> arrange(desc(edad)) |> head(5)
+
+# Renombrar columnas
+datos |> rename(country = pais, age = edad) |> head(3)
+
+# Condiciones múltiples
+datos |>
+  mutate(
+    nivel_confianza = case_when(
+      confianza_gob <= 2 ~ "baja",
+      confianza_gob <= 5 ~ "media",
+      TRUE               ~ "alta"
+    )
+  ) |>
+  count(nivel_confianza)
+```
+
+### Reestructurar datos
+
+```{r tidyverse-pivot}
+# De ancho a largo (pivot_longer)
+resumen <- datos |>
+  group_by(pais) |>
+  summarise(
+    edad_media    = mean(edad),
+    ingreso_medio = mean(ingreso_hogar),
+    .groups       = "drop"
+  )
+
+resumen |>
+  pivot_longer(cols = c(edad_media, ingreso_medio),
+               names_to = "variable",
+               values_to = "valor")
+
+# De largo a ancho (pivot_wider)
+datos |>
+  count(pais, voto) |>
+  pivot_wider(names_from = voto, values_from = n)
+```
+
+## División de datos (rsample)
+
+### Train/test split
+
+```{r division}
+# 75% entrenamiento, 25% prueba
+# strata = voto mantiene la misma proporción de "si"/"no" en ambos conjuntos
+division <- initial_split(datos, prop = 0.75, strata = voto)
+
+datos_train <- training(division)
+datos_test  <- testing(division)
+
+cat("Entrenamiento:", nrow(datos_train), "filas\n")
+cat("Prueba:", nrow(datos_test), "filas\n")
+
+# Verificar estratificación
+datos_train |> count(voto) |> mutate(prop = n / sum(n))
+datos_test  |> count(voto) |> mutate(prop = n / sum(n))
+```
+
+### Validación cruzada
+
+```{r cv-folds}
+# Crear 5 folds para validación cruzada
+folds_5 <- vfold_cv(datos_train, v = 5, strata = voto)
+folds_5
+
+# Crear 10 folds
+folds_10 <- vfold_cv(datos_train, v = 10, strata = voto)
+```
+
+## Preprocesamiento con recipes
+
+### Recipe básico
+
+Un `recipe()` define qué transformaciones aplicar a los datos antes de entrenar un modelo.
+
+```{r receta-basica}
+receta <- recipe(voto ~ ., data = datos_train) |>
+  step_dummy(all_nominal_predictors()) |>   # convertir categorías a dummies (0/1)
+  step_zv(all_predictors()) |>              # eliminar columnas con varianza cero
+  step_normalize(all_numeric_predictors())  # estandarizar numéricos (media=0, sd=1)
+
+receta
+```
+
+### Pasos de preprocesamiento disponibles
+
+```{r receta-pasos, eval=FALSE}
+# Dummies: convierte factores en columnas binarias (one-hot encoding)
+step_dummy(all_nominal_predictors())
+
+# Normalizar: centra y escala variables numéricas
+step_normalize(all_numeric_predictors())
+
+# Varianza cero: elimina columnas constantes
+step_zv(all_predictors())
+
+# Categorías nuevas: protege contra niveles no vistos en datos nuevos
+step_novel(all_nominal_predictors())
+
+# Imputar con mediana: reemplaza NAs en numéricos
+step_impute_median(all_numeric_predictors())
+
+# Agrupar categorías raras: junta niveles poco frecuentes como "other"
+step_other(all_nominal_predictors(), threshold = 0.05)
+
+# Correlación alta: elimina predictores muy correlacionados
+step_corr(all_numeric_predictors(), threshold = 0.9)
+
+# Transformación logarítmica
+step_log(ingreso_hogar, offset = 1)
+
+# Interacciones entre variables
+step_interact(terms = ~ edad:educacion_anios)
+
+# Polinomios
+step_poly(edad, degree = 2)
+```
+
+### Preparar y aplicar un recipe
+
+```{r receta-prep-bake}
+# prep() estima los parámetros (medias, SDs, niveles) usando datos de entrenamiento
+receta_prep <- prep(receta, training = datos_train)
+
+# bake() aplica las transformaciones a cualquier dataset
+datos_train_proc <- bake(receta_prep, new_data = datos_train)
+datos_test_proc  <- bake(receta_prep, new_data = datos_test)
+
+# Ver resultado
+head(datos_train_proc)
+```
+
+## Especificación de modelos (parsnip)
+
+### Regresión logística
+
+```{r modelo-logit}
+spec_logit <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+spec_logit
+```
+
+### Árbol de decisión
+
+```{r modelo-arbol}
+spec_arbol <- decision_tree(
+  tree_depth      = 10,    # profundidad máxima
+  min_n           = 10,    # mínimo de observaciones por nodo
+  cost_complexity = 0.01   # penalización por complejidad
+) |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+spec_arbol
+```
+
+### Random Forest
+
+```{r modelo-rf}
+spec_rf <- rand_forest(
+  mtry  = 4,     # variables a considerar en cada split
+  trees = 500,   # número de árboles
+  min_n = 10     # mínimo de observaciones por nodo
+) |>
+  set_engine("ranger", importance = "impurity") |>
+  set_mode("classification")
+
+spec_rf
+```
+
+### XGBoost (Gradient Boosting)
+
+```{r modelo-xgb}
+spec_xgb <- boost_tree(
+  trees      = 500,   # número de árboles
+  tree_depth = 6,     # profundidad de cada árbol
+  learn_rate = 0.01,  # tasa de aprendizaje (shrinkage)
+  min_n      = 10     # mínimo de observaciones por nodo
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+
+spec_xgb
+```
+
+### K-Nearest Neighbors (KNN)
+
+```{r modelo-knn}
+spec_knn <- nearest_neighbor(
+  neighbors = 5   # número de vecinos (k)
+) |>
+  set_engine("kknn") |>
+  set_mode("classification")
+
+spec_knn
+```
+
+### Regresión regularizada (LASSO, Ridge, Elastic Net)
+
+```{r modelo-regularizado, eval=FALSE}
+# LASSO (mixture = 1): selecciona variables, pone coeficientes en cero
+spec_lasso <- logistic_reg(penalty = 0.01, mixture = 1) |>
+  set_engine("glmnet") |>
+  set_mode("classification")
+
+# Ridge (mixture = 0): encoge coeficientes pero no los elimina
+spec_ridge <- logistic_reg(penalty = 0.01, mixture = 0) |>
+  set_engine("glmnet") |>
+  set_mode("classification")
+
+# Elastic Net (mixture entre 0 y 1): combinación de ambos
+spec_enet <- logistic_reg(penalty = 0.01, mixture = 0.5) |>
+  set_engine("glmnet") |>
+  set_mode("classification")
+```
+
+### Modelos de regresión (variable continua)
+
+```{r modelo-regresion, eval=FALSE}
+# Los mismos modelos funcionan para regresión, cambiando set_mode()
+spec_lineal <- linear_reg() |>
+  set_engine("lm") |>
+  set_mode("regression")
+
+spec_rf_reg <- rand_forest(mtry = 4, trees = 500) |>
+  set_engine("ranger") |>
+  set_mode("regression")
+
+spec_xgb_reg <- boost_tree(trees = 500, learn_rate = 0.01) |>
+  set_engine("xgboost") |>
+  set_mode("regression")
+```
+
+## Workflows
+
+### Crear y ajustar un workflow
+
+Un `workflow()` combina un recipe y un modelo en un solo objeto que se puede ajustar, predecir y evaluar.
+
+```{r workflow-basico}
+# Crear workflow
+wf_logit <- workflow() |>
+  add_recipe(receta) |>
+  add_model(spec_logit)
+
+wf_logit
+
+# Ajustar el workflow a los datos de entrenamiento
+ajuste_logit <- fit(wf_logit, data = datos_train)
+```
+
+### Predecir
+
+```{r workflow-predecir}
+# Predecir clases
+pred_clase <- predict(ajuste_logit, new_data = datos_test)
+head(pred_clase)
+
+# Predecir probabilidades
+pred_prob <- predict(ajuste_logit, new_data = datos_test, type = "prob")
+head(pred_prob)
+
+# Combinar predicciones con datos reales
+pred_logit <- bind_cols(
+  datos_test |> select(voto),
+  pred_clase,
+  pred_prob
+)
+
+head(pred_logit)
+```
+
+### Múltiples workflows
+
+Los árboles de decisión, Random Forest y XGBoost no necesitan normalización (son invariantes a la escala). En la práctica, conviene usar un recipe más simple para estos modelos:
+
+```{r workflow-multiples}
+# Recipe para modelos basados en árboles (sin normalización)
+receta_arbol <- recipe(voto ~ ., data = datos_train) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_zv(all_predictors())
+
+# Crear workflows: receta completa para logística, receta simple para árboles
+wf_rf    <- workflow() |> add_recipe(receta_arbol) |> add_model(spec_rf)
+wf_xgb   <- workflow() |> add_recipe(receta_arbol) |> add_model(spec_xgb)
+wf_arbol <- workflow() |> add_recipe(receta_arbol) |> add_model(spec_arbol)
+
+# Ajustar todos
+ajuste_rf    <- fit(wf_rf, data = datos_train)
+ajuste_xgb   <- fit(wf_xgb, data = datos_train)
+ajuste_arbol <- fit(wf_arbol, data = datos_train)
+```
+
+## Evaluación de modelos (yardstick)
+
+### Métricas individuales
+
+```{r eval-metricas}
+# Accuracy: proporción de predicciones correctas
+accuracy(pred_logit, truth = voto, estimate = .pred_class)
+
+# AUC: área bajo la curva ROC (requiere probabilidades)
+roc_auc(pred_logit, truth = voto, .pred_si)
+
+# Precision: de los que predije como "si", cuántos realmente son "si"
+precision(pred_logit, truth = voto, estimate = .pred_class)
+
+# Recall: de los que realmente son "si", cuántos identifiqué correctamente
+recall(pred_logit, truth = voto, estimate = .pred_class)
+
+# F1-score: media armónica de precision y recall
+f_meas(pred_logit, truth = voto, estimate = .pred_class)
+```
+
+### Múltiples métricas a la vez
+
+```{r eval-metric-set}
+# Definir un conjunto de métricas
+mis_metricas <- metric_set(accuracy, roc_auc, precision, recall, f_meas)
+
+# Calcular todas a la vez
+mis_metricas(pred_logit, truth = voto, estimate = .pred_class, .pred_si)
+```
+
+### Matriz de confusión
+
+```{r eval-confmat}
+# Crear la matriz
+cm <- conf_mat(pred_logit, truth = voto, estimate = .pred_class)
+cm
+
+# Visualizar como heatmap
+autoplot(cm, type = "heatmap") +
+  labs(title = "Matriz de confusión: regresión logística")
+
+# Obtener todas las métricas de la matriz
+summary(cm)
+```
+
+### Curva ROC
+
+```{r eval-roc}
+# Calcular la curva
+curva_roc <- roc_curve(pred_logit, truth = voto, .pred_si)
+
+# Graficar
+autoplot(curva_roc) +
+  labs(title = "Curva ROC: regresión logística")
+```
+
+### Comparar modelos
+
+```{r eval-comparar}
+# Función auxiliar para calcular métricas de un modelo ajustado
+calcular_metricas <- function(ajuste, datos_test, nombre) {
+  pred <- bind_cols(
+    datos_test |> select(voto),
+    predict(ajuste, new_data = datos_test),
+    predict(ajuste, new_data = datos_test, type = "prob")
+  )
+
+  metricas <- mis_metricas(pred, truth = voto,
+                           estimate = .pred_class, .pred_si)
+  metricas |> mutate(modelo = nombre)
+}
+
+# Calcular para cada modelo
+comparacion <- bind_rows(
+  calcular_metricas(ajuste_logit, datos_test, "Logística"),
+  calcular_metricas(ajuste_rf, datos_test, "Random Forest"),
+  calcular_metricas(ajuste_xgb, datos_test, "XGBoost"),
+  calcular_metricas(ajuste_arbol, datos_test, "Árbol")
+)
+
+# Tabla comparativa
+comparacion |>
+  select(modelo, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  arrange(desc(roc_auc))
+```
+
+### Curvas ROC superpuestas
+
+```{r eval-roc-comparar}
+# Preparar predicciones de cada modelo
+roc_todos <- bind_rows(
+  roc_curve(
+    bind_cols(datos_test |> select(voto),
+              predict(ajuste_logit, datos_test, type = "prob")),
+    truth = voto, .pred_si
+  ) |> mutate(modelo = "Logística"),
+  roc_curve(
+    bind_cols(datos_test |> select(voto),
+              predict(ajuste_rf, datos_test, type = "prob")),
+    truth = voto, .pred_si
+  ) |> mutate(modelo = "Random Forest"),
+  roc_curve(
+    bind_cols(datos_test |> select(voto),
+              predict(ajuste_xgb, datos_test, type = "prob")),
+    truth = voto, .pred_si
+  ) |> mutate(modelo = "XGBoost")
+)
+
+ggplot(roc_todos, aes(x = 1 - specificity, y = sensitivity, colour = modelo)) +
+  geom_path(linewidth = 1) +
+  geom_abline(linetype = "dashed", colour = "grey50") +
+  scale_colour_manual(values = c("Logística" = "#1E3A5F",
+                                  "Random Forest" = "#D4A843",
+                                  "XGBoost" = "#B8922E")) +
+  labs(title = "Curvas ROC comparadas",
+       x = "1 - Especificidad", y = "Sensibilidad", colour = "Modelo") +
+  coord_equal() +
+  theme_minimal()
+```
+
+## Coeficientes e interpretación de regresión logística
+
+### Extraer y visualizar coeficientes
+
+```{r coeficientes}
+# Extraer coeficientes en formato tidy
+coefs <- tidy(ajuste_logit) |>
+  mutate(odds_ratio = exp(estimate)) |>
+  arrange(desc(abs(statistic)))
+
+coefs
+
+# Visualizar coeficientes (sin intercepto)
+coefs |>
+  filter(term != "(Intercept)") |>
+  ggplot(aes(x = reorder(term, estimate), y = estimate)) +
+  geom_col(fill = "#1E3A5F", alpha = 0.8) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() +
+  labs(title = "Coeficientes de la regresión logística",
+       x = "", y = "Coeficiente (log-odds)") +
+  theme_minimal()
+```
+
+## Validación cruzada y tuning de hiperparámetros
+
+### Tuning con Random Forest
+
+```{r tuning-rf}
+# Especificar qué hiperparámetros ajustar con tune()
+spec_rf_tune <- rand_forest(
+  mtry  = tune(),   # se va a buscar el mejor valor
+  trees = 500,
+  min_n = tune()    # se va a buscar el mejor valor
+) |>
+  set_engine("ranger", importance = "impurity") |>
+  set_mode("classification")
+
+# Crear workflow con el modelo tunable (usamos receta_arbol, sin normalización)
+wf_rf_tune <- workflow() |>
+  add_recipe(receta_arbol) |>
+  add_model(spec_rf_tune)
+```
+
+### Grilla regular
+
+```{r tuning-grilla-regular}
+# Crear grilla de combinaciones de hiperparámetros
+grilla_regular <- grid_regular(
+  mtry(range = c(2, 8)),    # probar de 2 a 8 variables por split
+  min_n(range = c(5, 30)),  # probar de 5 a 30 obs mínimas por nodo
+  levels = 5                # 5 valores por parámetro = 25 combinaciones
+)
+
+grilla_regular
+```
+
+### Grilla aleatoria
+
+```{r tuning-grilla-random}
+# Alternativa: muestrear combinaciones al azar
+grilla_random <- grid_random(
+  mtry(range = c(2, 8)),
+  min_n(range = c(5, 30)),
+  size = 20    # 20 combinaciones aleatorias
+)
+
+grilla_random
+```
+
+### Ejecutar el tuning
+
+```{r tuning-ejecutar}
+# Buscar la mejor combinación usando validación cruzada
+resultados_tune <- tune_grid(
+  wf_rf_tune,
+  resamples = folds_5,
+  grid      = grilla_regular,
+  metrics   = metric_set(roc_auc, accuracy)
+)
+
+# Ver resultados
+collect_metrics(resultados_tune)
+```
+
+### Visualizar resultados del tuning
+
+```{r tuning-visualizar}
+autoplot(resultados_tune) +
+  labs(title = "Resultados del tuning de Random Forest") +
+  theme_minimal()
+```
+
+### Seleccionar el mejor modelo
+
+```{r tuning-seleccionar}
+# Elegir la combinación con el mejor AUC
+mejor <- select_best(resultados_tune, metric = "roc_auc")
+mejor
+
+# Alternativa: elegir el modelo más simple dentro de 1 error estándar del mejor
+mejor_1se <- select_by_one_std_err(resultados_tune,
+                                    metric = "roc_auc",
+                                    mtry, min_n)
+mejor_1se
+```
+
+### Finalizar y ajustar el modelo final
+
+```{r tuning-finalizar}
+# Aplicar los mejores hiperparámetros al workflow
+wf_rf_final <- finalize_workflow(wf_rf_tune, mejor)
+
+# Ajustar el modelo final con todos los datos de entrenamiento
+ajuste_rf_final <- fit(wf_rf_final, data = datos_train)
+
+# Evaluar en datos de prueba
+pred_rf_final <- bind_cols(
+  datos_test |> select(voto),
+  predict(ajuste_rf_final, new_data = datos_test),
+  predict(ajuste_rf_final, new_data = datos_test, type = "prob")
+)
+
+mis_metricas(pred_rf_final, truth = voto,
+             estimate = .pred_class, .pred_si)
+```
+
+### last_fit: ajustar y evaluar en un solo paso
+
+```{r tuning-lastfit}
+# last_fit() ajusta en el training set y evalúa en el test set automáticamente
+resultado_final <- last_fit(wf_rf_final, split = division)
+
+# Métricas
+collect_metrics(resultado_final)
+
+# Predicciones
+collect_predictions(resultado_final) |> head()
+```
+
+## Importancia de variables (VIP)
+
+### Gráfico de importancia
+
+```{r vip}
+# Extraer el modelo ajustado del workflow
+modelo_rf <- extract_fit_parsnip(ajuste_rf_final)
+
+# Crear gráfico VIP
+vip(modelo_rf, num_features = 10) +
+  labs(title = "Importancia de variables (Random Forest)") +
+  theme_minimal()
+```
+
+## Partial Dependence Plots (PDP)
+
+Los PDPs muestran cómo cambia la predicción promedio cuando variamos una variable, manteniendo las demás constantes.
+
+```{r pdp}
+# Necesitamos el modelo de ranger directamente y los datos preprocesados
+modelo_ranger <- extract_fit_engine(ajuste_rf_final)
+datos_baked   <- bake(prep(receta_arbol), new_data = datos_train)
+
+# PDP para interes_politica
+pdp_interes <- partial(
+  modelo_ranger,
+  pred.var   = "interes_politica",
+  train      = datos_baked,
+  prob        = TRUE,
+  which.class = 1    # clase "si"
+)
+
+# Graficar
+ggplot(pdp_interes, aes(x = interes_politica, y = yhat)) +
+  geom_line(colour = "#1E3A5F", linewidth = 1.2) +
+  labs(title = "PDP: efecto del interés político sobre P(voto = si)",
+       x = "Interés político", y = "Probabilidad predicha de votar") +
+  theme_minimal()
+```
+
+```{r pdp-educacion}
+# PDP para educacion_anios
+pdp_educ <- partial(
+  modelo_ranger,
+  pred.var    = "educacion_anios",
+  train       = datos_baked,
+  prob        = TRUE,
+  which.class = 1
+)
+
+ggplot(pdp_educ, aes(x = educacion_anios, y = yhat)) +
+  geom_line(colour = "#D4A843", linewidth = 1.2) +
+  labs(title = "PDP: efecto de los años de educación sobre P(voto = si)",
+       x = "Años de educación", y = "Probabilidad predicha de votar") +
+  theme_minimal()
+```
+
+## Threshold de clasificación
+
+Por defecto, clasificamos como "si" cuando P(si) > 0.5. Pero podemos ajustar este umbral para optimizar distintas métricas.
+
+```{r threshold}
+# Probar varios thresholds
+thresholds <- seq(0.3, 0.7, by = 0.05)
+resultados_th <- data.frame(threshold = numeric(), f1 = numeric())
+
+for (t in thresholds) {
+  pred_nuevo <- pred_rf_final |>
+    mutate(.pred_class_nuevo = factor(
+      ifelse(.pred_si > t, "si", "no"),
+      levels = c("si", "no")
+    ))
+
+  f1 <- f_meas(pred_nuevo, truth = voto,
+               estimate = .pred_class_nuevo)
+
+  resultados_th <- rbind(resultados_th,
+                         data.frame(threshold = t, f1 = f1$.estimate))
+}
+
+# Ver resultados ordenados por F1
+resultados_th |> arrange(desc(f1))
+
+# Graficar
+ggplot(resultados_th, aes(x = threshold, y = f1)) +
+  geom_line(colour = "#1E3A5F", linewidth = 1) +
+  geom_point(colour = "#D4A843", size = 3) +
+  labs(title = "F1-score por threshold de clasificación",
+       x = "Threshold", y = "F1-score") +
+  theme_minimal()
+```
+
+## Resumen de funciones
+
+La tabla siguiente resume las funciones principales del ecosistema `tidymodels` organizadas por etapa del flujo de trabajo.
+
+| Etapa | Función | Descripción |
+|-------|---------|-------------|
+| **Datos** | `initial_split()` | Dividir datos en train/test |
+| | `training()`, `testing()` | Extraer conjuntos |
+| | `vfold_cv()` | Crear folds de validación cruzada |
+| **Recipe** | `recipe()` | Definir preprocesamiento |
+| | `step_dummy()` | Crear variables dummy |
+| | `step_normalize()` | Estandarizar numéricas |
+| | `step_zv()` | Eliminar varianza cero |
+| | `step_novel()` | Manejar categorías nuevas |
+| | `step_impute_median()` | Imputar con mediana |
+| | `step_other()` | Agrupar categorías raras |
+| | `step_corr()` | Eliminar alta correlación |
+| | `step_log()` | Transformación logarítmica |
+| | `step_interact()` | Interacciones |
+| | `step_poly()` | Polinomios |
+| | `prep()` | Estimar parámetros del recipe |
+| | `bake()` | Aplicar recipe a datos nuevos |
+| **Modelo** | `logistic_reg()` | Regresión logística |
+| | `linear_reg()` | Regresión lineal |
+| | `decision_tree()` | Árbol de decisión |
+| | `rand_forest()` | Random Forest |
+| | `boost_tree()` | XGBoost / Gradient Boosting |
+| | `nearest_neighbor()` | K-Nearest Neighbors |
+| | `set_engine()` | Motor computacional |
+| | `set_mode()` | Clasificación o regresión |
+| **Workflow** | `workflow()` | Crear flujo de trabajo |
+| | `add_recipe()` | Agregar recipe |
+| | `add_model()` | Agregar modelo |
+| | `fit()` | Ajustar a datos |
+| | `predict()` | Generar predicciones |
+| | `last_fit()` | Ajustar y evaluar en un paso |
+| **Tuning** | `tune()` | Marcar hiperparámetro para ajustar |
+| | `tune_grid()` | Buscar en grilla con CV |
+| | `grid_regular()` | Grilla con valores uniformes |
+| | `grid_random()` | Grilla con valores aleatorios |
+| | `collect_metrics()` | Extraer métricas del tuning |
+| | `select_best()` | Elegir mejor combinación |
+| | `select_by_one_std_err()` | Elegir modelo simple dentro de 1 SE |
+| | `finalize_workflow()` | Aplicar mejores hiperparámetros |
+| **Evaluación** | `accuracy()` | Proporción correcta |
+| | `roc_auc()` | Área bajo curva ROC |
+| | `precision()` | Precisión |
+| | `recall()` | Sensibilidad |
+| | `f_meas()` | F1-score |
+| | `conf_mat()` | Matriz de confusión |
+| | `roc_curve()` | Curva ROC |
+| | `metric_set()` | Definir conjunto de métricas |
+| | `tidy()` | Coeficientes en formato tidy |
+| **Interpretación** | `vip()` | Importancia de variables |
+| | `partial()` | Dependencia parcial |
+| | `extract_fit_parsnip()` | Extraer modelo del workflow |
+| | `extract_fit_engine()` | Extraer modelo nativo |

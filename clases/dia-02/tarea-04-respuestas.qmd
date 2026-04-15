@@ -1,0 +1,396 @@
+---
+title: "Tarea 4: Regresión y regularización -- Respuestas"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-15"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta es la clave de respuestas de la Tarea 4. Cada pregunta incluye el código R completo y una respuesta escrita.
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidymodels)
+library(tidyverse)
+library(glmnet)
+library(ranger)
+
+datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+
+datos <- datos |>
+  mutate(
+    pais = factor(pais),
+    zona = factor(zona),
+    genero = factor(genero),
+    uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario"))
+  )
+
+set.seed(2026)
+```
+
+## Exploración
+
+### Pregunta 1: Resumen del dataset
+
+Calculen la media y desviación estándar de `satisfaccion_vida` por país.
+
+```{r p1}
+resumen_pais <- datos |>
+  group_by(pais) |>
+  summarise(
+    media = round(mean(satisfaccion_vida), 2),
+    sd = round(sd(satisfaccion_vida), 2),
+    n = n()
+  ) |>
+  arrange(desc(media))
+
+resumen_pais
+```
+
+**Respuesta:** La satisfacción con la vida varía entre países, lo cual es esperable dado que refleja diferencias en condiciones socioeconómicas, confianza institucional y otras variables contextuales. Las diferencias entre países son en parte producto de la simulación, pero representan patrones que se observan en datos reales de Latinobarómetro: países con mejores indicadores económicos y mayor confianza institucional tienden a reportar mayor satisfacción.
+
+### Pregunta 2: Correlaciones con la variable objetivo
+
+Calculen la correlación entre `satisfaccion_vida` y todas las variables numéricas.
+
+```{r p2}
+cors <- datos |>
+  select(satisfaccion_vida, edad, educacion_anios, ingreso_hogar,
+         confianza_gobierno, confianza_justicia, satisfaccion_democracia,
+         percepcion_economia, interes_politica) |>
+  cor() |>
+  as.data.frame() |>
+  select(satisfaccion_vida) |>
+  arrange(desc(abs(satisfaccion_vida)))
+
+cors
+```
+
+**Respuesta:** Las variables con mayor correlación con la satisfacción son probablemente `percepcion_economia`, `satisfaccion_democracia` y `confianza_gobierno`, todas positivas. Esto tiene sentido: quienes perciben que la economía va bien, están satisfechos con la democracia y confían en el gobierno tienden a reportar mayor satisfacción con la vida. Variables como `edad` y `educacion_anios` probablemente tienen correlaciones más débiles, lo que sugiere que la satisfacción depende más de percepciones subjetivas que de características demográficas.
+
+### Pregunta 3: Distribución por zona
+
+Creen un boxplot de `satisfaccion_vida` por `zona`.
+
+```{r p3}
+ggplot(datos, aes(x = zona, y = satisfaccion_vida, fill = zona)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_manual(values = c("#2d4563", "#e74c3c")) +
+  labs(
+    title = "Satisfacción con la vida por zona",
+    x = "Zona",
+    y = "Satisfacción (1-10)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+**Respuesta:** La diferencia entre zonas urbana y rural puede ser pequeña en este dataset simulado. En datos reales de Latinoamérica, la relación entre zona y satisfacción es ambigua: las zonas urbanas suelen tener mayor acceso a servicios, pero también más desigualdad y costos de vida. El boxplot permite ver si hay diferencias en la mediana y la dispersión.
+
+## Modelo baseline
+
+### Pregunta 4: División de datos y receta
+
+```{r p4}
+division <- initial_split(datos, prop = 0.75)
+datos_train <- training(division)
+datos_test <- testing(division)
+
+receta <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
+                 zona + genero + confianza_gobierno + confianza_justicia +
+                 satisfaccion_democracia + percepcion_economia +
+                 uso_internet + interes_politica,
+                 data = datos_train) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_zv(all_predictors())
+
+# Verificar
+receta_prep <- receta |> prep() |> juice()
+cat("Predictores:", ncol(receta_prep) - 1, "\n")
+glimpse(receta_prep)
+```
+
+**Respuesta:** La receta preparada tiene más predictores que las variables originales porque `step_dummy()` convierte las categóricas en variables binarias. Por ejemplo, `uso_internet` con 3 niveles genera 2 dummies (el nivel de referencia se omite). La normalización con `step_normalize()` centra y escala cada predictor numérico para que tenga media 0 y desviación 1. Esto es necesario para que la regularización trate todas las variables de forma equitativa: sin normalizar, variables con escalas grandes dominarían la penalización.
+
+### Pregunta 5: Modelo OLS
+
+```{r p5}
+modelo_ols <- linear_reg() |>
+  set_engine("lm") |>
+  set_mode("regression")
+
+wf_ols <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_ols)
+
+ajuste_ols <- fit(wf_ols, data = datos_train)
+
+coef_ols <- tidy(ajuste_ols) |>
+  filter(term != "(Intercept)") |>
+  arrange(desc(abs(estimate)))
+
+coef_ols
+```
+
+**Respuesta:** Los coeficientes normalizados permiten comparar directamente la importancia de cada variable. El predictor más importante (mayor coeficiente en valor absoluto) probablemente es `percepcion_economia` o `satisfaccion_democracia`, lo que indica que las percepciones subjetivas sobre la situación del país tienen más peso que variables demográficas como `edad` o `genero`. El predictor menos importante tiene un coeficiente cercano a cero, lo que sugiere que aporta poca información una vez que las demás variables están en el modelo.
+
+### Pregunta 6: Evaluar OLS
+
+```{r p6}
+pred_ols <- predict(ajuste_ols, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+
+metricas_ols <- pred_ols |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+
+metricas_ols
+```
+
+**Respuesta:** El R² indica el porcentaje de la variación en satisfacción que el modelo explica. Un R² en el rango de 0.3-0.5 es razonable para datos de encuestas sociales, donde la satisfacción con la vida depende de muchos factores difíciles de medir (personalidad, relaciones familiares, salud mental). El RMSE nos dice el error promedio en unidades de la variable objetivo: si es alrededor de 1.5, el modelo se equivoca en promedio en 1.5 puntos de la escala de 1 a 10.
+
+## LASSO
+
+### Pregunta 7: Tuning de LASSO
+
+```{r p7}
+modelo_lasso <- linear_reg(
+  penalty = tune(),
+  mixture = 1
+) |>
+  set_engine("glmnet") |>
+  set_mode("regression")
+
+wf_lasso <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_lasso)
+
+grilla_lambda <- grid_regular(
+  penalty(range = c(-4, 0)),
+  levels = 30
+)
+
+folds <- vfold_cv(datos_train, v = 10)
+
+resultados_lasso <- tune_grid(
+  wf_lasso,
+  resamples = folds,
+  grid = grilla_lambda,
+  metrics = metric_set(rmse, rsq, mae)
+)
+
+lambda_min <- select_best(resultados_lasso, metric = "rmse")
+cat("Mejor lambda:\n")
+print(lambda_min)
+
+autoplot(resultados_lasso) +
+  scale_x_log10() +
+  theme_minimal() +
+  labs(title = "Tuning de LASSO: RMSE vs. penalty")
+```
+
+**Respuesta:** El lambda óptimo es el valor que minimiza el RMSE en la validación cruzada. Valores de lambda muy pequeños (cercanos a 0) producen un modelo similar a OLS, mientras que valores muy grandes eliminan todas las variables. El gráfico de autoplot muestra la curva típica en U: el RMSE baja al principio (la regularización reduce el sobreajuste) y luego sube (demasiada penalización elimina señal útil).
+
+### Pregunta 8: Lambda mínimo vs. 1SE
+
+```{r p8}
+lambda_1se <- select_by_one_std_err(
+  resultados_lasso,
+  metric = "rmse",
+  desc(penalty)
+)
+
+cat("Lambda mínimo:\n")
+print(lambda_min)
+cat("\nLambda 1SE:\n")
+print(lambda_1se)
+cat("\nDiferencia:", round(lambda_1se$penalty / lambda_min$penalty, 1), "veces más grande")
+```
+
+**Respuesta:** El lambda 1SE es más grande que el mínimo, lo que produce un modelo más simple (más coeficientes eliminados). La regla 1SE dice: "elijamos el modelo más simple cuyo error esté dentro de un error estándar del mínimo". La lógica es que si dos modelos tienen rendimiento estadísticamente similar, preferimos el más simple (principio de parsimonia). Esto es útil cuando queremos un modelo más interpretable o cuando sospechamos que el lambda mínimo podría sobreajustar ligeramente.
+
+### Pregunta 9: Variables eliminadas por LASSO
+
+```{r p9}
+wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
+ajuste_lasso <- fit(wf_lasso_final, data = datos_train)
+
+coef_lasso <- tidy(ajuste_lasso) |>
+  filter(term != "(Intercept)") |>
+  arrange(desc(abs(estimate)))
+
+coef_lasso
+
+# Variables eliminadas
+eliminadas <- coef_lasso |> filter(estimate == 0)
+cat("\nVariables eliminadas:", nrow(eliminadas), "de", nrow(coef_lasso), "\n")
+if (nrow(eliminadas) > 0) {
+  cat("Son:", paste(eliminadas$term, collapse = ", "), "\n")
+}
+```
+
+**Respuesta:** LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Las variables eliminadas probablemente son las que tienen correlación débil con la satisfacción o cuya información ya está capturada por otros predictores. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basandose en los datos.
+
+## Ridge y Elastic Net
+
+### Pregunta 10: Comparar coeficientes Ridge vs. LASSO
+
+```{r p10}
+modelo_ridge <- linear_reg(
+  penalty = tune(),
+  mixture = 0
+) |>
+  set_engine("glmnet") |>
+  set_mode("regression")
+
+wf_ridge <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_ridge)
+
+resultados_ridge <- tune_grid(
+  wf_ridge,
+  resamples = folds,
+  grid = grilla_lambda,
+  metrics = metric_set(rmse)
+)
+
+lambda_ridge <- select_best(resultados_ridge, metric = "rmse")
+ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
+  fit(data = datos_train)
+
+# Comparar coeficientes
+coef_ridge <- tidy(ajuste_ridge) |>
+  filter(term != "(Intercept)") |>
+  select(term, ridge = estimate)
+
+coef_lasso_comp <- tidy(ajuste_lasso) |>
+  filter(term != "(Intercept)") |>
+  select(term, lasso = estimate)
+
+comparacion <- left_join(coef_ridge, coef_lasso_comp, by = "term")
+comparacion
+
+cat("\nMedia |coef| Ridge:", round(mean(abs(comparacion$ridge)), 4))
+cat("\nMedia |coef| LASSO:", round(mean(abs(comparacion$lasso)), 4))
+```
+
+**Respuesta:** Ridge tiende a tener coeficientes más grandes en promedio porque reduce todos los coeficientes de forma proporcional, sin eliminar ninguno. LASSO, en cambio, pone algunos en exactamente cero, lo que baja el promedio. Ridge usa la penalización L2 (suma de cuadrados), que "encoge" pero no elimina. LASSO usa la penalización L1 (suma de valores absolutos), que produce soluciones "sparse" donde algunos coeficientes son exactamente cero. La diferencia se debe a la geometría de cada tipo de penalización.
+
+### Pregunta 11: Elastic Net con dos hiperparámetros
+
+```{r p11}
+modelo_enet <- linear_reg(
+  penalty = tune(),
+  mixture = tune()
+) |>
+  set_engine("glmnet") |>
+  set_mode("regression")
+
+wf_enet <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_enet)
+
+grilla_enet <- grid_regular(
+  penalty(range = c(-4, 0)),
+  mixture(range = c(0, 1)),
+  levels = c(15, 5)
+)
+
+resultados_enet <- tune_grid(
+  wf_enet,
+  resamples = folds,
+  grid = grilla_enet,
+  metrics = metric_set(rmse)
+)
+
+mejor_enet <- select_best(resultados_enet, metric = "rmse")
+cat("Mejor combinación:\n")
+print(mejor_enet)
+
+autoplot(resultados_enet) +
+  scale_x_log10() +
+  theme_minimal() +
+  labs(title = "Tuning de Elastic Net")
+```
+
+**Respuesta:** La mejor combinación de penalty y mixture indica si los datos se benefician más de la selección de variables (LASSO, mixture cercano a 1) o de la reducción proporcional (Ridge, mixture cercano a 0). Si el mixture óptimo es intermedio (por ejemplo, 0.5), el Elastic Net combina ambos enfoques, lo cual puede ser útil cuando hay grupos de predictores correlacionados. En este dataset, con variables relativamente independientes, la diferencia entre las tres formas de regularización es probablemente pequeña.
+
+## Comparación
+
+### Pregunta 12: Tabla comparativa
+
+```{r p12}
+# Ajustar Elastic Net final
+ajuste_enet <- finalize_workflow(wf_enet, mejor_enet) |>
+  fit(data = datos_train)
+
+# Random Forest
+modelo_rf <- rand_forest(trees = 500, mtry = tune(), min_n = tune()) |>
+  set_engine("ranger") |>
+  set_mode("regression")
+
+wf_rf <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_rf)
+
+grilla_rf <- grid_regular(
+  mtry(range = c(2, 8)),
+  min_n(range = c(5, 20)),
+  levels = c(4, 4)
+)
+
+resultados_rf <- tune_grid(wf_rf, resamples = folds, grid = grilla_rf, metrics = metric_set(rmse))
+mejor_rf <- select_best(resultados_rf, metric = "rmse")
+ajuste_rf <- finalize_workflow(wf_rf, mejor_rf) |>
+  fit(data = datos_train)
+
+# Predicciones para todos los modelos
+pred_lasso <- predict(ajuste_lasso, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ridge <- predict(ajuste_ridge, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_enet <- predict(ajuste_enet, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_rf <- predict(ajuste_rf, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+
+metricas_lasso <- pred_lasso |> metrics(truth = satisfaccion_vida, estimate = .pred)
+metricas_ridge <- pred_ridge |> metrics(truth = satisfaccion_vida, estimate = .pred)
+metricas_enet <- pred_enet |> metrics(truth = satisfaccion_vida, estimate = .pred)
+metricas_rf <- pred_rf |> metrics(truth = satisfaccion_vida, estimate = .pred)
+
+tabla <- bind_rows(
+  metricas_ols |> mutate(modelo = "OLS"),
+  metricas_lasso |> mutate(modelo = "LASSO"),
+  metricas_ridge |> mutate(modelo = "Ridge"),
+  metricas_enet |> mutate(modelo = "Elastic Net"),
+  metricas_rf |> mutate(modelo = "Random Forest")
+) |>
+  select(modelo, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  arrange(rmse)
+
+tabla
+```
+
+**Respuesta:** Random Forest probablemente tiene el mejor RMSE porque puede capturar relaciones no lineales entre los predictores y la satisfacción. Los modelos lineales (OLS, LASSO, Ridge, Elastic Net) son muy similares entre sí porque: (a) el dataset tiene relaciones aproximadamente lineales, (b) hay pocos predictores irrelevantes, y (c) la ratio observaciones/predictores no es extrema. La mejora de regularización sobre OLS es marginal, lo que confirma que con p = 11 y n ~ 375, OLS ya es un modelo razonable.
+
+### Pregunta 13: Reflexión
+
+**Respuesta:**
+
+1. La regularización no mejora mucho respecto a OLS en este dataset. Esto se debe a que el número de predictores es bajo (11) comparado con las observaciones (~375), las variables son razonablemente independientes, y no hay mucho sobreajuste que corregir. La regularización es más útil cuando hay muchos predictores (p >> n), multicolinealidad fuerte, o variables irrelevantes que necesitan ser eliminadas automáticamente.
+
+2. LASSO es preferible cuando queremos selección automática de variables, por ejemplo si tenemos docenas de predictores y sospechamos que solo unos pocos son relevantes. Ridge es preferible cuando creemos que todos los predictores contribuyen algo (no queremos eliminar ninguno) y hay multicolinealidad: Ridge reduce los coeficientes de variables correlacionadas de forma proporcional en vez de eliminar arbitrariamente una.
+
+3. Para un tomador de decisiones, probablemente elegiría OLS o LASSO. Aunque Random Forest tiene mejor rendimiento predictivo, la diferencia es pequeña, y OLS/LASSO producen coeficientes que se pueden interpretar directamente: "un punto más en percepción económica se asocia con X puntos más de satisfacción". Un modelo de Random Forest solo dice "esta variable es importante", sin indicar la dirección o magnitud del efecto. En ciencias sociales, la interpretabilidad suele ser tan valiosa como la precisión predictiva.

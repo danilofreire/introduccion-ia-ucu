@@ -765,7 +765,7 @@ rf_fit |>
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
-:::{.column width=55%}
+:::{.column width=45%}
 - La importancia nos dice [qué]{.alert} variables importan
 - Los [Partial Dependence Plots (PDP)]{.alert} nos dicen [cómo]{.alert} afectan
 - Muestran el [efecto marginal]{.alert} de una variable sobre la predicción
@@ -780,27 +780,17 @@ ajuste_rf |>
 ```
 :::
 
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 26px;"}
+:::{.column width=55%}
+:::{style="text-align: center;"}
 **Ejemplo de PDP:**
 
-```
-Prob(voto)
-    │
-0.7 │           ┌────────────
-    │          ╱
-0.6 │        ╱
-    │      ╱
-0.5 │    ╱
-    │  ╱
-0.4 │╱
-    └──────────────────────▶
-     20  30  40  50  60  70  edad
-```
+[![](figures/pdp-example.png){width="80%"}](#){data-modal-type="image" data-modal-url="figures/pdp-example.png"}
+:::
 
-[Interpretación:]{.alert} La probabilidad de votar aumenta con la edad, pero se estabiliza después de los 50 años.
+:::{style="font-size: 22px;"}
+- [Interpretación:]{.alert} La probabilidad de votar aumenta con la edad, pero se estabiliza después de los 50 años.
 
-Esto es algo que la regresión logística no captura automáticamente.
+- Esto es algo que la regresión logística no captura automáticamente.
 :::
 :::
 :::
@@ -810,7 +800,7 @@ Esto es algo que la regresión logística no captura automáticamente.
 
 ## ¿Por qué ajustar hiperparámetros?
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 - Los [hiperparámetros]{.alert} son decisiones que tomamos antes de entrenar
@@ -819,7 +809,10 @@ Esto es algo que la regresión logística no captura automáticamente.
     - Random Forest: `trees`, `mtry`, `min_n`
 - Los valores por defecto [suelen funcionar]{.alert}, pero no siempre son óptimos
 - El [tuning]{.alert} busca la mejor combinación de hiperparámetros
-- [Nunca usar datos de test para tuning]{.alert}: usamos validación cruzada
+- [Nunca usar datos de test para tuning]{.alert}: usamos validación cruzada (`vfold_cv()`)
+- `tune()` es la función de tidymodels para marcar qué parámetros queremos ajustar
+- `grid_regular()` o `grid_random()` nos ayudan a crear combinaciones de valores para probar
+- `tune_grid()` hace el proceso de ajuste y evaluación automáticamente
 :::
 
 :::{.column width=45%}
@@ -863,17 +856,17 @@ modelo_rf_tune <- rand_forest(
   set_mode("classification")
 
 # 2. Crear grilla de valores
-grilla <- grid_regular(
+grilla <- grid_regular(      # grid_regular: combinaciones sistemáticas 
   mtry(range = c(2, 6)),
   min_n(range = c(5, 20)),
   levels = 4
 )
 
 # 3. Validación cruzada
-folds <- vfold_cv(datos_train, v = 5, strata = voto)
+folds <- vfold_cv(datos_train, v = 5, strata = voto) # estratificar por voto para mantener proporciones
 
 # 4. Ajustar
-resultados <- tune_grid(
+resultados <- tune_grid(   # ajusta el modelo para cada combinación y fold
   modelo_rf_tune,
   voto ~ .,
   resamples = folds,
@@ -912,6 +905,8 @@ metrics(pred_final, truth = voto, estimate = .pred_class)
 - El [tuning puede mejorar significativamente]{.alert} el rendimiento
 - Pero también [toma tiempo]{.alert}: con muchas combinaciones y folds, puede ser lento
 - En la práctica, empezar con valores por defecto y hacer tuning si es necesario
+- `select_best()` nos muestra la mejor combinación según la métrica que elijamos (accuracy, AUC, etc.)
+- `finalize_model()` fija los hiperparámetros en el modelo para el entrenamiento final
 :::
 :::
 

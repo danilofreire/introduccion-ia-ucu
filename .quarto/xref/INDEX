@@ -13,5 +13,92 @@
   },
   "index.qmd": {
     "index.html": "d7f26538"
+  },
+  "clases/dia-01/04-laboratorio-02.qmd": {
+    "04-laboratorio-02.html": "ab3708fe"
+  },
+  "clases/dia-02/03-clasificacion.qmd": {
+    "03-clasificacion.html": "3cf058ca"
+  },
+  "clases/dia-01/tarea-01.qmd": {
+    "tarea-01.html": "f452873e"
+  },
+  "clases/dia-01/tarea-02.qmd": {
+    "tarea-02.html": "a9d75c3d"
+  },
+  "clases/dia-01/tarea-01-respuestas.qmd": {
+    "tarea-01-respuestas.html": "9e4a426a"
+  },
+  "clases/dia-01/tarea-02-respuestas.qmd": {
+    "tarea-02-respuestas.html": "e9a987b1"
+  },
+  "clases/dia-02/04-regresion-prediccion.qmd": {
+    "04-regresion-prediccion.html": "4fabc7b7"
+  },
+  "clases/dia-01/01-que-es-ia.qmd": {
+    "01-que-es-ia.html": "2fcd6441"
+  },
+  "clases/dia-03/05-clustering-pca.qmd": {
+    "05-clustering-pca.html": "3f833b4c"
+  },
+  "clases/dia-02/05-laboratorio-03.qmd": {
+    "05-laboratorio-03.html": "59a3decf"
+  },
+  "clases/dia-02/06-laboratorio-04.qmd": {
+    "06-laboratorio-04.html": "e2ab7974"
+  },
+  "clases/dia-01/02-fundamentos-ml.qmd": {
+    "02-fundamentos-ml.html": "510f597c"
+  },
+  "clases/dia-01/03-laboratorio-01.qmd": {
+    "03-laboratorio-01.html": "7b9b689c"
+  },
+  "referencia-tidymodels.qmd": {
+    "referencia-tidymodels.html": "90a335f7"
+  },
+  "clases/dia-03/06-analisis-texto.qmd": {
+    "06-analisis-texto.html": "cb848b65"
+  },
+  "clases/dia-03/07-laboratorio-05.qmd": {
+    "07-laboratorio-05.html": "290acb13"
+  },
+  "clases/dia-03/08-laboratorio-06.qmd": {
+    "08-laboratorio-06.html": "50b6205d"
+  },
+  "clases/dia-04/09-laboratorio-07.qmd": {
+    "09-laboratorio-07.html": "37dc5471"
+  },
+  "clases/dia-04/07-entendiendo-llms.qmd": {
+    "07-entendiendo-llms.html": "df27e32e"
+  },
+  "clases/dia-04/10-laboratorio-08.qmd": {
+    "10-laboratorio-08.html": "4531bc23"
+  },
+  "clases/dia-04/08-llms-investigacion.qmd": {
+    "08-llms-investigacion.html": "ea28c6e9"
+  },
+  "clases/dia-05/12-propuestas-cierre.qmd": {
+    "12-propuestas-cierre.html": "38fbdf4c"
+  },
+  "clases/dia-05/09-etica-sesgo.qmd": {
+    "09-etica-sesgo.html": "d9083ca4"
+  },
+  "clases/dia-05/11-laboratorio-09.qmd": {
+    "11-laboratorio-09.html": "3050c302"
+  },
+  "clases/dia-05/10-sesgo-regulacion.qmd": {
+    "10-sesgo-regulacion.html": "dcf50850"
+  },
+  "clases/dia-02/tarea-03.qmd": {
+    "tarea-03.html": "53ede1a3"
+  },
+  "clases/dia-02/tarea-03-respuestas.qmd": {
+    "tarea-03-respuestas.html": "2a4e147a"
+  },
+  "clases/dia-02/tarea-04-respuestas.qmd": {
+    "tarea-04-respuestas.html": "913355b1"
+  },
+  "clases/dia-02/tarea-04.qmd": {
+    "tarea-04.html": "355f2e30"
   }
 }

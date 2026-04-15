@@ -1,0 +1,765 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 4.3: Laboratorio - Primeros pasos con ellmer"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 4.3](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-04/09-laboratorio-07.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 7: Primeros pasos con ellmer {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Configurar ellmer con API keys
+2. Crear nuestro primer chat
+3. Experimentar con system prompts
+4. Clasificar textos con LLMs
+5. Extraer datos estructurados
+6. Comparar con métodos del Día 3
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- Usar [ellmer]{.alert} desde R
+- Diseñar [prompts efectivos]{.alert}
+- [Extraer datos]{.alert} en formato estructurado
+- Evaluar la [calidad]{.alert} de las clasificaciones
+
+<br>
+
+[Cada estudiante necesita una API key. Compartiré una del curso si no la tienen.]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Configuración y primer chat | ~25 min |
+| 2 | Clasificación de textos | ~35 min |
+| 3 | Extracción estructurada | ~30 min |
+| 4 | Comparación con LDA | ~30 min |
+
+<br>
+
+[Usaremos los textos políticos del Día 3 para comparar LLMs con métodos clásicos.]{.alert}
+:::
+
+# Parte 1: Configuración {background-color="#2d4563"}
+
+## Instalar y cargar ellmer
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: instalar-ellmer
+#| eval: false
+#| prompt: false
+
+# Instalar ellmer (solo la primera vez)
+install.packages("ellmer")
+```
+
+```{r}
+#| label: cargar-paquetes
+#| eval: false
+#| message: false
+#| warning: false
+
+# Cargar paquetes
+library(ellmer)
+library(tidyverse)
+library(jsonlite)
+
+# Verificar que ellmer está instalado
+packageVersion("ellmer")
+```
+:::
+
+## Configurar la API key
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: configurar-api
+#| eval: false
+#| prompt: false
+
+# Opción 1: OpenAI (GPT-4)
+Sys.setenv(OPENAI_API_KEY = "sk-...")
+
+# Opción 2: Anthropic (Claude)
+Sys.setenv(ANTHROPIC_API_KEY = "sk-ant-...")
+
+# Opción 3: Para este curso, usaremos la key compartida
+# (la compartiré en clase)
+
+# Verificar que la key está configurada
+Sys.getenv("OPENAI_API_KEY") != ""  # Debería ser TRUE
+```
+
+:::{.callout-warning}
+**Seguridad**: Nunca incluir API keys directamente en el código que se comparte o sube a GitHub. Usar variables de entorno o archivos `.Renviron`.
+:::
+:::
+
+## Crear el primer chat
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: primer-chat
+#| eval: false
+
+# Crear un chat con GPT-4o-mini (rápido y barato)
+chat <- chat_openai(
+  model = "gpt-4o-mini"
+)
+
+# Enviar un mensaje
+respuesta <- chat$chat("Hola, ¿cómo estás?")
+
+# Ver la respuesta
+cat(respuesta)
+
+# El chat mantiene el historial
+chat$chat("¿Cuál fue mi primer mensaje?")
+```
+:::
+
+## Usar un system prompt
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: system-prompt
+#| eval: false
+
+# Chat con personalidad definida
+analista <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un analista político experto en América Latina.
+                   Respondes de forma concisa y académica.
+                   Siempre citas fuentes cuando es posible.
+                   Respondes en español."
+)
+
+# Ahora todas las respuestas seguirán estas instrucciones
+analista$chat("¿Cuáles son los principales desafíos democráticos en Uruguay?")
+```
+
+:::{.callout-tip}
+El system prompt define el "rol" del modelo para toda la conversación. Es clave para obtener respuestas consistentes.
+:::
+:::
+
+## Experimentar con system prompts
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Ejercicio**: Crear tres chats con diferentes personalidades y comparar las respuestas a la misma pregunta.
+
+```{r}
+#| label: ejercicio-system
+#| eval: false
+
+# Chat 1: Académico formal
+academico <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un profesor universitario. Responde de forma
+                   formal y académica con referencias."
+)
+
+# Chat 2: Periodista
+periodista <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un periodista. Responde de forma clara y
+                   accesible para el público general."
+)
+
+# Chat 3: Activista
+activista <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un activista social. Responde con pasión
+                   y énfasis en la justicia social."
+)
+
+# Misma pregunta, diferentes respuestas
+pregunta <- "¿Qué opinas sobre la desigualdad en América Latina?"
+
+academico$chat(pregunta)
+periodista$chat(pregunta)
+activista$chat(pregunta)
+```
+:::
+
+# Parte 2: Clasificación de textos {background-color="#2d4563"}
+
+## Cargar los textos del Día 3
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cargar-textos
+#| eval: false
+
+# Cargar los textos políticos
+textos <- read_csv("../dia-03/datos/textos_politicos.csv",
+                   show_col_types = FALSE)
+
+# Ver estructura
+glimpse(textos)
+
+# Recordar: tenemos 60 textos con 5 temas
+textos |> count(tema)
+```
+:::
+
+## Crear un clasificador
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: crear-clasificador
+#| eval: false
+
+# System prompt para clasificación
+clasificador <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un clasificador de textos políticos.
+
+  Tu tarea es clasificar cada texto en UNO de estos temas:
+  - economia
+  - educacion
+  - seguridad
+  - salud
+  - medioambiente
+
+  REGLAS:
+  1. Responde SOLO con el nombre del tema, en minúsculas
+  2. No agregues explicaciones ni puntuación
+  3. Si no estás seguro, elige el tema más probable
+
+  Ejemplos:
+  Texto: 'La inflación afecta a las familias' → economia
+  Texto: 'Los estudiantes protestaron' → educacion
+  Texto: 'Aumentaron los homicidios' → seguridad"
+)
+
+# Probar con un texto
+clasificador$chat(textos$texto[1])
+```
+:::
+
+## Clasificar un texto
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: clasificar-uno
+#| eval: false
+
+# Ver el primer texto
+cat("Texto:", textos$texto[1], "\n")
+cat("Tema real:", textos$tema[1], "\n")
+
+# Clasificar
+tema_llm <- clasificador$chat(textos$texto[1])
+cat("Tema LLM:", tema_llm, "\n")
+
+# ¿Coincide?
+cat("Correcto:", textos$tema[1] == trimws(tolower(tema_llm)))
+```
+:::
+
+## Función para clasificar en batch
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: funcion-clasificar
+#| eval: false
+
+# IMPORTANTE: crear un chat nuevo para cada texto
+# Esto evita que el historial acumulado sesgue las respuestas
+
+clasificar_texto <- function(texto) {
+  # Chat sin historial
+  chat_temp <- chat_openai(
+    model = "gpt-4o-mini",
+    system_prompt = "Eres un clasificador de textos políticos.
+    Clasifica en: economia, educacion, seguridad, salud, medioambiente.
+    Responde SOLO con el nombre del tema, sin explicación."
+  )
+
+  respuesta <- chat_temp$chat(texto)
+  return(trimws(tolower(respuesta)))
+}
+
+# Probar
+clasificar_texto("La inflación sigue siendo un problema grave.")
+```
+:::
+
+## Clasificar los primeros 20 textos
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: clasificar-batch
+#| eval: false
+
+# Clasificar un subconjunto (para no gastar mucha API)
+# Esto toma ~1-2 minutos
+
+resultados <- textos |>
+  slice(1:20) |>
+  mutate(
+    tema_llm = map_chr(texto, clasificar_texto, .progress = TRUE)
+  )
+
+# Ver resultados
+resultados |>
+  select(tema, tema_llm, texto) |>
+  head(10)
+```
+:::
+
+## Evaluar la clasificación
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: evaluar-clasificacion
+#| eval: false
+
+# Calcular accuracy
+evaluacion <- resultados |>
+  mutate(correcto = tema == tema_llm)
+
+# Accuracy general
+accuracy <- mean(evaluacion$correcto)
+cat("Accuracy:", round(accuracy * 100, 1), "%\n")
+
+# Matriz de confusión
+table(Real = evaluacion$tema, LLM = evaluacion$tema_llm)
+```
+:::
+
+## Analizar errores
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: analizar-errores
+#| eval: false
+
+# Ver los errores
+errores <- evaluacion |>
+  filter(!correcto) |>
+  select(texto, tema, tema_llm)
+
+# Mostrar errores
+errores
+
+# Pregunta: ¿los errores son "razonables"?
+# A veces el LLM clasifica diferente pero no está "mal"
+```
+:::
+
+# Parte 3: Extracción estructurada {background-color="#2d4563"}
+
+## ¿Por qué datos estructurados?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Texto libre:**
+
+```
+"El sentimiento del texto es
+negativo porque menciona crisis
+e inflación alta."
+```
+
+Difícil de procesar automáticamente.
+:::
+
+:::{.column width=50%}
+**JSON estructurado:**
+
+```json
+{
+  "sentimiento": "negativo",
+  "confianza": 0.85,
+  "palabras_clave": ["crisis", "inflación"]
+}
+```
+
+Fácil de convertir a dataframe.
+:::
+:::
+
+<br>
+
+[Pedir respuestas en formato JSON permite integrar LLMs en pipelines de análisis.]{.alert}
+:::
+
+## Extracción con prompt
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: extraccion-prompt
+#| eval: false
+
+# Chat para extracción estructurada
+extractor <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = 'Analiza textos políticos y extrae información.
+  Responde SIEMPRE en JSON válido con esta estructura:
+  {
+    "tema": "economia/educacion/seguridad/salud/medioambiente",
+    "sentimiento": "positivo/negativo/neutro",
+    "confianza": 0.0-1.0,
+    "entidades": ["lista de personas, organizaciones o lugares mencionados"],
+    "resumen": "resumen en una oración"
+  }
+  NO incluyas texto fuera del JSON.'
+)
+
+# Probar
+texto_ejemplo <- "El presidente anunció que la inflación bajará al 5%
+                  gracias a las nuevas políticas del Banco Central."
+
+respuesta_json <- extractor$chat(texto_ejemplo)
+cat(respuesta_json)
+```
+:::
+
+## Parsear el JSON
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: parsear-json
+#| eval: false
+
+# Convertir JSON a lista de R
+resultado <- fromJSON(respuesta_json)
+
+# Acceder a los campos
+cat("Tema:", resultado$tema, "\n")
+cat("Sentimiento:", resultado$sentimiento, "\n")
+cat("Confianza:", resultado$confianza, "\n")
+cat("Entidades:", paste(resultado$entidades, collapse = ", "), "\n")
+cat("Resumen:", resultado$resumen, "\n")
+```
+:::
+
+## Usar extract_data de ellmer
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: extract-data
+#| eval: false
+
+# ellmer tiene una función que valida el JSON automáticamente
+
+chat_extractor <- chat_openai(model = "gpt-4o-mini")
+
+resultado <- chat_extractor$extract_data(
+  "El gobierno de Uruguay aumentó el salario mínimo en un 10%,
+   lo que beneficiará a miles de trabajadores.",
+  type = type_object(
+    tema = type_string("Tema: economia/educacion/seguridad/salud/medioambiente"),
+    sentimiento = type_string("Sentimiento: positivo/negativo/neutro"),
+    confianza = type_number("Confianza entre 0 y 1"),
+    pais = type_string("País mencionado, o 'no especificado'"),
+    impacto = type_string("Descripción breve del impacto")
+  )
+)
+
+# Resultado ya es una lista estructurada
+str(resultado)
+```
+:::
+
+## Extraer múltiples textos
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: extraer-batch
+#| eval: false
+
+# Función para extraer de un texto
+extraer_info <- function(texto) {
+  chat_temp <- chat_openai(model = "gpt-4o-mini")
+
+  resultado <- chat_temp$extract_data(
+    texto,
+    type = type_object(
+      tema = type_string("economia/educacion/seguridad/salud/medioambiente"),
+      sentimiento = type_string("positivo/negativo/neutro"),
+      confianza = type_number("0 a 1")
+    )
+  )
+
+  return(as_tibble(resultado))
+}
+
+# Aplicar a varios textos
+extracciones <- textos |>
+  slice(1:10) |>
+  mutate(
+    info = map(texto, extraer_info)
+  ) |>
+  unnest(info)
+
+# Ver resultado
+extracciones |>
+  select(tema, sentimiento, confianza, texto)
+```
+:::
+
+# Parte 4: Comparación con LDA {background-color="#2d4563"}
+
+## Recordar los resultados del Día 3
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+En el Día 3, usamos LDA para clasificar los mismos textos:
+
+- LDA descubrió 5 temas a partir de las palabras
+- Asignamos cada documento al tema dominante
+- Calculamos accuracy comparando con las etiquetas reales
+
+**Pregunta**: ¿El LLM clasifica mejor que LDA?
+
+[Vamos a comparar los dos métodos con los mismos textos.]{.alert}
+:::
+
+## Comparación directa
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: comparacion
+#| eval: false
+
+# Supongamos que tenemos resultados de LDA del Día 3
+# y resultados de LLM de hoy
+
+# Crear tabla comparativa
+comparacion <- tibble(
+
+  metodo = c("LDA", "LLM (GPT-4o-mini)"),
+  accuracy = c(0.72, 0.87),  # Valores ejemplo
+
+  tiempo = c("2 segundos", "2 minutos"),
+  costo = c("Gratis", "~USD 0.02")
+)
+
+comparacion
+
+# Conclusión: LLM más preciso pero más lento y con costo
+```
+:::
+
+## Discusión
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Ventajas del LLM:**
+
+- Mayor [precisión]{.alert}
+- Entiende [contexto]{.alert} y [negaciones]{.alert}
+- No requiere [preprocesamiento]{.alert}
+- Funciona en [múltiples idiomas]{.alert}
+:::
+
+:::{.column width=50%}
+**Ventajas de LDA:**
+
+- [Gratuito]{.alert} y local
+- [Rápido]{.alert} para grandes volúmenes
+- [Reproducible]{.alert} al 100%
+- [Interpretable]{.alert}: sabemos qué palabras definen cada tema
+:::
+:::
+
+<br>
+
+[La elección depende del caso: precisión vs. escala vs. costo.]{.alert}
+:::
+
+# Ejercicios adicionales {background-color="#2d4563"}
+
+## Ejercicio 1: Cambiar el modelo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Repetir la clasificación con `gpt-4o` en lugar de `gpt-4o-mini`
+2. ¿Mejora la accuracy?
+3. ¿Vale la pena el costo adicional?
+
+```{r}
+#| label: ejercicio-1
+#| eval: false
+
+# Tu código aquí
+clasificador_gpt4 <- chat_openai(
+  model = "gpt-4o",  # Modelo más potente
+  system_prompt = "..."
+)
+
+# Clasificar y comparar
+```
+:::
+
+## Ejercicio 2: Few-shot prompting
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+**Instrucciones:**
+
+1. Modificar el system prompt para incluir 3-5 ejemplos
+2. ¿Mejora la clasificación con ejemplos?
+
+```{r}
+#| label: ejercicio-2
+#| eval: false
+
+# Tu código aquí
+clasificador_fewshot <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Clasifica textos políticos.
+
+  EJEMPLOS:
+  - 'La inflación bajó al 3%' → economia
+  - 'Los docentes reclaman mejores salarios' → educacion
+  - 'Aumentaron los robos en la capital' → seguridad
+  - 'Se inauguró un nuevo hospital' → salud
+  - 'Los incendios forestales continúan' → medioambiente
+
+  Responde SOLO con el tema, sin explicación."
+)
+```
+:::
+
+## Ejercicio 3: Extraer entidades
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Crear un extractor de entidades nombradas (NER)
+2. Extraer personas, organizaciones y lugares de los textos
+3. ¿Qué entidades aparecen más frecuentemente?
+
+```{r}
+#| label: ejercicio-3
+#| eval: false
+
+# Tu código aquí
+ner <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Extrae entidades nombradas del texto.
+  Responde en JSON:
+  {
+    'personas': [...],
+    'organizaciones': [...],
+    'lugares': [...]
+  }"
+)
+```
+:::
+
+## Resumen del laboratorio
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que practicamos:**
+
+- Configurar ellmer con API keys
+- Crear chats con system prompts
+- Clasificar textos con LLMs
+- Extraer datos estructurados
+- Comparar con métodos clásicos
+:::
+
+:::{.column width=50%}
+**Funciones clave:**
+
+- `chat_openai()`: crear chat
+- `$chat()`: enviar mensaje
+- `$extract_data()`: extraer JSON
+- `fromJSON()`: parsear JSON
+- `map_chr()`: aplicar a vectores
+:::
+:::
+
+<br>
+
+[En el próximo laboratorio: análisis de sentimiento, datos sintéticos y auditoría de sesgos.]{.alert}
+:::
+
+# Continuar con el laboratorio avanzado {background-color="#2d4563"}

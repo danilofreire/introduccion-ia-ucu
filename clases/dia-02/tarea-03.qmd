@@ -1,0 +1,207 @@
+---
+title: "Tarea 3: Clasificación avanzada con tidymodels"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-13"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta tarea usa el dataset del Laboratorio 3 (`latinobarometro_sim.csv`). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
+
+**Para trabajar en esta tarea:**
+
+1. Descarguen este archivo `.qmd` y el dataset `latinobarometro_sim.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <https://quarto.org/docs/get-started/>
+3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)
+4. Cuando terminen, pueden renderizar el documento completo con el botón "Render" en RStudio
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidymodels)
+library(tidyverse)
+library(ranger)
+library(vip)
+library(pdp)
+library(xgboost)
+
+set.seed(2026)
+
+datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+
+datos <- datos |>
+  mutate(
+    pais = factor(pais),
+    zona = factor(zona),
+    genero = factor(genero),
+    uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
+    voto = factor(voto, levels = c("si", "no"))
+  )
+```
+
+## Exploración
+
+### Pregunta 1: Participación electoral por grupos
+
+Calculen la proporción de votantes (`voto == "si"`) por zona (urbana/rural) y por género. Muestren los resultados en una tabla. ¿Hay diferencias entre los grupos?
+
+```{r p1}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 2: Correlaciones entre predictores
+
+Calculen la matriz de correlaciones entre las variables numéricas: `edad`, `educacion_anios`, `ingreso_hogar`, `confianza_gobierno`, `confianza_justicia`, `satisfaccion_democracia`, `percepcion_economia`, `interes_politica` y `satisfaccion_vida`. ¿Cuáles dos variables tienen la mayor correlación? ¿Tiene sentido teórico?
+
+```{r p2}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 3: Distribución de edad por voto
+
+Creen un boxplot que muestre la distribución de `edad` separada por `voto`. Agreguen `labs()` con título y etiquetas claras. ¿Los votantes tienden a ser mayores o menores que los no votantes?
+
+```{r p3}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Modelos base
+
+### Pregunta 4: Modelo reducido
+
+Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(2026)` y estratificación por `voto`. Luego ajusten una regresión logística usando solo tres predictores: `edad`, `educacion_anios` e `interes_politica`. Calculen la accuracy y el AUC sobre el conjunto de prueba. ¿Cómo se compara con el modelo completo del laboratorio?
+
+*Pista:* usen la misma estructura de `recipe()` + `workflow()` del laboratorio, pero con menos variables en la fórmula.
+
+```{r p4}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 5: Coeficientes e interpretación
+
+Usando el modelo logístico completo (con todos los predictores del laboratorio), extraigan los coeficientes con `tidy()` y calculen los odds ratios (`exp(estimate)`). ¿Cuál variable tiene el efecto más fuerte sobre la probabilidad de votar? ¿Cuál tiene un efecto negativo?
+
+```{r p5}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Random Forest y tuning
+
+### Pregunta 6: Efecto del número de árboles
+
+Entrenen tres modelos de Random Forest con 100, 500 y 1000 árboles respectivamente (usando `mtry = 4` y `min_n = 10` fijos, sin tuning). Calculen el AUC de cada modelo sobre el conjunto de prueba. ¿Cuánto mejora el AUC al aumentar el número de árboles? ¿Vale la pena usar 1000?
+
+```{r p6}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 7: Grilla aleatoria vs. regular
+
+En el laboratorio usamos `grid_regular()` para crear la grilla de búsqueda. Ahora usen `grid_random()` con `size = 20` para el mismo modelo de Random Forest con `mtry` y `min_n` a ajustar. Comparen el mejor AUC obtenido con cada tipo de grilla.
+
+*Pista:* `grid_random(mtry(range = c(2, 8)), min_n(range = c(5, 30)), size = 20)`.
+
+```{r p7}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 8: Más folds de validación cruzada
+
+Repitan el tuning de Random Forest del laboratorio pero con 10 folds en vez de 5. ¿El mejor modelo tiene los mismos hiperparámetros? ¿El error estándar (`std_err`) de las métricas es menor con más folds?
+
+```{r p8}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Interpretación
+
+### Pregunta 9: PDPs adicionales
+
+Usando el modelo de Random Forest ajustado en el laboratorio, creen Partial Dependence Plots para `confianza_gobierno` y `educacion_anios`. Describan la relación que observan: ¿es lineal, tiene mesetas, tiene curvas?
+
+```{r p9}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 10: VIP vs. coeficientes logísticos
+
+Comparen el ranking de importancia del VIP (Random Forest, Gini) con el ranking de los coeficientes de la regresión logística (ordenados por valor absoluto del estadístico z). ¿Coinciden los dos rankings? ¿Por qué podrían diferir?
+
+*Pista:* en `tidy()`, la columna `statistic` contiene el estadístico z.
+
+```{r p10}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Comparación de modelos
+
+### Pregunta 11: Agregar un árbol de decisión
+
+Entrenen un modelo `decision_tree()` con `cost_complexity = 0.01`, `tree_depth = 10` y `min_n = 10`. Calculen sus métricas (accuracy, AUC) sobre el conjunto de prueba y compárenlas con la regresión logística y el Random Forest. ¿Cuánto se pierde en rendimiento respecto al Random Forest?
+
+```{r p11}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 12: Tabla comparativa completa
+
+Creen una tabla que compare cuatro modelos (regresión logística, Random Forest, XGBoost y árbol de decisión) con las métricas: accuracy, AUC, precision, recall y F1-score. Usen `bind_rows()` para combinar y `pivot_wider()` para formatear.
+
+*Pista:* para cada modelo, generen predicciones con `predict()` y `predict(type = "prob")`, luego calculen las métricas con `metrics()` y `f_meas()`.
+
+```{r p12}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Reflexión
+
+### Pregunta 13: Recomendación para un tomador de decisiones
+
+Imaginen que trabajan para un organismo electoral latinoamericano que quiere entender qué factores influyen en la participación electoral para diseñar campañas de movilización. ¿Qué modelo recomendarían de los cuatro que entrenaron? Consideren al menos tres criterios: rendimiento predictivo, interpretabilidad y utilidad para la toma de decisiones. Justifiquen su respuesta.
+
+**Respuesta:**

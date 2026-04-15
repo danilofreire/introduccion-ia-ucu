@@ -60,7 +60,16 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 - Predicción vs. explicación en ciencias sociales
 - Regularización: LASSO, Ridge, Elastic Net
 - Ingeniería de variables para datos sociales
-- Laboratorio: clasificación y predicción con datos de Latinobarómetro usando `ranger` y `glmnet`
+
+**[Laboratorio 3: Clasificación avanzada con Latinobarómetro](clases/dia-02/05-laboratorio-03.html)**
+
+- Random Forest con tuning de hiperparámetros, XGBoost
+- Interpretación con VIP y Partial Dependence Plots
+
+**[Laboratorio 4: Regresión y regularización](clases/dia-02/06-laboratorio-04.html)**
+
+- Regresión lineal, LASSO, Ridge y Elastic Net con `glmnet`
+- Comparación de modelos de regresión y selección de variables
 
 ### Día 3: Texto y aprendizaje no supervisado
 

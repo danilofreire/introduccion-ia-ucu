@@ -53,13 +53,13 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 28px;"}
+:::{style="margin-top: 20px; font-size: 26px;"}
 
 :::{.columns}
 :::{.column width=50%}
 **Primera parte**
 
-- Predicción vs. explicación: el debate
+- Predicción vs. explicación: las "dos culturas"
 - Regresión lineal y sus limitaciones
 - El problema del sobreajuste
 - Regularización: LASSO, Ridge, Elastic Net
@@ -68,13 +68,13 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 - Ajuste de hiperparámetros (tuning)
 - Ingeniería de variables para datos sociales
-- Aplicaciones en América Latina
+- Aplicaciones en ciencias sociales
 - Comparación con otros métodos
 :::
 
 :::{.column width=50%}
 :::{style="text-align: center;"}
-[![](figures/overfit-underfit.png){width="90%"}](#){data-modal-type="image" data-modal-url="figures/overfit-underfit.png"}
+[![](figures/linear-regression.gif){width="90%"}](#){data-modal-type="image" data-modal-url="figures/linear-regression.gif"}
 :::
 :::
 :::
@@ -84,36 +84,29 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## El debate central en ciencias sociales
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 25px;"}
 :::{.columns}
 :::{.column width=55%}
-- Mullainathan y Spiess (2017), "[Machine Learning: An Applied Econometric Approach](https://www.aeaweb.org/articles?id=10.1257/jep.31.2.87)":
-    - En economía (y ciencias sociales en general), la tradición es la [explicación causal]{.alert}: $\hat{\beta}$
-    - Pero muchos problemas de política pública son en realidad problemas de [predicción]{.alert}: $\hat{y}$
-- [Explicación]{.alert}: ¿por qué ocurre algo? ¿cuál es el efecto causal de X sobre Y?
-    - Necesitamos [identificación causal]{.alert} (experimentos, variables instrumentales, diff-in-diff)
-    - El foco está en el [coeficiente]{.alert}
-- [Predicción]{.alert}: ¿qué va a ocurrir? ¿quién está en riesgo?
-    - Necesitamos [buena generalización]{.alert} a datos nuevos
-    - El foco está en la [predicción]{.alert}
+- Breiman (2001), "[Statistical Modeling: The Two Cultures](https://doi.org/10.1214/ss/1009213726)":
+    - [Modelo de datos]{.alert}: se asume un modelo generador, se estiman parámetros ($\hat{\beta}$). Foco en identificación causal
+    - [Modelo algorítmico]{.alert}: caja negra, se optimiza la predicción ($\hat{y}$). Foco en generalización a datos nuevos
+- En ciencias sociales solemos explicar, pero predecir deserción escolar o focalizar intervenciones también requiere buenos modelos
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Ejemplos**
 
 | Pregunta | Tipo |
 |----------|------|
-| ¿El programa de becas aumentó la asistencia escolar? | [Explicación]{.alert} |
-| ¿Qué estudiantes tienen mayor riesgo de desertar? | [Predicción]{.alert} |
-| ¿La vacunación redujo la mortalidad infantil? | [Explicación]{.alert} |
+| ¿Las becas aumentaron la asistencia escolar? | [Explicación]{.alert} |
+| ¿Qué estudiantes van a desertar? | [Predicción]{.alert} |
+| ¿La vacunación redujo la mortalidad? | [Explicación]{.alert} |
 | ¿Qué pacientes necesitan cuidados intensivos? | [Predicción]{.alert} |
-| ¿El acuerdo de paz redujo la violencia? | [Explicación]{.alert} |
-| ¿Dónde ocurrirán las protestas la próxima semana? | [Predicción]{.alert} |
 
 <br>
 
-[Ambos son valiosos.]{.alert} El ML aporta herramientas para predicción que complementan los métodos causales.
+[Ambos son valiosos!]{.alert} El ML aporta herramientas de predicción que complementan los métodos causales.
 :::
 :::
 :::
@@ -132,10 +125,10 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center;"}
-[![](figures/overfit-underfit.png){width="90%"}](#){data-modal-type="image" data-modal-url="figures/overfit-underfit.png"}
+:::{style="text-align: center; margin-top: -30px; font-size: 18px;"}
+[![](figures/bias-variance.gif){width="70%"}](#){data-modal-type="image" data-modal-url="figures/bias-variance.gif"}
 
-El mismo principio aplica a la regresión: un modelo demasiado complejo (muchas variables) memoriza el ruido.
+A medida que agregamos variables, el error de entrenamiento baja pero el error de test sube: el modelo memoriza el ruido
 :::
 :::
 :::
@@ -145,7 +138,7 @@ El mismo principio aplica a la regresión: un modelo demasiado complejo (muchas 
 
 ## La idea de la regularización
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 :::{.columns}
 :::{.column width=55%}
 - [Regularización]{.alert} = agregar una penalización por la complejidad del modelo
@@ -164,29 +157,21 @@ $$\min \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 + \lambda \cdot \text{penalización}(\
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**La intuición**
+**La intuición: un presupuesto para coeficientes**
 
-Regularización le dice al modelo:
+- OLS puede asignar coeficientes tan grandes como quiera. Con muchas variables, esto genera sobreajuste.
 
-"Sí, quiero que ajustes los datos, pero [no te esfuerces demasiado]{.alert}. Si un coeficiente es muy grande, vas a pagar un precio."
+- Regularización impone un [presupuesto]{.alert}: la suma total de los coeficientes no puede ser ilimitada. El modelo debe [repartir un presupuesto finito]{.alert} entre todas las variables.
 
-Esto obliga al modelo a:
-
-- Usar solo las variables que [realmente importan]{.alert}
-- Mantener los coeficientes [pequeños]{.alert}
-- [Generalizar mejor]{.alert} a datos nuevos
-
-Es como un profesor que dice:
-"Puedes usar notas en el examen, pero cada hoja que traigas te cuesta puntos."
-:::
+- Presupuesto generoso ($\lambda$ bajo): el modelo usa muchas variables, similar a OLS
+- Presupuesto ajustado ($\lambda$ alto): el modelo solo gasta en las variables que más ayudan
 :::
 :::
 :::
 
 ## LASSO (L1)
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 - [LASSO]{.alert} = Least Absolute Shrinkage and Selection Operator ([Tibshirani, 1996](https://doi.org/10.1111/j.2517-6161.1996.tb02080.x))
@@ -202,7 +187,7 @@ $$\min \sum (y_i - \hat{y}_i)^2 + \lambda \sum |\beta_j|$$
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 24px;"}
 **LASSO en acción**
 
 ```
@@ -228,7 +213,7 @@ automáticamente.
 
 ## Ridge (L2)
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 - [Ridge]{.alert} = penalización L2: suma de los [cuadrados]{.alert} de los coeficientes
@@ -278,9 +263,9 @@ $$\min \sum (y_i - \hat{y}_i)^2 + \lambda \left[ \alpha \sum |\beta_j| + (1-\alp
 - Dos hiperparámetros:
     - $\lambda$: fuerza general de la penalización
     - $\alpha$: mezcla entre LASSO y Ridge
-        - $\alpha = 1$: LASSO puro
-        - $\alpha = 0$: Ridge puro
-        - $0 < \alpha < 1$: Elastic Net
+    - $\alpha = 1$: LASSO puro
+    - $\alpha = 0$: Ridge puro
+    - $0 < \alpha < 1$: Elastic Net
 - [Selecciona variables]{.alert} (como LASSO) pero maneja mejor las [correlaciones]{.alert} (como Ridge)
 - En la práctica, [Elastic Net suele funcionar mejor]{.alert} que LASSO o Ridge por separado
 :::
@@ -345,39 +330,93 @@ ajuste <- fit(modelo_lasso, satisfaccion_vida ~ ., data = datos_train)
 ## Ingeniería de variables para datos sociales
 
 :::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
 - [Ingeniería de variables]{.alert} (feature engineering): crear, transformar o seleccionar variables para mejorar el modelo
-- En ciencias sociales, los datos encuestas suelen necesitar transformación:
-    - [Variables categóricas]{.alert}: convertir a dummies (one-hot encoding)
-        - `zona = "urbana"` → `zona_urbana = 1`, `zona_rural = 0`
-    - [Variables ordinales]{.alert}: decidir si tratar como numéricas o categóricas
-        - Confianza (1-4): ¿numérica o 4 dummies?
-    - [Interacciones]{.alert}: crear productos entre variables
-        - `edad * educacion`: el efecto de la educación cambia con la edad?
-    - [Transformaciones]{.alert}: logaritmos, polinomios
-        - `log(ingreso)` para relaciones no lineales
+- [Variables categóricas]{.alert}: convertir a dummies (one-hot encoding)
+    - `zona = "urbana"` → `zona_urbana = 1`, `zona_rural = 0`
+- [Variables ordinales]{.alert}: decidir si tratar como numéricas o categóricas
+    - Nivel educativo (primaria, secundaria, universitaria): ¿ordinal o nominal?
+- [Interacciones]{.alert}: crear productos entre variables
+    - `edad * educacion`: el efecto de la educación cambia con la edad?
+- [Transformaciones]{.alert}: logaritmos, polinomios
+    - `log(ingreso)` para relaciones no lineales
+    - `edad^2` para capturar efectos cuadráticos (ej: participación política en forma de U por edad)
+- [Discretización]{.alert}: convertir variables continuas en categorías
+    - Edad → grupos etarios (18-29, 30-44, 45-59, 60+)
+- [Imputación]{.alert}: reemplazar valores faltantes con estimaciones
+    - Encuestas siempre tienen datos faltantes; la mediana o KNN son opciones comunes
 :::
 
-:::{.column width=45%}
-:::{style="font-size: 20px;"}
+## Ingeniería de variables para datos sociales
+
+:::{style="margin-top: 30px; font-size: 25px;"}
 **Con recipes de tidymodels:**
 
 ```r
 receta <- recipe(voto ~ ., data = datos_train) |>
   # Convertir categóricas a dummies
   step_dummy(all_nominal_predictors()) |>
-  # Normalizar numéricas
+  # Normalizar numéricas (media = 0, sd = 1)
   step_normalize(all_numeric_predictors()) |>
-  # Eliminar variables con varianza cero
+  # Eliminar variables con varianza cero (constantes)
   step_zv(all_predictors()) |>
   # Crear interacciones
-  step_interact(terms = ~ edad:educacion_anios)
+  step_interact(terms = ~ edad:educacion_anios) |>
+  # Imputar valores faltantes con la mediana
+  step_impute_median(all_numeric_predictors()) |>
+  # Agrupar categorías poco frecuentes en "other"
+  step_other(religion, threshold = 0.05) |>
+  # Eliminar predictores altamente correlacionados (r > 0.9)
+  step_corr(all_numeric_predictors(), threshold = 0.9) |>
+  # Transformación logarítmica
+  step_log(ingreso, offset = 1) |>
+  # Términos polinómicos (ej: edad + edad²)
+  step_poly(edad, degree = 2)
+```
+:::
+
+## El flujo completo: `workflow()`
+
+:::{style="margin-top: 30px; font-size: 21px;"}
+:::{.columns}
+:::{.column width=55%}
+- En tidymodels, `recipe` y `model` se combinan en un [workflow()]{.alert}
+- El workflow conecta el preprocesamiento con el modelo en un solo objeto
+- Ventaja: se aplica automáticamente a datos nuevos, sin repetir pasos manualmente
+
+```r
+# Combinar receta + modelo
+flujo <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_lasso)
+
+# Ajustar todo junto
+ajuste <- fit(flujo, data = datos_train)
+
+# Predecir con datos nuevos
+predicciones <- predict(ajuste,
+                        new_data = datos_test)
+```
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px;"}
+**Evaluación final con `last_fit()`:**
+
+```r
+# Evaluar en el test set (una sola vez)
+resultado <- last_fit(flujo,
+                      split = datos_split)
+
+# Métricas finales
+collect_metrics(resultado)
+
+# Ver predicciones
+collect_predictions(resultado)
 ```
 
-- `recipes` nos permite definir el [preprocesamiento como parte del flujo]{.alert}
-- Se aplica automáticamente a datos nuevos
-- Evita [data leakage]{.alert}: el preprocesamiento se ajusta solo con datos de entrenamiento
+<br>
+
+[`last_fit()` ajusta con todo el train set y evalúa con el test set en un solo paso.]{.alert} Es la forma recomendada de obtener las métricas finales del modelo.
 :::
 :::
 :::
@@ -387,41 +426,32 @@ receta <- recipe(voto ~ ., data = datos_train) |>
 
 ## ¿Cómo elegir λ (penalty)?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- El hiperparámetro $\lambda$ (penalty) controla la [fuerza de la regularización]{.alert}
-- $\lambda = 0$: sin penalización (OLS)
-- $\lambda$ grande: coeficientes muy pequeños (o cero en LASSO)
-- [No hay un valor "correcto" universal]{.alert}: depende de los datos
-- Solución: [validación cruzada]{.alert}
-    1. Probar muchos valores de $\lambda$
-    2. Para cada uno, evaluar con CV
-    3. Elegir el que minimice el error de validación
+- $\lambda$ controla la [fuerza de la regularización]{.alert}
+- $\lambda = 0$: sin penalización (equivale a OLS)
+- $\lambda$ grande: coeficientes se encogen hacia cero
+- El valor correcto [depende de los datos]{.alert}, así que lo buscamos empíricamente
+
+**Estrategia práctica (3 pasos):**
+
+1. Definir una [grilla]{.alert} de valores candidatos de $\lambda$ (en escala logarítmica, ej: $10^{-4}$ a $10^{0}$)
+2. Evaluar cada $\lambda$ con [validación cruzada]{.alert} (5 o 10 folds)
+3. Elegir el $\lambda$ que minimice el error de validación (RMSE, MAE, etc.)
+
+**Consejo:** `tidymodels` genera la grilla automáticamente con `grid_regular(penalty(), levels = 30)`. No hace falta adivinar los valores 😉
 :::
 
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 18px;"}
-**Curva de selección de λ:**
+**¿Qué pasa al variar λ?**
 
-```
-Error CV
-    │
-    │ \
-    │  \        Subajuste
-    │   \      ╱
-    │    \    ╱
-    │     \  ╱
-    │      \/  ← λ óptimo
-    │      /\
-    │     ╱  \
-    │    ╱    \
-    │         Sobreajuste
-    └──────────────────────▶
-            log(λ)
-```
+[![](figures/lambda-curve.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/lambda-curve.png"}
 
-El error de CV tiene forma de U: hay un [punto óptimo]{.alert} entre sobreajuste y subajuste.
+- λ pequeño → muchas variables, riesgo de [sobreajuste]{.alert}
+- λ grande → pocas variables, riesgo de [subajuste]{.alert}
+- La curva en U nos muestra el [punto medio]{.alert} donde el modelo generaliza mejor
 :::
 :::
 :::
@@ -429,33 +459,36 @@ El error de CV tiene forma de U: hay un [punto óptimo]{.alert} entre sobreajust
 
 ## Tuning de LASSO con tidymodels
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 
 ```r
 # 1. Modelo con penalty a ajustar
+# tune() = marcador: "no fijes este valor, búscalo con CV"
+# mixture = 1 → LASSO puro (L1). Si fuera 0 → Ridge (L2)
 modelo_lasso_tune <- linear_reg(penalty = tune(), mixture = 1) |>
-  set_engine("glmnet") |>
-  set_mode("regression")
+  set_engine("glmnet") |>    # glmnet: paquete que implementa LASSO/Ridge
 
-# 2. Grilla de valores de penalty
+# 2. Grilla de valores candidatos de penalty (λ)
+# range = c(-4, 0) → en escala log10: de 10^-4 = 0.0001 a 10^0 = 1
+# levels = 30 → probar 30 valores espaciados uniformemente en ese rango
 grilla_lambda <- grid_regular(penalty(range = c(-4, 0)), levels = 30)
 
-# 3. Validación cruzada
+# 3. Validación cruzada: dividir datos en 5 partes
 folds <- vfold_cv(datos_train, v = 5)
 
-# 4. Ajustar
+# 4. Probar cada valor de λ con CV
 resultados <- tune_grid(
-  modelo_lasso_tune,
-  satisfaccion_vida ~ .,
-  resamples = folds,
-  grid = grilla_lambda,
-  metrics = metric_set(rmse, rsq)
+  modelo_lasso_tune,               # modelo con tune()
+  satisfaccion_vida ~ .,           # fórmula: predecir con todas las variables
+  resamples = folds,               # usar los 5 folds
+  grid = grilla_lambda,            # los 30 valores de λ a probar
+  metrics = metric_set(rmse, rsq)  # métricas: error y R²
 )
 
-# 5. Visualizar
+# 5. Visualizar: gráfico de RMSE vs. λ (curva en U)
 autoplot(resultados)
 
-# 6. Seleccionar mejor λ
+# 6. Seleccionar el λ con menor RMSE promedio
 mejor_lambda <- select_best(resultados, metric = "rmse")
 modelo_final <- finalize_model(modelo_lasso_tune, mejor_lambda)
 ```
@@ -532,11 +565,11 @@ show_best(resultados_enet, metric = "rmse", n = 5)
 ```
 :::
 
-# Aplicaciones en América Latina {background-color="#2d4563"}
+# Aplicaciones en ciencias sociales {background-color="#2d4563"}
 
 ## Ejemplo: Predicción de pobreza con datos de encuestas
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
 **El problema:**
@@ -554,7 +587,7 @@ show_best(resultados_enet, metric = "rmse", n = 5)
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 25px;"}
 **Variables típicas seleccionadas:**
 
 ```
@@ -570,7 +603,9 @@ tiene_vehiculo         0.09
 zona_urbana            0.00  ← eliminada
 genero_jefe            0.00  ← eliminada
 ```
+:::
 
+:::{style="font-size: 21px;"}
 LASSO identifica automáticamente qué variables [realmente predicen]{.alert} la pobreza.
 :::
 :::
@@ -584,9 +619,7 @@ LASSO identifica automáticamente qué variables [realmente predicen]{.alert} la
 :::{.column width=55%}
 **Pregunta de investigación:**
 
-¿Qué factores predicen la satisfacción con la democracia en América Latina?
-
-**Datos:** Latinobarómetro (simulados)
+¿Qué factores predicen la satisfacción con la democracia en América Latina? (datos simulados)
 
 **Enfoque:**
 
@@ -603,7 +636,7 @@ LASSO identifica automáticamente qué variables [realmente predicen]{.alert} la
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 24px;"}
 **Comparación de modelos:**
 
 ```
@@ -619,9 +652,11 @@ RF tiene mejor R², pero...
 ¿podemos interpretar el efecto
 de cada variable?
 ```
+:::
 
 <br>
 
+:::{style="font-size: 21px;"}
 [El trade-off interpretabilidad-rendimiento es real. La elección depende del objetivo.]{.alert}
 :::
 :::
@@ -630,7 +665,7 @@ de cada variable?
 
 ## Regularización para datos de alta dimensionalidad
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 **¿Cuándo es especialmente útil la regularización?**
@@ -652,21 +687,17 @@ de cada variable?
 :::{style="text-align: center; font-size: 20px;"}
 **La regla del pulgar:**
 
-```
-Si  n >> p  (muchos datos, pocas variables)
-    → OLS probablemente está bien
-
-Si  n ≈ p  (datos y variables similares)
-    → Regularización ayuda
-
-Si  n << p  (pocas observaciones, muchas variables)
-    → Regularización es NECESARIA
-    → OLS no funciona (matriz singular)
-```
+| Situación | Significado | Recomendación |
+|-----------|-------------|---------------|
+| $n \gg p$ | Muchos datos, pocas variables | OLS probablemente está bien |
+| $n \approx p$ | Datos y variables similares | Regularización ayuda |
+| $n \ll p$ | Pocas observaciones, muchas variables | Regularización es [necesaria]{.alert} (OLS no funciona) |
+:::
 
 <br>
 
-[LASSO funciona incluso cuando p > n, lo cual es imposible con OLS clásico.]{.alert}
+:::{style="font-size: 23px;"}
+[LASSO funciona incluso cuando $p > n$, lo cual es imposible con OLS clásico.]{.alert}
 :::
 :::
 :::
@@ -674,7 +705,7 @@ Si  n << p  (pocas observaciones, muchas variables)
 
 ## Comparación: Regularización vs. Random Forest
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 
 :::{style="text-align: center;"}
 
@@ -695,9 +726,189 @@ Si  n << p  (pocas observaciones, muchas variables)
 [En la práctica, es útil probar ambos enfoques y comparar.]{.alert} La regularización es mejor cuando las relaciones son aproximadamente lineales y queremos interpretabilidad. RF es mejor cuando hay no linealidades e interacciones complejas.
 :::
 
-## Resumen de la sesión
+## ¿Cómo interpretar los coeficientes de LASSO?
+
+:::{style="margin-top: 30px; font-size: 21px;"}
+:::{.columns}
+:::{.column width=55%}
+- Tras ajustar un modelo LASSO, obtenemos un conjunto de [coeficientes]{.alert}
+- Algunos son exactamente cero: esas variables fueron [eliminadas]{.alert} por el modelo
+- Los que sobreviven son los predictores que LASSO consideró más relevantes
+
+**¿Cómo leerlos?**
+
+- Un coeficiente [positivo]{.alert} indica que aumentar esa variable se asocia con un aumento en la respuesta
+- Un coeficiente [negativo]{.alert} indica lo contrario
+- La [magnitud]{.alert} depende de la escala de las variables. Si normalizamos antes (`step_normalize()`), los coeficientes son directamente comparables
+
+**Atención:** LASSO elige [una]{.alert} variable entre un grupo correlacionado y descarta las demás. No significa que las eliminadas no importen, sino que son redundantes con la que quedó.
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 22px;"}
+**Extraer coeficientes en tidymodels:**
+
+```r
+# Ajustar modelo final
+ajuste_final <- fit(modelo_final,
+                    satisfaccion ~ .,
+                    data = datos_train)
+
+# Ver coeficientes
+tidy(ajuste_final) |>
+  filter(estimate != 0) |>   # solo no-cero
+  arrange(desc(abs(estimate)))
+```
+
+```
+# Resultado (ejemplo):
+term                  estimate
+─────────────────────────────
+confianza_gobierno     0.38
+percepcion_economia    0.31
+educacion_anios        0.22
+edad                  -0.14
+desempleo_regional    -0.09
+```
+
+Las variables con coeficiente = 0 (no mostradas) fueron [descartadas]{.alert} por LASSO.
+:::
+:::
+:::
+:::
+
+## Regularización también para clasificación
 
 :::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- LASSO, Ridge y Elastic Net [no son solo para regresión]{.alert}
+- Funcionan igual con regresión logística: se penalizan los coeficientes para evitar sobreajuste y seleccionar variables
+- En tidymodels, basta con cambiar `linear_reg()` por `logistic_reg()`:
+
+```r
+# Regresión logística con LASSO
+modelo_clasif <- logistic_reg(
+  penalty = tune(),
+  mixture = 1          # LASSO
+) |>
+  set_engine("glmnet") |>
+  set_mode("classification")
+
+# El resto del flujo es idéntico:
+# workflow, recipe, tune_grid, etc.
+```
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px;"}
+**Ejemplo: predecir voto**
+
+¿Qué variables predicen si alguien vota o no? Con 40 predictores de una encuesta, LASSO logístico selecciona los que realmente importan:
+
+```
+Variable              Coef
+─────────────────────────────
+edad                   0.52
+educacion_anios        0.34
+interes_politica       0.41
+confianza_partidos     0.28
+ingreso_hogar          0.00 ← eliminada
+genero                 0.00 ← eliminada
+satisf_servicios       0.00 ← eliminada
+```
+
+[Misma lógica que antes: LASSO descarta las variables redundantes.]{.alert}
+:::
+:::
+:::
+:::
+
+## Guía práctica: ¿qué modelo uso?
+
+:::{style="margin-top: 30px; font-size: 19px;"}
+
+:::{style="text-align: center;"}
+[![](figures/model-choice.png){width="70%"}](#){data-modal-type="image" data-modal-url="figures/model-choice.png"}
+:::
+
+:::{.columns}
+:::{.column width=50%}
+**Si priorizas [interpretabilidad]{.alert}:**
+
+- OLS para pocos predictores claros
+- LASSO cuando quieres que el modelo elija
+- Ridge si todos los predictores importan
+:::
+
+:::{.column width=50%}
+**Si priorizas [rendimiento]{.alert}:**
+
+- Random Forest para relaciones complejas
+- Elastic Net como buen punto de partida
+- Siempre compara varios modelos con CV
+:::
+:::
+:::
+
+## Validación cruzada: ¿por qué y cómo?
+
+:::{style="margin-top: 30px; font-size: 19px;"}
+:::{.columns}
+:::{.column width=55%}
+- Un solo split train/test puede dar resultados [inestables]{.alert} (depende de qué datos caen en cada grupo)
+- [Validación cruzada (CV)]{.alert} resuelve esto: divide los datos en $k$ partes (folds) y entrena $k$ veces, dejando un fold diferente como validación cada vez
+- `vfold_cv(datos, v = 5)` en tidymodels hace esto automáticamente
+
+**Pasos de k-fold CV:**
+
+1. Dividir los datos en $k$ partes iguales (típicamente $k$ = 5 o 10)
+2. Para cada fold $i$: entrenar con los otros $k-1$ folds, evaluar con el fold $i$
+3. Promediar las $k$ métricas de evaluación
+4. Ese promedio es nuestra [estimación del error]{.alert} en datos nuevos
+
+**¿Por qué $k$ = 5 o 10?** Es un compromiso práctico: suficientes folds para una buena estimación sin gastar demasiado tiempo de cómputo.
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 18px;"}
+**5-fold CV ilustrado:**
+
+```
+Fold 1: [VAL] [Train] [Train] [Train] [Train]
+Fold 2: [Train] [VAL] [Train] [Train] [Train]
+Fold 3: [Train] [Train] [VAL] [Train] [Train]
+Fold 4: [Train] [Train] [Train] [VAL] [Train]
+Fold 5: [Train] [Train] [Train] [Train] [VAL]
+
+→ 5 estimaciones de error → promedio
+```
+
+**En tidymodels:**
+
+```r
+# Crear folds
+folds <- vfold_cv(datos_train, v = 5)
+
+# Evaluar un modelo con CV
+resultados <- fit_resamples(
+  modelo,
+  satisfaccion ~ .,
+  resamples = folds,
+  metrics = metric_set(rmse, rsq)
+)
+
+# Ver resultados promedio
+collect_metrics(resultados)
+```
+:::
+:::
+:::
+:::
+
+## Resumen de la sesión
+
+:::{style="margin-top: 30px; font-size: 25px;"}
 :::{.columns}
 :::{.column width=50%}
 **Conceptos clave:**
@@ -735,7 +946,7 @@ Si  n << p  (pocas observaciones, muchas variables)
     - Análisis computacional de texto
     - Topic modeling
 
-[Nos vemos en el laboratorio.]{.alert}
+[Nos vemos en el laboratorio!]{.alert} 🤓
 :::
 
-# Nos vemos en el laboratorio {background-color="#2d4563"}
+# Nos vemos en el laboratorio! 😊 {background-color="#2d4563"}

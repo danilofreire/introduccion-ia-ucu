@@ -74,11 +74,11 @@ if (!require("fontawesome", character.only = TRUE)) {
 - [Visualización]{.alert} de resultados
 - [Interpretación]{.alert} de modelos
 
-<br>
+:::{style="margin-top: 30px; font-size: 28px;"}
+[Hay menos código predefinido. Ustedes van a escribir más!]{.alert} 
 
-[Este laboratorio es más abierto: ustedes toman las decisiones.]{.alert}
-
-[Hay menos código predefinido. Ustedes van a escribir más.]{.alert}
+[¡No se preocupen! Les damos una estructura para que puedan completar.]{.alert} 😉
+:::
 :::
 :::
 :::
@@ -116,7 +116,7 @@ Vamos a trabajar con datos simulados de [satisfacción con la democracia]{.alert
 satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
 
 # Ver estructura
-glimpse(satisfaccion)
+glimpse(satisfaccion) # Ver las variables y tipos
 ```
 
 **Variable objetivo:** `satisfecho` (sí/no) - ¿El encuestado está satisfecho con la democracia?
@@ -325,6 +325,10 @@ folds <- vfold_cv(datos_train, v = 5, strata = satisfecho)
 
 cat("Train:", nrow(datos_train), "| Test:", nrow(datos_test))
 ```
+
+- `initial_split()`: Divide el dataset en train/test
+- `training()` y `testing()`: Extraen los datasets de train y test
+- `vfold_cv()`: Crea folds para validación cruzada (5 folds, estratificados por `satisfecho`)
 :::
 
 # Parte 3: Comparación de modelos {background-color="#2d4563"}

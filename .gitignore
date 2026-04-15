@@ -573,3 +573,6 @@ rsconnect/
 
 /.quarto/
 **/*.quarto_ipynb
+
+# Root-level site_libs created by quarto preview (real copy lives in docs/)
+/site_libs/
