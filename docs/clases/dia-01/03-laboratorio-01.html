@@ -1351,34 +1351,23 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </section>
 <section id="recapitulando-el-ecosistema-tidy" class="slide level2">
 <h2>Recapitulando: el ecosistema tidy</h2>
-<div style="margin-top: 30px; font-size: 24px;">
-<div class="columns">
-<div class="column" style="width:55%;">
+<div style="margin-top: 30px; font-size: 26px;">
 <ul>
 <li><a href="https://www.tidymodels.org/">tidymodels</a> es un conjunto de paquetes de R para modelado de datos</li>
 <li>Sigue la filosofía del <span class="alert">tidyverse</span>: código legible, consistente y modular</li>
 <li>Paquetes principales:
 <ul>
 <li><span class="alert"><a href="https://rsample.tidymodels.org/">rsample:</a></span> división de datos</li>
-<li><span class="alert"><a href="https://parsnip.tidymodels.org/">parsnip:</a></span> especificación de modelos</li>
-<li><span class="alert"><a href="https://yardstick.tidymodels.org/">yardstick:</a></span> métricas de evaluación</li>
-<li><span class="alert"><a href="https://workflows.tidymodels.org/">workflows:</a></span> combinar preprocesamiento + modelo</li>
 <li><span class="alert"><a href="https://recipes.tidymodels.org/">recipes:</a></span> preprocesamiento de datos</li>
+<li><span class="alert"><a href="https://parsnip.tidymodels.org/">parsnip:</a></span> especificación de modelos</li>
+<li><span class="alert"><a href="https://workflows.tidymodels.org/">workflows:</a></span> combinar preprocesamiento + modelo</li>
+<li><span class="alert"><a href="https://tune.tidymodels.org/">tune:</a></span> ajuste de hiperparámetros</li>
+<li><span class="alert"><a href="https://yardstick.tidymodels.org/">yardstick:</a></span> métricas de evaluación</li>
 </ul></li>
 </ul>
-</div><div class="column" style="width:45%;">
-<div style="text-align: center; font-size: 26px; margin-top: 20px;">
-<pre><code>tidymodels
-├── rsample    → dividir datos
-├── recipes    → preprocesar
-├── parsnip    → especificar modelo
-├── workflows  → combinar todo
-├── tune       → ajustar hiperparámetros
-└── yardstick  → evaluar</code></pre>
-<p><br></p>
-<p>Ventaja: <span class="alert">misma sintaxis</span> para todos los modelos, ya sea regresión logística, random forest o redes neuronales.</p>
 </div>
-</div></div>
+<div style="margin-top: 30px; font-size: 26px;">
+<p>Ventaja: <span class="alert">misma sintaxis</span> para todos los modelos, ya sea regresión logística, random forest o redes neuronales.</p>
 </div>
 </section>
 <section id="cargar-los-datos" class="slide level2">
@@ -1390,11 +1379,11 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <li>Los datos fueron generados a partir de un factor latente de “desarrollo” con ruido propio por indicador, lo que produce correlaciones moderadas entre predictores (r ~ 0.10-0.40)</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a><span class="co"># Cargar los datos</span></span>
-<span id="cb4-2"><a></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;datos/indicadores_mundiales.csv&quot;</span>)</span>
-<span id="cb4-3"><a></a></span>
-<span id="cb4-4"><a></a><span class="co"># Ver las primeras filas</span></span>
-<span id="cb4-5"><a></a><span class="fu">glimpse</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="co"># Cargar los datos</span></span>
+<span id="cb3-2"><a></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;datos/indicadores_mundiales.csv&quot;</span>)</span>
+<span id="cb3-3"><a></a></span>
+<span id="cb3-4"><a></a><span class="co"># Ver las primeras filas</span></span>
+<span id="cb3-5"><a></a><span class="fu">glimpse</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 179
 Columns: 11
@@ -1418,8 +1407,8 @@ $ crecimiento_alto        &lt;chr&gt; &quot;si&quot;, &quot;si&quot;, &quot;no&q
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Antes de modelar, siempre hay que <span class="alert">explorar los datos</span>:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="co"># Resumen estadístico</span></span>
-<span id="cb6-2"><a></a><span class="fu">summary</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="co"># Resumen estadístico</span></span>
+<span id="cb5-2"><a></a><span class="fu">summary</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     pais            continente        gasto_educacion acceso_internet
  Length:179         Length:179         Min.   :2.100   Min.   : 5.00  
@@ -1461,11 +1450,11 @@ $ crecimiento_alto        &lt;chr&gt; &quot;si&quot;, &quot;si&quot;, &quot;no&q
 </div><div class="column" style="width:45%;">
 <div style="margin-top: 20px; font-size: 26px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="co"># Verificar la distribución </span></span>
-<span id="cb8-2"><a></a><span class="co"># del outcome</span></span>
-<span id="cb8-3"><a></a>datos <span class="sc">|&gt;</span></span>
-<span id="cb8-4"><a></a>  <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span></span>
-<span id="cb8-5"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># Verificar la distribución </span></span>
+<span id="cb7-2"><a></a><span class="co"># del outcome</span></span>
+<span id="cb7-3"><a></a>datos <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a></a>  <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 3
   crecimiento_alto     n  prop
@@ -1502,18 +1491,18 @@ $ crecimiento_alto        &lt;chr&gt; &quot;si&quot;, &quot;si&quot;, &quot;no&q
 <div style="margin-top: 30px; font-size: 24px;">
 <p>Convertimos la variable de resultado a factor (necesario para clasificación) y seleccionamos las variables:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="co"># Asegurar que el outcome sea un factor</span></span>
-<span id="cb10-2"><a></a>datos <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
-<span id="cb10-3"><a></a>  <span class="fu">mutate</span>(<span class="at">crecimiento_alto =</span> <span class="fu">factor</span>(crecimiento_alto, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;si&quot;</span>)))</span>
-<span id="cb10-4"><a></a></span>
-<span id="cb10-5"><a></a><span class="co"># Seleccionar variables para el modelo (solo numéricas)</span></span>
-<span id="cb10-6"><a></a>datos_modelo <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
-<span id="cb10-7"><a></a>  <span class="fu">select</span>(crecimiento_alto, gasto_educacion, acceso_internet,</span>
-<span id="cb10-8"><a></a>         urbanizacion, gasto_salud, inflacion, desempleo,</span>
-<span id="cb10-9"><a></a>         inversion_extranjera, indice_gobierno_digital)</span>
-<span id="cb10-10"><a></a></span>
-<span id="cb10-11"><a></a><span class="co"># Verificar</span></span>
-<span id="cb10-12"><a></a><span class="fu">glimpse</span>(datos_modelo)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co"># Asegurar que el outcome sea un factor</span></span>
+<span id="cb9-2"><a></a>datos <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a></a>  <span class="fu">mutate</span>(<span class="at">crecimiento_alto =</span> <span class="fu">factor</span>(crecimiento_alto, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;si&quot;</span>)))</span>
+<span id="cb9-4"><a></a></span>
+<span id="cb9-5"><a></a><span class="co"># Seleccionar variables para el modelo (solo numéricas)</span></span>
+<span id="cb9-6"><a></a>datos_modelo <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
+<span id="cb9-7"><a></a>  <span class="fu">select</span>(crecimiento_alto, gasto_educacion, acceso_internet,</span>
+<span id="cb9-8"><a></a>         urbanizacion, gasto_salud, inflacion, desempleo,</span>
+<span id="cb9-9"><a></a>         inversion_extranjera, indice_gobierno_digital)</span>
+<span id="cb9-10"><a></a></span>
+<span id="cb9-11"><a></a><span class="co"># Verificar</span></span>
+<span id="cb9-12"><a></a><span class="fu">glimpse</span>(datos_modelo)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 179
 Columns: 9
@@ -1549,8 +1538,8 @@ $ indice_gobierno_digital &lt;dbl&gt; 0.38, 0.78, 0.13, 0.49, 0.52, 0.33, 0.57, 
 </ul>
 </div><div class="column" style="width:45%;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="co"># Ver los niveles del factor</span></span>
-<span id="cb12-2"><a></a><span class="fu">levels</span>(datos_modelo<span class="sc">$</span>crecimiento_alto)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="co"># Ver los niveles del factor</span></span>
+<span id="cb11-2"><a></a><span class="fu">levels</span>(datos_modelo<span class="sc">$</span>crecimiento_alto)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;no&quot; &quot;si&quot;</code></pre>
 </div>
@@ -1563,22 +1552,22 @@ $ indice_gobierno_digital &lt;dbl&gt; 0.38, 0.78, 0.13, 0.49, 0.52, 0.33, 0.57, 
 <div style="margin-top: 30px; font-size: 24px;">
 <p>Usamos <code>initial_split()</code> de rsample para crear la división train/test:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a><span class="co"># Fijar semilla para reproducibilidad</span></span>
-<span id="cb14-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb14-3"><a></a></span>
-<span id="cb14-4"><a></a><span class="co"># Dividir: 75% entrenamiento, 25% prueba</span></span>
-<span id="cb14-5"><a></a>datos_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb14-6"><a></a></span>
-<span id="cb14-7"><a></a><span class="co"># Extraer los conjuntos</span></span>
-<span id="cb14-8"><a></a>datos_train <span class="ot">&lt;-</span> <span class="fu">training</span>(datos_split)</span>
-<span id="cb14-9"><a></a>datos_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(datos_split)</span>
-<span id="cb14-10"><a></a></span>
-<span id="cb14-11"><a></a><span class="co"># Verificar tamaños</span></span>
-<span id="cb14-12"><a></a><span class="fu">cat</span>(<span class="st">&quot;Entrenamiento:&quot;</span>, <span class="fu">nrow</span>(datos_train), <span class="st">&quot;filas</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a><span class="co"># Fijar semilla para reproducibilidad</span></span>
+<span id="cb13-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb13-3"><a></a></span>
+<span id="cb13-4"><a></a><span class="co"># Dividir: 75% entrenamiento, 25% prueba</span></span>
+<span id="cb13-5"><a></a>datos_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<span id="cb13-6"><a></a></span>
+<span id="cb13-7"><a></a><span class="co"># Extraer los conjuntos</span></span>
+<span id="cb13-8"><a></a>datos_train <span class="ot">&lt;-</span> <span class="fu">training</span>(datos_split)</span>
+<span id="cb13-9"><a></a>datos_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(datos_split)</span>
+<span id="cb13-10"><a></a></span>
+<span id="cb13-11"><a></a><span class="co"># Verificar tamaños</span></span>
+<span id="cb13-12"><a></a><span class="fu">cat</span>(<span class="st">&quot;Entrenamiento:&quot;</span>, <span class="fu">nrow</span>(datos_train), <span class="st">&quot;filas</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Entrenamiento: 133 filas</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a><span class="fu">cat</span>(<span class="st">&quot;Prueba:&quot;</span>, <span class="fu">nrow</span>(datos_test), <span class="st">&quot;filas</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a><span class="fu">cat</span>(<span class="st">&quot;Prueba:&quot;</span>, <span class="fu">nrow</span>(datos_test), <span class="st">&quot;filas</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Prueba: 46 filas</code></pre>
 </div>
@@ -1594,10 +1583,10 @@ $ indice_gobierno_digital &lt;dbl&gt; 0.38, 0.78, 0.13, 0.49, 0.52, 0.33, 0.57, 
 <div style="margin-top: 30px; font-size: 24px;">
 <p>Comprobemos que las proporciones son similares en ambos conjuntos:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="co"># Proporciones en entrenamiento</span></span>
-<span id="cb18-2"><a></a>datos_train <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a></a>  <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span></span>
-<span id="cb18-4"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>), <span class="at">conjunto =</span> <span class="st">&quot;train&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="co"># Proporciones en entrenamiento</span></span>
+<span id="cb17-2"><a></a>datos_train <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a></a>  <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>), <span class="at">conjunto =</span> <span class="st">&quot;train&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 4
   crecimiento_alto     n  prop conjunto
@@ -1605,10 +1594,10 @@ $ indice_gobierno_digital &lt;dbl&gt; 0.38, 0.78, 0.13, 0.49, 0.52, 0.33, 0.57, 
 1 no                  69 0.519 train   
 2 si                  64 0.481 train   </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="co"># Proporciones en prueba</span></span>
-<span id="cb20-2"><a></a>datos_test <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a></a>  <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span></span>
-<span id="cb20-4"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>), <span class="at">conjunto =</span> <span class="st">&quot;test&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="co"># Proporciones en prueba</span></span>
+<span id="cb19-2"><a></a>datos_test <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a></a>  <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>), <span class="at">conjunto =</span> <span class="st">&quot;test&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 4
   crecimiento_alto     n  prop conjunto
@@ -1630,10 +1619,10 @@ $ indice_gobierno_digital &lt;dbl&gt; 0.38, 0.78, 0.13, 0.49, 0.52, 0.33, 0.57, 
 <li>¿Qué pasa si cambian la semilla (<code>set.seed()</code>)?</li>
 </ol>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="co"># Prueben diferentes configuraciones:</span></span>
-<span id="cb22-2"><a></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
-<span id="cb22-3"><a></a>datos_split_2 <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.50</span>)</span>
-<span id="cb22-4"><a></a><span class="co"># ...</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="co"># Prueben diferentes configuraciones:</span></span>
+<span id="cb21-2"><a></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
+<span id="cb21-3"><a></a>datos_split_2 <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.50</span>)</span>
+<span id="cb21-4"><a></a><span class="co"># ...</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><span class="alert">Entender cómo afectan estos parámetros es importante para diseñar experimentos robustos.</span></p>
 <p><a href="#/sec:appendix02"><span class="button">Apéndice 2: Solución</span></a></p>
@@ -1649,12 +1638,12 @@ $ indice_gobierno_digital &lt;dbl&gt; 0.38, 0.78, 0.13, 0.49, 0.52, 0.33, 0.57, 
 <div style="margin-top: 30px; font-size: 24px;">
 <p>Usamos <code>logistic_reg()</code> de parsnip para definir una regresión logística:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="co"># Especificar el modelo</span></span>
-<span id="cb23-2"><a></a>modelo_log <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb23-3"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glm&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb23-4"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span>
-<span id="cb23-5"><a></a></span>
-<span id="cb23-6"><a></a>modelo_log</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="co"># Especificar el modelo</span></span>
+<span id="cb22-2"><a></a>modelo_log <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glm&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span>
+<span id="cb22-5"><a></a></span>
+<span id="cb22-6"><a></a>modelo_log</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Logistic Regression Model Specification (classification)
 
@@ -1675,12 +1664,12 @@ Computational engine: glm </code></pre>
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Ahora ajustamos el modelo a los datos de entrenamiento:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="co"># Ajustar el modelo</span></span>
-<span id="cb25-2"><a></a>ajuste <span class="ot">&lt;-</span> modelo_log <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a></a>  <span class="fu">fit</span>(crecimiento_alto <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
-<span id="cb25-4"><a></a></span>
-<span id="cb25-5"><a></a><span class="co"># Ver los coeficientes</span></span>
-<span id="cb25-6"><a></a><span class="fu">tidy</span>(ajuste)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="co"># Ajustar el modelo</span></span>
+<span id="cb24-2"><a></a>ajuste <span class="ot">&lt;-</span> modelo_log <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a></a>  <span class="fu">fit</span>(crecimiento_alto <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
+<span id="cb24-4"><a></a></span>
+<span id="cb24-5"><a></a><span class="co"># Ver los coeficientes</span></span>
+<span id="cb24-6"><a></a><span class="fu">tidy</span>(ajuste)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 9 × 5
   term                    estimate std.error statistic  p.value
@@ -1698,6 +1687,7 @@ Computational engine: glm </code></pre>
 </div>
 <ul>
 <li><code>crecimiento_alto ~ .</code> significa: predecir <code>crecimiento_alto</code> usando <span class="alert">todas las demás variables</span></li>
+<li><code>fit()</code> entrena el modelo con los datos de entrenamiento</li>
 <li><code>tidy()</code> nos da una tabla limpia con coeficientes, errores estándar y p-valores</li>
 </ul>
 </div>
@@ -1723,10 +1713,10 @@ Computational engine: glm </code></pre>
 </div><div class="column" style="width:55%;">
 <div style="margin-top: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="co"># Ver los odds ratios</span></span>
-<span id="cb27-2"><a></a><span class="fu">tidy</span>(ajuste) <span class="sc">|&gt;</span></span>
-<span id="cb27-3"><a></a>  <span class="fu">mutate</span>(<span class="at">odds_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
-<span id="cb27-4"><a></a>  <span class="fu">select</span>(term, estimate, odds_ratio, p.value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a><span class="co"># Ver los odds ratios</span></span>
+<span id="cb26-2"><a></a><span class="fu">tidy</span>(ajuste) <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a></a>  <span class="fu">mutate</span>(<span class="at">odds_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
+<span id="cb26-4"><a></a>  <span class="fu">select</span>(term, estimate, odds_ratio, p.value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 9 × 4
   term                    estimate odds_ratio  p.value
@@ -1751,15 +1741,15 @@ Computational engine: glm </code></pre>
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Generamos predicciones en los datos de prueba:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a><span class="co"># Predecir clases</span></span>
-<span id="cb29-2"><a></a>predicciones <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span></span>
-<span id="cb29-3"><a></a>  <span class="fu">predict</span>(datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb29-4"><a></a>  <span class="fu">bind_cols</span>(datos_test)</span>
-<span id="cb29-5"><a></a></span>
-<span id="cb29-6"><a></a><span class="co"># Ver las primeras predicciones</span></span>
-<span id="cb29-7"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb29-8"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_class) <span class="sc">|&gt;</span></span>
-<span id="cb29-9"><a></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a><span class="co"># Predecir clases</span></span>
+<span id="cb28-2"><a></a>predicciones <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span></span>
+<span id="cb28-3"><a></a>  <span class="fu">predict</span>(datos_test) <span class="sc">|&gt;</span>  <span class="co"># predice clases por defecto</span></span>
+<span id="cb28-4"><a></a>  <span class="fu">bind_cols</span>(datos_test)   <span class="co"># combinar con datos originales para evaluación</span></span>
+<span id="cb28-5"><a></a></span>
+<span id="cb28-6"><a></a><span class="co"># Ver las primeras predicciones</span></span>
+<span id="cb28-7"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb28-8"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb28-9"><a></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 2
    crecimiento_alto .pred_class
@@ -1787,8 +1777,8 @@ Computational engine: glm </code></pre>
 <div style="margin-top: 30px; font-size: 22px;">
 <p>La matriz de confusión muestra todos los resultados posibles:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a><span class="co"># Matriz de confusión</span></span>
-<span id="cb31-2"><a></a><span class="fu">conf_mat</span>(predicciones, <span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="co"># Matriz de confusión</span></span>
+<span id="cb30-2"><a></a><span class="fu">conf_mat</span>(predicciones, <span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          Truth
 Prediction no si
@@ -1814,10 +1804,10 @@ Prediction no si
 <h2>Métricas de evaluación</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="co"># Conjunto completo de métricas</span></span>
-<span id="cb33-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb33-3"><a></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
-<span id="cb33-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a><span class="co"># Conjunto completo de métricas</span></span>
+<span id="cb32-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb32-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 13 × 3
    .metric              .estimator .estimate
@@ -1867,15 +1857,15 @@ Prediction no si
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Los modelos de clasificación también pueden dar <span class="alert">probabilidades</span>, no solo clases:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a><span class="co"># Obtener probabilidades</span></span>
-<span id="cb35-2"><a></a>pred_probs <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span></span>
-<span id="cb35-3"><a></a>  <span class="fu">predict</span>(datos_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb35-4"><a></a>  <span class="fu">bind_cols</span>(datos_test)</span>
-<span id="cb35-5"><a></a></span>
-<span id="cb35-6"><a></a><span class="co"># Ver las probabilidades</span></span>
-<span id="cb35-7"><a></a>pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb35-8"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_no, .pred_si) <span class="sc">|&gt;</span></span>
-<span id="cb35-9"><a></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a><span class="co"># Obtener probabilidades</span></span>
+<span id="cb34-2"><a></a>pred_probs <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span></span>
+<span id="cb34-3"><a></a>  <span class="fu">predict</span>(datos_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb34-4"><a></a>  <span class="fu">bind_cols</span>(datos_test)</span>
+<span id="cb34-5"><a></a></span>
+<span id="cb34-6"><a></a><span class="co"># Ver las probabilidades</span></span>
+<span id="cb34-7"><a></a>pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb34-8"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_no, .pred_si) <span class="sc">|&gt;</span></span>
+<span id="cb34-9"><a></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 3
    crecimiento_alto .pred_no .pred_si
@@ -1901,28 +1891,28 @@ Prediction no si
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Por defecto, el umbral es 0.5. Pero podemos cambiarlo:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a><span class="co"># Crear predicciones con umbral personalizado</span></span>
-<span id="cb37-2"><a></a>umbral <span class="ot">&lt;-</span> <span class="fl">0.3</span>  <span class="co"># Más sensible: predice &quot;sí&quot; más fácilmente</span></span>
-<span id="cb37-3"><a></a></span>
-<span id="cb37-4"><a></a>pred_umbral <span class="ot">&lt;-</span> pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb37-5"><a></a>  <span class="fu">mutate</span>(<span class="at">.pred_class_nuevo =</span> <span class="fu">factor</span>(</span>
-<span id="cb37-6"><a></a>    <span class="fu">if_else</span>(.pred_si <span class="sc">&gt;=</span> umbral, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
-<span id="cb37-7"><a></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;si&quot;</span>)</span>
-<span id="cb37-8"><a></a>  ))</span>
-<span id="cb37-9"><a></a></span>
-<span id="cb37-10"><a></a><span class="co"># Comparar métricas</span></span>
-<span id="cb37-11"><a></a>pred_umbral <span class="sc">|&gt;</span></span>
-<span id="cb37-12"><a></a>  <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class_nuevo,</span>
-<span id="cb37-13"><a></a>            <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="co"># Crear predicciones con umbral personalizado</span></span>
+<span id="cb36-2"><a></a>umbral <span class="ot">&lt;-</span> <span class="fl">0.3</span>  <span class="co"># Más sensible: predice &quot;sí&quot; más fácilmente</span></span>
+<span id="cb36-3"><a></a></span>
+<span id="cb36-4"><a></a>pred_umbral <span class="ot">&lt;-</span> pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb36-5"><a></a>  <span class="fu">mutate</span>(<span class="at">.pred_class_nuevo =</span> <span class="fu">factor</span>(</span>
+<span id="cb36-6"><a></a>    <span class="fu">if_else</span>(.pred_si <span class="sc">&gt;=</span> umbral, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
+<span id="cb36-7"><a></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;si&quot;</span>)</span>
+<span id="cb36-8"><a></a>  ))</span>
+<span id="cb36-9"><a></a></span>
+<span id="cb36-10"><a></a><span class="co"># Comparar métricas</span></span>
+<span id="cb36-11"><a></a>pred_umbral <span class="sc">|&gt;</span></span>
+<span id="cb36-12"><a></a>  <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class_nuevo,</span>
+<span id="cb36-13"><a></a>            <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric   .estimator .estimate
   &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;
 1 precision binary         0.688</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a>pred_umbral <span class="sc">|&gt;</span></span>
-<span id="cb39-2"><a></a>  <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class_nuevo,</span>
-<span id="cb39-3"><a></a>         <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>pred_umbral <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a></a>  <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class_nuevo,</span>
+<span id="cb38-3"><a></a>         <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
@@ -1937,14 +1927,18 @@ Prediction no si
 <section id="sec:exercise06" class="slide level2">
 <h2>Validación cruzada</h2>
 <div style="margin-top: 30px; font-size: 22px;">
-<p>En lugar de una sola división, usemos <span class="alert">validación cruzada</span>:</p>
+<ul>
+<li>En lugar de una sola división, usemos <span class="alert">validación cruzada</span></li>
+<li><code>vfold_cv()</code> crea folds estratificados para evaluar el modelo en múltiples subconjuntos</li>
+<li><code>fit_resamples()</code> ajusta el modelo en cada fold y calcula métricas promedio</li>
+</ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a><span class="co"># Crear folds de validación cruzada</span></span>
-<span id="cb41-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb41-3"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb41-4"><a></a></span>
-<span id="cb41-5"><a></a><span class="co"># Ver los folds</span></span>
-<span id="cb41-6"><a></a>folds</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a><span class="co"># Crear folds de validación cruzada</span></span>
+<span id="cb40-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb40-3"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<span id="cb40-4"><a></a></span>
+<span id="cb40-5"><a></a><span class="co"># Ver los folds</span></span>
+<span id="cb40-6"><a></a>folds</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>#  5-fold cross-validation using stratification 
 # A tibble: 5 × 2
@@ -1958,17 +1952,17 @@ Prediction no si
 </div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a><span class="co"># Ajustar modelo en cada fold</span></span>
-<span id="cb43-2"><a></a>cv_results <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb43-3"><a></a>  modelo_log,</span>
-<span id="cb43-4"><a></a>  crecimiento_alto <span class="sc">~</span> .,</span>
-<span id="cb43-5"><a></a>  <span class="at">resamples =</span> folds,</span>
-<span id="cb43-6"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, precision, recall),</span>
-<span id="cb43-7"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb43-8"><a></a>)</span>
-<span id="cb43-9"><a></a></span>
-<span id="cb43-10"><a></a><span class="co"># Ver resultados promedio</span></span>
-<span id="cb43-11"><a></a><span class="fu">collect_metrics</span>(cv_results)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a><span class="co"># Ajustar modelo en cada fold</span></span>
+<span id="cb42-2"><a></a>cv_results <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb42-3"><a></a>  modelo_log,</span>
+<span id="cb42-4"><a></a>  crecimiento_alto <span class="sc">~</span> .,</span>
+<span id="cb42-5"><a></a>  <span class="at">resamples =</span> folds,</span>
+<span id="cb42-6"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, precision, recall),</span>
+<span id="cb42-7"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb42-8"><a></a>)</span>
+<span id="cb42-9"><a></a></span>
+<span id="cb42-10"><a></a><span class="co"># Ver resultados promedio</span></span>
+<span id="cb42-11"><a></a><span class="fu">collect_metrics</span>(cv_results)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 6
   .metric   .estimator  mean     n std_err .config        
@@ -1986,12 +1980,12 @@ Prediction no si
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Visualicemos el rendimiento con una <span class="alert">curva ROC</span>:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a><span class="co"># Calcular curva ROC</span></span>
-<span id="cb45-2"><a></a>roc_data <span class="ot">&lt;-</span> pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb45-3"><a></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb45-4"><a></a></span>
-<span id="cb45-5"><a></a><span class="co"># Graficar</span></span>
-<span id="cb45-6"><a></a><span class="fu">autoplot</span>(roc_data)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="co"># Calcular curva ROC</span></span>
+<span id="cb44-2"><a></a>roc_data <span class="ot">&lt;-</span> pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb44-3"><a></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb44-4"><a></a></span>
+<span id="cb44-5"><a></a><span class="co"># Graficar</span></span>
+<span id="cb44-6"><a></a><span class="fu">autoplot</span>(roc_data)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2004,9 +1998,9 @@ Prediction no si
 <li><code>event_level = &quot;second&quot;</code> indica que el <span class="alert">evento positivo</span> es el segundo nivel del factor (<code>&quot;si&quot;</code>). Por defecto, yardstick usa el primer nivel (<code>&quot;no&quot;</code>) como evento positivo. Sin este argumento, la curva ROC y el AUC se calculan al revés (AUC &lt; 0.5)</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a><span class="co"># Calcular AUC</span></span>
-<span id="cb46-2"><a></a>pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb46-3"><a></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a><span class="co"># Calcular AUC</span></span>
+<span id="cb45-2"><a></a>pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb45-3"><a></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
@@ -2074,25 +2068,25 @@ Prediction no si
 <div class="column" style="width:50%;">
 <p><strong>Comandos para cada pregunta:</strong></p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a></a><span class="co"># 1. Dimensiones del dataset</span></span>
-<span id="cb48-2"><a></a><span class="fu">dim</span>(datos)            <span class="co"># filas y columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a><span class="co"># 1. Dimensiones del dataset</span></span>
+<span id="cb47-2"><a></a><span class="fu">dim</span>(datos)            <span class="co"># filas y columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 179  11</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a></a><span class="fu">nrow</span>(datos)           <span class="co"># solo filas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a></a><span class="fu">nrow</span>(datos)           <span class="co"># solo filas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 179</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a></a><span class="fu">ncol</span>(datos)           <span class="co"># solo columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a></a><span class="fu">ncol</span>(datos)           <span class="co"># solo columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 11</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a></a><span class="co"># 2. Valores faltantes</span></span>
-<span id="cb54-2"><a></a><span class="fu">sum</span>(<span class="fu">is.na</span>(datos))         <span class="co"># total de NAs</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a></a><span class="co"># 2. Valores faltantes</span></span>
+<span id="cb53-2"><a></a><span class="fu">sum</span>(<span class="fu">is.na</span>(datos))         <span class="co"># total de NAs</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(datos))     <span class="co"># NAs por columna</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(datos))     <span class="co"># NAs por columna</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                   pais              continente         gasto_educacion 
                       0                       0                       0 
@@ -2103,10 +2097,10 @@ Prediction no si
 indice_gobierno_digital        crecimiento_alto 
                       0                       0 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a></a><span class="co"># 3. Distribución de variables numéricas</span></span>
-<span id="cb58-2"><a></a>datos <span class="sc">|&gt;</span></span>
-<span id="cb58-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
-<span id="cb58-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a></a><span class="co"># 3. Distribución de variables numéricas</span></span>
+<span id="cb57-2"><a></a>datos <span class="sc">|&gt;</span></span>
+<span id="cb57-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb57-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> gasto_educacion acceso_internet  urbanizacion    gasto_salud   
  Min.   :2.100   Min.   : 5.00   Min.   :16.40   Min.   :3.200  
@@ -2123,11 +2117,11 @@ indice_gobierno_digital        crecimiento_alto
  3rd Qu.:14.70   3rd Qu.:10.100   3rd Qu.:5.100        3rd Qu.:0.6350         
  Max.   :37.40   Max.   :16.100   Max.   :7.400        Max.   :0.9600         </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a></a><span class="co"># 4. Correlaciones entre variables</span></span>
-<span id="cb60-2"><a></a>datos <span class="sc">|&gt;</span></span>
-<span id="cb60-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
-<span id="cb60-4"><a></a>  <span class="fu">cor</span>() <span class="sc">|&gt;</span></span>
-<span id="cb60-5"><a></a>  <span class="fu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a></a><span class="co"># 4. Correlaciones entre variables</span></span>
+<span id="cb59-2"><a></a>datos <span class="sc">|&gt;</span></span>
+<span id="cb59-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb59-4"><a></a>  <span class="fu">cor</span>() <span class="sc">|&gt;</span></span>
+<span id="cb59-5"><a></a>  <span class="fu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                        gasto_educacion acceso_internet urbanizacion
 gasto_educacion                    1.00            0.07         0.24
@@ -2175,17 +2169,17 @@ indice_gobierno_digital                    1.00</code></pre>
 <h2>Apéndice 2: División de datos</h2>
 <div style="margin-top: 20px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a></a><span class="co"># Pregunta 1: prop = 0.50 (menos datos de entrenamiento)</span></span>
-<span id="cb62-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb62-3"><a></a>split_50 <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.50</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb62-4"><a></a><span class="fu">cat</span>(<span class="st">&quot;Train:&quot;</span>, <span class="fu">nrow</span>(<span class="fu">training</span>(split_50)), <span class="st">&quot;/ Test:&quot;</span>, <span class="fu">nrow</span>(<span class="fu">testing</span>(split_50)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a></a><span class="co"># Pregunta 1: prop = 0.50 (menos datos de entrenamiento)</span></span>
+<span id="cb61-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb61-3"><a></a>split_50 <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.50</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<span id="cb61-4"><a></a><span class="fu">cat</span>(<span class="st">&quot;Train:&quot;</span>, <span class="fu">nrow</span>(<span class="fu">training</span>(split_50)), <span class="st">&quot;/ Test:&quot;</span>, <span class="fu">nrow</span>(<span class="fu">testing</span>(split_50)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Train: 89 / Test: 90</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a></a><span class="co"># Pregunta 2: sin estratificación</span></span>
-<span id="cb64-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb64-3"><a></a>split_sin <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
-<span id="cb64-4"><a></a><span class="fu">training</span>(split_sin) <span class="sc">|&gt;</span> <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a></a><span class="co"># Pregunta 2: sin estratificación</span></span>
+<span id="cb63-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb63-3"><a></a>split_sin <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
+<span id="cb63-4"><a></a><span class="fu">training</span>(split_sin) <span class="sc">|&gt;</span> <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 3
   crecimiento_alto     n  prop
@@ -2193,7 +2187,7 @@ indice_gobierno_digital                    1.00</code></pre>
 1 no                  68 0.507
 2 si                  66 0.493</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a></a><span class="fu">testing</span>(split_sin)  <span class="sc">|&gt;</span> <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a></a><span class="fu">testing</span>(split_sin)  <span class="sc">|&gt;</span> <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 3
   crecimiento_alto     n  prop
@@ -2201,12 +2195,12 @@ indice_gobierno_digital                    1.00</code></pre>
 1 no                  25 0.556
 2 si                  20 0.444</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a></a><span class="co"># Las proporciones pueden diferir entre train y test</span></span>
-<span id="cb68-2"><a></a></span>
-<span id="cb68-3"><a></a><span class="co"># Pregunta 3: diferente semilla</span></span>
-<span id="cb68-4"><a></a><span class="fu">set.seed</span>(<span class="dv">999</span>)</span>
-<span id="cb68-5"><a></a>split_999 <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb68-6"><a></a><span class="fu">training</span>(split_999) <span class="sc">|&gt;</span> <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a></a><span class="co"># Las proporciones pueden diferir entre train y test</span></span>
+<span id="cb67-2"><a></a></span>
+<span id="cb67-3"><a></a><span class="co"># Pregunta 3: diferente semilla</span></span>
+<span id="cb67-4"><a></a><span class="fu">set.seed</span>(<span class="dv">999</span>)</span>
+<span id="cb67-5"><a></a>split_999 <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<span id="cb67-6"><a></a><span class="fu">training</span>(split_999) <span class="sc">|&gt;</span> <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 3
   crecimiento_alto     n  prop
@@ -2214,8 +2208,8 @@ indice_gobierno_digital                    1.00</code></pre>
 1 no                  69 0.519
 2 si                  64 0.481</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a></a><span class="co"># Los resultados del modelo varían, pero la distribución de clases</span></span>
-<span id="cb70-2"><a></a><span class="co"># se mantiene gracias a la estratificación</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a></a><span class="co"># Los resultados del modelo varían, pero la distribución de clases</span></span>
+<span id="cb69-2"><a></a><span class="co"># se mantiene gracias a la estratificación</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
 <li>Con <span class="alert">menos datos de entrenamiento</span> (<code>prop = 0.50</code>), el modelo puede tener peor rendimiento</li>
@@ -2232,31 +2226,31 @@ indice_gobierno_digital                    1.00</code></pre>
 <div class="column" style="width:50%;">
 <p><strong>Calcular las métricas:</strong></p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb71-2"><a></a>  <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto,</span>
-<span id="cb71-3"><a></a>            <span class="at">estimate =</span> .pred_class,</span>
-<span id="cb71-4"><a></a>            <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb70-2"><a></a>  <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto,</span>
+<span id="cb70-3"><a></a>            <span class="at">estimate =</span> .pred_class,</span>
+<span id="cb70-4"><a></a>            <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric   .estimator .estimate
   &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;
 1 precision binary         0.783</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb73-2"><a></a>  <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto,</span>
-<span id="cb73-3"><a></a>         <span class="at">estimate =</span> .pred_class,</span>
-<span id="cb73-4"><a></a>         <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb72-2"><a></a>  <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto,</span>
+<span id="cb72-3"><a></a>         <span class="at">estimate =</span> .pred_class,</span>
+<span id="cb72-4"><a></a>         <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 1 recall  binary         0.818</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a></a><span class="co"># O ambas a la vez:</span></span>
-<span id="cb75-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb75-3"><a></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> crecimiento_alto,</span>
-<span id="cb75-4"><a></a>           <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
-<span id="cb75-5"><a></a>  <span class="fu">summary</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb74"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a></a><span class="co"># O ambas a la vez:</span></span>
+<span id="cb74-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb74-3"><a></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> crecimiento_alto,</span>
+<span id="cb74-4"><a></a>           <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb74-5"><a></a>  <span class="fu">summary</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 13 × 3
    .metric              .estimator .estimate
@@ -2298,12 +2292,12 @@ indice_gobierno_digital                    1.00</code></pre>
 <div style="margin-top: 20px; font-size: 21px;">
 <p><strong>¿Cómo identificar predicciones inciertas?</strong></p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a></a><span class="co"># Observaciones con probabilidad cercana a 0.5</span></span>
-<span id="cb77-2"><a></a>pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb77-3"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_no, .pred_si) <span class="sc">|&gt;</span></span>
-<span id="cb77-4"><a></a>  <span class="fu">mutate</span>(<span class="at">incertidumbre =</span> <span class="fu">abs</span>(.pred_si <span class="sc">-</span> <span class="fl">0.5</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb77-5"><a></a>  <span class="fu">filter</span>(incertidumbre <span class="sc">&lt;</span> <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
-<span id="cb77-6"><a></a>  <span class="fu">arrange</span>(incertidumbre)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a></a><span class="co"># Observaciones con probabilidad cercana a 0.5</span></span>
+<span id="cb76-2"><a></a>pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb76-3"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_no, .pred_si) <span class="sc">|&gt;</span></span>
+<span id="cb76-4"><a></a>  <span class="fu">mutate</span>(<span class="at">incertidumbre =</span> <span class="fu">abs</span>(.pred_si <span class="sc">-</span> <span class="fl">0.5</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb76-5"><a></a>  <span class="fu">filter</span>(incertidumbre <span class="sc">&lt;</span> <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb76-6"><a></a>  <span class="fu">arrange</span>(incertidumbre)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 4
   crecimiento_alto .pred_no .pred_si incertidumbre
@@ -2327,19 +2321,19 @@ indice_gobierno_digital                    1.00</code></pre>
 <h2>Apéndice 5: Cambio de umbral</h2>
 <div style="margin-top: 20px; font-size: 21px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a></a><span class="co"># Comparar precisión y recall para tres umbrales</span></span>
-<span id="cb79-2"><a></a>purrr<span class="sc">::</span><span class="fu">map_df</span>(<span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>, <span class="fl">0.7</span>), <span class="cf">function</span>(u) {</span>
-<span id="cb79-3"><a></a>  pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb79-4"><a></a>    <span class="fu">mutate</span>(<span class="at">.pred_u =</span> <span class="fu">factor</span>(</span>
-<span id="cb79-5"><a></a>      dplyr<span class="sc">::</span><span class="fu">if_else</span>(.pred_si <span class="sc">&gt;=</span> u, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
-<span id="cb79-6"><a></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;si&quot;</span>)</span>
-<span id="cb79-7"><a></a>    )) <span class="sc">|&gt;</span></span>
-<span id="cb79-8"><a></a>    <span class="fu">summarise</span>(</span>
-<span id="cb79-9"><a></a>      <span class="at">umbral    =</span> u,</span>
-<span id="cb79-10"><a></a>      <span class="at">precision =</span> <span class="fu">precision_vec</span>(crecimiento_alto, .pred_u, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>),</span>
-<span id="cb79-11"><a></a>      <span class="at">recall    =</span> <span class="fu">recall_vec</span>(crecimiento_alto, .pred_u, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb79-12"><a></a>    )</span>
-<span id="cb79-13"><a></a>})</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a></a><span class="co"># Comparar precisión y recall para tres umbrales</span></span>
+<span id="cb78-2"><a></a>purrr<span class="sc">::</span><span class="fu">map_df</span>(<span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>, <span class="fl">0.7</span>), <span class="cf">function</span>(u) {</span>
+<span id="cb78-3"><a></a>  pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb78-4"><a></a>    <span class="fu">mutate</span>(<span class="at">.pred_u =</span> <span class="fu">factor</span>(</span>
+<span id="cb78-5"><a></a>      dplyr<span class="sc">::</span><span class="fu">if_else</span>(.pred_si <span class="sc">&gt;=</span> u, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
+<span id="cb78-6"><a></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;si&quot;</span>)</span>
+<span id="cb78-7"><a></a>    )) <span class="sc">|&gt;</span></span>
+<span id="cb78-8"><a></a>    <span class="fu">summarise</span>(</span>
+<span id="cb78-9"><a></a>      <span class="at">umbral    =</span> u,</span>
+<span id="cb78-10"><a></a>      <span class="at">precision =</span> <span class="fu">precision_vec</span>(crecimiento_alto, .pred_u, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>),</span>
+<span id="cb78-11"><a></a>      <span class="at">recall    =</span> <span class="fu">recall_vec</span>(crecimiento_alto, .pred_u, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb78-12"><a></a>    )</span>
+<span id="cb78-13"><a></a>})</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
   umbral precision recall
@@ -2393,8 +2387,8 @@ indice_gobierno_digital                    1.00</code></pre>
 <h2>Apéndice 6: Validación cruzada</h2>
 <div style="margin-top: 20px; font-size: 21px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a></a><span class="co"># collect_metrics() devuelve media y error estándar de cada métrica</span></span>
-<span id="cb81-2"><a></a><span class="fu">collect_metrics</span>(cv_results)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a></a><span class="co"># collect_metrics() devuelve media y error estándar de cada métrica</span></span>
+<span id="cb80-2"><a></a><span class="fu">collect_metrics</span>(cv_results)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 6
   .metric   .estimator  mean     n std_err .config        
@@ -2403,9 +2397,9 @@ indice_gobierno_digital                    1.00</code></pre>
 2 precision binary     0.763     5  0.0244 pre0_mod0_post0
 3 recall    binary     0.732     5  0.0562 pre0_mod0_post0</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb83"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a></a><span class="co"># Comparar con las métricas de la división única</span></span>
-<span id="cb83-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb83-3"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a></a><span class="co"># Comparar con las métricas de la división única</span></span>
+<span id="cb82-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb82-3"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 3
   .metric  .estimator .estimate

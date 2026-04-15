@@ -39,9 +39,41 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 :::
 
 ::: {.resource-card}
-[Lab 3: Clasificación y predicción con Latinobarómetro]{.resource-title}
+[Lab 3: Clasificación avanzada con Latinobarómetro]{.resource-title}
 
-[Día 2. Clasificación de actitudes políticas con datos de Latinobarómetro. Comparación de modelos: regresión logística, Random Forest y Elastic Net con `parsnip`.]{.resource-meta}
+[Día 2. Clasificación avanzada con datos simulados de Latinobarómetro. Random Forest con tuning de hiperparámetros, XGBoost, interpretación con VIP y Partial Dependence Plots.]{.resource-meta}
+
+::: {.resource-links}
+[Diapositivas (.html)](clases/dia-02/05-laboratorio-03.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/05-laboratorio-03.qmd) |
+[Código (.R)](clases/dia-02/laboratorio-03.R) |
+[Tarea 3 (.html)](clases/dia-02/tarea-03.html) |
+[Tarea 3 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-03.qmd) |
+[Respuestas Tarea 3 (.html)](clases/dia-02/tarea-03-respuestas.html) |
+[Respuestas Tarea 3 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-03-respuestas.qmd)
+:::
+:::
+
+::: {.resource-card}
+[Lab 4: Regresión y regularización]{.resource-title}
+
+[Día 2. Regresión lineal, LASSO, Ridge y Elastic Net con `glmnet`. Selección de variables, comparación de modelos de regresión y predicción con datos de Latinobarómetro.]{.resource-meta}
+
+::: {.resource-links}
+[Diapositivas (.html)](clases/dia-02/06-laboratorio-04.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/06-laboratorio-04.qmd) |
+[Código (.R)](clases/dia-02/laboratorio-04.R) |
+[Tarea 4 (.html)](clases/dia-02/tarea-04.html) |
+[Tarea 4 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-04.qmd) |
+[Respuestas Tarea 4 (.html)](clases/dia-02/tarea-04-respuestas.html) |
+[Respuestas Tarea 4 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-04-respuestas.qmd)
+:::
+:::
+
+::: {.resource-card}
+[Lab 5: Clustering y PCA]{.resource-title}
+
+[Día 3, sesión 1. Segmentación de países latinoamericanos por indicadores socioeconómicos del Banco Mundial usando K-means, clustering jerárquico y PCA.]{.resource-meta}
 
 ::: {.resource-links}
 Código (próximamente)
@@ -49,19 +81,9 @@ Código (próximamente)
 :::
 
 ::: {.resource-card}
-[Lab 4a: Clustering de países (versión express)]{.resource-title}
+[Lab 6: Análisis de texto]{.resource-title}
 
-[Día 3, sesión 1. Segmentación de países latinoamericanos por indicadores socioeconómicos del Banco Mundial usando K-means y PCA.]{.resource-meta}
-
-::: {.resource-links}
-Código (próximamente)
-:::
-:::
-
-::: {.resource-card}
-[Lab 4b: Análisis de texto en discursos políticos]{.resource-title}
-
-[Día 3, sesión 2. Tokenización, TF-IDF, análisis de sentimiento y extracción de tópicos (LDA) en discursos políticos latinoamericanos con `tidytext` y `topicmodels`.]{.resource-meta}
+[Día 3, sesión 2. Tokenización, TF-IDF, nube de palabras y extracción de tópicos (LDA) en discursos políticos latinoamericanos con `tidytext` y `topicmodels`.]{.resource-meta}
 
 ::: {.resource-links}
 Código (próximamente)
@@ -69,9 +91,9 @@ Código (próximamente)
 :::
 
 ::: {.resource-card}
-[Lab 5: Interacción con LLMs desde R]{.resource-title}
+[Lab 7: Primeros pasos con ellmer]{.resource-title}
 
-[Día 4. Uso de `ellmer` para interactuar con modelos de lenguaje. Anotación automática de textos, generación de datos sintéticos y auditoría de sesgos.]{.resource-meta}
+[Día 4, sesión 1. Uso de `ellmer` para interactuar con modelos de lenguaje desde R. Clasificación automática de textos y extracción de datos estructurados.]{.resource-meta}
 
 ::: {.resource-links}
 Código (próximamente)
@@ -79,12 +101,22 @@ Código (próximamente)
 :::
 
 ::: {.resource-card}
-[Lab 6: Mini-propuesta de investigación]{.resource-title}
+[Lab 8: Aplicaciones avanzadas de LLMs]{.resource-title}
 
-[Día 5. Cada estudiante diseña una propuesta breve que integra una técnica del curso con una pregunta de ciencias sociales relevante para América Latina.]{.resource-meta}
+[Día 4, sesión 2. Análisis de sentimiento con LLMs, generación de datos sintéticos y auditoría de sesgos algorítmicos.]{.resource-meta}
 
 ::: {.resource-links}
-Plantilla (próximamente)
+Código (próximamente)
+:::
+:::
+
+::: {.resource-card}
+[Lab 9: Auditoría de sesgo algorítmico]{.resource-title}
+
+[Día 5. Métricas de equidad, detección de sesgo en modelos de ML y propuestas de investigación.]{.resource-meta}
+
+::: {.resource-links}
+Código (próximamente)
 :::
 :::
 

@@ -9,7 +9,6 @@ format:
     toc-depth: 2
     number-sections: true
     code-fold: false
-    self-contained: true
 lang: es
 engine: knitr
 ---

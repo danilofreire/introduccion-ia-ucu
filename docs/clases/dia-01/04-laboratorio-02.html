@@ -1316,9 +1316,10 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <li><span class="alert">Visualización</span> de resultados</li>
 <li><span class="alert">Interpretación</span> de modelos</li>
 </ul>
-<p><br></p>
-<p><span class="alert">Este laboratorio es más abierto: ustedes toman las decisiones.</span></p>
-<p><span class="alert">Hay menos código predefinido. Ustedes van a escribir más.</span></p>
+<div style="margin-top: 30px; font-size: 28px;">
+<p><span class="alert">Hay menos código predefinido. Ustedes van a escribir más!</span></p>
+<p><span class="alert">¡No se preocupen! Les damos una estructura para que puedan completar.</span> 😉</p>
+</div>
 </div></div>
 </div>
 </section></section>
@@ -1353,7 +1354,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <span id="cb3-2"><a></a>satisfaccion <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;datos/satisfaccion_democracia.csv&quot;</span>)</span>
 <span id="cb3-3"><a></a></span>
 <span id="cb3-4"><a></a><span class="co"># Ver estructura</span></span>
-<span id="cb3-5"><a></a><span class="fu">glimpse</span>(satisfaccion)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-5"><a></a><span class="fu">glimpse</span>(satisfaccion) <span class="co"># Ver las variables y tipos</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 500
 Columns: 10
@@ -1655,6 +1656,11 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <pre><code>Train: 374 | Test: 126</code></pre>
 </div>
 </div>
+<ul>
+<li><code>initial_split()</code>: Divide el dataset en train/test</li>
+<li><code>training()</code> y <code>testing()</code>: Extraen los datasets de train y test</li>
+<li><code>vfold_cv()</code>: Crea folds para validación cruzada (5 folds, estratificados por <code>satisfecho</code>)</li>
+</ul>
 </div>
 </section></section>
 <section>

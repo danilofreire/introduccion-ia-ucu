@@ -1,0 +1,814 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 5.3: Laboratorio - Auditoría de sesgo"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 5.3](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-05/11-laboratorio-09.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  message = FALSE,
+  warning = FALSE,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio: Auditoría de sesgo {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Hoy aprenderemos a:**
+
+1. Instalar y usar [fairmodels]{.alert} en R
+2. Calcular métricas de equidad por grupo
+3. Visualizar disparidades
+4. Interpretar resultados de auditoría
+5. Discutir trade-offs de equidad
+:::
+
+:::{.column width=50%}
+**Caso de estudio:**
+
+Usaremos el dataset [German Credit]{.alert}, un clásico en estudios de sesgo algorítmico.
+
+- 1000 solicitudes de crédito
+- Variable objetivo: buen/mal pagador
+- Atributos sensibles: sexo, edad, estado civil
+- Pregunta: ¿el modelo trata igual a hombres y mujeres?
+:::
+:::
+:::
+
+## Preparación del entorno
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+#| cache: true
+
+# Instalar paquetes si no están disponibles
+if (!require("fairmodels")) install.packages("fairmodels")
+if (!require("DALEX")) install.packages("DALEX")
+if (!require("ranger")) install.packages("ranger")
+
+# Cargar paquetes
+library(tidyverse)
+library(tidymodels)
+library(fairmodels)
+library(DALEX)
+library(ranger)
+```
+
+[fairmodels]{.alert} usa explicadores de DALEX para auditar modelos. Funciona con cualquier modelo de clasificación.
+:::
+
+# Parte 1: Datos y modelo {background-color="#2d4563"}
+
+## El dataset German Credit
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+```{r}
+#| echo: true
+#| eval: true
+
+# Cargar datos incluidos en fairmodels
+data("german", package = "fairmodels")
+
+# Explorar estructura
+glimpse(german)
+```
+:::
+
+:::{.column width=45%}
+**Variables clave:**
+
+- `Risk`: variable objetivo (good/bad)
+- `Sex`: atributo protegido
+- `Age`: otro atributo sensible
+- Variables de crédito: monto, duración, historial
+
+El dataset es de los años 1990 y tiene [sesgos históricos conocidos]{.alert}.
+:::
+:::
+:::
+
+## Explorar el atributo protegido
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 4
+
+# Distribución de Risk por Sex
+german |>
+  count(Sex, Risk) |>
+  group_by(Sex) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = Sex, y = prop, fill = Risk)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("good" = "#2d4563", "bad" = "#e63946")) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Distribución de riesgo crediticio por sexo",
+       y = "Proporción", x = "Sexo", fill = "Riesgo") +
+  theme_minimal(base_size = 14)
+```
+
+:::{style="margin-top: 10px;"}
+Las [tasas base]{.alert} son similares entre grupos, lo que facilita la comparación de métricas.
+:::
+:::
+
+## Preparar los datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Crear variable binaria para el modelo
+german <- german |>
+  mutate(
+    Risk_binary = ifelse(Risk == "good", 1, 0),
+    Sex_binary = ifelse(Sex == "male", 1, 0)
+  )
+
+# Dividir en train/test
+set.seed(123)
+split <- initial_split(german, prop = 0.7, strata = Risk)
+train_data <- training(split)
+test_data <- testing(split)
+
+cat("Entrenamiento:", nrow(train_data), "filas\n")
+cat("Test:", nrow(test_data), "filas\n")
+```
+
+Usaremos el conjunto de [test]{.alert} para evaluar equidad, ya que representa datos no vistos.
+:::
+
+## Entrenar un modelo Random Forest
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Entrenar Random Forest (sin usar Sex como predictor)
+rf_model <- ranger(
+  Risk ~ . - Sex - Sex_binary - Risk_binary,
+  data = train_data,
+  probability = TRUE,
+  seed = 123
+)
+
+# Obtener predicciones en test
+pred_probs <- predict(rf_model, test_data)$predictions[, "good"]
+pred_class <- ifelse(pred_probs > 0.5, "good", "bad")
+
+# Accuracy global
+accuracy <- mean(pred_class == test_data$Risk)
+cat("Accuracy global:", round(accuracy, 3), "\n")
+```
+
+[El modelo no usa Sex como variable]{.alert}, pero ¿eso garantiza que sea justo?
+:::
+
+# Parte 2: Crear el explicador {background-color="#2d4563"}
+
+## ¿Qué es un explicador DALEX?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+**DALEX** (Descriptive mAchine Learning EXplanations) es un framework para explicar modelos de ML.
+
+Un [explicador]{.alert} es un objeto que envuelve:
+
+- El modelo entrenado
+- Los datos de test
+- La variable objetivo
+- Una función de predicción
+
+fairmodels usa explicadores para calcular métricas de equidad por grupo.
+:::
+
+:::{.column width=45%}
+```{r}
+#| echo: false
+#| eval: true
+#| fig-width: 5
+#| fig-height: 4
+
+# Diagrama simple
+library(ggplot2)
+df <- data.frame(
+  x = c(1, 2, 3),
+  y = c(3, 2, 1),
+  label = c("Modelo", "Explicador\nDALEX", "fairmodels\nAuditoría")
+)
+ggplot(df, aes(x = x, y = 2)) +
+  geom_point(size = 15, color = "#2d4563") +
+  geom_text(aes(label = label), color = "white", size = 3) +
+  geom_segment(aes(x = 1.3, xend = 1.7, y = 2, yend = 2),
+               arrow = arrow(length = unit(0.3, "cm")), color = "#2d4563") +
+  geom_segment(aes(x = 2.3, xend = 2.7, y = 2, yend = 2),
+               arrow = arrow(length = unit(0.3, "cm")), color = "#2d4563") +
+  xlim(0.5, 3.5) + ylim(1, 3) +
+  theme_void()
+```
+:::
+:::
+:::
+
+## Crear el explicador
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Función de predicción personalizada para ranger
+predict_function <- function(model, data) {
+  predict(model, data)$predictions[, "good"]
+}
+
+# Crear explicador DALEX
+explainer <- DALEX::explain(
+  model = rf_model,
+  data = test_data |> select(-Risk, -Risk_binary, -Sex_binary),
+  y = test_data$Risk_binary,
+  predict_function = predict_function,
+  label = "Random Forest",
+  verbose = FALSE
+)
+
+cat("Explicador creado con", nrow(test_data), "observaciones\n")
+```
+
+El explicador está listo para ser auditado por fairmodels.
+:::
+
+# Parte 3: Auditoría con fairmodels {background-color="#2d4563"}
+
+## Crear objeto de equidad
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Crear objeto fairness con Sex como atributo protegido
+fobject <- fairness_check(
+  explainer,
+  protected = test_data$Sex,
+  privileged = "male",  # grupo de referencia
+  cutoff = 0.5,
+  verbose = FALSE
+)
+
+# Ver resumen
+print(fobject)
+```
+
+El grupo [privilegiado]{.alert} es el de referencia. Las métricas comparan otros grupos con este.
+:::
+
+## Visualizar métricas de equidad
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Gráfico de radar de equidad
+plot(fobject)
+```
+
+:::{style="margin-top: 10px;"}
+La zona verde (0.8-1.25) indica [equidad aceptable]{.alert}. Fuera de ella hay disparidad.
+:::
+:::
+
+## Interpretar las métricas
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=50%}
+**¿Qué significan las métricas?**
+
+| Métrica | Significado |
+|---------|-------------|
+| TPR | Tasa de verdaderos positivos |
+| TNR | Tasa de verdaderos negativos |
+| PPV | Valor predictivo positivo |
+| NPV | Valor predictivo negativo |
+| FPR | Tasa de falsos positivos |
+| FNR | Tasa de falsos negativos |
+| ACC | Accuracy |
+| STP | Statistical parity (tasa de positivos) |
+
+Un ratio de 1.0 significa [igualdad perfecta]{.alert} entre grupos.
+:::
+
+:::{.column width=50%}
+**Interpretación del gráfico:**
+
+- Valores dentro del área verde (0.8-1.25): [equidad aceptable]{.alert}
+- Valores fuera: [posible sesgo]{.alert}
+- Más cerca del centro (1.0) = más equitativo
+
+**En nuestro caso:**
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Extraer métricas numéricas
+fobject$fairness_check_data |>
+  filter(metric %in% c("TPR", "FPR", "ACC", "STP")) |>
+  select(metric, score) |>
+  mutate(score = round(score, 3))
+```
+:::
+:::
+:::
+
+## Métricas detalladas por grupo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Calcular métricas crudas por grupo
+group_metrics <- test_data |>
+  mutate(pred = pred_class) |>
+  group_by(Sex) |>
+  summarise(
+    n = n(),
+    accuracy = mean(pred == Risk),
+    tpr = sum(pred == "good" & Risk == "good") / sum(Risk == "good"),
+    fpr = sum(pred == "good" & Risk == "bad") / sum(Risk == "bad"),
+    positive_rate = mean(pred == "good"),
+    .groups = "drop"
+  )
+
+group_metrics |>
+  mutate(across(where(is.numeric), ~round(., 3)))
+```
+
+Estas son las métricas [absolutas]{.alert}. fairmodels calcula los ratios entre grupos.
+:::
+
+## Comparación visual por grupo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 4
+
+# Gráfico de barras de métricas por grupo
+group_metrics |>
+  pivot_longer(cols = c(accuracy, tpr, fpr, positive_rate),
+               names_to = "metric", values_to = "value") |>
+  ggplot(aes(x = metric, y = value, fill = Sex)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("female" = "#e63946", "male" = "#2d4563")) +
+  scale_y_continuous(labels = scales::percent) +
+  labs(title = "Métricas de rendimiento por sexo",
+       y = "Valor", x = "Métrica", fill = "Sexo") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+:::
+
+# Parte 4: Explorar diferentes umbrales {background-color="#2d4563"}
+
+## El efecto del umbral de clasificación
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+El umbral de 0.5 es [arbitrario]{.alert}. Podemos ajustarlo para diferentes objetivos:
+
+- Umbral **más alto** (ej. 0.7): menos falsos positivos, más falsos negativos
+- Umbral **más bajo** (ej. 0.3): más falsos positivos, menos falsos negativos
+
+En crédito:
+
+- FP = dar crédito a quien no pagará (pérdida para el banco)
+- FN = rechazar a quien pagaría (pérdida de negocio + injusticia)
+
+[Los umbrales por grupo]{.alert} son una forma de mitigación post-procesamiento.
+:::
+
+:::{.column width=45%}
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 5
+#| fig-height: 4
+
+# Histograma de probabilidades por grupo
+test_data |>
+  mutate(prob = pred_probs) |>
+  ggplot(aes(x = prob, fill = Sex)) +
+  geom_histogram(bins = 20, alpha = 0.7, position = "identity") +
+  geom_vline(xintercept = 0.5, linetype = "dashed", color = "black") +
+  scale_fill_manual(values = c("female" = "#e63946", "male" = "#2d4563")) +
+  labs(title = "Distribución de probabilidades",
+       x = "P(good)", y = "Frecuencia") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+:::
+:::
+:::
+
+## Probar diferentes umbrales
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Función para calcular métricas con umbral personalizado
+calc_metrics_threshold <- function(data, probs, threshold) {
+  pred <- ifelse(probs > threshold, "good", "bad")
+  data |>
+    mutate(pred = pred) |>
+    group_by(Sex) |>
+    summarise(
+      threshold = threshold,
+      accuracy = mean(pred == Risk),
+      tpr = sum(pred == "good" & Risk == "good") / sum(Risk == "good"),
+      fpr = sum(pred == "good" & Risk == "bad") / sum(Risk == "bad"),
+      .groups = "drop"
+    )
+}
+
+# Probar varios umbrales
+thresholds <- c(0.3, 0.4, 0.5, 0.6, 0.7)
+results <- map_dfr(thresholds, ~calc_metrics_threshold(test_data, pred_probs, .x))
+
+# Mostrar resultados
+results |>
+  arrange(Sex, threshold) |>
+  mutate(across(where(is.numeric), ~round(., 3)))
+```
+:::
+
+## Visualizar el trade-off
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 4
+
+results |>
+  pivot_longer(cols = c(accuracy, tpr, fpr), names_to = "metric", values_to = "value") |>
+  ggplot(aes(x = factor(threshold), y = value, color = Sex, group = Sex)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 3) +
+  facet_wrap(~metric, scales = "free_y") +
+  scale_color_manual(values = c("female" = "#e63946", "male" = "#2d4563")) +
+  labs(title = "Efecto del umbral en métricas por grupo",
+       x = "Umbral", y = "Valor") +
+  theme_minimal(base_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+:::{style="margin-top: 10px;"}
+[Diferentes umbrales afectan a los grupos de manera diferente.]{.alert}
+:::
+:::
+
+# Parte 5: Mitigación {background-color="#2d4563"}
+
+## Umbrales diferenciados por grupo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+Una estrategia de [post-procesamiento]{.alert} es usar umbrales diferentes para cada grupo.
+
+**Objetivo:** igualar la tasa de falsos positivos (FPR).
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Encontrar umbral que iguale FPR
+# Para mujeres, buscar umbral que dé FPR similar a hombres
+target_fpr <- results |>
+  filter(Sex == "male", threshold == 0.5) |>
+  pull(fpr)
+
+cat("FPR objetivo (hombres, umbral 0.5):", round(target_fpr, 3), "\n")
+
+# FPR de mujeres con umbral 0.5
+female_fpr <- results |>
+  filter(Sex == "female", threshold == 0.5) |>
+  pull(fpr)
+
+cat("FPR mujeres (umbral 0.5):", round(female_fpr, 3), "\n")
+```
+:::
+
+:::{.column width=45%}
+**Consideraciones éticas:**
+
+- ¿Es justo usar [umbrales diferentes]{.alert} por grupo?
+- Algunos argumentan que es [discriminación inversa]{.alert}
+- Otros argumentan que [corrige]{.alert} sesgos sistémicos
+- Las leyes varían: en EE.UU. está prohibido en empleo; en otros contextos es permitido
+
+:::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
+[La decisión de usar umbrales diferenciados es política, no técnica.]{.alert}
+:::
+:::
+:::
+:::
+
+## Comparar modelo original vs. mitigado
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+
+# Simular mitigación: umbral 0.5 para hombres, 0.45 para mujeres
+mitigated_pred <- ifelse(
+  test_data$Sex == "male",
+  ifelse(pred_probs > 0.5, "good", "bad"),
+  ifelse(pred_probs > 0.45, "good", "bad")
+)
+
+# Comparar métricas
+comparison <- test_data |>
+  mutate(
+    pred_original = pred_class,
+    pred_mitigated = mitigated_pred
+  ) |>
+  group_by(Sex) |>
+  summarise(
+    fpr_original = sum(pred_original == "good" & Risk == "bad") / sum(Risk == "bad"),
+    fpr_mitigated = sum(pred_mitigated == "good" & Risk == "bad") / sum(Risk == "bad"),
+    acc_original = mean(pred_original == Risk),
+    acc_mitigated = mean(pred_mitigated == Risk),
+    .groups = "drop"
+  )
+
+comparison |> mutate(across(where(is.numeric), ~round(., 3)))
+```
+
+[La mitigación reduce la disparidad en FPR, pero puede afectar otras métricas.]{.alert}
+:::
+
+# Parte 6: Discusión grupal {background-color="#2d4563"}
+
+## Actividad: Debate sobre trade-offs
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Escenario:**
+
+Son consultores de un banco uruguayo que quiere implementar un modelo de scoring crediticio.
+
+El análisis muestra que el modelo tiene:
+
+- [FPR más alto para mujeres]{.alert}: más mujeres buenas pagadoras son rechazadas
+- [Accuracy similar]{.alert} entre grupos
+- [Calibración correcta]{.alert}: las probabilidades significan lo mismo
+
+El banco les pide una recomendación.
+:::
+
+:::{.column width=50%}
+**Preguntas para discutir (15 min):**
+
+1. ¿Deberían usar [umbrales diferenciados]{.alert} por sexo?
+2. Si lo hacen, ¿es [discriminación positiva]{.alert} o simplemente [corrección de sesgo]{.alert}?
+3. ¿Qué [métrica de equidad]{.alert} priorizarían y por qué?
+4. ¿Cómo [comunicarían]{.alert} la decisión a los clientes?
+5. ¿Qué [información adicional]{.alert} necesitarían para decidir?
+
+:::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
+**Divídanse en grupos de 4. Cada grupo presentará su recomendación (3 min).**
+:::
+:::
+:::
+:::
+
+## Preguntas guía para la discusión
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+1. **Contexto histórico:** ¿las mujeres han tenido históricamente menos acceso al crédito en Uruguay?
+
+2. **Causa de la disparidad:** ¿el FPR más alto se debe al modelo o a diferencias en los datos?
+
+3. **Consecuencias:** ¿qué pasa si una mujer buena pagadora es rechazada? ¿Y si un hombre mal pagador es aprobado?
+
+4. **Alternativas:** además de ajustar umbrales, ¿hay otras formas de abordar la disparidad?
+
+5. **Transparencia:** ¿los clientes deberían saber que se usan umbrales diferentes?
+
+6. **Legalidad:** ¿la ley uruguaya permite trato diferenciado por sexo en decisiones de crédito?
+:::
+
+# Parte 7: Ejercicio individual {background-color="#2d4563"}
+
+## Auditar con otra variable protegida
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Ejercicio:**
+
+Repitan la auditoría usando [edad]{.alert} como variable protegida.
+
+1. Crear grupos de edad (ej. jóvenes < 30, adultos 30-50, mayores > 50)
+2. Calcular métricas de equidad para cada grupo
+3. Visualizar disparidades
+4. Identificar qué grupo es más perjudicado
+
+**Código inicial:**
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Crear grupos de edad
+test_data <- test_data |>
+  mutate(
+    Age_group = case_when(
+      Age < 30 ~ "joven",
+      Age < 50 ~ "adulto",
+      TRUE ~ "mayor"
+    )
+  )
+
+# Crear nuevo objeto fairness
+fobject_age <- fairness_check(
+  explainer,
+  protected = test_data$Age_group,
+  privileged = "adulto",
+  cutoff = 0.5,
+  verbose = FALSE
+)
+
+# Visualizar
+plot(fobject_age)
+```
+:::
+
+:::{.column width=45%}
+**Preguntas a responder:**
+
+1. ¿Qué grupo de edad tiene peor rendimiento?
+
+2. ¿En qué métricas hay mayor disparidad?
+
+3. ¿Tiene sentido que [adultos]{.alert} sean el grupo privilegiado?
+
+4. ¿Cómo se compara el sesgo por edad con el sesgo por sexo?
+
+:::{style="margin-top: 20px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
+**Tiempo:** 15 minutos
+
+Trabajen individualmente o en parejas. Pueden consultar la documentación de fairmodels.
+:::
+:::
+:::
+:::
+
+## Solución del ejercicio
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 4
+
+# Crear grupos de edad
+test_data <- test_data |>
+  mutate(
+    Age_group = case_when(
+      Age < 30 ~ "joven",
+      Age < 50 ~ "adulto",
+      TRUE ~ "mayor"
+    )
+  )
+
+# Crear objeto fairness por edad
+fobject_age <- fairness_check(
+  explainer,
+  protected = test_data$Age_group,
+  privileged = "adulto",
+  cutoff = 0.5,
+  verbose = FALSE
+)
+
+# Visualizar
+plot(fobject_age)
+```
+:::
+
+## Resumen del laboratorio
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que aprendimos:**
+
+- Usar [fairmodels]{.alert} para auditar modelos
+- Calcular métricas de equidad con [fairness_check()]{.alert}
+- Visualizar disparidades con [plot()]{.alert}
+- El efecto del [umbral]{.alert} en la equidad
+- [Mitigación]{.alert} con umbrales diferenciados
+:::
+
+:::{.column width=50%}
+**Ideas clave:**
+
+- Un modelo [sin variables sensibles]{.alert} puede seguir siendo sesgado
+- Diferentes [métricas]{.alert} capturan diferentes nociones de equidad
+- La [mitigación]{.alert} implica trade-offs
+- Las decisiones de equidad son [políticas]{.alert}, no solo técnicas
+- La [auditoría]{.alert} debe ser parte del ciclo de vida del modelo
+:::
+:::
+
+:::{style="margin-top: 20px; text-align: center;"}
+[En la próxima sesión: mini-propuestas de investigación y cierre del curso.]{.alert}
+:::
+:::
+
+# Nos vemos en la sesión 5.4 {background-color="#2d4563"}

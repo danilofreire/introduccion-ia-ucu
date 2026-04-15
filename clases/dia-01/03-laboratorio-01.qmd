@@ -116,37 +116,20 @@ install.packages("tidymodels", dependencies = TRUE)
 
 ## Recapitulando: el ecosistema tidy
 
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
+:::{style="margin-top: 30px; font-size: 26px;"}
 - [tidymodels](https://www.tidymodels.org/) es un conjunto de paquetes de R para modelado de datos
 - Sigue la filosofía del [tidyverse]{.alert}: código legible, consistente y modular
 - Paquetes principales:
     - [[rsample:](https://rsample.tidymodels.org/)]{.alert} división de datos
-    - [[parsnip:](https://parsnip.tidymodels.org/)]{.alert} especificación de modelos
-    - [[yardstick:](https://yardstick.tidymodels.org/)]{.alert} métricas de evaluación
-    - [[workflows:](https://workflows.tidymodels.org/)]{.alert} combinar preprocesamiento + modelo
     - [[recipes:](https://recipes.tidymodels.org/)]{.alert} preprocesamiento de datos
+    - [[parsnip:](https://parsnip.tidymodels.org/)]{.alert} especificación de modelos
+    - [[workflows:](https://workflows.tidymodels.org/)]{.alert} combinar preprocesamiento + modelo
+    - [[tune:](https://tune.tidymodels.org/)]{.alert} ajuste de hiperparámetros
+    - [[yardstick:](https://yardstick.tidymodels.org/)]{.alert} métricas de evaluación
 :::
 
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 26px; margin-top: 20px;"}
-```
-tidymodels
-├── rsample    → dividir datos
-├── recipes    → preprocesar
-├── parsnip    → especificar modelo
-├── workflows  → combinar todo
-├── tune       → ajustar hiperparámetros
-└── yardstick  → evaluar
-```
-
-<br>
-
+:::{style="margin-top: 30px; font-size: 26px;"}
 Ventaja: [misma sintaxis]{.alert} para todos los modelos, ya sea regresión logística, random forest o redes neuronales.
-:::
-:::
-:::
 :::
 
 ## Cargar los datos
@@ -386,6 +369,7 @@ tidy(ajuste)
 ```
 
 - `crecimiento_alto ~ .` significa: predecir `crecimiento_alto` usando [todas las demás variables]{.alert}
+- `fit()` entrena el modelo con los datos de entrenamiento
 - `tidy()` nos da una tabla limpia con coeficientes, errores estándar y p-valores
 :::
 
@@ -430,8 +414,8 @@ Generamos predicciones en los datos de prueba:
 ```{r lab-predecir, prompt=FALSE, echo=TRUE}
 # Predecir clases
 predicciones <- ajuste |>
-  predict(datos_test) |>
-  bind_cols(datos_test)
+  predict(datos_test) |>  # predice clases por defecto
+  bind_cols(datos_test)   # combinar con datos originales para evaluación
 
 # Ver las primeras predicciones
 predicciones |>
@@ -558,7 +542,9 @@ pred_umbral |>
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-En lugar de una sola división, usemos [validación cruzada]{.alert}:
+- En lugar de una sola división, usemos [validación cruzada]{.alert}
+- `vfold_cv()` crea folds estratificados para evaluar el modelo en múltiples subconjuntos
+- `fit_resamples()` ajusta el modelo en cada fold y calcula métricas promedio
 
 ```{r ej6-cv, prompt=FALSE, echo=TRUE}
 # Crear folds de validación cruzada

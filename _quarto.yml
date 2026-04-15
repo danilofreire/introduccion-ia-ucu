@@ -28,6 +28,8 @@ website:
         text: Laboratorios
       - href: lecturas.qmd
         text: Lecturas
+      - href: referencia-tidymodels.qmd
+        text: Referencia R
     right:
       - icon: envelope
         href: mailto:danilofreire@gmail.com
