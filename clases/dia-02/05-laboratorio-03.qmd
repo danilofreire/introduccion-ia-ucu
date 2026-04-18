@@ -59,20 +59,19 @@ if (!require("fontawesome", character.only = TRUE)) {
 **Lo que vamos a hacer:**
 
 1. Predecir participación electoral
-2. Comparar múltiples clasificadores
-3. Ajustar hiperparámetros con CV
-4. Interpretar la importancia de variables
-5. Visualizar Partial Dependence Plots
-6. Evaluar con múltiples métricas
+2. Baseline con regresión logística
+3. Ajustar un Random Forest con CV
+4. Interpretar con VIP y PDP
+5. Comparar modelos en el conjunto de test
 :::
 
 :::{.column width=50%}
 **Lo que vamos a aprender:**
 
-- [Random Forest]{.alert} y [Gradient Boosting]{.alert}
-- [Tuning]{.alert} de hiperparámetros
+- [Random Forest]{.alert} para clasificación
+- [Tuning]{.alert} de hiperparámetros con grilla
 - Interpretación de modelos complejos
-- Cuándo usar cada clasificador
+- Cuándo vale la pena la complejidad extra
 
 <br>
 
@@ -118,37 +117,23 @@ set.seed(2026)
 
 ```{r cargar-datos, prompt=FALSE, echo=TRUE}
 # Cargar el dataset (generado con datos/crear-datos.R)
-# show_col_types = FALSE: no mostrar los tipos detectados automáticamente
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
 # Convertir variables categóricas a factores
-# factor(): convierte texto en variable categórica con niveles ordenados
-# levels = c(...): define el orden de las categorías
+# El primer nivel de voto es la clase positiva para yardstick
 datos <- datos |>
   mutate(
     pais = factor(pais),
     zona = factor(zona),
     genero = factor(genero),
     uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
-    # levels: el primer nivel es la clase positiva (evento) para yardstick
     voto = factor(voto, levels = c("si", "no"))
   )
 
-# Exploración inicial
-# glimpse(): muestra las columnas, tipos y primeros valores de forma compacta
+# Estructura y distribución del voto
 glimpse(datos)
-```
-:::
 
-## Explorar la variable objetivo
-
-:::{style="margin-top: 30px; font-size: 25px;"}
-
-```{r explorar-voto, prompt=FALSE, echo=TRUE, fig.width=10, fig.height=4}
-# Distribución del voto
-datos |>
-  count(voto) |>
-  mutate(proporcion = n / sum(n))
+datos |> count(voto) |> mutate(proporcion = n / sum(n))
 ```
 :::
 
@@ -380,53 +365,30 @@ autoplot(resultados_tune) +
 ```
 :::
 
-## Seleccionar el mejor modelo
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-```{r seleccionar-mejor, prompt=FALSE, echo=TRUE}
-# select_best(): elige la combinación con el mejor valor de la métrica
-mejor_rf <- select_best(resultados_tune, metric = "roc_auc")
-mejor_rf
-
-# select_by_one_std_err(): elige el modelo más simple cuyo rendimiento
-# esté dentro de 1 error estándar del mejor (regla del "1-SE")
-# desc(min_n): entre los candidatos, preferir más obs por nodo (más simple)
-mejor_rf_1se <- select_by_one_std_err(
-  resultados_tune,
-  metric = "roc_auc",
-  desc(min_n)
-)
-mejor_rf_1se
-
-# finalize_workflow(): reemplaza los tune() del workflow por los valores
-# óptimos encontrados, dejando un workflow listo para ajustar
-wf_rf_final <- finalize_workflow(wf_rf_tune, mejor_rf)
-```
-:::
-
-## Ajustar el modelo final
+## Seleccionar y ajustar el modelo final
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
 ```{r ajustar-final, prompt=FALSE, echo=TRUE}
-# Ajustar con todos los datos de training
+# select_best(): elige la combinación con el mejor valor de la métrica
+mejor_rf <- select_best(resultados_tune, metric = "roc_auc")
+mejor_rf
+
+# finalize_workflow(): reemplaza los tune() por los valores óptimos
+# Luego ajustamos con todos los datos de entrenamiento
+wf_rf_final <- finalize_workflow(wf_rf_tune, mejor_rf)
 ajuste_rf <- fit(wf_rf_final, data = datos_train)
 
-# Predicciones en test
+# Predicciones y métricas en test
 pred_rf <- predict(ajuste_rf, datos_test) |>
   bind_cols(predict(ajuste_rf, datos_test, type = "prob")) |>
   bind_cols(datos_test |> select(voto))
 
-# Comparar con baseline
 metricas_rf <- pred_rf |>
   metrics(truth = voto, estimate = .pred_class, .pred_si)
 
-# Mostrar comparación
-cat("Regresión logística:\n")
-print(metricas_logit)
-cat("\nRandom Forest:\n")
-print(metricas_rf)
+cat("Regresión logística:\n"); print(metricas_logit)
+cat("\nRandom Forest:\n");     print(metricas_rf)
 ```
 :::
 
@@ -511,56 +473,34 @@ Que la edad sea importante no significa que "envejecer causa votar más", solo q
 
 ## Partial Dependence Plots
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 18px;"}
 
-```{r pdp-edad, prompt=FALSE, echo=TRUE, fig.width=10, fig.height=5}
+```{r pdp-combinado, prompt=FALSE, echo=TRUE, fig.width=12, fig.height=4.5}
 # extract_fit_engine(): extrae el objeto nativo del motor (ranger)
-# (a diferencia de extract_fit_parsnip que devuelve un objeto parsnip)
 modelo_ranger <- extract_fit_engine(ajuste_rf)
 
-# bake(): aplica una receta ya estimada (prep) a datos nuevos o existentes
+# bake(): aplica la receta ya estimada a los datos de entrenamiento
 datos_prep <- bake(prep(receta), new_data = datos_train)
 
-# partial(): calcula el Partial Dependence Plot
-# pred.var: la variable para la que se calcula el efecto marginal
-# prob = TRUE: trabajar con probabilidades (no clases)
-# which.class = 1: calcular para la primera clase ("si")
-pdp_edad <- partial(
-  modelo_ranger,
-  pred.var = "edad",
-  train = datos_prep,
-  prob = TRUE,
-  which.class = 1  # Clase "si" (primer nivel del factor)
-)
+# partial() calcula el efecto marginal sobre P(voto = "si")
+# which.class = 1: primera clase del factor, es decir, "si"
+pdp_edad <- partial(modelo_ranger, pred.var = "edad",
+                    train = datos_prep, prob = TRUE, which.class = 1)
 
-# Graficar
-autoplot(pdp_edad) +
-  labs(title = "Partial Dependence Plot: Edad",
-       subtitle = "Efecto marginal sobre P(voto = sí)",
-       x = "Edad (normalizada)", y = "Probabilidad predicha de votar") +
-  theme_minimal()
-```
-:::
+pdp_interes <- partial(modelo_ranger, pred.var = "interes_politica",
+                       train = datos_prep, prob = TRUE, which.class = 1)
 
-## PDP para interés político
+# Graficar lado a lado con patchwork (o cowplot)
+library(patchwork)
+p1 <- autoplot(pdp_edad) +
+  labs(title = "PDP: Edad", x = "Edad (normalizada)",
+       y = "P(voto = sí)") + theme_minimal()
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+p2 <- autoplot(pdp_interes) +
+  labs(title = "PDP: Interés en política", x = "Interés (normalizado)",
+       y = "P(voto = sí)") + theme_minimal()
 
-```{r pdp-interes, prompt=FALSE, echo=TRUE, fig.width=10, fig.height=5}
-# PDP para interés político
-pdp_interes <- partial(
-  modelo_ranger,
-  pred.var = "interes_politica",
-  train = datos_prep,
-  prob = TRUE,
-  which.class = 1  # Clase "si"
-)
-
-autoplot(pdp_interes) +
-  labs(title = "Partial Dependence Plot: Interés en política",
-       subtitle = "Efecto marginal sobre P(voto = sí)",
-       x = "Interés en política (normalizado)", y = "Probabilidad predicha de votar") +
-  theme_minimal()
+p1 + p2
 ```
 :::
 
@@ -620,109 +560,9 @@ datos_uruguay <- datos |>
 [[Apéndice 2: Solución]{.button}](#sec:appendix02)
 :::
 
-# Parte 4: Comparación de modelos {background-color="#2d4563"}
+# Parte 4: Discusión y cierre {background-color="#2d4563"}
 
-## Agregar Gradient Boosting
-
-:::{style="margin-top: 30px; font-size: 18px;"}
-
-```{r xgboost, prompt=FALSE, echo=TRUE, cache=TRUE}
-# boost_tree(): modelo de Gradient Boosting (construye árboles secuencialmente)
-# trees: número total de árboles a construir uno tras otro
-# tree_depth: profundidad máxima de cada árbol (a optimizar)
-# learn_rate: tasa de aprendizaje, controla cuánto aporta cada árbol nuevo
-# min_n: mínimo de observaciones por nodo terminal (fijo)
-modelo_xgb <- boost_tree(
-  trees = 500,
-  tree_depth = tune(),
-  learn_rate = tune(),
-  min_n = 10
-) |>
-  set_engine("xgboost") |>
-  set_mode("classification")
-
-# Workflow: receta + modelo
-wf_xgb <- workflow() |>
-  add_recipe(receta) |>
-  add_model(modelo_xgb)
-
-# Grilla de búsqueda para XGBoost
-# learn_rate(range = c(-3, -1)): en escala log10, es decir 10^-3=0.001 a 10^-1=0.1
-grilla_xgb <- grid_regular(
-  tree_depth(range = c(3, 8)),
-  learn_rate(range = c(-3, -1)),
-  levels = c(3, 3)
-)
-
-# Tuning con validación cruzada
-resultados_xgb <- tune_grid(
-  wf_xgb,
-  resamples = folds,
-  grid = grilla_xgb,
-  metrics = metric_set(roc_auc),
-  control = control_grid(verbose = FALSE)
-)
-
-# Seleccionar, finalizar y ajustar el mejor modelo
-mejor_xgb <- select_best(resultados_xgb, metric = "roc_auc")
-wf_xgb_final <- finalize_workflow(wf_xgb, mejor_xgb)
-ajuste_xgb <- fit(wf_xgb_final, data = datos_train)
-```
-:::
-
-## Comparación final de modelos
-
-:::{style="margin-top: 30px; font-size: 18px;"}
-
-```{r comparacion-final, prompt=FALSE, echo=TRUE}
-# Predicciones de todos los modelos
-pred_xgb <- predict(ajuste_xgb, datos_test) |>
-  bind_cols(predict(ajuste_xgb, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
-
-# Calcular métricas para todos
-metricas_todos <- bind_rows(
-  pred_logit |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
-    mutate(modelo = "Regresión logística"),
-  pred_rf |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
-    mutate(modelo = "Random Forest"),
-  pred_xgb |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
-    mutate(modelo = "XGBoost")
-)
-
-# Tabla resumen
-metricas_todos |>
-  select(modelo, .metric, .estimate) |>
-  pivot_wider(names_from = .metric, values_from = .estimate) |>
-  arrange(desc(roc_auc))
-```
-:::
-
-## Visualización comparativa
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-```{r comparacion-viz, prompt=FALSE, echo=TRUE, fig.width=10, fig.height=5}
-# Curvas ROC de todos los modelos
-roc_xgb <- pred_xgb |>
-  roc_curve(truth = voto, .pred_si) |>
-  mutate(modelo = "XGBoost")
-
-bind_rows(roc_logit, roc_rf, roc_xgb) |>
-  ggplot(aes(x = 1 - specificity, y = sensitivity, color = modelo)) +
-  geom_path(linewidth = 1.2) +
-  geom_abline(linetype = "dashed", color = "gray50") +
-  coord_equal() +
-  scale_color_manual(values = c("Regresión logística" = "#3498DB",
-                                "Random Forest" = "#27AE60",
-                                "XGBoost" = "#9B59B6")) +
-  labs(title = "Comparación de curvas ROC",
-       x = "1 - Especificidad", y = "Sensibilidad") +
-  theme_minimal()
-```
-:::
-
-## Discusión: ¿Cuál modelo elegir?
+## ¿Cuál modelo elegir?
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
@@ -730,7 +570,7 @@ bind_rows(roc_logit, roc_rf, roc_xgb) |>
 **Si el objetivo es [predicción pura]{.alert}:**
 
 - Elegir el modelo con mejor AUC
-- XGBoost o Random Forest suelen ganar
+- Random Forest suele superar a la regresión logística
 - La interpretabilidad es secundaria
 
 **Si el objetivo es [entender los factores]{.alert}:**
@@ -742,44 +582,17 @@ bind_rows(roc_logit, roc_rf, roc_xgb) |>
 :::{.column width=50%}
 **Consideraciones prácticas:**
 
-- [Complejidad]{.alert}: XGBoost requiere más tuning
-- [Tiempo]{.alert}: RF y XGBoost son más lentos
+- [Tiempo]{.alert}: RF es más lento que la regresión logística
 - [Explicabilidad]{.alert}: ¿Podemos justificar las predicciones?
 - [Mejora marginal]{.alert}: ¿Vale la pena 2% más de AUC?
 
 <br>
 
 [En ciencias sociales, la interpretabilidad suele ser tan importante como el rendimiento.]{.alert}
+
+[[Apéndice 4: XGBoost opcional]{.button}](#sec:appendix04)
 :::
 :::
-:::
-
-## Ejercicio 3: Ajustar un árbol de decisión (si el tiempo lo permite) {#sec:exercise03}
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-**Instrucciones:**
-
-1. Crear un modelo `decision_tree()` con costo de complejidad (`cost_complexity`) a ajustar
-2. Usar validación cruzada para encontrar el mejor valor
-3. Comparar con Random Forest: ¿cuánto se pierde en rendimiento?
-
-```{r ejercicio-3, eval=FALSE, prompt=FALSE, echo=TRUE}
-# Tu código aquí
-modelo_arbol <- decision_tree(
-  cost_complexity = tune(),
-  tree_depth = 10,
-  min_n = 10
-) |>
-  set_engine("rpart") |>
-  set_mode("classification")
-
-# ... completar el workflow y tuning
-```
-
-[Reutilicen la receta y los folds que ya crearon.]{.alert}
-
-[[Apéndice 3: Solución]{.button}](#sec:appendix03)
 :::
 
 ## Resumen del laboratorio
@@ -792,7 +605,7 @@ modelo_arbol <- decision_tree(
 - Flujo completo de clasificación
 - Tuning de hiperparámetros con CV
 - Interpretación con VIP y PDP
-- Comparación de múltiples modelos
+- Comparación de modelos en test
 :::
 
 :::{.column width=50%}
@@ -962,6 +775,64 @@ autoplot(resultados_arbol) +
 - El árbol de decisión suele tener [menor AUC]{.alert} que Random Forest
 - A cambio, es mucho más [interpretable]{.alert}: se puede visualizar como un diagrama de flujo
 - `cost_complexity` controla la poda: valores más altos producen árboles más simples
+:::
 
-[[Volver al ejercicio]{.button}](#sec:exercise03)
+## Apéndice 4: XGBoost opcional {#sec:appendix04}
+
+:::{style="margin-top: 20px; font-size: 18px;"}
+
+```{r ap4-xgb, prompt=FALSE, echo=TRUE, eval=TRUE, cache=TRUE}
+# boost_tree(): Gradient Boosting (árboles secuenciales)
+# tree_depth y learn_rate a optimizar; min_n fijo
+modelo_xgb <- boost_tree(
+  trees = 500,
+  tree_depth = tune(),
+  learn_rate = tune(),
+  min_n = 10
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+
+wf_xgb <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_xgb)
+
+# learn_rate en escala log10: 10^-3 a 10^-1
+grilla_xgb <- grid_regular(
+  tree_depth(range = c(3, 8)),
+  learn_rate(range = c(-3, -1)),
+  levels = c(3, 3)
+)
+
+resultados_xgb <- tune_grid(
+  wf_xgb, resamples = folds, grid = grilla_xgb,
+  metrics = metric_set(roc_auc),
+  control = control_grid(verbose = FALSE)
+)
+
+mejor_xgb <- select_best(resultados_xgb, metric = "roc_auc")
+wf_xgb_final <- finalize_workflow(wf_xgb, mejor_xgb)
+ajuste_xgb <- fit(wf_xgb_final, data = datos_train)
+
+# Predicciones y comparación final
+pred_xgb <- predict(ajuste_xgb, datos_test) |>
+  bind_cols(predict(ajuste_xgb, datos_test, type = "prob")) |>
+  bind_cols(datos_test |> select(voto))
+
+bind_rows(
+  pred_logit |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "Regresión logística"),
+  pred_rf |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "Random Forest"),
+  pred_xgb |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "XGBoost")
+) |>
+  select(modelo, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  arrange(desc(roc_auc))
+```
+
+- XGBoost suele igualar o superar a Random Forest en datasets tabulares
+- Requiere más tuning (tree_depth, learn_rate, trees) y más tiempo de cómputo
+- En ciencias sociales, la mejora marginal rara vez justifica la pérdida de interpretabilidad
 :::

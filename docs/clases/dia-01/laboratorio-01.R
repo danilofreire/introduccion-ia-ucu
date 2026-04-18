@@ -92,20 +92,19 @@ datos_test |>
   mutate(prop = round(n / sum(n), 3), conjunto = "test")
 
 
-# --- Ejercicio 2: División de datos ---------------------------
+# --- Variaciones de la división (demo) -----------------------
 
-# Pregunta 1: prop = 0.50
+# prop baja: menos datos de entrenamiento
 set.seed(2026)
 split_50 <- initial_split(datos_modelo, prop = 0.50, strata = crecimiento_alto)
 cat("Train:", nrow(training(split_50)), "/ Test:", nrow(testing(split_50)))
 
-# Pregunta 2: sin estratificación
+# Sin estratificación: las proporciones pueden diferir
 set.seed(2026)
 split_sin <- initial_split(datos_modelo, prop = 0.75)
 training(split_sin) |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
-testing(split_sin)  |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
 
-# Pregunta 3: diferente semilla
+# Otra semilla: otra partición (pero strata mantiene las proporciones)
 set.seed(999)
 split_999 <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
 training(split_999) |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
@@ -164,9 +163,9 @@ predicciones |>
          event_level = "second")
 
 
-# --- Ejercicio 4: Probabilidades de predicción ----------------
+# --- Probabilidades y umbral (demo) --------------------------
 
-# Obtener probabilidades
+# Obtener probabilidades en test
 pred_probs <- ajuste |>
   predict(datos_test, type = "prob") |>
   bind_cols(datos_test)
@@ -175,34 +174,7 @@ pred_probs |>
   select(crecimiento_alto, .pred_no, .pred_si) |>
   head(10)
 
-# Observaciones con probabilidad cercana a 0.5 (inciertas)
-pred_probs |>
-  select(crecimiento_alto, .pred_no, .pred_si) |>
-  mutate(incertidumbre = abs(.pred_si - 0.5)) |>
-  filter(incertidumbre < 0.1) |>
-  arrange(incertidumbre)
-
-
-# --- Ejercicio 5: Cambiar el umbral ---------------------------
-
-# Umbral personalizado
-umbral <- 0.3
-
-pred_umbral <- pred_probs |>
-  mutate(.pred_class_nuevo = factor(
-    if_else(.pred_si >= umbral, "si", "no"),
-    levels = c("no", "si")
-  ))
-
-pred_umbral |>
-  precision(truth = crecimiento_alto, estimate = .pred_class_nuevo,
-            event_level = "second")
-
-pred_umbral |>
-  recall(truth = crecimiento_alto, estimate = .pred_class_nuevo,
-         event_level = "second")
-
-# Comparar tres umbrales
+# Comparar precision y recall para tres umbrales
 purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
   pred_probs |>
     mutate(.pred_u = factor(
@@ -217,13 +189,42 @@ purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
 })
 
 
-# --- Ejercicio 6: Validación cruzada -------------------------
+# --- Curva ROC y AUC (demo) ----------------------------------
+
+# event_level = "second" fija "si" como el evento positivo.
+# Sin esto, el AUC sale invertido.
+pred_probs |>
+  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second") |>
+  autoplot()
+
+pred_probs |>
+  roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
+
+
+# ============================================================
+# MATERIAL OPCIONAL
+# Estas secciones no se cubren en clase, pero están aquí
+# para quienes quieran profundizar. Validación cruzada aparece
+# formalmente en el Laboratorio 2.
+# ============================================================
+
+
+# --- Opcional: observaciones inciertas -----------------------
+
+# Observaciones con probabilidad cercana a 0.5
+pred_probs |>
+  select(crecimiento_alto, .pred_no, .pred_si) |>
+  mutate(incertidumbre = abs(.pred_si - 0.5)) |>
+  filter(incertidumbre < 0.1) |>
+  arrange(incertidumbre)
+
+
+# --- Opcional: validación cruzada ----------------------------
 
 set.seed(2026)
 folds <- vfold_cv(datos_train, v = 5, strata = crecimiento_alto)
 folds
 
-# Ajustar modelo en cada fold
 cv_results <- fit_resamples(
   modelo_log,
   crecimiento_alto ~ .,
@@ -232,24 +233,8 @@ cv_results <- fit_resamples(
   control = control_resamples(event_level = "second")
 )
 
-# Resultados promedio
 collect_metrics(cv_results)
 
 # Comparar con la división única
 predicciones |>
   metrics(truth = crecimiento_alto, estimate = .pred_class)
-
-
-# --- Ejercicio 7: Curva ROC ----------------------------------
-
-# Calcular curva ROC
-# event_level = "second" indica que "si" es el evento positivo
-# (el segundo nivel del factor). Sin esto, el AUC sale invertido.
-roc_data <- pred_probs |>
-  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second")
-
-autoplot(roc_data)
-
-# Calcular AUC
-pred_probs |>
-  roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")

@@ -116,20 +116,14 @@ install.packages("tidymodels", dependencies = TRUE)
 
 ## Recapitulando: el ecosistema tidy
 
-:::{style="margin-top: 30px; font-size: 26px;"}
-- [tidymodels](https://www.tidymodels.org/) es un conjunto de paquetes de R para modelado de datos
-- Sigue la filosofía del [tidyverse]{.alert}: código legible, consistente y modular
-- Paquetes principales:
-    - [[rsample:](https://rsample.tidymodels.org/)]{.alert} división de datos
-    - [[recipes:](https://recipes.tidymodels.org/)]{.alert} preprocesamiento de datos
-    - [[parsnip:](https://parsnip.tidymodels.org/)]{.alert} especificación de modelos
-    - [[workflows:](https://workflows.tidymodels.org/)]{.alert} combinar preprocesamiento + modelo
-    - [[tune:](https://tune.tidymodels.org/)]{.alert} ajuste de hiperparámetros
-    - [[yardstick:](https://yardstick.tidymodels.org/)]{.alert} métricas de evaluación
-:::
+:::{style="margin-top: 30px; font-size: 28px;"}
+[tidymodels](https://www.tidymodels.org/) es un conjunto de paquetes que comparten la filosofía del [tidyverse]{.alert}. Los que usaremos hoy:
 
-:::{style="margin-top: 30px; font-size: 26px;"}
-Ventaja: [misma sintaxis]{.alert} para todos los modelos, ya sea regresión logística, random forest o redes neuronales.
+- [rsample:]{.alert} división de datos
+- [parsnip:]{.alert} especificación de modelos
+- [yardstick:]{.alert} métricas de evaluación
+
+Ventaja: [misma sintaxis]{.alert} para cualquier modelo, sea regresión logística, random forest o redes neuronales. La [lista completa](https://www.tidymodels.org/packages/) queda en la documentación.
 :::
 
 ## Cargar los datos
@@ -162,9 +156,9 @@ summary(datos)
 ```
 :::
 
-## Explorar la variable objetivo
+## Explorar la variable de resultado
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 
 :::{.columns}
 :::{.column width=55%}
@@ -252,10 +246,12 @@ glimpse(datos_modelo)
 :::
 
 :::{.column width=45%}
+:::{style="margin-top: 30px; font-size: 24px;"}
 ```{r factor-ejemplo, prompt=FALSE, echo=TRUE}
 # Ver los niveles del factor
 levels(datos_modelo$crecimiento_alto)
 ```
+:::
 :::
 :::
 :::
@@ -307,26 +303,30 @@ datos_test |>
 [Las proporciones deberían ser muy similares (¡y realmente lo son en este caso!)]{.alert}
 :::
 
-## Ejercicio 2: División de datos {#sec:exercise02}
+## Variaciones de la división (demo) {#sec:exercise02}
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 
-**Instrucciones:** Experimenten con diferentes configuraciones de división.
+Tres parámetros moldean la partición. Vean el efecto:
 
-1. ¿Qué pasa si cambian `prop = 0.75` a `prop = 0.50`?
-2. ¿Qué pasa si quitan `strata = crecimiento_alto`?
-3. ¿Qué pasa si cambian la semilla (`set.seed()`)?
+```{r variaciones-split, prompt=FALSE, echo=TRUE}
+# (1) Menos datos de entrenamiento
+set.seed(2026)
+split_50 <- initial_split(datos_modelo, prop = 0.50, strata = crecimiento_alto)
+cat("prop = 0.50 -> Train:", nrow(training(split_50)),
+    "| Test:", nrow(testing(split_50)), "\n")
 
-```{r ej2-solucion, eval=FALSE, prompt=FALSE, echo=TRUE}
-# Prueben diferentes configuraciones:
-set.seed(12345)
-datos_split_2 <- initial_split(datos_modelo, prop = 0.50)
-# ...
+# (2) Sin estratificacion (las proporciones pueden diferir)
+set.seed(1234)
+split_sin <- initial_split(datos_modelo, prop = 0.75)
+training(split_sin) |> count(crecimiento_alto) |>
+  mutate(prop = round(n / sum(n), 3))
 ```
 
-[Entender cómo afectan estos parámetros es importante para diseñar experimentos robustos.]{.alert}
-
-[[Apéndice 2: Solución]{.button}](#sec:appendix02)
+- `prop` baja: menos datos para aprender, peor ajuste
+- sin `strata`: proporciones de clase pueden diferir, [sesga las métricas]{.alert}
+- otra semilla: resultados levemente distintos, la estratificación los mantiene comparables
+- [[Más ejemplos en el Apéndice 2]{.button}](#sec:appendix02)
 :::
 
 # Parte 3: Entrenamiento y evaluación {background-color="#2d4563"}
@@ -393,7 +393,7 @@ tidy(ajuste)
 :::
 
 :::{.column width=55%}
-:::{style="margin-top: 20px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 ```{r coef-interpretacion, prompt=FALSE, echo=TRUE}
 # Ver los odds ratios
 tidy(ajuste) |>
@@ -409,7 +409,9 @@ tidy(ajuste) |>
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-Generamos predicciones en los datos de prueba:
+- Generamos predicciones en los datos de prueba
+- `.pred_class` es la clase predicha por el modelo
+- Comparamos con `crecimiento_alto` (la verdad)
 
 ```{r lab-predecir, prompt=FALSE, echo=TRUE}
 # Predecir clases
@@ -420,21 +422,18 @@ predicciones <- ajuste |>
 # Ver las primeras predicciones
 predicciones |>
   select(crecimiento_alto, .pred_class) |>
-  head(10)
+  head(8)
 ```
-
-- `.pred_class` es la clase predicha por el modelo
-- Comparamos con `crecimiento_alto` (la verdad)
 :::
 
 ## Matriz de confusión
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 La matriz de confusión muestra todos los resultados posibles:
 
 ```{r lab-evaluar, prompt=FALSE, echo=TRUE}
-# Matriz de confusión
+# Matriz de confusión (conf_mat = confusion matrix)
 conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
 ```
 
@@ -453,7 +452,7 @@ conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
 
 ## Métricas de evaluación
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r lab-metricas-adicionales, prompt=FALSE, echo=TRUE}
 # Conjunto completo de métricas
@@ -467,7 +466,7 @@ predicciones |>
 
 ## Ejercicio 3: Interpretación {#sec:exercise03}
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 
 **Instrucciones:** Reflexionen sobre los resultados.
 
@@ -482,118 +481,69 @@ predicciones |>
 [[Apéndice 3: Reflexión]{.button}](#sec:appendix03)
 :::
 
-# Parte 4: Ejercicios adicionales {background-color="#2d4563"}
+# Parte 4: Más allá de la clasificación binaria {background-color="#2d4563"}
 
-## Probabilidades de predicción {#sec:exercise04}
+## Probabilidades y umbral (demo) {#sec:exercise04}
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
-Los modelos de clasificación también pueden dar [probabilidades]{.alert}, no solo clases:
+El modelo no solo predice clases: también da [probabilidades]{.alert}. Por defecto, `predict()` usa un umbral de 0.5, pero podemos cambiarlo.
 
-```{r ej4-probabilidades, prompt=FALSE, echo=TRUE}
-# Obtener probabilidades
+```{r probs-umbral, prompt=FALSE, echo=TRUE}
+# Obtener probabilidades en test
 pred_probs <- ajuste |>
   predict(datos_test, type = "prob") |>
   bind_cols(datos_test)
 
-# Ver las probabilidades
+# Precision y recall para tres umbrales
+purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
+  pred_probs |>
+    mutate(.pred_u = factor(
+      dplyr::if_else(.pred_si >= u, "si", "no"),
+      levels = c("no", "si")
+    )) |>
+    summarise(
+      umbral    = u,
+      precision = precision_vec(crecimiento_alto, .pred_u, event_level = "second"),
+      recall    = recall_vec(crecimiento_alto, .pred_u, event_level = "second")
+    )
+})
+```
+
+- Umbral bajo (0.3): predice "sí" con facilidad, [alta recall, baja precisión]{.alert}
+- Umbral alto (0.7): predice "sí" con cautela, [alta precisión, baja recall]{.alert}
+- Detalle de observaciones inciertas: [[Apéndice 4]{.button}](#sec:appendix04)
+:::
+
+## Curva ROC y AUC (demo) {#sec:exercise07}
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+La curva ROC resume el rendimiento [en todos los umbrales a la vez]{.alert}:
+
+```{r roc-demo, prompt=FALSE, fig.width=6, fig.height=3.5, echo=TRUE}
 pred_probs |>
-  select(crecimiento_alto, .pred_no, .pred_si) |>
-  head(10)
-```
+  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second") |>
+  autoplot()
 
-**Tarea:** ¿Qué observaciones tienen predicciones "inciertas" (probabilidades cercanas a 0.5)?
-
-[[Apéndice 4: Solución]{.button}](#sec:appendix04)
-:::
-
-## Cambiar el umbral {#sec:exercise05}
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-Por defecto, el umbral es 0.5. Pero podemos cambiarlo:
-
-```{r ej5-umbral, prompt=FALSE, echo=TRUE}
-# Crear predicciones con umbral personalizado
-umbral <- 0.3  # Más sensible: predice "sí" más fácilmente
-
-pred_umbral <- pred_probs |>
-  mutate(.pred_class_nuevo = factor(
-    if_else(.pred_si >= umbral, "si", "no"),
-    levels = c("no", "si")
-  ))
-
-# Comparar métricas
-pred_umbral |>
-  precision(truth = crecimiento_alto, estimate = .pred_class_nuevo,
-            event_level = "second")
-
-pred_umbral |>
-  recall(truth = crecimiento_alto, estimate = .pred_class_nuevo,
-         event_level = "second")
-```
-
-**Tarea:** Prueben con umbrales de 0.3, 0.5 y 0.7. ¿Cómo cambian precision y recall?
-
-[[Apéndice 5: Solución]{.button}](#sec:appendix05)
-:::
-
-## Validación cruzada {#sec:exercise06}
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-- En lugar de una sola división, usemos [validación cruzada]{.alert}
-- `vfold_cv()` crea folds estratificados para evaluar el modelo en múltiples subconjuntos
-- `fit_resamples()` ajusta el modelo en cada fold y calcula métricas promedio
-
-```{r ej6-cv, prompt=FALSE, echo=TRUE}
-# Crear folds de validación cruzada
-set.seed(2026)
-folds <- vfold_cv(datos_train, v = 5, strata = crecimiento_alto)
-
-# Ver los folds
-folds
-```
-
-```{r ej6-cv-fit, prompt=FALSE, echo=TRUE}
-# Ajustar modelo en cada fold
-cv_results <- fit_resamples(
-  modelo_log,
-  crecimiento_alto ~ .,
-  resamples = folds,
-  metrics = metric_set(accuracy, precision, recall),
-  control = control_resamples(event_level = "second")
-)
-
-# Ver resultados promedio
-collect_metrics(cv_results)
-```
-
-[[Apéndice 6: Solución]{.button}](#sec:appendix06)
-:::
-
-## Curva ROC {#sec:exercise07}
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-Visualicemos el rendimiento con una [curva ROC]{.alert}:
-
-```{r ej8-roc, prompt=FALSE, fig.width=6, fig.height=4, echo=TRUE}
-# Calcular curva ROC
-roc_data <- pred_probs |>
-  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second")
-
-# Graficar
-autoplot(roc_data)
-```
-
-- `event_level = "second"` indica que el [evento positivo]{.alert} es el segundo nivel del factor (`"si"`). Por defecto, yardstick usa el primer nivel (`"no"`) como evento positivo. Sin este argumento, la curva ROC y el AUC se calculan al revés (AUC < 0.5)
-
-```{r ej8-auc, prompt=FALSE, echo=TRUE}
-# Calcular AUC
 pred_probs |>
   roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
 ```
+
+- `event_level = "second"` fija "si" como el evento positivo. Sin esto, el AUC sale invertido
+- AUC ≈ 0.5 es azar; 0.7–0.8 aceptable; > 0.9 excelente (revisen data leakage)
+:::
+
+## Más allá de esta sesión
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+
+Dos temas que no tocaremos hoy pero aparecen en los apéndices:
+
+- **Comparación de umbrales en detalle**: tabla completa y discusión en [[Apéndice 5]{.button}](#sec:appendix05)
+- **Validación cruzada** (`vfold_cv` + `fit_resamples`): en lugar de una sola división train/test, el modelo se evalúa en varios folds y se promedian las métricas. Da estimaciones más estables. La veremos en [Laboratorio 2]{.alert}. Ejemplo en [[Apéndice 6]{.button}](#sec:appendix06)
+
+[Material opcional: carguen el script [`laboratorio-01.R`](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/laboratorio-01.R) para ejecutar todos los ejemplos.]{.alert}
 :::
 
 # Resumen y cierre {background-color="#2d4563"}
@@ -842,7 +792,7 @@ predicciones |>
 
 ## Apéndice 7: Curva ROC {#sec:appendix07}
 
-:::{style="margin-top: 20px; font-size: 22px;"}
+:::{style="margin-top: 20px; font-size: 26px;"}
 
 **Interpretar el AUC:**
 
