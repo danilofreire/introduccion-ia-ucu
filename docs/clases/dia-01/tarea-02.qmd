@@ -19,7 +19,7 @@ Esta tarea usa el dataset del Laboratorio 2 (`satisfaccion_democracia.csv`). Res
 
 **Para trabajar en esta tarea:**
 
-1. Descarguen este archivo `.qmd` y el dataset `satisfaccion_democracia.csv` de la [página del curso](https://danilofreire.github.io/introducción-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+1. Descarguen este archivo `.qmd` y el dataset `satisfaccion_democracia.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
 2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <https://quarto.org/docs/get-started/>
 3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)
 4. Cuando terminen, pueden renderizar el documento completo con el botón "Render" en RStudio

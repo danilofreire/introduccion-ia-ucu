@@ -1,14 +1,16 @@
-# Script para crear el dataset simulado del Laboratorio 3
+# Script para crear el dataset simulado de los Laboratorios 3 y 4
 # Encuesta tipo Latinobarometro: 500 encuestados de 18 paises latinoamericanos
 #
 # Diseno:
 #   - Las variables de actitud politica estan correlacionadas entre si
 #     (interes politico -> confianza gobierno -> confianza justicia).
 #   - Ingreso correlaciona con educacion (~0.30).
-#   - 11 predictores tienen efecto directo sobre el outcome (voto).
-#   - Efectos mas fuertes: interes politico, edad, confianza gobierno.
-#   - Efecto negativo: percepcion economica (voto de protesta).
-#   - Ruido residual (sd = 1.0) produce ROC-AUC esperado ~0.72-0.78.
+#   - Outcome Lab 3 (voto): 11 predictores con efecto directo. Efectos mas
+#     fuertes: interes politico, edad, confianza gobierno. Efecto negativo:
+#     percepcion economica (voto de protesta). Ruido sd = 1.0 -> ROC-AUC ~0.72-0.78.
+#   - Outcome Lab 4 (satisfaccion_vida): funcion lineal de educacion, ingreso,
+#     confianza en el gobierno, satisfaccion con la democracia, percepcion
+#     economica e interes politico. Ruido sd = 1.2 -> R^2 esperado ~0.35-0.45.
 
 set.seed(2026)
 n <- 500
@@ -50,7 +52,17 @@ percepcion_economia <- round(pmin(pmax(rnorm(n, 3, 1.2), 1), 5))
 
 uso_internet <- sample(c("nunca", "semanal", "diario"), n, replace = TRUE,
                         prob = c(0.15, 0.30, 0.55))
-satisfaccion_vida <- round(pmin(pmax(rnorm(n, 6.5, 1.5), 1), 10), 1)
+satisfaccion_vida <- round(pmin(pmax(
+  2.0 +
+  0.08 * educacion_anios +          # mas educacion -> mas satisfaccion
+  0.15 * ingreso_hogar +            # mas ingreso -> mas satisfaccion
+  0.35 * confianza_gobierno +       # confianza en gobierno -> satisfaccion
+  0.30 * satisfaccion_democracia +  # satisfaccion democratica -> vital
+  0.20 * percepcion_economia +      # buena economia -> mas satisfaccion
+  0.15 * interes_politica +         # interes politico -> efecto leve
+  0.01 * edad +                     # edad -> efecto muy leve
+  rnorm(n, 0, 1.2),                 # ruido residual
+  1), 10), 1)
 
 # --- Outcome: voto en la ultima eleccion ---
 

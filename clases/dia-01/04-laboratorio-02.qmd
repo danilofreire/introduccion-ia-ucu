@@ -87,10 +87,11 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Cargar los paquetes
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r lab2-setup, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
 # Cargar paquetes
+# install.packages("tidymodels", "tidyverse") # Instalar si es necesario
 library(tidymodels)
 library(tidyverse)
 
@@ -98,10 +99,19 @@ library(tidyverse)
 theme_set(theme_minimal(base_size = 14))
 ```
 
-Si no tienen los paquetes instalados, ejecuten primero:
+O de una forma más automatizada:
 
 ```{r lab2-install, eval=FALSE, prompt=FALSE, echo=TRUE}
-install.packages(c("tidymodels", "tidyverse", "kknn", "rpart"))
+paquetes <- c("tidymodels", "tidyverse", "rpart")
+
+# require(): intenta cargar el paquete y devuelve TRUE/FALSE
+# Si no está instalado (FALSE), lo instala y carga
+for (pkg in paquetes) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
 ```
 :::
 
@@ -141,52 +151,12 @@ glimpse(satisfaccion) # Ver las variables y tipos
 
 :::
 
-## Ejercicio 1: Exploración inicial {#sec:exercise01}
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-**Tarea:** Exploren el dataset y respondan estas preguntas.
-
-1. ¿Cuántas observaciones hay? ¿Cuántas variables?
-2. ¿Cómo está distribuida la variable objetivo?
-3. ¿Hay valores faltantes?
-4. ¿Cómo se distribuyen las variables numéricas?
-
-```{r ej1-exploracion, eval=FALSE, prompt=FALSE, echo=TRUE}
-# Código para empezar (completen ustedes)
-dim(satisfaccion)
-satisfaccion |> count(satisfecho)
-sum(is.na(satisfaccion))
-# ... más exploración
-```
-
-[Tómense 10 minutos para explorar.]{.alert}
-
-[[Ir al Apéndice 1]{.button}](#sec:appendix01)
-:::
-
 ## Visualizar distribuciones
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-```{r lab2-histogramas, prompt=FALSE, fig.width=10, fig.height=5, echo=TRUE}
-# Histogramas de variables numéricas
-satisfaccion |>
-  select(where(is.numeric)) |>
-  pivot_longer(everything(), names_to = "variable", values_to = "valor") |>
-  ggplot(aes(x = valor)) +
-  geom_histogram(bins = 30, fill = "#2d4563", alpha = 0.7) +
-  facet_wrap(~variable, scales = "free") +
-  labs(title = "Distribución de variables numéricas")
-```
-:::
-
-## Relación con la variable objetivo
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab2-boxplots, prompt=FALSE, fig.width=10, fig.height=5, echo=TRUE}
-# Boxplots por satisfacción
+```{r lab2-boxplots, prompt=FALSE, fig.width=10, fig.height=4.5, echo=TRUE}
+# Variables numéricas por nivel de satisfacción
 satisfaccion |>
   select(satisfecho, confianza_gobierno, participacion_politica, edad) |>
   pivot_longer(-satisfecho, names_to = "variable", values_to = "valor") |>
@@ -197,34 +167,38 @@ satisfaccion |>
   labs(title = "Variables numéricas por nivel de satisfacción") +
   theme(legend.position = "none")
 ```
+
+Quienes tengan tiempo pueden ver también `geom_histogram()` por variable. Ejemplo completo en [Apéndice 1]{.alert}.
 :::
 
-## Ejercicio 2: Más visualizaciones {#sec:exercise02}
+## Ejercicio 1: Exploración {#sec:exercise01}
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-**Tarea:** Creen visualizaciones adicionales para entender los datos.
+**Tarea:** Exploren el dataset y produzcan una visualización que les llame la atención.
 
-1. ¿Cómo varía la satisfacción por [zona]{.alert} (urbano/rural)?
-2. ¿Cómo varía por [país]{.alert}?
-3. ¿Hay diferencias por [género]{.alert}?
-4. ¿Qué relación hay entre [ingreso]{.alert} y [educación]{.alert}?
+1. ¿Cuántas observaciones? ¿Hay valores faltantes?
+2. ¿Cómo se distribuye la variable objetivo `satisfecho`?
+3. Elijan [una]{.alert} de estas preguntas y hagan un gráfico para responderla:
+    - ¿Cómo varía la satisfacción por [zona]{.alert} (urbano/rural) o por [país]{.alert}?
+    - ¿Qué relación hay entre [ingreso]{.alert} y [educación]{.alert}?
 
-```{r ej2-visualizacion, eval=FALSE, prompt=FALSE, echo=TRUE}
+```{r ej1-exploracion, eval=FALSE, prompt=FALSE, echo=TRUE}
+# Código para empezar
+dim(satisfaccion)
+satisfaccion |> count(satisfecho) |> mutate(prop = n / sum(n))
+
 # Ejemplo: satisfacción por zona
 satisfaccion |>
   count(zona, satisfecho) |>
-  group_by(zona) |>
-  mutate(prop = n / sum(n)) |>
+  group_by(zona) |> mutate(prop = n / sum(n)) |>
   ggplot(aes(x = zona, y = prop, fill = satisfecho)) +
   geom_col(position = "dodge")
-
-# Completen con más visualizaciones...
 ```
 
-[Tómense 10 minutos.]{.alert}
+[Tómense 5-10 minutos.]{.alert}
 
-[[Ir al Apéndice 2]{.button}](#sec:appendix02)
+[[Ir al Apéndice 1]{.button}](#sec:appendix01) · [[Más visualizaciones: Apéndice 2]{.button}](#sec:appendix02)
 :::
 
 # Parte 2: Feature engineering {background-color="#2d4563"}
@@ -269,42 +243,38 @@ satisfaccion <- satisfaccion |>
     ingreso_percapita = ingreso_hogar / 3.5,
 
     # Indicador de alta participación
-    alta_participacion = if_else(participacion_politica > 50, "alta", "baja"),
-
-    # Interacción: confianza × participación
-    confianza_x_participacion = confianza_gobierno * participacion_politica / 100
+    alta_participacion = if_else(participacion_politica > 50, "alta", "baja")
   )
 
 # Ver las nuevas variables
-satisfaccion |> select(grupo_edad, ingreso_percapita, alta_participacion, confianza_x_participacion) |> head()
+satisfaccion |> select(grupo_edad, ingreso_percapita, alta_participacion) |> head()
 ```
 :::
 
-## Ejercicio 3: Crear más features {#sec:exercise03}
+## Ejercicio 2: Crear un feature {#sec:exercise03}
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-**Tarea:** Piensen en otras variables que podrían ser útiles.
+**Tarea:** Elijan [una]{.alert} variable derivada y créenla.
 
-Ideas para explorar:
+Opciones sugeridas (elijan la que más les interese). Entre paréntesis, la variable base:
 
-- ¿Un indicador de "educación alta" (más de 12 años)?
-- ¿Una variable que combine zona y género?
-- ¿Grupos de ingreso (bajo, medio, alto)?
-- ¿Consumidor de noticias alto vs. bajo?
+- Grupos de ingreso por terciles: bajo, medio, alto (`ingreso_hogar`)
+- Consumidor alto de noticias: más de 5 horas por semana (`consumo_noticias`)
+- Baja confianza en el gobierno: puntaje menor o igual a 4 (`confianza_gobierno`)
+- Interacción zona y género: combinación de ambas categorías (`zona`, `genero`)
 
 ```{r ej3-features, eval=FALSE, prompt=FALSE, echo=TRUE}
-# Ejemplo
+# Ejemplo: Crear variable educacion_alta
 satisfaccion <- satisfaccion |>
   mutate(
-    educacion_alta = if_else(educacion_anos > 12, "alta", "baja"),
-    # ... más variables
+    educacion_alta = if_else(educacion_anos > 12, "alta", "baja")
   )
 ```
 
-[Creen al menos 2 variables nuevas.]{.alert}
+[Tómense 5 minutos.]{.alert}
 
-[[Ir al Apéndice 3]{.button}](#sec:appendix03)
+[[Más ejemplos en el Apéndice 3]{.button}](#sec:appendix03)
 :::
 
 ## Dividir los datos
@@ -337,31 +307,21 @@ cat("Train:", nrow(datos_train), "| Test:", nrow(datos_test))
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-Vamos a comparar tres modelos diferentes:
+Vamos a comparar dos modelos de naturaleza distinta: uno lineal y uno no lineal.
 
 ```{r lab2-modelos, prompt=FALSE, echo=TRUE}
-# 1. Regresión logística
+# 1. Regresión logística (lineal)
 modelo_logistico <- logistic_reg() |>
   set_engine("glm") |>
   set_mode("classification")
 
-# 2. Árbol de decisión
+# 2. Árbol de decisión (no lineal, captura interacciones automáticamente)
 modelo_arbol <- decision_tree() |>
   set_engine("rpart") |>
   set_mode("classification")
-
-# 3. K-Nearest Neighbors (k vecinos más cercanos)
-modelo_knn <- nearest_neighbor(neighbors = 5) |>
-  set_engine("kknn") |>
-  set_mode("classification")
-
-# Lista de modelos
-modelos <- list(
-  logistico = modelo_logistico,
-  arbol = modelo_arbol,
-  knn = modelo_knn
-)
 ```
+
+La [misma sintaxis]{.alert} sirve para ambos: esa es la ventaja de `parsnip`. Otros motores (`kknn`, `ranger`, `xgboost`) funcionan igual cambiando solo `set_engine()`.
 :::
 
 ## Crear una fórmula
@@ -375,15 +335,9 @@ Decidamos qué variables usar:
 formula_basica <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
                                confianza_gobierno + consumo_noticias +
                                participacion_politica + zona
-
-# Fórmula con features nuevas
-formula_extendida <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
-                                  confianza_gobierno + consumo_noticias +
-                                  participacion_politica + zona +
-                                  confianza_x_participacion
 ```
 
-[Vamos a probar ambas fórmulas.]{.alert}
+Más adelante añadiremos una variable derivada para ver si mejora el ajuste.
 :::
 
 ## Función para evaluar un modelo
@@ -422,12 +376,11 @@ eval_logistico
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r lab2-evaluar-todos, prompt=FALSE, echo=TRUE}
-# Evaluar todos los modelos con la fórmula básica
+# Evaluar el árbol con la misma fórmula
 eval_arbol <- evaluar_modelo(modelo_arbol, formula_basica, folds, "Árbol")
-eval_knn <- evaluar_modelo(modelo_knn, formula_basica, folds, "KNN")
 
 # Combinar resultados
-resultados <- bind_rows(eval_logistico, eval_arbol, eval_knn)
+resultados <- bind_rows(eval_logistico, eval_arbol)
 
 # Mostrar comparación
 resultados |>
@@ -441,39 +394,40 @@ resultados |>
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r lab2-visualizar-comparacion, prompt=FALSE, fig.width=10, fig.height=5, echo=TRUE}
-# Gráfico de barras con error estándar
 resultados |>
   ggplot(aes(x = modelo, y = mean, fill = modelo)) +
   geom_col(alpha = 0.8) +
   geom_errorbar(aes(ymin = mean - std_err, ymax = mean + std_err),
                 width = 0.2) +
   facet_wrap(~.metric, scales = "free_y") +
-  scale_fill_manual(values = c("#2d4563", "#e74c3c", "#27ae60")) +
+  scale_fill_manual(values = c("#2d4563", "#27ae60")) +
   labs(title = "Comparación de modelos", y = "Valor", x = "") +
   theme(legend.position = "none")
 ```
 :::
 
-## Ejercicio 4: Comparar con features nuevos {#sec:exercise04}
+## Ejercicio 3: ¿Ayuda el feature engineering? {#sec:exercise04}
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-**Tarea:** Evalúen los modelos con la fórmula extendida.
+**Tarea:** Agreguen [la variable derivada que crearon antes]{.alert} a la fórmula y re-evalúen.
 
-1. ¿Mejora algún modelo al agregar las nuevas variables?
-2. ¿Cuál modelo es más sensible a los features nuevos?
-3. ¿Vale la pena el esfuerzo del feature engineering?
+1. ¿Mejora la regresión logística? ¿Y el árbol?
+2. ¿Cuál de los dos modelos es más sensible al feature nuevo?
 
 ```{r ej4-features-nuevos, eval=FALSE, prompt=FALSE, echo=TRUE}
-# Evaluar con fórmula extendida
-eval_log_ext <- evaluar_modelo(modelo_logistico, formula_extendida, folds, "Logístico (ext)")
-# ... evaluar los otros modelos
+# Ejemplo con la variable educacion_alta
+formula_ext <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
+                            confianza_gobierno + consumo_noticias +
+                            participacion_politica + zona + educacion_alta
 
-# Comparar resultados
-# ...
+eval_log_ext <- evaluar_modelo(modelo_logistico, formula_ext, folds, "Logístico (ext)")
+eval_arb_ext <- evaluar_modelo(modelo_arbol,     formula_ext, folds, "Árbol (ext)")
+bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
+  filter(.metric == "accuracy") |> select(modelo, mean, std_err)
 ```
 
-[Tómense 5-10 minutos para experimentar.]{.alert}
+[Tómense 10 minutos.]{.alert}
 
 [[Ir al Apéndice 4]{.button}](#sec:appendix04)
 :::
@@ -505,129 +459,19 @@ pred_test |>
 ```
 :::
 
-# Parte 4: Mini-proyecto guiado {background-color="#2d4563"}
+## Tarea para casa
 
-## El desafío
+:::{style="margin-top: 30px; font-size: 24px;"}
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+Hay una [tarea para esta sesión]{.alert} con preguntas prácticas que aplican todo lo que vimos hoy.
 
-**Escenario:** Un organismo regional quiere identificar qué factores predicen mejor la [insatisfacción]{.alert} con la democracia para diseñar políticas públicas.
+- Página de [Laboratorios](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html) del sitio del curso
+- [Tarea 2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-02.html)
+- [Respuestas Tarea 2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-02-respuestas.html)
 
-**Su tarea:**
+<br>
 
-1. Elegir las variables más relevantes (justifiquen)
-2. Crear al menos una variable derivada útil
-3. Entrenar y comparar al menos 2 modelos
-4. Presentar resultados con [recomendaciones de política]{.alert}
-
-[Tienen 10 minutos. Trabajen en grupos de 2-3.]{.alert}
-:::
-
-## Guía para el mini-proyecto
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-**Paso 1: Definir la pregunta**
-
-- ¿Qué queremos predecir exactamente?
-- ¿Qué métricas son más relevantes para el organismo?
-
-**Paso 2: Seleccionar variables**
-
-- ¿Qué variables tienen sentido teórico?
-- ¿Cuáles mostraron relación en la exploración?
-
-**Paso 3: Modelar y evaluar**
-
-- Entrenar modelos con validación cruzada
-- Comparar métricas
-
-**Paso 4: Interpretar y recomendar**
-
-- ¿Qué variables son más importantes?
-- ¿Qué recomiendanción dar al organismo?
-:::
-
-## Estructura sugerida para el código
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-```{r mini-proyecto-estructura, eval=FALSE, prompt=FALSE, echo=TRUE}
-# 1. Seleccionar y preparar variables
-datos_proyecto <- satisfaccion |>
-  select(satisfecho, ...) |>  # Sus variables elegidas
-  mutate(...)                  # Sus variables derivadas
-
-# 2. Dividir datos
-set.seed(2026)
-split_proy <- initial_split(datos_proyecto, prop = 0.75, strata = satisfecho)
-train_proy <- training(split_proy)
-test_proy <- testing(split_proy)
-folds_proy <- vfold_cv(train_proy, v = 5, strata = satisfecho)
-
-# 3. Definir y evaluar modelos
-# ...
-
-# 4. Evaluar en test
-# ...
-
-# 5. Interpretar coeficientes (si es regresión logística)
-ajuste_final |> tidy() |> arrange(p.value)
-```
-:::
-
-## Un ejemplo completo
-
-:::{style="margin-top: 30px; font-size: 19px;"}
-
-```{r mini-proyecto-ejemplo, eval=FALSE, prompt=FALSE, echo=TRUE}
-# --- Ejemplo: análisis para el organismo regional ---
-
-# 1. Preparar datos con variables seleccionadas + feature nuevo
-datos_proy <- satisfaccion |>
-  mutate(
-    confianza_baja = if_else(confianza_gobierno <= 4, "si", "no"),
-    educacion_alta = if_else(educacion_anos > 12, "si", "no")
-  ) |>
-  select(satisfecho, edad, confianza_gobierno, participacion_politica,
-         ingreso_hogar, zona, confianza_baja, educacion_alta)
-
-# 2. Dividir y crear folds
-set.seed(2026)
-sp <- initial_split(datos_proy, prop = 0.75, strata = satisfecho)
-train_p <- training(sp); test_p <- testing(sp)
-folds_p <- vfold_cv(train_p, v = 5, strata = satisfecho)
-
-# 3. Evaluar regresión logística y árbol de decisión
-formula_proy <- satisfecho ~ edad + confianza_gobierno +
-  participacion_politica + ingreso_hogar + zona + confianza_baja
-
-eval_log <- evaluar_modelo(modelo_logistico, formula_proy, folds_p, "Logístico")
-eval_arb <- evaluar_modelo(modelo_arbol, formula_proy, folds_p, "Árbol")
-bind_rows(eval_log, eval_arb) |>
-  select(modelo, .metric, mean) |>
-  pivot_wider(names_from = .metric, values_from = mean)
-
-# 4. Interpretar coeficientes del mejor modelo
-fit_proy <- modelo_logistico |> fit(formula_proy, data = train_p)
-tidy(fit_proy) |> mutate(odds_ratio = exp(estimate)) |> arrange(p.value)
-```
-
-[Copien, adapten y personalicen este código para su propio análisis.]{.alert}
-:::
-
-## Presentación de resultados
-
-:::{style="margin-top: 30px; font-size: 30px;"}
-
-Al final del laboratorio, cada grupo presentará (3 minutos):
-
-1. **Variables seleccionadas:** ¿Por qué eligieron esas?
-2. **Modelo elegido:** ¿Cuál funcionó mejor?
-3. **Hallazgos principales:** ¿Qué factores predicen insatisfacción?
-4. **Recomendación de política:** ¿Qué debería hacer el organismo?
-
-[Preparen un resumen verbal!]{.alert}
+[Hagan la tarea antes de la próxima clase. Las respuestas ya están disponibles para que verifiquen su trabajo.]{.alert}
 :::
 
 # Cierre del Día 1 {background-color="#2d4563"}
@@ -661,10 +505,10 @@ Al final del laboratorio, cada grupo presentará (3 minutos):
 
 **Sesión 1.4: Laboratorio 2**
 
-- Exploración avanzada
-- Feature engineering
-- Comparación de modelos
-- Mini-proyecto aplicado
+- Exploración guiada
+- Feature engineering básico
+- Comparación logístico vs. árbol
+- Tarea 2 disponible en la página de laboratorios
 :::
 :::
 :::
@@ -717,9 +561,9 @@ Al final del laboratorio, cada grupo presentará (3 minutos):
 
 # Fin del Día 1 🥳 {background-color="#2d4563"}
 
-# Apéndices {background-color="#2d4563" visibility="uncounted"}
+# Apéndices {background-color="#2d4563"}
 
-## Apéndice 1: Exploración inicial {#sec:appendix01 visibility="uncounted"}
+## Apéndice 1: Exploración inicial {#sec:appendix01}
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -748,7 +592,7 @@ satisfaccion |> count(zona)
 [[Volver al Ejercicio 1]{.button}](#sec:exercise01)
 :::
 
-## Apéndice 2: Más visualizaciones {#sec:appendix02 visibility="uncounted"}
+## Apéndice 2: Más visualizaciones {#sec:appendix02}
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -765,7 +609,7 @@ satisfaccion |>
 ```
 :::
 
-## Apéndice 2 (cont.) {visibility="uncounted"}
+## Apéndice 2 (cont.)
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -783,7 +627,7 @@ satisfaccion |>
 ```
 :::
 
-## Apéndice 2 (cont.) {visibility="uncounted"}
+## Apéndice 2 (cont.)
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -808,72 +652,75 @@ ggplot(satisfaccion, aes(x = educacion_anos, y = ingreso_hogar, color = satisfec
   labs(title = "Ingreso vs. educación por satisfacción")
 ```
 
-[[Volver al Ejercicio 2]{.button}](#sec:exercise02)
+[[Volver al Ejercicio 1]{.button}](#sec:exercise01)
 :::
 
-## Apéndice 3: Crear más features {#sec:appendix03 visibility="uncounted"}
+## Apéndice 3: Crear más features {#sec:appendix03}
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
 ```{r appendix03, prompt=FALSE, echo=TRUE}
-# Crear variables adicionales
+# Una posible solución para cada una de las cuatro opciones sugeridas
 satisfaccion <- satisfaccion |>
   mutate(
-    # Educación alta: más de 12 años
-    educacion_alta = if_else(educacion_anos > 12, "alta", "baja"),
-
-    # Combinación zona + género
-    zona_genero = paste(zona, genero, sep = "_"),
-
-    # Grupos de ingreso (terciles)
+    # 1. Grupos de ingreso por terciles (ingreso_hogar)
     grupo_ingreso = cut(ingreso_hogar,
                         breaks = quantile(ingreso_hogar, c(0, 1/3, 2/3, 1)),
                         labels = c("bajo", "medio", "alto"),
                         include.lowest = TRUE),
 
-    # Consumidor alto de noticias (más de 5 horas semanales)
-    noticias_alto = if_else(consumo_noticias > 5, "alto", "bajo")
+    # 2. Consumidor alto de noticias (consumo_noticias)
+    noticias_alto = if_else(consumo_noticias > 5, "alto", "bajo"),
+
+    # 3. Baja confianza en el gobierno (confianza_gobierno)
+    confianza_baja = if_else(confianza_gobierno <= 4, "si", "no"),
+
+    # 4. Interacción zona + género
+    zona_genero = paste(zona, genero, sep = "_")
   )
 
 # Verificar las nuevas variables
-satisfaccion |>
-  count(educacion_alta)
-satisfaccion |>
-  count(grupo_ingreso)
-satisfaccion |>
-  count(noticias_alto)
+satisfaccion |> count(grupo_ingreso)
+satisfaccion |> count(noticias_alto)
+satisfaccion |> count(confianza_baja)
+satisfaccion |> count(zona_genero)
 ```
 
 [[Volver al Ejercicio 3]{.button}](#sec:exercise03)
 :::
 
-## Apéndice 4: Comparar con features nuevos {#sec:appendix04 visibility="uncounted"}
+## Apéndice 4: ¿Ayuda el feature engineering? {#sec:appendix04}
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
 ```{r appendix04, prompt=FALSE, echo=TRUE}
-# Evaluar los 3 modelos con la fórmula extendida
-eval_log_ext <- evaluar_modelo(
-  modelo_logistico, formula_extendida, folds, "Logístico (ext)")
-eval_arbol_ext <- evaluar_modelo(
-  modelo_arbol, formula_extendida, folds, "Árbol (ext)")
-eval_knn_ext <- evaluar_modelo(
-  modelo_knn, formula_extendida, folds, "KNN (ext)")
+# Crear el feature derivado (si no lo hicieron antes)
+satisfaccion <- satisfaccion |>
+  mutate(educacion_alta = if_else(educacion_anos > 12, "alta", "baja"),
+         educacion_alta = factor(educacion_alta))
 
-# Combinar todos los resultados
-todos <- bind_rows(
-  eval_logistico, eval_arbol, eval_knn,
-  eval_log_ext, eval_arbol_ext, eval_knn_ext
-)
+# Re-crear folds con la columna nueva disponible
+set.seed(2026)
+split_ext <- initial_split(satisfaccion, prop = 0.75, strata = satisfecho)
+train_ext <- training(split_ext)
+folds_ext <- vfold_cv(train_ext, v = 5, strata = satisfecho)
 
-# Comparar accuracy: básica vs. extendida
-todos |>
+# Fórmula con el feature nuevo
+formula_ext <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
+                            confianza_gobierno + consumo_noticias +
+                            participacion_politica + zona + educacion_alta
+
+# Evaluar los dos modelos con y sin feature nuevo
+eval_log_ext <- evaluar_modelo(modelo_logistico, formula_ext, folds_ext, "Logístico (ext)")
+eval_arb_ext <- evaluar_modelo(modelo_arbol,     formula_ext, folds_ext, "Árbol (ext)")
+
+bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
   filter(.metric == "accuracy") |>
   select(modelo, mean, std_err) |>
   arrange(desc(mean))
 ```
 
-La mejora por agregar `confianza_x_participacion` suele ser modesta. El feature engineering vale la pena cuando las variables nuevas capturan relaciones no lineales o interacciones que el modelo no puede descubrir por sí solo.
+La mejora por agregar una sola variable derivada suele ser modesta. El feature engineering rinde cuando las variables nuevas capturan relaciones no lineales o interacciones que el modelo no puede descubrir por sí solo (en un árbol esto pesa menos, porque ya captura no linealidades automáticamente).
 
-[[Volver al Ejercicio 4]{.button}](#sec:exercise04)
+[[Volver al Ejercicio 3]{.button}](#sec:exercise04)
 :::
