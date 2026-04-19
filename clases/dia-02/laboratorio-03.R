@@ -13,9 +13,9 @@
 # --- Parte 1: Preparación y baseline -----------------------
 
 # Instalar paquetes (solo la primera vez)
-# install.packages(c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "patchwork"))
+# install.packages(c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "xgboost"))
 
-paquetes <- c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "patchwork")
+paquetes <- c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "xgboost")
 
 for (pkg in paquetes) {
   if (!require(pkg, character.only = TRUE)) {
@@ -55,6 +55,12 @@ division <- initial_split(datos, prop = 0.75, strata = voto)
 datos_train <- training(division)
 datos_test  <- testing(division)
 
+# Verificar proporciones
+cat("Proporción en train:\n")
+prop.table(table(datos_train$voto))
+cat("\nProporción en test:\n")
+prop.table(table(datos_test$voto))
+
 
 # --- Preprocesamiento con recipes ---------------------------
 
@@ -66,6 +72,8 @@ receta <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())
+
+receta |> prep() |> juice() |> glimpse()
 
 
 # --- Modelo baseline: Regresión logística -------------------
@@ -96,10 +104,13 @@ conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
   labs(title = "Matriz de confusión - Regresión logística")
 
 
-# --- Ejercicio 1: Threshold óptimo --------------------------
+# --- Apéndice 1: Threshold óptimo (solución) ----------------
 
-# Probar varios thresholds y medir F1-score
-for (t in c(0.3, 0.5, 0.7)) {
+# Probar thresholds de 0.3 a 0.7 y guardar los resultados
+thresholds <- seq(0.3, 0.7, by = 0.05)
+resultados <- data.frame(threshold = numeric(), f1 = numeric())
+
+for (t in thresholds) {
   pred_nuevo <- pred_logit |>
     mutate(.pred_class_nuevo = factor(
       ifelse(.pred_si > t, "si", "no"),
@@ -107,8 +118,20 @@ for (t in c(0.3, 0.5, 0.7)) {
 
   f1 <- f_meas(pred_nuevo, truth = voto,
                estimate = .pred_class_nuevo)
-  cat("Threshold:", t, "- F1:", round(f1$.estimate, 3), "\n")
+  resultados <- rbind(resultados,
+                      data.frame(threshold = t, f1 = f1$.estimate))
 }
+
+# Ver todos los resultados, ordenados de mejor a peor
+resultados |> arrange(desc(f1))
+
+# Visualizar
+ggplot(resultados, aes(x = threshold, y = f1)) +
+  geom_line(linewidth = 1.2, color = "#2d4563") +
+  geom_point(size = 3, color = "#2d4563") +
+  labs(title = "F1-score según el threshold de clasificación",
+       x = "Threshold", y = "F1-score") +
+  theme_minimal()
 
 
 # --- Parte 2: Random Forest con tuning ---------------------
@@ -126,6 +149,8 @@ wf_rf_tune <- workflow() |>
   add_recipe(receta) |>
   add_model(modelo_rf_tune)
 
+modelo_rf_tune |> extract_parameter_set_dials()
+
 # 4 x 4 = 16 combinaciones
 grilla_rf <- grid_regular(
   mtry(range = c(2, 8)),
@@ -135,6 +160,8 @@ grilla_rf <- grid_regular(
 
 # 5-fold CV estratificada
 folds <- vfold_cv(datos_train, v = 5, strata = voto)
+
+folds
 
 resultados_tune <- tune_grid(
   wf_rf_tune,
@@ -157,6 +184,8 @@ autoplot(resultados_tune) +
 # --- Seleccionar y ajustar el modelo final ------------------
 
 mejor_rf <- select_best(resultados_tune, metric = "roc_auc")
+mejor_rf
+
 wf_rf_final <- finalize_workflow(wf_rf_tune, mejor_rf)
 ajuste_rf <- fit(wf_rf_final, data = datos_train)
 
@@ -187,7 +216,9 @@ bind_rows(roc_logit, roc_rf) |>
   geom_abline(linetype = "dashed", color = "gray50") +
   coord_equal() +
   labs(title = "Comparación de curvas ROC",
-       x = "1 - Especificidad", y = "Sensibilidad") +
+       x = "1 - Especificidad (Tasa de falsos positivos)",
+       y = "Sensibilidad (Tasa de verdaderos positivos)",
+       color = "Modelo") +
   theme_minimal()
 
 
@@ -221,7 +252,7 @@ p2 <- autoplot(pdp_interes) +
 p1 + p2
 
 
-# --- Ejercicio 2: Análisis por país -------------------------
+# --- Apéndice 2: Análisis por país (solución) ---------------
 
 # Filtrar datos de Uruguay
 datos_uruguay <- datos |> filter(pais == "Uruguay")
@@ -296,6 +327,13 @@ pred_arbol <- predict(ajuste_arbol, datos_test) |>
 
 cat("Árbol de decisión:\n")
 print(pred_arbol |> metrics(truth = voto, estimate = .pred_class, .pred_si))
+
+cat("\nRandom Forest:\n")
+print(metricas_rf)
+
+autoplot(resultados_arbol) +
+  theme_minimal() +
+  labs(title = "Tuning del árbol de decisión")
 
 
 # --- Opcional: XGBoost --------------------------------------

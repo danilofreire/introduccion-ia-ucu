@@ -49,6 +49,70 @@ if (!require("fontawesome", character.only = TRUE)) {
 }
 ```
 
+```{r data-setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidymodels)
+  library(ranger)
+  library(vip)
+  library(broom)
+  library(dplyr)
+  library(rpart)
+  library(rpart.plot)
+  library(pdp)
+  library(ggplot2)
+})
+
+set.seed(20260419)
+n <- 1500
+
+datos_uruguay <- tibble(
+  edad                = round(runif(n, 18, 80)),
+  educacion_anos      = pmin(20, pmax(0, round(rnorm(n, 11, 4)))),
+  ingreso_log         = rnorm(n, 9, 1),
+  confianza_gobierno  = sample(1:10, n, replace = TRUE),
+  percepcion_economia = sample(1:5,  n, replace = TRUE),
+  zona                = factor(sample(c("urbano", "rural"), n,
+                                      replace = TRUE,
+                                      prob = c(0.85, 0.15))),
+  genero              = factor(sample(c("femenino", "masculino"), n,
+                                      replace = TRUE))
+)
+
+# Proceso generador: efecto fuerte de confianza, percepción económica y
+# educación; efecto modesto de edad e ingreso; zona casi nula
+lp <- with(datos_uruguay,
+  -4.5 +
+    0.02 * edad +
+    0.10 * educacion_anos +
+    0.15 * ingreso_log +
+    0.22 * confianza_gobierno +
+    0.30 * percepcion_economia +
+    0.15 * (zona == "urbano")
+)
+prob <- 1 / (1 + exp(-lp))
+datos_uruguay$apoya_democracia <- factor(
+  rbinom(n, 1, prob),
+  levels = c(0, 1),
+  labels = c("no", "si")
+)
+
+set.seed(20260419)
+split_uy     <- initial_split(datos_uruguay, prop = 0.75,
+                              strata = apoya_democracia)
+datos_train  <- training(split_uy)
+datos_test   <- testing(split_uy)
+
+# Árbol de decisión que reusan varias slides (Gini, visualización, poda).
+# Mismos hiperparámetros que el `decision_tree(tree_depth=5, min_n=10)` que
+# se ajusta más adelante con tidymodels, para que todas las slides muestren
+# exactamente el mismo árbol.
+arbol_demo <- rpart(
+  apoya_democracia ~ .,
+  data    = datos_train,
+  control = rpart.control(maxdepth = 5, minsplit = 10, cp = 0.01)
+)
+```
+
 # Día 2: Aprendizaje supervisado {background-color="#2d4563"}
 
 ## Repaso del Día 1
@@ -182,7 +246,7 @@ de votar, y en qué magnitud.
 :::{.column width=55%}
 - En ciencias sociales, la regresión logística se usa mucho para:
     - [Comportamiento electoral]{.alert}: ¿qué predice si alguien vota por un candidato?
-    - [Conflicto]{.alert}: ¿qué factores predicen la ocurrencia de un conflicto armado? (Muchlinski et al., 2016)
+    - [Conflicto]{.alert}: ¿qué factores predicen la ocurrencia de un conflicto armado?
     - [Pobreza]{.alert}: ¿qué variables predicen si un hogar está por debajo de la línea de pobreza?
     - [Migración]{.alert}: ¿qué factores predicen la intención de emigrar?
 - [La interpretabilidad es clave]{.alert} para informar políticas públicas
@@ -191,26 +255,24 @@ de votar, y en qué magnitud.
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 23px;"}
+:::{style="text-align: center; font-size: 19px;"}
 **Regresión logística en R (tidymodels)**
 
-```r
-# Ya lo vimos ayer:
-modelo_log <- logistic_reg() |>
+```{r reg-log-fit, echo=TRUE, message=FALSE}
+# Cargar los datos (Latinobarómetro Uruguay)
+datos <- datos_train
+
+# Ajustar el modelo logístico
+ajuste_log <- logistic_reg() |>
   set_engine("glm") |>
-  set_mode("classification")
+  set_mode("classification") |>
+  fit(apoya_democracia ~ .,
+      data = datos)
 
-ajuste <- fit(modelo_log,
-  voto ~ edad + educacion + ingreso,
-  data = datos_train)
-
-# Los coeficientes:
-tidy(ajuste)
-
-# Resultado:
-# edad:       0.023 (más edad → más voto)
-# educacion:  0.085 (más edu → más voto)
-# ingreso:    0.041 (más ingreso → más voto)
+# Mostrar los coeficientes
+tidy(ajuste_log) |>
+  select(term, estimate, p.value) |>
+  knitr::kable(digits = 3)
 ```
 :::
 :::
@@ -241,25 +303,35 @@ tidy(ajuste)
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 25px;"}
-**Resultados típicos:**
+:::{style="text-align: center; font-size: 22px;"}
+**Resultados (datos simulados, n = `r nrow(datos_train)`):**
 
+```{r resultados-log, echo=FALSE, message=FALSE}
+broom::tidy(ajuste_log) |>
+  dplyr::mutate(
+    odds_ratio = exp(estimate),
+    sig = dplyr::case_when(
+      p.value < 0.001 ~ "***",
+      p.value < 0.01  ~ "**",
+      p.value < 0.05  ~ "*",
+      TRUE            ~ ""
+    ),
+    term = dplyr::recode(term,
+      `(Intercept)` = "Intercept",
+      `zonaurbano`  = "zona_urbano"
+    )
+  ) |>
+  dplyr::select(Variable = term,
+                Coef = estimate,
+                `Odds Ratio` = odds_ratio,
+                ` ` = sig) |>
+  knitr::kable(digits = 2, align = c("l", "r", "r", "l"))
 ```
-Variable              Coef    Odds Ratio
-─────────────────────────────────────────
-Intercept            -1.20    0.30
-edad                  0.02    1.02
-educacion_anos        0.08    1.08 ***
-ingreso_log           0.15    1.16 *
-confianza_gobierno    0.25    1.28 ***
-percepcion_economia   0.18    1.20 **
-zona_urbano           0.12    1.13
 
-*** p < 0.001, ** p < 0.01, * p < 0.05
-```
+[*** p < 0.001, ** p < 0.01, * p < 0.05]{style="font-size: 18px;"}
 
-:::{style="font-size: 22px;"}
-[Pregunta]{.alert}: ¿Qué significa un OR de 1.28 para confianza en el gobierno?
+:::{style="font-size: 20px;"}
+[Pregunta]{.alert}: ¿qué significa un OR de `r round(exp(broom::tidy(ajuste_log) |> dplyr::filter(term == "confianza_gobierno") |> dplyr::pull(estimate)), 2)` para confianza en el gobierno?
 :::
 :::
 :::
@@ -280,28 +352,25 @@ zona_urbano           0.12    1.13
 - OR > 1: aumenta la probabilidad
 - OR < 1: disminuye la probabilidad
 
-**Ejemplo:** OR = 1.28 para confianza en el gobierno
+**Ejemplo:** OR = 1.25 para confianza en el gobierno
 
-- Por cada punto adicional de confianza (escala 1-10), las chances de apoyar la democracia se multiplican por 1.28
-- Es decir, [aumentan un 28%]{.alert}
+- Por cada punto adicional de confianza (escala 1-10), las chances de apoyar la democracia se multiplican por 1.25
+- Es decir, [aumentan un 25%]{.alert}
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 22px;"}
+:::{style="text-align: center; font-size: 19px;"}
 **Cálculo en R:**
 
-```r
-# Obtener coeficientes
-coefs <- tidy(ajuste)
-
-# Calcular odds ratios
-coefs |>
+```{r or-ci, echo=TRUE, message=FALSE}
+tidy(ajuste_log) |>
   mutate(
-    odds_ratio = exp(estimate),
-    # Intervalo de confianza
-    or_lower = exp(estimate - 1.96*std.error),
-    or_upper = exp(estimate + 1.96*std.error)
-  )
+    OR     = exp(estimate),
+    IC_inf = exp(estimate - 1.96 * std.error),
+    IC_sup = exp(estimate + 1.96 * std.error)
+  ) |>
+  select(term, OR, IC_inf, IC_sup) |>
+  knitr::kable(digits = 2)
 ```
 
 <br>
@@ -401,20 +470,49 @@ $$\text{Gini}_{\text{split}} = \frac{n_L}{n} \text{Gini}(t_L) + \frac{n_R}{n} \t
 :::
 
 :::{.column width=45%}
-:::{style="font-size: 22px;"}
-**Ejemplo con datos de votación**
+:::{style="font-size: 20px;"}
+**Ejemplo con nuestros datos (apoyo a la democracia)**
 
-| Nodo | Votó | No votó | Gini |
-|------|:----:|:-------:|:----:|
-| Raíz | 265 | 235 | 0.497 |
-| Edad > 35 | 200 | 100 | 0.444 |
-| Edad ≤ 35 | 65 | 135 | 0.442 |
+```{r gini-tabla, echo=FALSE}
+n_tot <- nrow(datos_train)
+n_si  <- sum(datos_train$apoya_democracia == "si")
+n_no  <- n_tot - n_si
 
-$\text{Gini}_{\text{split}} = \frac{300}{500}(0.444) + \frac{200}{500}(0.442)$
+cut1  <- arbol_demo$splits[1, "index"]
+var1  <- rownames(arbol_demo$splits)[1]
 
-$= 0.267 + 0.177 = 0.443$
+izq <- datos_train[datos_train[[var1]] <  cut1, ]
+der <- datos_train[datos_train[[var1]] >= cut1, ]
 
-Como $0.443 < 0.497$, [esta división mejora la separación]{.alert} de las clases
+gini <- function(d) {
+  p <- mean(d$apoya_democracia == "si")
+  1 - p^2 - (1 - p)^2
+}
+g_root <- gini(datos_train)
+g_izq  <- gini(izq)
+g_der  <- gini(der)
+
+tibble::tibble(
+  Nodo  = c("Raíz",
+            paste0(var1, " < ", cut1),
+            paste0(var1, " ≥ ", cut1)),
+  Sí    = c(n_si, sum(izq$apoya_democracia == "si"),
+            sum(der$apoya_democracia == "si")),
+  No    = c(n_no, sum(izq$apoya_democracia == "no"),
+            sum(der$apoya_democracia == "no")),
+  Gini  = round(c(g_root, g_izq, g_der), 3)
+) |>
+  knitr::kable(align = c("l", "r", "r", "r"))
+```
+
+```{r gini-split, echo=FALSE}
+n_l <- nrow(izq); n_r <- nrow(der)
+g_split <- (n_l/n_tot)*g_izq + (n_r/n_tot)*g_der
+```
+
+$\text{Gini}_{\text{split}} = \tfrac{`r n_l`}{`r n_tot`}(`r round(g_izq,3)`) + \tfrac{`r n_r`}{`r n_tot`}(`r round(g_der,3)`) = `r round(g_split,3)`$
+
+Como $`r round(g_split,3)` < `r round(g_root,3)`$, [esta división mejora la separación]{.alert} de las clases.
 :::
 :::
 :::
@@ -452,26 +550,24 @@ Como $0.443 < 0.497$, [esta división mejora la separación]{.alert} de las clas
 
 ## Árboles de decisión en R
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 
 Con tidymodels, solo necesitamos cambiar la especificación del modelo:
 
 :::{style="font-size: 22px;"}
-```r
+```{r arbol-fit, echo=TRUE, message=FALSE}
 # Especificar un árbol de decisión
 modelo_arbol <- decision_tree(
-  tree_depth = 5,       # profundidad máxima
-  min_n = 10            # mínimo de observaciones por nodo
-) |>
+  tree_depth = 5, min_n = 10) |>
   set_engine("rpart") |>
   set_mode("classification")
 
 # Ajustar (exactamente igual que antes)
-ajuste_arbol <- fit(modelo_arbol, voto ~ ., data = datos_train)
+ajuste_arbol <- modelo_arbol |> fit(apoya_democracia ~ ., data = datos_train)
 
-# Predecir (exactamente igual que antes)
-pred_arbol <- predict(ajuste_arbol, datos_test) |>
-  bind_cols(datos_test)
+# Predecir y calcular accuracy
+pred_arbol <- predict(ajuste_arbol, datos_test)$.pred_class
+accuracy_vec(datos_test$apoya_democracia, pred_arbol)
 ```
 :::
 
@@ -488,43 +584,37 @@ pred_arbol <- predict(ajuste_arbol, datos_test) |>
 - Una de las grandes ventajas de los árboles es que [se pueden visualizar]{.alert}
 - Con el paquete `rpart.plot`:
 
-```r
-# install.packages("rpart.plot")
+```{r arbol-vis-code, echo=TRUE, eval=TRUE, fig.show='hide', message=FALSE}
 library(rpart.plot)
 
-# Extraer el modelo rpart del ajuste
+# Extraer el modelo rpart del ajuste tidymodels
 arbol_rpart <- extract_fit_engine(ajuste_arbol)
 
-# Visualizar
 # type=4: muestra reglas en todos los nodos
 # extra=104: clase predicha + % de observaciones
-# roundint=FALSE: evita warning con predictores 
+# roundint=FALSE: evita warning con predictores
 # no enteros
 rpart.plot(arbol_rpart,
-           type = 4,
-           extra = 104,
+           type     = 4,
+           extra    = 104,
            roundint = FALSE)
 ```
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 26px;"}
-**Ejemplo de visualización:**
+:::{style="text-align: center; font-size: 20px;"}
+**Árbol ajustado a nuestros datos:**
 
-```
-                [voto]
-               /      \
-         edad < 35   edad >= 35
-           /              \
-      [no votó]      educacion < 12
-       65%              /        \
-                  [no votó]    [votó]
-                    55%         78%
+```{r arbol-vis, echo=FALSE, fig.height=4.2, fig.width=5.5, fig.align="center", out.width="100%"}
+rpart.plot(arbol_demo,
+           type     = 4,
+           extra    = 104,
+           roundint = FALSE,
+           tweak    = 1.0,
+           box.palette = "RdBu")
 ```
 
-[Cualquier persona puede entender este modelo]{.alert}, incluso sin conocimientos técnicos.
-
-Es ideal para [comunicar resultados]{.alert} a tomadores de decisiones.
+[Cualquier persona puede entender este modelo]{.alert}, incluso sin formación técnica.
 :::
 :::
 :::
@@ -532,7 +622,7 @@ Es ideal para [comunicar resultados]{.alert} a tomadores de decisiones.
 
 ## Poda (pruning): controlando la complejidad
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - Un árbol sin restricciones crece hasta [memorizar]{.alert} los datos
@@ -547,23 +637,42 @@ Es ideal para [comunicar resultados]{.alert} a tomadores de decisiones.
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 25px;"}
-**El trade-off:**
+:::{style="text-align: center; font-size: 22px;"}
+**El trade-off (con nuestros datos):**
 
+```{r poda-tradeoff, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3.5, fig.width=5, fig.align="center", out.width="100%"}
+profs <- c(1, 2, 3, 5, 7, 10, 15, 20)
+err <- purrr::map_dfr(profs, function(d) {
+  fit <- rpart(apoya_democracia ~ .,
+               data    = datos_train,
+               control = rpart.control(maxdepth  = d,
+                                       minsplit  = 2,
+                                       minbucket = 1,
+                                       cp        = 0))
+  tibble::tibble(
+    profundidad = d,
+    train = mean(predict(fit, datos_train, type = "class") !=
+                 datos_train$apoya_democracia),
+    test  = mean(predict(fit, datos_test,  type = "class") !=
+                 datos_test$apoya_democracia)
+  )
+})
+
+err |>
+  tidyr::pivot_longer(c(train, test),
+                      names_to = "conjunto", values_to = "error") |>
+  ggplot(aes(profundidad, error, colour = conjunto)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  scale_colour_manual(values = c(train = "#1f77b4", test = "#d62728"),
+                      labels = c(train = "Entrenamiento", test = "Test")) +
+  labs(x = "Profundidad del árbol", y = "Error de clasificación",
+       colour = NULL) +
+  theme_minimal(base_size = 13) +
+  theme(legend.position = "bottom")
 ```
-Profundidad     Error train    Error test
-─────────────────────────────────────────
-1               0.35           0.36
-3               0.22           0.25
-5               0.15           0.23
-10              0.08           0.28  ←
-15              0.03           0.35  ←
-20              0.01           0.42  ←
-```
 
-A partir de cierta profundidad, el error en test [empeora]{.alert} mientras el error en train sigue bajando.
-
-[La poda previene el sobreajuste.]{.alert}
+A partir de cierta profundidad, el error en test [empeora]{.alert} mientras el error en train sigue bajando: [la poda previene el sobreajuste]{.alert}.
 :::
 :::
 :::
@@ -573,7 +682,7 @@ A partir de cierta profundidad, el error en test [empeora]{.alert} mientras el e
 
 ## La idea detrás de Random Forest
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - Un solo árbol es [inestable]{.alert} y propenso al sobreajuste
@@ -650,35 +759,32 @@ Predicción final: VOTÓ
 
 ## Random Forest en R
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 
 De nuevo, con tidymodels solo cambiamos la especificación:
 
 :::{style="font-size: 22px;"}
-```r
+```{r rf-fit, echo=TRUE, message=FALSE}
 # Especificar Random Forest
 modelo_rf <- rand_forest(
-  trees = 500,    # 500 árboles
-  mtry = 3,       # 3 variables por división
-  min_n = 5       # mínimo 5 observaciones por nodo
-) |>
-  set_engine("ranger") |>       # ranger es una implementación rápida
+  trees = 500, mtry  = 3, min_n = 5) |>
+  set_engine("ranger", seed = 1) |>
   set_mode("classification")
 
 # Ajustar
-ajuste_rf <- fit(modelo_rf, voto ~ ., data = datos_train)
+ajuste_rf <- modelo_rf |>
+  fit(apoya_democracia ~ ., data = datos_train)
 
-# Predecir
-pred_rf <- predict(ajuste_rf, datos_test) |>
-  bind_cols(datos_test)
-
-# Evaluar
-metrics(pred_rf, truth = voto, estimate = .pred_class)
+# Predecir y evaluar
+predict(ajuste_rf, datos_test) |>
+  dplyr::bind_cols(datos_test) |>
+  yardstick::metrics(truth    = apoya_democracia,
+                     estimate = .pred_class)
 ```
 :::
 
 - `ranger` es una implementación [rápida y eficiente]{.alert} de Random Forest en R
-- La interfaz de tidymodels permite [comparar modelos fácilmente]{.alert}: misma estructura para logística, árbol y RF
+- Misma estructura para logística, árbol y RF!
 :::
 
 ## Importancia de variables
@@ -696,29 +802,18 @@ metrics(pred_rf, truth = voto, estimate = .pred_class)
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-```r
-# Con tidymodels + vip
-library(tidymodels)
-library(vip) # Variable Importance Plots
-
+:::{style="text-align: center; font-size: 21px; margin-top: 20px;"}
+```{r vip-rf, echo=TRUE, message=FALSE, warning=FALSE, fig.height=3.5, fig.width=5, fig.align="center", out.width="100%"}
 rf_spec <- rand_forest(trees = 500) |>
   set_engine("ranger",
              importance = "permutation") |>
   set_mode("classification")
 
 rf_fit <- rf_spec |>
-  fit(voto ~ ., data = datos_train)
+  fit(apoya_democracia ~ .,
+      data = datos_train)
 
-# Ver importancia
-rf_fit |>
-  vip(num_features = 10)
-
-# edad                 ████████████ 0.042
-# educacion_anios      ██████████   0.038
-# interes_politica     ████████     0.031
-# ingreso_hogar        ██████       0.025
-# confianza_gobierno   █████        0.019
+vip(rf_fit, num_features = 7)
 ```
 :::
 :::
@@ -759,11 +854,10 @@ rf_fit |>
 :::
 :::
 :::
-:::
 
 ## Gráficos de dependencia parcial (PDP)
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=45%}
 - La importancia nos dice [qué]{.alert} variables importan
@@ -771,26 +865,37 @@ rf_fit |>
 - Muestran el [efecto marginal]{.alert} de una variable sobre la predicción
 - Útiles para entender relaciones no lineales
 
-```r
+```{r pdp-code, echo=TRUE, eval=TRUE, fig.show='hide', message=FALSE, warning=FALSE}
 library(pdp)
 
-ajuste_rf |>
-  partial(pred.var = "edad") |>
+rf_fit |>
+  partial(pred.var    = "confianza_gobierno",
+          which.class = "si",
+          prob        = TRUE,
+          train       = datos_train) |>
   autoplot()
 ```
 :::
 
 :::{.column width=55%}
 :::{style="text-align: center;"}
-**Ejemplo de PDP:**
+**PDP: confianza en el gobierno → P(apoya democracia)**
 
-[![](figures/pdp-example.png){width="80%"}](#){data-modal-type="image" data-modal-url="figures/pdp-example.png"}
+```{r pdp-confianza, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3.5, fig.width=5, fig.align="center", out.width="90%"}
+rf_fit |>
+  pdp::partial(pred.var = "confianza_gobierno",
+               which.class = "si",
+               prob = TRUE,
+               train = datos_train) |>
+  autoplot() +
+  labs(x = "Confianza en el gobierno (1–10)",
+       y = "P(apoya democracia)") +
+  theme_minimal(base_size = 13)
+```
 :::
 
-:::{style="font-size: 22px;"}
-- [Interpretación:]{.alert} La probabilidad de votar aumenta con la edad, pero se estabiliza después de los 50 años.
-
-- Esto es algo que la regresión logística no captura automáticamente.
+:::{style="font-size: 20px;"}
+- [Interpretación:]{.alert} la probabilidad de apoyar la democracia crece con la confianza en el gobierno, pero el efecto se acelera a partir de un valor moderado. Esto es algo que la regresión logística asume lineal por construcción.
 :::
 :::
 :::
@@ -844,38 +949,36 @@ ajuste_rf |>
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
-```r
+```{r tuning, echo=TRUE, message=FALSE, warning=FALSE}
 # 1. Especificar modelo con parámetros a ajustar (tune())
 modelo_rf_tune <- rand_forest(
   trees = 500,
-  mtry = tune(),      # <- ajustar este
-
+  mtry  = tune(),     # <- ajustar este
   min_n = tune()      # <- y este
 ) |>
-  set_engine("ranger") |>
+  set_engine("ranger", seed = 1) |>
   set_mode("classification")
 
 # 2. Crear grilla de valores
-grilla <- grid_regular(      # grid_regular: combinaciones sistemáticas 
-  mtry(range = c(2, 6)),
-  min_n(range = c(5, 20)),
-  levels = 4
+grilla <- grid_regular(
+  mtry(range  = c(2, 6)), min_n(range = c(5, 20)), levels = 4
 )
 
 # 3. Validación cruzada
-folds <- vfold_cv(datos_train, v = 5, strata = voto) # estratificar por voto para mantener proporciones
+folds <- vfold_cv(datos_train, v = 5, strata = apoya_democracia)
 
-# 4. Ajustar
-resultados <- tune_grid(   # ajusta el modelo para cada combinación y fold
+# 4. Ajustar (puede tardar ~1-2 min la primera vez)
+set.seed(1)
+resultados <- tune_grid(
   modelo_rf_tune,
-  voto ~ .,
+  apoya_democracia ~ .,
   resamples = folds,
-  grid = grilla,
-  metrics = metric_set(accuracy, roc_auc)
+  grid      = grilla,
+  metrics   = metric_set(accuracy, roc_auc)
 )
 
 # 5. Ver mejores combinaciones
-show_best(resultados, metric = "roc_auc")
+show_best(resultados, metric = "roc_auc", n = 5)
 ```
 :::
 
@@ -883,7 +986,7 @@ show_best(resultados, metric = "roc_auc")
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-```r
+```{r final-model, echo=TRUE, message=FALSE, warning=FALSE}
 # Seleccionar la mejor combinación
 mejor <- select_best(resultados, metric = "roc_auc")
 mejor
@@ -892,13 +995,14 @@ mejor
 modelo_final <- finalize_model(modelo_rf_tune, mejor)
 
 # Entrenar con todos los datos de entrenamiento
-ajuste_final <- fit(modelo_final, voto ~ ., data = datos_train)
+ajuste_final <- modelo_final |>
+  fit(apoya_democracia ~ ., data = datos_train)
 
 # Evaluar en datos de test
-pred_final <- predict(ajuste_final, datos_test) |>
-  bind_cols(datos_test)
-
-metrics(pred_final, truth = voto, estimate = .pred_class)
+predict(ajuste_final, datos_test) |>
+  dplyr::bind_cols(datos_test) |>
+  yardstick::metrics(truth    = apoya_democracia,
+                     estimate = .pred_class)
 ```
 
 :::{style="margin-top: 20px;"}
@@ -919,22 +1023,30 @@ metrics(pred_final, truth = voto, estimate = .pred_class)
 La gran ventaja de tidymodels es que [cambiar de modelo es trivial]{.alert}:
 
 :::{style="font-size: 20px;"}
-```r
-# Modelo 1: Regresión logística
+```{r comparacion-modelos, echo=TRUE, message=FALSE, warning=FALSE}
+# Modelos:
 modelo_1 <- logistic_reg() |> set_engine("glm") |> set_mode("classification")
-
-# Modelo 2: Árbol de decisión
 modelo_2 <- decision_tree(tree_depth = 5) |> set_engine("rpart") |> set_mode("classification")
+modelo_3 <- rand_forest(trees = 500) |> set_engine("ranger", seed = 1) |> set_mode("classification")
 
-# Modelo 3: Random Forest
-modelo_3 <- rand_forest(trees = 500) |> set_engine("ranger") |> set_mode("classification")
+# Todos se ajustan con la misma sintaxis
+ajuste_1 <- modelo_1 |> fit(apoya_democracia ~ ., data = datos_train)
+ajuste_2 <- modelo_2 |> fit(apoya_democracia ~ ., data = datos_train)
+ajuste_3 <- modelo_3 |> fit(apoya_democracia ~ ., data = datos_train)
 
-# Todos se ajustan y evalúan con la misma sintaxis:
-ajuste_1 <- fit(modelo_1, voto ~ ., data = datos_train)
-ajuste_2 <- fit(modelo_2, voto ~ ., data = datos_train)
-ajuste_3 <- fit(modelo_3, voto ~ ., data = datos_train)
+# Predecir las clases en el conjunto de prueba
+pred_1 <- predict(ajuste_1, datos_test)$.pred_class
+pred_2 <- predict(ajuste_2, datos_test)$.pred_class
+pred_3 <- predict(ajuste_3, datos_test)$.pred_class
 
-# Y se comparan con las mismas métricas
+# Comparar con las clases verdaderas usando yardstick::accuracy_vec()
+verdad <- datos_test$apoya_democracia
+
+tibble(
+  modelo   = c("Logística", "Árbol", "Random Forest"),
+  accuracy = c(accuracy_vec(verdad, pred_1), accuracy_vec(verdad, pred_2), accuracy_vec(verdad, pred_3))
+) |>
+  knitr::kable(digits = 3)
 ```
 :::
 
@@ -1000,7 +1112,7 @@ ajuste_3 <- fit(modelo_3, voto ~ ., data = datos_train)
 <br>
 
 En tidymodels:
-```r
+```{r boost-spec, echo=TRUE, message=FALSE, eval=FALSE}
 modelo_xgb <- boost_tree() |>
   set_engine("xgboost") |>
   set_mode("classification")

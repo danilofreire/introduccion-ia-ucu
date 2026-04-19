@@ -145,10 +145,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../lecturas.html"> 
 <span class="menu-text">Lecturas</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../referencia-tidymodels.html"> 
-<span class="menu-text">Referencia R</span></a>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-referencia-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Referencia R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
+        <li>
+    <a class="dropdown-item" href="../../referencia-tidymodels.html">
+ <span class="dropdown-text">Supervisado (tidymodels)</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-no-supervisado.html">
+ <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-texto.html">
+ <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -231,7 +246,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Esta tarea usa el dataset del Laboratorio 2 (<code>satisfaccion_democracia.csv</code>). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
 <p><strong>Para trabajar en esta tarea:</strong></p>
 <ol type="1">
-<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>satisfaccion_democracia.csv</code> de la <a href="https://danilofreire.github.io/introducción-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code></li>
+<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>satisfaccion_democracia.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code></li>
 <li>Necesitan <a href="https://quarto.org/docs/get-started/">Quarto</a> instalado junto con RStudio. Las versiones recientes de RStudio (&gt;= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <a href="https://quarto.org/docs/get-started/" class="uri">https://quarto.org/docs/get-started/</a></li>
 <li>Abran este archivo <code>.qmd</code> en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)</li>
 <li>Cuando terminen, pueden renderizar el documento completo con el botón “Render” en RStudio</li>

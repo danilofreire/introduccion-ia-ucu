@@ -2231,10 +2231,12 @@ estable y generalizable</code></pre>
 <span id="cb12-6"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glm&quot;</span>)</span>
 <span id="cb12-7"><a></a></span>
 <span id="cb12-8"><a></a><span class="co"># 3. Ajustar</span></span>
-<span id="cb12-9"><a></a>ajuste <span class="ot">&lt;-</span> <span class="fu">fit</span>(modelo, formula, <span class="fu">training</span>(datos_split))</span>
-<span id="cb12-10"><a></a></span>
-<span id="cb12-11"><a></a><span class="co"># 4. Evaluar</span></span>
-<span id="cb12-12"><a></a>predicciones <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste, <span class="fu">testing</span>(datos_split))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-9"><a></a>ajuste <span class="ot">&lt;-</span> <span class="fu">fit</span>(modelo, formula,</span>
+<span id="cb12-10"><a></a>              <span class="fu">training</span>(datos_split))</span>
+<span id="cb12-11"><a></a></span>
+<span id="cb12-12"><a></a><span class="co"># 4. Evaluar</span></span>
+<span id="cb12-13"><a></a>predicciones <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste,</span>
+<span id="cb12-14"><a></a>                        <span class="fu">testing</span>(datos_split))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div></div>
 </div>

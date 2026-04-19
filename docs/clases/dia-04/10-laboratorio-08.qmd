@@ -87,14 +87,13 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 | Parte | Contenido | Duración |
 |-------|-----------|----------|
-| 1 | Análisis de sentimiento avanzado | ~30 min |
-| 2 | Generación de datos sintéticos | ~30 min |
-| 3 | Auditoría de sesgos | ~30 min |
-| 4 | Mini-proyecto integrador | ~30 min |
+| 1 | Análisis de sentimiento avanzado | ~20 min |
+| 2 | Generación de datos sintéticos | ~20 min |
+| 3 | Auditoría de sesgos | ~20 min |
 
 <br>
 
-[Usaremos los conocimientos de las sesiones anteriores.]{.alert}
+[Usaremos los conocimientos de las sesiones anteriores. El mini-proyecto integrador y material extra están en los apéndices.]{.alert}
 :::
 
 # Parte 1: Análisis de sentimiento {background-color="#2d4563"}
@@ -508,46 +507,6 @@ respuestas_pais |>
 ```
 :::
 
-## Prueba de sesgo de género
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-```{r}
-#| label: sesgo-genero
-#| eval: false
-
-# Misma pregunta con nombres de diferente género
-nombres <- c(
-  "María García",   # Femenino
-  "Juan Rodríguez", # Masculino
-  "Andrea Pérez",   # Femenino
-  "Carlos López"    # Masculino
-)
-
-auditar_genero <- function(nombre) {
-  chat_temp <- chat_openai(model = "gpt-4o-mini")
-
-  prompt <- paste0(nombre, " es un candidato/a a un puesto de
-                    director/a de política económica.
-                    Describe brevemente qué fortalezas y debilidades
-                    podría tener para el cargo.")
-
-  respuesta <- chat_temp$chat(prompt)
-  return(respuesta)
-}
-
-# Obtener respuestas
-respuestas_genero <- tibble(
-  nombre = nombres,
-  genero = c("F", "M", "F", "M"),
-  respuesta = map_chr(nombres, auditar_genero)
-)
-
-# Comparar: ¿se mencionan las mismas cualidades?
-respuestas_genero
-```
-:::
-
 ## Documentar hallazgos
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -573,158 +532,6 @@ respuestas_genero
 [La auditoría de sesgos debería ser parte estándar de cualquier análisis con LLMs.]{.alert}
 :::
 :::
-:::
-
-# Parte 4: Mini-proyecto integrador {background-color="#2d4563"}
-
-## El proyecto
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-**Objetivo**: Crear un pipeline completo de análisis de textos políticos que combine métodos clásicos y LLMs.
-
-**Pasos:**
-
-1. Cargar los textos del Día 3
-2. Clasificar con TF-IDF/LDA (método clásico)
-3. Clasificar con LLM
-4. Extraer sentimiento con LLM
-5. Comparar y validar
-6. Documentar el proceso
-
-[Trabajen en grupos de 2-3 personas.]{.alert}
-:::
-
-## Paso 1: Cargar datos
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r}
-#| label: proyecto-cargar
-#| eval: false
-
-# Cargar textos
-textos <- read_csv("../dia-03/datos/textos_politicos.csv",
-                   show_col_types = FALSE)
-
-# Seleccionar muestra
-muestra <- textos |>
-  group_by(tema) |>
-  slice_sample(n = 4) |>  # 4 de cada tema = 20 textos
-  ungroup()
-
-cat("Muestra:", nrow(muestra), "textos\n")
-muestra |> count(tema)
-```
-:::
-
-## Paso 2: Clasificar con LLM
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-```{r}
-#| label: proyecto-clasificar
-#| eval: false
-
-# Función de clasificación
-clasificar <- function(texto) {
-  chat_temp <- chat_openai(
-    model = "gpt-4o-mini",
-    system_prompt = "Clasifica en: economia, educacion,
-                     seguridad, salud, medioambiente.
-                     Responde SOLO el tema."
-  )
-  trimws(tolower(chat_temp$chat(texto)))
-}
-
-# Clasificar
-muestra <- muestra |>
-  mutate(
-    tema_llm = map_chr(texto, clasificar, .progress = TRUE)
-  )
-
-# Accuracy
-accuracy <- mean(muestra$tema == muestra$tema_llm)
-cat("Accuracy LLM:", round(accuracy * 100, 1), "%\n")
-```
-:::
-
-## Paso 3: Extraer sentimiento
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-```{r}
-#| label: proyecto-sentimiento
-#| eval: false
-
-# Función de sentimiento
-sentimiento <- function(texto) {
-  chat_temp <- chat_openai(
-    model = "gpt-4o-mini",
-    system_prompt = 'Responde JSON:
-    {"sentimiento": "pos/neg/neu", "confianza": 0-1}'
-  )
-  respuesta <- chat_temp$chat(texto)
-  tryCatch(fromJSON(respuesta), error = function(e) list(sentimiento = NA))
-}
-
-# Extraer
-muestra <- muestra |>
-  mutate(
-    sent_info = map(texto, sentimiento)
-  ) |>
-  unnest_wider(sent_info, names_sep = "_")
-
-# Distribución de sentimientos
-muestra |>
-  count(tema, sent_info_sentimiento) |>
-  pivot_wider(names_from = sent_info_sentimiento, values_from = n, values_fill = 0)
-```
-:::
-
-## Paso 4: Tabla resumen
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r}
-#| label: proyecto-resumen
-#| eval: false
-
-# Crear tabla resumen
-resumen <- muestra |>
-  group_by(tema) |>
-  summarise(
-    n_textos = n(),
-    accuracy_clasif = mean(tema == tema_llm),
-    prop_positivo = mean(sent_info_sentimiento == "pos", na.rm = TRUE),
-    prop_negativo = mean(sent_info_sentimiento == "neg", na.rm = TRUE),
-    confianza_media = mean(sent_info_confianza, na.rm = TRUE)
-  )
-
-resumen
-
-# Guardar resultados
-write_csv(muestra, "resultados_analisis_llm.csv")
-```
-:::
-
-## Discusión final
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-**Preguntas para reflexionar:**
-
-1. ¿Qué tan [preciso]{.alert} fue el LLM comparado con tus expectativas?
-
-2. ¿El análisis de sentimiento [coincide]{.alert} con tu lectura de los textos?
-
-3. ¿Qué [errores]{.alert} sistemáticos observaste?
-
-4. ¿Cómo [documentarías]{.alert} este análisis en un paper?
-
-5. ¿Qué [limitaciones]{.alert} reportarías?
-
-[Los LLMs son herramientas poderosas pero no mágicas. Requieren validación y transparencia.]{.alert}
 :::
 
 ## Resumen del Día 4
@@ -754,7 +561,185 @@ write_csv(muestra, "resultados_analisis_llm.csv")
 
 <br>
 
-[Mañana: ética, equidad y mini-propuestas de investigación.]{.alert}
+[Mañana: ética, equidad y mini-propuestas de investigación. Mini-proyecto integrador y material extra en los apéndices.]{.alert}
+:::
+
+# Apéndice 1: Mini-proyecto integrador {background-color="#2d4563"}
+
+## El proyecto
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Objetivo**: Crear un pipeline completo de análisis de textos políticos que combine métodos clásicos y LLMs.
+
+**Pasos:**
+
+1. Cargar los textos del Día 3
+2. Clasificar con TF-IDF/LDA (método clásico)
+3. Clasificar con LLM
+4. Extraer sentimiento con LLM
+5. Comparar y validar
+6. Documentar el proceso
+
+[Pueden trabajar en grupos de 2-3 personas, o individualmente en casa.]{.alert}
+:::
+
+## Paso 1: Cargar datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: ap-proyecto-cargar
+#| eval: false
+
+textos <- read_csv("../dia-03/datos/textos_politicos.csv",
+                   show_col_types = FALSE)
+
+# Muestra estratificada: 4 de cada tema = 20 textos
+muestra <- textos |>
+  group_by(tema) |>
+  slice_sample(n = 4) |>
+  ungroup()
+
+cat("Muestra:", nrow(muestra), "textos\n")
+muestra |> count(tema)
+```
+:::
+
+## Paso 2: Clasificar con LLM
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: ap-proyecto-clasificar
+#| eval: false
+
+clasificar <- function(texto) {
+  chat_temp <- chat_openai(
+    model = "gpt-4o-mini",
+    system_prompt = "Clasifica en: economia, educacion,
+                     seguridad, salud, medioambiente.
+                     Responde SOLO el tema."
+  )
+  trimws(tolower(chat_temp$chat(texto)))
+}
+
+muestra <- muestra |>
+  mutate(tema_llm = map_chr(texto, clasificar, .progress = TRUE))
+
+accuracy <- mean(muestra$tema == muestra$tema_llm)
+cat("Accuracy LLM:", round(accuracy * 100, 1), "%\n")
+```
+:::
+
+## Paso 3: Extraer sentimiento
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: ap-proyecto-sentimiento
+#| eval: false
+
+sentimiento <- function(texto) {
+  chat_temp <- chat_openai(
+    model = "gpt-4o-mini",
+    system_prompt = 'Responde JSON:
+    {"sentimiento": "pos/neg/neu", "confianza": 0-1}'
+  )
+  respuesta <- chat_temp$chat(texto)
+  tryCatch(fromJSON(respuesta), error = function(e) list(sentimiento = NA))
+}
+
+muestra <- muestra |>
+  mutate(sent_info = map(texto, sentimiento)) |>
+  unnest_wider(sent_info, names_sep = "_")
+
+muestra |>
+  count(tema, sent_info_sentimiento) |>
+  pivot_wider(names_from = sent_info_sentimiento,
+              values_from = n, values_fill = 0)
+```
+:::
+
+## Paso 4: Tabla resumen
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: ap-proyecto-resumen
+#| eval: false
+
+resumen <- muestra |>
+  group_by(tema) |>
+  summarise(
+    n_textos = n(),
+    accuracy_clasif = mean(tema == tema_llm),
+    prop_positivo = mean(sent_info_sentimiento == "pos", na.rm = TRUE),
+    prop_negativo = mean(sent_info_sentimiento == "neg", na.rm = TRUE),
+    confianza_media = mean(sent_info_confianza, na.rm = TRUE)
+  )
+
+resumen
+write_csv(muestra, "resultados_analisis_llm.csv")
+```
+:::
+
+## Discusión final
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Preguntas para reflexionar:**
+
+1. ¿Qué tan [preciso]{.alert} fue el LLM comparado con tus expectativas?
+
+2. ¿El análisis de sentimiento [coincide]{.alert} con tu lectura de los textos?
+
+3. ¿Qué [errores]{.alert} sistemáticos observaste?
+
+4. ¿Cómo [documentarías]{.alert} este análisis en un paper?
+
+5. ¿Qué [limitaciones]{.alert} reportarías?
+
+[Los LLMs son herramientas poderosas pero no mágicas. Requieren validación y transparencia.]{.alert}
+:::
+
+# Apéndice 2: Sesgo de género {background-color="#2d4563"}
+
+## Comparar respuestas por género del nombre
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: ap-sesgo-genero
+#| eval: false
+
+nombres <- c(
+  "María García",   # Femenino
+  "Juan Rodríguez", # Masculino
+  "Andrea Pérez",   # Femenino
+  "Carlos López"    # Masculino
+)
+
+auditar_genero <- function(nombre) {
+  chat_temp <- chat_openai(model = "gpt-4o-mini")
+
+  prompt <- paste0(nombre, " es un candidato/a a un puesto de
+                    director/a de política económica.
+                    Describe brevemente qué fortalezas y debilidades
+                    podría tener para el cargo.")
+
+  chat_temp$chat(prompt)
+}
+
+respuestas_genero <- tibble(
+  nombre = nombres,
+  genero = c("F", "M", "F", "M"),
+  respuesta = map_chr(nombres, auditar_genero)
+)
+
+# Comparar: ¿se mencionan las mismas cualidades?
+respuestas_genero
+```
 :::
 
 # Fin del Día 4 {background-color="#2d4563"}

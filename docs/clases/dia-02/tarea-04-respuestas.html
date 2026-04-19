@@ -145,10 +145,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../lecturas.html"> 
 <span class="menu-text">Lecturas</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../referencia-tidymodels.html"> 
-<span class="menu-text">Referencia R</span></a>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-referencia-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Referencia R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
+        <li>
+    <a class="dropdown-item" href="../../referencia-tidymodels.html">
+ <span class="dropdown-text">Supervisado (tidymodels)</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-no-supervisado.html">
+ <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-texto.html">
+ <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -271,24 +286,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 18 × 4
    pais                 media    sd     n
    &lt;fct&gt;                &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
- 1 Ecuador               7.03  1.48    15
- 2 Costa Rica            6.76  1.38    32
- 3 Perú                  6.63  1.81    26
- 4 Guatemala             6.62  1.51    30
- 5 Bolivia               6.56  1.52    28
- 6 Chile                 6.56  1.34    32
- 7 Venezuela             6.55  1.43    38
- 8 Panamá                6.53  1.44    38
- 9 Uruguay               6.47  1.66    31
-10 México                6.42  1.7     19
-11 Honduras              6.41  1.85    27
-12 Paraguay              6.41  1.48    23
-13 Nicaragua             6.34  1.5     32
-14 Colombia              6.3   1.75    26
-15 Argentina             6.18  1.43    25
-16 El Salvador           6.1   0.98    27
-17 República Dominicana  6.02  1.31    30
-18 Brasil                6     1.68    21</code></pre>
+ 1 México                7.07  1.51    19
+ 2 Uruguay               7.04  1.34    31
+ 3 Costa Rica            6.93  1.26    32
+ 4 Panamá                6.93  1.35    38
+ 5 Ecuador               6.91  1.44    15
+ 6 Bolivia               6.8   1.43    28
+ 7 Guatemala             6.8   1.35    30
+ 8 Venezuela             6.8   1.41    38
+ 9 Paraguay              6.7   1.47    23
+10 Chile                 6.66  1.17    32
+11 Colombia              6.6   1.61    26
+12 Nicaragua             6.59  1.31    32
+13 Perú                  6.54  1.62    26
+14 República Dominicana  6.5   1.39    30
+15 Argentina             6.48  1.31    25
+16 Honduras              6.31  1.78    27
+17 Brasil                6.28  1.58    21
+18 El Salvador           6.2   1.04    27</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> La satisfacción con la vida varía entre países, lo cual es esperable dado que refleja diferencias en condiciones socioeconómicas, confianza institucional y otras variables contextuales. Las diferencias entre países son en parte producto de la simulación, pero representan patrones que se observan en datos reales de Latinobarómetro: países con mejores indicadores económicos y mayor confianza institucional tienden a reportar mayor satisfacción.</p>
@@ -310,14 +325,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stdout">
 <pre><code>                        satisfaccion_vida
 satisfaccion_vida              1.00000000
-confianza_gobierno            -0.05403099
-interes_politica              -0.04789418
-confianza_justicia            -0.03706223
-edad                          -0.03376150
-satisfaccion_democracia       -0.01611282
-percepcion_economia           -0.01116026
-ingreso_hogar                 -0.01110600
-educacion_anios               -0.01091978</code></pre>
+educacion_anios                0.35927869
+ingreso_hogar                  0.32791542
+confianza_gobierno             0.23964978
+satisfaccion_democracia        0.21260159
+interes_politica               0.17492574
+percepcion_economia            0.13945967
+edad                           0.07714857
+confianza_justicia             0.01001771</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> Las variables con mayor correlación con la satisfacción son probablemente <code>percepcion_economia</code>, <code>satisfaccion_democracia</code> y <code>confianza_gobierno</code>, todas positivas. Esto tiene sentido: quienes perciben que la economía va bien, están satisfechos con la democracia y confían en el gobierno tienden a reportar mayor satisfacción con la vida. Variables como <code>edad</code> y <code>educacion_anios</code> probablemente tienen correlaciones más débiles, lo que sugiere que la satisfacción depende más de percepciones subjetivas que de características demográficas.</p>
@@ -383,7 +398,7 @@ $ confianza_justicia      &lt;dbl&gt; -0.5648555, 0.4535138, -1.5832247, -0.5648
 $ satisfaccion_democracia &lt;dbl&gt; 0.5461895, -0.5491103, -0.5491103, 0.5461895, …
 $ percepcion_economia     &lt;dbl&gt; 1.57455077, -0.08170881, -0.90983860, 0.746420…
 $ interes_politica        &lt;dbl&gt; 1.5995530, 1.5995530, -0.4546675, -0.4546675, …
-$ satisfaccion_vida       &lt;dbl&gt; 6.4, 6.5, 8.4, 4.9, 7.2, 5.8, 8.4, 8.0, 3.9, 3…
+$ satisfaccion_vida       &lt;dbl&gt; 7.6, 6.3, 7.2, 6.0, 6.3, 5.5, 7.4, 8.5, 4.3, 3…
 $ zona_urbana             &lt;dbl&gt; -1.8877612, 0.5283154, 0.5283154, 0.5283154, 0…
 $ genero_mujer            &lt;dbl&gt; -1.0450130, 0.9543741, -1.0450130, -1.0450130,…
 $ uso_internet_semanal    &lt;dbl&gt; -0.598113, -0.598113, -0.598113, 1.667466, -0.…
@@ -412,20 +427,20 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>coef_ols</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 5
-   term                    estimate std.error statistic p.value
-   &lt;chr&gt;                      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
- 1 uso_internet_diario     -0.196      0.118    -1.65    0.0988
- 2 ingreso_hogar           -0.127      0.0929   -1.36    0.174 
- 3 uso_internet_semanal    -0.117      0.119    -0.979   0.328 
- 4 genero_mujer             0.0907     0.0813    1.12    0.265 
- 5 educacion_anios          0.0808     0.0930    0.869   0.386 
- 6 confianza_gobierno      -0.0739     0.0909   -0.813   0.417 
- 7 interes_politica        -0.0387     0.0891   -0.434   0.665 
- 8 confianza_justicia      -0.0359     0.0821   -0.437   0.662 
- 9 zona_urbana             -0.0313     0.0813   -0.385   0.700 
-10 percepcion_economia     -0.0185     0.0808   -0.229   0.819 
-11 edad                    -0.00303    0.0805   -0.0377  0.970 
-12 satisfaccion_democracia  0.00231    0.0826    0.0279  0.978 </code></pre>
+   term                    estimate std.error statistic     p.value
+   &lt;chr&gt;                      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;
+ 1 educacion_anios           0.382     0.0734     5.21  0.000000323
+ 2 satisfaccion_democracia   0.261     0.0652     4.01  0.0000751  
+ 3 confianza_gobierno        0.250     0.0717     3.48  0.000562   
+ 4 ingreso_hogar             0.223     0.0734     3.05  0.00249    
+ 5 percepcion_economia       0.215     0.0638     3.37  0.000845   
+ 6 edad                      0.181     0.0635     2.84  0.00475    
+ 7 uso_internet_diario      -0.155     0.0935    -1.66  0.0985     
+ 8 interes_politica          0.113     0.0704     1.60  0.111      
+ 9 uso_internet_semanal     -0.0968    0.0942    -1.03  0.305      
+10 genero_mujer              0.0745    0.0642     1.16  0.247      
+11 confianza_justicia       -0.0245    0.0648    -0.378 0.706      
+12 zona_urbana              -0.0178    0.0642    -0.278 0.781      </code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> Los coeficientes normalizados permiten comparar directamente la importancia de cada variable. El predictor más importante (mayor coeficiente en valor absoluto) probablemente es <code>percepcion_economia</code> o <code>satisfaccion_democracia</code>, lo que indica que las percepciones subjetivas sobre la situación del país tienen más peso que variables demográficas como <code>edad</code> o <code>genero</code>. El predictor menos importante tiene un coeficiente cercano a cero, lo que sugiere que aporta poca información una vez que las demás variables están en el modelo.</p>
@@ -444,9 +459,9 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <pre><code># A tibble: 3 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard      1.49  
-2 rsq     standard      0.0392
-3 mae     standard      1.18  </code></pre>
+1 rmse    standard       1.19 
+2 rsq     standard       0.264
+3 mae     standard       0.945</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> El R² indica el porcentaje de la variación en satisfacción que el modelo explica. Un R² en el rango de 0.3-0.5 es razonable para datos de encuestas sociales, donde la satisfacción con la vida depende de muchos factores difíciles de medir (personalidad, relaciones familiares, salud mental). El RMSE nos dice el error promedio en unidades de la variable objetivo: si es alrededor de 1.5, el modelo se equivoca en promedio en 1.5 puntos de la escala de 1 a 10.</p>
@@ -486,16 +501,16 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
                standard deviation, resulting in a divide by 0 error. `NA` will be returned.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>There were issues with some computations   A: x6</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>There were issues with some computations   A: x13</code></pre>
+<pre><code>There were issues with some computations   A: x18</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>There were issues with some computations   A: x48</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>There were issues with some computations   A: x69</code></pre>
+<pre><code>There were issues with some computations   A: x30</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code></code></pre>
@@ -510,7 +525,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <pre><code># A tibble: 1 × 2
   penalty .config         
     &lt;dbl&gt; &lt;chr&gt;           
-1   0.204 pre0_mod25_post0</code></pre>
+1  0.0304 pre0_mod19_post0</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(resultados_lasso) <span class="sc">+</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
@@ -548,7 +563,7 @@ Adding another scale for x, which will replace the existing scale.</code></pre>
 <pre><code># A tibble: 1 × 2
   penalty .config         
     &lt;dbl&gt; &lt;chr&gt;           
-1   0.204 pre0_mod25_post0</code></pre>
+1  0.0304 pre0_mod19_post0</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Lambda 1SE:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -560,7 +575,7 @@ Lambda 1SE:</code></pre>
 <pre><code># A tibble: 1 × 2
   penalty .config         
     &lt;dbl&gt; &lt;chr&gt;           
-1       1 pre0_mod30_post0</code></pre>
+1   0.149 pre0_mod24_post0</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Diferencia:"</span>, <span class="fu">round</span>(lambda_1se<span class="sc">$</span>penalty <span class="sc">/</span> lambda_min<span class="sc">$</span>penalty, <span class="dv">1</span>), <span class="st">"veces más grande"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -585,31 +600,31 @@ Diferencia: 4.9 veces más grande</code></pre>
 <pre><code># A tibble: 12 × 3
    term                    estimate penalty
    &lt;chr&gt;                      &lt;dbl&gt;   &lt;dbl&gt;
- 1 edad                           0   0.204
- 2 educacion_anios                0   0.204
- 3 ingreso_hogar                  0   0.204
- 4 confianza_gobierno             0   0.204
- 5 confianza_justicia             0   0.204
- 6 satisfaccion_democracia        0   0.204
- 7 percepcion_economia            0   0.204
- 8 interes_politica               0   0.204
- 9 zona_urbana                    0   0.204
-10 genero_mujer                   0   0.204
-11 uso_internet_semanal           0   0.204
-12 uso_internet_diario            0   0.204</code></pre>
+ 1 educacion_anios           0.359   0.0304
+ 2 confianza_gobierno        0.233   0.0304
+ 3 satisfaccion_democracia   0.230   0.0304
+ 4 ingreso_hogar             0.199   0.0304
+ 5 percepcion_economia       0.185   0.0304
+ 6 edad                      0.154   0.0304
+ 7 interes_politica          0.0980  0.0304
+ 8 uso_internet_diario      -0.0515  0.0304
+ 9 genero_mujer              0.0408  0.0304
+10 confianza_justicia        0       0.0304
+11 zona_urbana               0       0.0304
+12 uso_internet_semanal      0       0.0304</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Variables eliminadas</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>eliminadas <span class="ot">&lt;-</span> coef_lasso <span class="sc">|&gt;</span> <span class="fu">filter</span>(estimate <span class="sc">==</span> <span class="dv">0</span>)</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Variables eliminadas:"</span>, <span class="fu">nrow</span>(eliminadas), <span class="st">"de"</span>, <span class="fu">nrow</span>(coef_lasso), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Variables eliminadas: 12 de 12 </code></pre>
+Variables eliminadas: 3 de 12 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(eliminadas) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Son:"</span>, <span class="fu">paste</span>(eliminadas<span class="sc">$</span>term, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Son: edad, educacion_anios, ingreso_hogar, confianza_gobierno, confianza_justicia, satisfaccion_democracia, percepcion_economia, interes_politica, zona_urbana, genero_mujer, uso_internet_semanal, uso_internet_diario </code></pre>
+<pre><code>Son: confianza_justicia, zona_urbana, uso_internet_semanal </code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Las variables eliminadas probablemente son las que tienen correlación débil con la satisfacción o cuya información ya está capturada por otros predictores. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basandose en los datos.</p>
@@ -655,30 +670,30 @@ Variables eliminadas: 12 de 12 </code></pre>
 <span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a>comparacion</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 3
-   term                       ridge lasso
-   &lt;chr&gt;                      &lt;dbl&gt; &lt;dbl&gt;
- 1 edad                     0.00197     0
- 2 educacion_anios          0.0245      0
- 3 ingreso_hogar           -0.0589      0
- 4 confianza_gobierno      -0.0438      0
- 5 confianza_justicia      -0.0193      0
- 6 satisfaccion_democracia -0.00513     0
- 7 percepcion_economia     -0.00807     0
- 8 interes_politica        -0.0280      0
- 9 zona_urbana             -0.0207      0
-10 genero_mujer             0.0524      0
-11 uso_internet_semanal    -0.0172      0
-12 uso_internet_diario     -0.0712      0</code></pre>
+   term                      ridge   lasso
+   &lt;chr&gt;                     &lt;dbl&gt;   &lt;dbl&gt;
+ 1 edad                     0.152   0.154 
+ 2 educacion_anios          0.323   0.359 
+ 3 ingreso_hogar            0.206   0.199 
+ 4 confianza_gobierno       0.218   0.233 
+ 5 confianza_justicia      -0.0119  0     
+ 6 satisfaccion_democracia  0.219   0.230 
+ 7 percepcion_economia      0.177   0.185 
+ 8 interes_politica         0.114   0.0980
+ 9 zona_urbana             -0.0141  0     
+10 genero_mujer             0.0562  0.0408
+11 uso_internet_semanal    -0.0481  0     
+12 uso_internet_diario     -0.0994 -0.0515</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Media |coef| Ridge:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">abs</span>(comparacion<span class="sc">$</span>ridge)), <span class="dv">4</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Media |coef| Ridge: 0.0293</code></pre>
+Media |coef| Ridge: 0.1366</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Media |coef| LASSO:"</span>, <span class="fu">round</span>(<span class="fu">mean</span>(<span class="fu">abs</span>(comparacion<span class="sc">$</span>lasso)), <span class="dv">4</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Media |coef| LASSO: 0</code></pre>
+Media |coef| LASSO: 0.1291</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> Ridge tiende a tener coeficientes más grandes en promedio porque reduce todos los coeficientes de forma proporcional, sin eliminar ninguno. LASSO, en cambio, pone algunos en exactamente cero, lo que baja el promedio. Ridge usa la penalización L2 (suma de cuadrados), que “encoge” pero no elimina. LASSO usa la penalización L1 (suma de valores absolutos), que produce soluciones “sparse” donde algunos coeficientes son exactamente cero. La diferencia se debe a la geometría de cada tipo de penalización.</p>
@@ -720,7 +735,7 @@ Media |coef| LASSO: 0</code></pre>
 <pre><code># A tibble: 1 × 3
   penalty mixture .config         
     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;           
-1   0.268    0.75 pre0_mod64_post0</code></pre>
+1   0.268       0 pre0_mod61_post0</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(resultados_enet) <span class="sc">+</span></span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
@@ -780,40 +795,32 @@ Adding another scale for x, which will replace the existing scale.</code></pre>
 <span id="cb56-32"><a href="#cb56-32" aria-hidden="true" tabindex="-1"></a>pred_rf <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_rf, datos_test) <span class="sc">|&gt;</span></span>
 <span id="cb56-33"><a href="#cb56-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(satisfaccion_vida))</span>
 <span id="cb56-34"><a href="#cb56-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-35"><a href="#cb56-35" aria-hidden="true" tabindex="-1"></a>metricas_lasso <span class="ot">&lt;-</span> pred_lasso <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: A correlation computation is required, but `estimate` is constant and has 0
-standard deviation, resulting in a divide by 0 error. `NA` will be returned.</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>metricas_ridge <span class="ot">&lt;-</span> pred_ridge <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
-<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>metricas_enet <span class="ot">&lt;-</span> pred_enet <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: A correlation computation is required, but `estimate` is constant and has 0
-standard deviation, resulting in a divide by 0 error. `NA` will be returned.</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>metricas_rf <span class="ot">&lt;-</span> pred_rf <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>tabla <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>  metricas_ols <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"OLS"</span>),</span>
-<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>  metricas_lasso <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"LASSO"</span>),</span>
-<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>  metricas_ridge <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Ridge"</span>),</span>
-<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>  metricas_enet <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Elastic Net"</span>),</span>
-<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>  metricas_rf <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Random Forest"</span>)</span>
-<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb60-11"><a href="#cb60-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb60-12"><a href="#cb60-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rmse)</span>
-<span id="cb60-13"><a href="#cb60-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb60-14"><a href="#cb60-14" aria-hidden="true" tabindex="-1"></a>tabla</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb56-35"><a href="#cb56-35" aria-hidden="true" tabindex="-1"></a>metricas_lasso <span class="ot">&lt;-</span> pred_lasso <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
+<span id="cb56-36"><a href="#cb56-36" aria-hidden="true" tabindex="-1"></a>metricas_ridge <span class="ot">&lt;-</span> pred_ridge <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
+<span id="cb56-37"><a href="#cb56-37" aria-hidden="true" tabindex="-1"></a>metricas_enet <span class="ot">&lt;-</span> pred_enet <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
+<span id="cb56-38"><a href="#cb56-38" aria-hidden="true" tabindex="-1"></a>metricas_rf <span class="ot">&lt;-</span> pred_rf <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
+<span id="cb56-39"><a href="#cb56-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-40"><a href="#cb56-40" aria-hidden="true" tabindex="-1"></a>tabla <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb56-41"><a href="#cb56-41" aria-hidden="true" tabindex="-1"></a>  metricas_ols <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"OLS"</span>),</span>
+<span id="cb56-42"><a href="#cb56-42" aria-hidden="true" tabindex="-1"></a>  metricas_lasso <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"LASSO"</span>),</span>
+<span id="cb56-43"><a href="#cb56-43" aria-hidden="true" tabindex="-1"></a>  metricas_ridge <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Ridge"</span>),</span>
+<span id="cb56-44"><a href="#cb56-44" aria-hidden="true" tabindex="-1"></a>  metricas_enet <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Elastic Net"</span>),</span>
+<span id="cb56-45"><a href="#cb56-45" aria-hidden="true" tabindex="-1"></a>  metricas_rf <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Random Forest"</span>)</span>
+<span id="cb56-46"><a href="#cb56-46" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb56-47"><a href="#cb56-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb56-48"><a href="#cb56-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb56-49"><a href="#cb56-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rmse)</span>
+<span id="cb56-50"><a href="#cb56-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-51"><a href="#cb56-51" aria-hidden="true" tabindex="-1"></a>tabla</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 4
-  modelo         rmse      rsq   mae
-  &lt;chr&gt;         &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
-1 LASSO          1.44 NA        1.13
-2 Elastic Net    1.44 NA        1.13
-3 Random Forest  1.46  0.00163  1.14
-4 Ridge          1.46  0.0374   1.15
-5 OLS            1.49  0.0392   1.18</code></pre>
+  modelo         rmse   rsq   mae
+  &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 Random Forest  1.17 0.297 0.928
+2 LASSO          1.18 0.273 0.940
+3 Ridge          1.18 0.271 0.945
+4 Elastic Net    1.18 0.271 0.945
+5 OLS            1.19 0.264 0.945</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> Random Forest probablemente tiene el mejor RMSE porque puede capturar relaciones no lineales entre los predictores y la satisfacción. Los modelos lineales (OLS, LASSO, Ridge, Elastic Net) son muy similares entre sí porque: (a) el dataset tiene relaciones aproximadamente lineales, (b) hay pocos predictores irrelevantes, y (c) la ratio observaciones/predictores no es extrema. La mejora de regularización sobre OLS es marginal, lo que confirma que con p = 11 y n ~ 375, OLS ya es un modelo razonable.</p>

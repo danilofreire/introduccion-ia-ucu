@@ -145,10 +145,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="../../lecturas.html"> 
 <span class="menu-text">Lecturas</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="../../referencia-tidymodels.html"> 
-<span class="menu-text">Referencia R</span></a>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-referencia-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Referencia R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
+        <li>
+    <a class="dropdown-item" href="../../referencia-tidymodels.html">
+ <span class="dropdown-text">Supervisado (tidymodels)</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-no-supervisado.html">
+ <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-texto.html">
+ <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -292,8 +307,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 2 × 4
   zona       n n_voto_si prop_si
   &lt;fct&gt;  &lt;int&gt;     &lt;int&gt;   &lt;dbl&gt;
-1 rural    114        65   0.57 
-2 urbana   386       201   0.521</code></pre>
+1 rural    114        66   0.579
+2 urbana   386       203   0.526</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Proporción de votantes por género</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Proporción de votantes por género:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -312,7 +327,7 @@ Proporción de votantes por género:</code></pre>
 <pre><code># A tibble: 2 × 4
   genero     n n_voto_si prop_si
   &lt;fct&gt;  &lt;int&gt;     &lt;int&gt;   &lt;dbl&gt;
-1 hombre   252       133   0.528
+1 hombre   252       136   0.54 
 2 mujer    248       133   0.536</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cruce zona x género</span></span>
@@ -332,9 +347,9 @@ Proporción de votantes por zona y género:</code></pre>
 <pre><code># A tibble: 4 × 4
   zona   genero     n prop_si
   &lt;fct&gt;  &lt;fct&gt;  &lt;int&gt;   &lt;dbl&gt;
-1 rural  hombre    66   0.545
+1 rural  hombre    66   0.561
 2 rural  mujer     48   0.604
-3 urbana hombre   186   0.522
+3 urbana hombre   186   0.532
 4 urbana mujer    200   0.52 </code></pre>
 </div>
 </div>
@@ -362,7 +377,7 @@ confianza_justicia       0.05           -0.03         -0.04               0.18
 satisfaccion_democracia  0.00           -0.01         -0.02               0.17
 percepcion_economia      0.08           -0.01         -0.08               0.02
 interes_politica        -0.06            0.04          0.02               0.38
-satisfaccion_vida       -0.03           -0.01         -0.01              -0.05
+satisfaccion_vida        0.08            0.36          0.33               0.24
                         confianza_justicia satisfaccion_democracia
 edad                                  0.05                    0.00
 educacion_anios                      -0.03                   -0.01
@@ -372,17 +387,17 @@ confianza_justicia                    1.00                    0.09
 satisfaccion_democracia               0.09                    1.00
 percepcion_economia                  -0.04                   -0.03
 interes_politica                      0.01                    0.16
-satisfaccion_vida                    -0.04                   -0.02
+satisfaccion_vida                     0.01                    0.21
                         percepcion_economia interes_politica satisfaccion_vida
-edad                                   0.08            -0.06             -0.03
-educacion_anios                       -0.01             0.04             -0.01
-ingreso_hogar                         -0.08             0.02             -0.01
-confianza_gobierno                     0.02             0.38             -0.05
-confianza_justicia                    -0.04             0.01             -0.04
-satisfaccion_democracia               -0.03             0.16             -0.02
-percepcion_economia                    1.00            -0.02             -0.01
-interes_politica                      -0.02             1.00             -0.05
-satisfaccion_vida                     -0.01            -0.05              1.00</code></pre>
+edad                                   0.08            -0.06              0.08
+educacion_anios                       -0.01             0.04              0.36
+ingreso_hogar                         -0.08             0.02              0.33
+confianza_gobierno                     0.02             0.38              0.24
+confianza_justicia                    -0.04             0.01              0.01
+satisfaccion_democracia               -0.03             0.16              0.21
+percepcion_economia                    1.00            -0.02              0.14
+interes_politica                      -0.02             1.00              0.17
+satisfaccion_vida                      0.14             0.17              1.00</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Par con mayor correlación</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>mat_cor_abs <span class="ot">&lt;-</span> <span class="fu">abs</span>(mat_cor)</span>
@@ -463,10 +478,10 @@ Par con mayor correlación: ingreso_hogar y educacion_anios </code></pre>
 <pre><code># A tibble: 4 × 3
   .metric     .estimator .estimate
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy    binary         0.595
-2 kap         binary         0.183
-3 mn_log_loss binary         0.652
-4 roc_auc     binary         0.654</code></pre>
+1 accuracy    binary         0.635
+2 kap         binary         0.258
+3 mn_log_loss binary         0.662
+4 roc_auc     binary         0.637</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo completo para comparar</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>wf_completo <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
@@ -494,8 +509,8 @@ Modelo completo (11 predictores):</code></pre>
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 1 accuracy    binary         0.611
 2 kap         binary         0.214
-3 mn_log_loss binary         0.659
-4 roc_auc     binary         0.643</code></pre>
+3 mn_log_loss binary         0.670
+4 roc_auc     binary         0.626</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> El modelo reducido con solo 3 predictores (edad, educación e interés político) tiene un AUC algo menor que el modelo completo, pero la diferencia es moderada. Esto sugiere que estos tres predictores capturan una parte significativa de la información relevante. El modelo completo mejora algo porque incluye variables como confianza en el gobierno y satisfacción democrática, que aportan información adicional, pero la ganancia marginal de cada variable extra es pequeña.</p>
@@ -514,19 +529,19 @@ Modelo completo (11 predictores):</code></pre>
 <pre><code># A tibble: 13 × 6
    term                    estimate std.error statistic p.value odds_ratio
    &lt;chr&gt;                      &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;
- 1 edad                    -0.313       0.112   -2.79   0.00524      0.732
- 2 confianza_justicia      -0.301       0.113   -2.66   0.00784      0.740
- 3 interes_politica        -0.306       0.124   -2.47   0.0135       0.737
- 4 educacion_anios         -0.299       0.132   -2.26   0.0239       0.742
- 5 uso_internet_semanal    -0.328       0.166   -1.98   0.0480       0.720
- 6 uso_internet_diario     -0.255       0.166   -1.54   0.124        0.775
- 7 (Intercept)             -0.144       0.109   -1.33   0.185        0.866
- 8 zona_urbana              0.0643      0.111    0.579  0.563        1.07 
- 9 confianza_gobierno      -0.0669      0.125   -0.536  0.592        0.935
-10 genero_mujer             0.0160      0.111    0.144  0.886        1.02 
-11 ingreso_hogar           -0.0156      0.129   -0.121  0.904        0.985
-12 percepcion_economia     -0.00630     0.111   -0.0570 0.955        0.994
-13 satisfaccion_democracia  0.00255     0.113    0.0226 0.982        1.00 </code></pre>
+ 1 educacion_anios         -0.433       0.133   -3.25   0.00114      0.648
+ 2 interes_politica        -0.335       0.122   -2.75   0.00601      0.716
+ 3 edad                    -0.302       0.112   -2.69   0.00714      0.739
+ 4 confianza_justicia      -0.247       0.114   -2.16   0.0311       0.781
+ 5 uso_internet_semanal    -0.343       0.162   -2.12   0.0338       0.709
+ 6 uso_internet_diario     -0.310       0.161   -1.93   0.0536       0.733
+ 7 (Intercept)             -0.172       0.110   -1.57   0.117        0.842
+ 8 zona_urbana              0.117       0.113    1.04   0.300        1.12 
+ 9 satisfaccion_democracia -0.0943      0.114   -0.829  0.407        0.910
+10 percepcion_economia      0.0645      0.112    0.576  0.564        1.07 
+11 confianza_gobierno      -0.0457      0.121   -0.377  0.706        0.955
+12 ingreso_hogar            0.0319      0.130    0.246  0.806        1.03 
+13 genero_mujer             0.00273     0.111    0.0246 0.980        1.00 </code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> Los coeficientes están en escala normalizada (ya que aplicamos <code>step_normalize()</code>), así que los odds ratios se interpretan como el cambio en las chances de votar por cada desviación estándar de aumento en el predictor. La variable con el efecto más fuerte es probablemente <code>interes_politica</code> o <code>edad</code> (odds ratio más alejado de 1). La variable <code>percepcion_economia</code> tiene un efecto negativo: cuando las personas perciben una economia peor, la probabilidad de votar aumenta (voto de protesta).</p>
@@ -566,9 +581,9 @@ Modelo completo (11 predictores):</code></pre>
 <span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>resultados_arboles</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  trees    auc
-1   100 0.6436
-2   500 0.6332
-3  1000 0.6271</code></pre>
+1   100 0.5477
+2   500 0.5718
+3  1000 0.5682</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> La diferencia entre 100 y 500 árboles suele ser pequeña (1-2 puntos de AUC), y entre 500 y 1000 es aún menor. En general, 500 árboles es suficiente para la mayoría de los problemas. El rendimiento de Random Forest se estabiliza rápidamente con más árboles, pero el tiempo de cómputo sigue creciendo de forma lineal. Para datasets pequeños como este (500 observaciones), 500 árboles es un buen punto de equilibrio.</p>
@@ -614,7 +629,7 @@ Modelo completo (11 predictores):</code></pre>
 <pre><code># A tibble: 1 × 4
    mtry min_n  mean std_err
   &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;
-1     2    30 0.612  0.0192</code></pre>
+1     2    21 0.624  0.0252</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Grilla aleatoria (20 combinaciones)</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
@@ -641,7 +656,7 @@ Mejor AUC con grilla aleatoria:</code></pre>
 <pre><code># A tibble: 1 × 4
    mtry min_n  mean std_err
   &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;
-1     2    17 0.607  0.0186</code></pre>
+1     2    17 0.615  0.0200</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> Ambas grillas dan resultados similares. La grilla regular explora el espacio de forma uniforme, lo cual es bueno cuando hay pocos hiperparámetros (2 en este caso). La grilla aleatoria explora combinaciones que la regular podría no probar, lo que es más eficiente cuando hay 3 o más hiperparámetros. Para este caso con solo 2 hiperparámetros, la diferencia es mínima.</p>
@@ -670,7 +685,7 @@ Mejor AUC con grilla aleatoria:</code></pre>
 <pre><code># A tibble: 1 × 4
    mtry min_n  mean std_err
   &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;
-1     2    30 0.612  0.0192</code></pre>
+1     2    21 0.624  0.0252</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Mejor modelo con 10 folds:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -682,7 +697,7 @@ Mejor modelo con 10 folds:</code></pre>
 <pre><code># A tibble: 1 × 4
    mtry min_n  mean std_err
   &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;
-1     2    30 0.617  0.0233</code></pre>
+1     4     5 0.616  0.0167</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> Los hiperparámetros seleccionados pueden ser los mismos o ligeramente diferentes. El error estándar con 10 folds suele ser algo menor que con 5 folds, porque cada fold de validación es más grande y las estimaciones son más estables. Sin embargo, con un dataset de 500 observaciones, la diferencia práctica es pequeña. Usar 10 folds tarda más, pero da estimaciones algo más confiables.</p>
@@ -765,18 +780,18 @@ Mejor modelo con 10 folds:</code></pre>
 <pre><code># A tibble: 12 × 2
    Variable                Importance
    &lt;chr&gt;                        &lt;dbl&gt;
- 1 edad                         29.0 
- 2 educacion_anios              20.2 
- 3 ingreso_hogar                14.2 
- 4 interes_politica             11.4 
- 5 confianza_justicia           10.6 
- 6 percepcion_economia           9.11
- 7 confianza_gobierno            8.70
- 8 satisfaccion_democracia       8.67
- 9 genero_mujer                  3.66
-10 uso_internet_semanal          3.26
-11 uso_internet_diario           3.17
-12 zona_urbana                   3.04</code></pre>
+ 1 edad                         26.4 
+ 2 educacion_anios              23.2 
+ 3 ingreso_hogar                15.3 
+ 4 interes_politica             10.7 
+ 5 confianza_justicia            9.73
+ 6 confianza_gobierno            9.32
+ 7 percepcion_economia           9.21
+ 8 satisfaccion_democracia       7.94
+ 9 uso_internet_semanal          3.74
+10 uso_internet_diario           3.70
+11 zona_urbana                   3.41
+12 genero_mujer                  3.35</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ranking de coeficientes logísticos (por |z|)</span></span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Ranking de coeficientes (regresión logística, |z|):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -795,18 +810,18 @@ Ranking de coeficientes (regresión logística, |z|):</code></pre>
 <pre><code># A tibble: 12 × 4
    term                    estimate statistic  abs_z
    &lt;chr&gt;                      &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;
- 1 edad                    -0.313     -2.79   2.79  
- 2 confianza_justicia      -0.301     -2.66   2.66  
- 3 interes_politica        -0.306     -2.47   2.47  
- 4 educacion_anios         -0.299     -2.26   2.26  
- 5 uso_internet_semanal    -0.328     -1.98   1.98  
- 6 uso_internet_diario     -0.255     -1.54   1.54  
- 7 zona_urbana              0.0643     0.579  0.579 
- 8 confianza_gobierno      -0.0669    -0.536  0.536 
- 9 genero_mujer             0.0160     0.144  0.144 
-10 ingreso_hogar           -0.0156    -0.121  0.121 
-11 percepcion_economia     -0.00630   -0.0570 0.0570
-12 satisfaccion_democracia  0.00255    0.0226 0.0226</code></pre>
+ 1 educacion_anios         -0.433     -3.25   3.25  
+ 2 interes_politica        -0.335     -2.75   2.75  
+ 3 edad                    -0.302     -2.69   2.69  
+ 4 confianza_justicia      -0.247     -2.16   2.16  
+ 5 uso_internet_semanal    -0.343     -2.12   2.12  
+ 6 uso_internet_diario     -0.310     -1.93   1.93  
+ 7 zona_urbana              0.117      1.04   1.04  
+ 8 satisfaccion_democracia -0.0943    -0.829  0.829 
+ 9 percepcion_economia      0.0645     0.576  0.576 
+10 confianza_gobierno      -0.0457    -0.377  0.377 
+11 ingreso_hogar            0.0319     0.246  0.246 
+12 genero_mujer             0.00273    0.0246 0.0246</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> Los rankings pueden coincidir en los predictores más importantes (edad, interés político) pero diferir en los menos importantes. Las diferencias surgen porque: (1) el VIP mide cuánto contribuye cada variable a reducir la impureza en los árboles, mientras que el estadístico z mide la significancia del efecto lineal; (2) Random Forest captura interacciones y no-linealidades que la regresión logística ignora; (3) variables correlacionadas pueden repartir la importancia de forma diferente en cada método. Cuando ambos métodos coinciden en las variables más importantes, tenemos más confianza en que esos predictores son realmente relevantes.</p>
@@ -850,9 +865,9 @@ Ranking de coeficientes (regresión logística, |z|):</code></pre>
   .metric     .estimator .estimate
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 1 accuracy    binary         0.571
-2 kap         binary         0.131
-3 mn_log_loss binary         1.34 
-4 roc_auc     binary         0.578</code></pre>
+2 kap         binary         0.133
+3 mn_log_loss binary         2.99 
+4 roc_auc     binary         0.604</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo RF para comparar</span></span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>ajuste_rf_comp <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_rf_final, <span class="at">data =</span> datos_train)</span>
@@ -874,10 +889,10 @@ Random Forest:</code></pre>
 <pre><code># A tibble: 4 × 3
   .metric     .estimator .estimate
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy    binary         0.579
-2 kap         binary         0.153
-3 mn_log_loss binary         0.678
-4 roc_auc     binary         0.622</code></pre>
+1 accuracy    binary         0.563
+2 kap         binary         0.114
+3 mn_log_loss binary         0.703
+4 roc_auc     binary         0.558</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Regresión logística:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -891,8 +906,8 @@ Regresión logística:</code></pre>
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
 1 accuracy    binary         0.611
 2 kap         binary         0.214
-3 mn_log_loss binary         0.659
-4 roc_auc     binary         0.643</code></pre>
+3 mn_log_loss binary         0.670
+4 roc_auc     binary         0.626</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> El árbol de decisión tiene un AUC menor que el Random Forest y posiblemente menor que la regresión logística. Esto es esperable: un solo árbol con poda tiende a ser un clasificador más débil que un ensemble de 500 árboles. La ventaja del árbol es su interpretabilidad: se puede visualizar como un diagrama de flujo que muestra exactamente cómo se toman las decisiones. La pérdida de AUC respecto al Random Forest depende de la complejidad del problema, pero suele ser de 5-15 puntos.</p>
@@ -958,10 +973,10 @@ Regresión logística:</code></pre>
 <pre><code># A tibble: 4 × 8
   modelo         accuracy   kap mn_log_loss roc_auc f_meas precision recall
   &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;
-1 Reg. logística    0.611 0.214       0.659   0.643  0.652     0.622  0.687
-2 XGBoost           0.595 0.185       0.677   0.625  0.628     0.614  0.642
-3 Random Forest     0.579 0.153       0.678   0.622  0.613     0.6    0.627
-4 Árbol decisión    0.571 0.131       1.34    0.578  0.625     0.584  0.672</code></pre>
+1 Reg. logística    0.611 0.214       0.67    0.626  0.647     0.634  0.662
+2 XGBoost           0.587 0.169       0.684   0.61   0.618     0.618  0.618
+3 Árbol decisión    0.571 0.133       2.99    0.604  0.614     0.597  0.632
+4 Random Forest     0.563 0.114       0.703   0.558  0.615     0.587  0.647</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> La tabla permite comparar los modelos en varias dimensiones. Random Forest y XGBoost suelen tener el mejor AUC, seguidos por la regresión logística y el árbol de decisión. Las diferencias en accuracy pueden ser pequeñas (2-5 puntos porcentuales), lo que plantea la pregunta de si la complejidad adicional de RF o XGBoost se justifica. La precisión y el recall pueden variar: algunos modelos son más conservadores (alta precisión, bajo recall) y otros más agresivos.</p>

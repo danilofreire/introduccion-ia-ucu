@@ -1336,27 +1336,27 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <tr class="odd">
 <td>1</td>
 <td>Configuración y primer chat</td>
-<td>~25 min</td>
+<td>~15 min</td>
 </tr>
 <tr class="even">
 <td>2</td>
 <td>Clasificación de textos</td>
-<td>~35 min</td>
+<td>~20 min</td>
 </tr>
 <tr class="odd">
 <td>3</td>
 <td>Extracción estructurada</td>
-<td>~30 min</td>
+<td>~15 min</td>
 </tr>
 <tr class="even">
 <td>4</td>
 <td>Comparación con LDA</td>
-<td>~30 min</td>
+<td>~10 min</td>
 </tr>
 </tbody>
 </table>
 <p><br></p>
-<p><span class="alert">Usaremos los textos políticos del Día 3 para comparar LLMs con métodos clásicos.</span></p>
+<p><span class="alert">Usaremos los textos políticos del Día 3 para comparar LLMs con métodos clásicos. Material extra en los apéndices.</span></p>
 </div>
 </section></section>
 <section>
@@ -1411,12 +1411,6 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </div>
 </div>
 </div>
-</section>
-<section id="experimentar-con-system-prompts" class="slide level2">
-<h2>Experimentar con system prompts</h2>
-<div style="margin-top: 30px; font-size: 22px;">
-<p><strong>Ejercicio</strong>: Crear tres chats con diferentes personalidades y comparar las respuestas a la misma pregunta.</p>
-</div>
 </section></section>
 <section>
 <section id="parte-2-clasificación-de-textos" class="title-slide slide level1 center" data-background-color="#2d4563">
@@ -1458,12 +1452,6 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <div style="margin-top: 30px; font-size: 22px;">
 
 </div>
-</section>
-<section id="analizar-errores" class="slide level2">
-<h2>Analizar errores</h2>
-<div style="margin-top: 30px; font-size: 22px;">
-
-</div>
 </section></section>
 <section>
 <section id="parte-3-extracción-estructurada" class="title-slide slide level1 center" data-background-color="#2d4563">
@@ -1502,18 +1490,6 @@ e inflación alta.&quot;</code></pre>
 <section id="parsear-el-json" class="slide level2">
 <h2>Parsear el JSON</h2>
 <div style="margin-top: 30px; font-size: 22px;">
-
-</div>
-</section>
-<section id="usar-extract_data-de-ellmer" class="slide level2">
-<h2>Usar extract_data de ellmer</h2>
-<div style="margin-top: 30px; font-size: 18px;">
-
-</div>
-</section>
-<section id="extraer-múltiples-textos" class="slide level2">
-<h2>Extraer múltiples textos</h2>
-<div style="margin-top: 30px; font-size: 18px;">
 
 </div>
 </section></section>
@@ -1592,17 +1568,6 @@ e inflación alta.&quot;</code></pre>
 </ol>
 </div>
 </section>
-<section id="ejercicio-3-extraer-entidades" class="slide level2 scrollable">
-<h2>Ejercicio 3: Extraer entidades</h2>
-<div style="margin-top: 30px; font-size: 22px;">
-<p><strong>Instrucciones:</strong></p>
-<ol type="1">
-<li>Crear un extractor de entidades nombradas (NER)</li>
-<li>Extraer personas, organizaciones y lugares de los textos</li>
-<li>¿Qué entidades aparecen más frecuentemente?</li>
-</ol>
-</div>
-</section>
 <section id="resumen-del-laboratorio" class="slide level2">
 <h2>Resumen del laboratorio</h2>
 <div style="margin-top: 30px; font-size: 24px;">
@@ -1627,7 +1592,57 @@ e inflación alta.&quot;</code></pre>
 </ul>
 </div></div>
 <p><br></p>
-<p><span class="alert">En el próximo laboratorio: análisis de sentimiento, datos sintéticos y auditoría de sesgos.</span></p>
+<p><span class="alert">En el próximo laboratorio: análisis de sentimiento, datos sintéticos y auditoría de sesgos. Material extra en los apéndices.</span></p>
+</div>
+</section></section>
+<section>
+<section id="apéndice-1-experimentar-con-system-prompts" class="title-slide slide level1 center" data-background-color="#2d4563">
+<h1>Apéndice 1: Experimentar con system prompts</h1>
+
+</section>
+<section id="tres-personalidades-misma-pregunta" class="slide level2">
+<h2>Tres personalidades, misma pregunta</h2>
+<div style="margin-top: 30px; font-size: 22px;">
+
+</div>
+</section></section>
+<section>
+<section id="apéndice-2-extract_data-y-análisis-de-errores" class="title-slide slide level1 center" data-background-color="#2d4563">
+<h1>Apéndice 2: extract_data y análisis de errores</h1>
+
+</section>
+<section id="usar-extract_data-de-ellmer" class="slide level2">
+<h2>Usar <code>extract_data</code> de ellmer</h2>
+<div style="margin-top: 30px; font-size: 18px;">
+<p><code>ellmer</code> tiene una función que valida el JSON automáticamente sin necesidad de parsearlo.</p>
+</div>
+</section>
+<section id="extraer-información-en-batch" class="slide level2">
+<h2>Extraer información en batch</h2>
+<div style="margin-top: 30px; font-size: 18px;">
+
+</div>
+</section>
+<section id="analizar-errores-de-clasificación" class="slide level2">
+<h2>Analizar errores de clasificación</h2>
+<div style="margin-top: 30px; font-size: 22px;">
+
+</div>
+</section></section>
+<section>
+<section id="apéndice-3-ejercicio-ner" class="title-slide slide level1 center" data-background-color="#2d4563">
+<h1>Apéndice 3: Ejercicio NER</h1>
+
+</section>
+<section id="extraer-entidades-nombradas" class="slide level2 scrollable">
+<h2>Extraer entidades nombradas</h2>
+<div style="margin-top: 30px; font-size: 22px;">
+<p><strong>Instrucciones:</strong></p>
+<ol type="1">
+<li>Crear un extractor de entidades nombradas (NER)</li>
+<li>Extraer personas, organizaciones y lugares de los textos</li>
+<li>¿Qué entidades aparecen más frecuentemente?</li>
+</ol>
 </div>
 </section></section>
 <section id="continuar-con-el-laboratorio-avanzado" class="title-slide slide level1 center" data-background-color="#2d4563">

@@ -38,6 +38,8 @@ datos |>
 
 # 1. Dimensiones del dataset
 dim(datos)
+nrow(datos)           # solo filas
+ncol(datos)           # solo columnas
 
 # 2. Valores faltantes
 sum(is.na(datos))
@@ -100,7 +102,7 @@ split_50 <- initial_split(datos_modelo, prop = 0.50, strata = crecimiento_alto)
 cat("Train:", nrow(training(split_50)), "/ Test:", nrow(testing(split_50)))
 
 # Sin estratificación: las proporciones pueden diferir
-set.seed(2026)
+set.seed(1234)
 split_sin <- initial_split(datos_modelo, prop = 0.75)
 training(split_sin) |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
 
@@ -133,12 +135,12 @@ tidy(ajuste) |>
 
 # Predecir clases en datos de prueba
 predicciones <- ajuste |>
-  predict(datos_test) |>
-  bind_cols(datos_test)
+  predict(datos_test) |>  # predice clases por defecto
+  bind_cols(datos_test)   # combinar con datos originales para evaluación
 
 predicciones |>
   select(crecimiento_alto, .pred_class) |>
-  head(10)
+  head(8)
 
 # Matriz de confusión
 conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
@@ -169,10 +171,6 @@ predicciones |>
 pred_probs <- ajuste |>
   predict(datos_test, type = "prob") |>
   bind_cols(datos_test)
-
-pred_probs |>
-  select(crecimiento_alto, .pred_no, .pred_si) |>
-  head(10)
 
 # Comparar precision y recall para tres umbrales
 purrr::map_df(c(0.3, 0.5, 0.7), function(u) {

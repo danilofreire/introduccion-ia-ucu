@@ -132,10 +132,18 @@ Los estudiantes deben tener instalado antes del inicio del curso:
 
 ```r
 install.packages(c(
+  # Núcleo
   "tidyverse", "tidymodels",
-  "ranger", "glmnet", "kknn", "rpart", "vip", "pdp",
-  "tidytext", "topicmodels", "textrecipes",
-  "ellmer", "httr2"
+  # Día 2: clasificación, regresión y regularización
+  "ranger", "xgboost", "glmnet", "kknn",
+  "rpart", "rpart.plot", "broom", "vip", "pdp", "patchwork",
+  # Día 3: clustering, PCA y análisis de texto
+  "cluster", "factoextra", "dendextend", "corrplot",
+  "tidytext", "topicmodels", "tm", "ggwordcloud",
+  # Día 4: modelos de lenguaje (LLMs)
+  "ellmer", "jsonlite",
+  # Día 5: auditoría de sesgo algorítmico
+  "fairmodels", "DALEX"
 ))
 ```
 
