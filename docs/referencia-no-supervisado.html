@@ -262,7 +262,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Esta página es una referencia rápida de los comandos de <span class="alert">clustering</span> y <span class="alert">PCA</span> que usamos en la Sesión 3.1 y en el Laboratorio 5. Todos los ejemplos son ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.</p>
+<p>Esta página es una referencia rápida de los comandos de <code>tidyverse</code>, <code>cluster</code> y <code>factoextra</code> que usamos para clustering y PCA en la Sesión 3.1 y en el Laboratorio 5. Todos los ejemplos son ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.</p>
 <p>El flujo típico de un análisis no supervisado es:</p>
 <ol type="1">
 <li>Seleccionar variables numéricas y escalarlas</li>
@@ -321,7 +321,7 @@ $ grupo_real  &lt;chr&gt; "alto", "alto", "alto", "alto", "alto", "alto", "alto"
 </section>
 <section id="preparar-la-matriz-numérica" class="level3" data-number="1.3">
 <h3 data-number="1.3" class="anchored" data-anchor-id="preparar-la-matriz-numérica"><span class="header-section-number">1.3</span> Preparar la matriz numérica</h3>
-<p>K-means y PCA requieren una <span class="alert">matriz numérica escalada</span>. Guardamos los nombres de grupo aparte para usarlos en la validación.</p>
+<p>K-means y PCA requieren una <strong>matriz numérica escalada</strong>. Guardamos los nombres de grupo aparte para usarlos en la validación.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Separar la etiqueta sustantiva (grupo_real) de las variables</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>grupo_real <span class="ot">&lt;-</span> datos<span class="sc">$</span>grupo_real</span>

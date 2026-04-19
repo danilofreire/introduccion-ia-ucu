@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Esta página es una referencia rápida de los comandos de [clustering]{.alert} y [PCA]{.alert} que usamos en la Sesión 3.1 y en el Laboratorio 5. Todos los ejemplos son ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.
+Esta página es una referencia rápida de los comandos de `tidyverse`, `cluster` y `factoextra` que usamos para clustering y PCA en la Sesión 3.1 y en el Laboratorio 5. Todos los ejemplos son ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.
 
 El flujo típico de un análisis no supervisado es:
 
@@ -69,7 +69,7 @@ glimpse(datos)
 
 ### Preparar la matriz numérica
 
-K-means y PCA requieren una [matriz numérica escalada]{.alert}. Guardamos los nombres de grupo aparte para usarlos en la validación.
+K-means y PCA requieren una **matriz numérica escalada**. Guardamos los nombres de grupo aparte para usarlos en la validación.
 
 ```{r preparar-datos}
 # Separar la etiqueta sustantiva (grupo_real) de las variables
