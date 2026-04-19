@@ -1915,7 +1915,7 @@
     "href": "referencia-no-supervisado.html",
     "title": "Referencia rápida: aprendizaje no supervisado en R",
     "section": "",
-    "text": "Esta página es una referencia rápida de los comandos de clustering y PCA que usamos en la Sesión 3.1 y en el Laboratorio 5. Todos los ejemplos son ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.\nEl flujo típico de un análisis no supervisado es:"
+    "text": "Esta página es una referencia rápida de los comandos de tidyverse, cluster y factoextra que usamos para clustering y PCA en la Sesión 3.1 y en el Laboratorio 5. Todos los ejemplos son ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.\nEl flujo típico de un análisis no supervisado es:"
   },
   {
     "objectID": "referencia-no-supervisado.html#paquetes-y-datos-simulados",
