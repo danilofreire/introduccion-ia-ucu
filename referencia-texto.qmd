@@ -1,0 +1,409 @@
+---
+title: "Referencia rápida: análisis de texto en R"
+toc: true
+toc-depth: 3
+number-sections: true
+code-fold: false
+lang: es
+engine: knitr
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4,
+  cache = TRUE
+)
+```
+
+Esta página es una referencia rápida de las funciones de análisis computacional de texto que usamos en la Sesión 3.2 y en el Laboratorio 6. Todos los ejemplos son ejecutables con un corpus simulado pequeño. Pueden copiar y pegar el código en RStudio para practicar.
+
+El flujo típico de análisis de texto es:
+
+1. Cargar el corpus
+2. Tokenizar (una fila por palabra)
+3. Limpiar: stopwords, números, palabras cortas
+4. Calcular frecuencias
+5. Aplicar una representación numérica (bag-of-words, TF-IDF)
+6. Ajustar un modelo (LDA, sentimiento, clasificación)
+7. Validar e interpretar
+
+## Paquetes y corpus simulado
+
+### Cargar paquetes
+
+```{r paquetes}
+library(tidyverse)    # manipulación de datos y visualización
+library(tidytext)     # tokenización tidy, TF-IDF, cast_dtm
+library(topicmodels)  # LDA
+library(tm)           # stopwords en español
+library(ggwordcloud)  # nubes de palabras
+
+set.seed(2026)        # fijar semilla para reproducibilidad
+```
+
+### Crear un corpus simulado
+
+Simulamos 20 textos cortos sobre 4 temas (economía, educación, salud, seguridad). Cada texto imita el vocabulario típico del tema. Usaremos este corpus en toda la página.
+
+```{r corpus-simulado}
+corpus <- tibble(
+  id = 1:20,
+  tema = rep(c("economia", "educacion", "salud", "seguridad"), each = 5),
+  texto = c(
+    # Economía
+    "La inflación subió y el empleo formal sigue estancado en la región",
+    "El crecimiento económico depende de la inversión privada y el empleo",
+    "La deuda pública aumenta y los precios siguen altos en el país",
+    "Políticas fiscales y monetarias deberían estabilizar la inflación",
+    "El desempleo juvenil es un problema grave para la economía",
+    # Educación
+    "Las escuelas públicas necesitan más docentes y mejor infraestructura",
+    "La educación universitaria debería ser gratuita y de calidad",
+    "Los estudiantes enfrentan dificultades de aprendizaje tras la pandemia",
+    "Las universidades deben invertir en investigación y docencia",
+    "La deserción escolar aumenta en las escuelas rurales del país",
+    # Salud
+    "El sistema de salud pública requiere más hospitales y médicos",
+    "La vacunación masiva protegió a millones de personas en la pandemia",
+    "Los hospitales públicos no tienen suficientes recursos ni médicos",
+    "La salud mental es un problema creciente tras la pandemia",
+    "Las políticas de salud deberían priorizar la atención primaria",
+    # Seguridad
+    "La violencia urbana y los robos aumentaron en las ciudades",
+    "El crimen organizado y el narcotráfico amenazan la seguridad pública",
+    "La policía necesita más recursos para combatir la delincuencia",
+    "La inseguridad afecta la calidad de vida en los barrios pobres",
+    "El gobierno debe reducir la violencia con políticas integrales"
+  )
+)
+
+glimpse(corpus)
+```
+
+## Tokenización
+
+### Tokenizar con `unnest_tokens()`
+
+`unnest_tokens()` divide cada texto en palabras, genera una fila por token y convierte todo a minúsculas. Es la función central de `tidytext`.
+
+```{r tokenizar}
+tokens <- corpus |>
+  unnest_tokens(palabra, texto)
+
+head(tokens, 10)
+```
+
+### Otras unidades de tokenización
+
+Cambiando el argumento `token`, podemos trabajar con bigramas, oraciones o caracteres.
+
+```{r tokens-bigramas}
+# Bigramas (pares de palabras consecutivas)
+corpus |>
+  slice(1:2) |>
+  unnest_tokens(bigrama, texto, token = "ngrams", n = 2) |>
+  head(6)
+```
+
+```{r tokens-oraciones}
+# Oraciones
+corpus |>
+  slice(1:2) |>
+  unnest_tokens(oracion, texto, token = "sentences") |>
+  select(id, oracion)
+```
+
+## Limpieza
+
+### Stopwords en español
+
+Las stopwords son palabras muy frecuentes que aportan poco significado ("la", "de", "que"...). `tm::stopwords("spanish")` devuelve una lista estándar. Podemos ampliarla con términos específicos del dominio.
+
+```{r stopwords}
+# Lista base en español
+stop_es <- tibble(palabra = tm::stopwords("spanish"))
+
+nrow(stop_es)
+head(stop_es$palabra, 15)
+```
+
+```{r stopwords-extra}
+# Ampliar con palabras frecuentes poco informativas para nuestro corpus
+extra <- c("más", "país", "países", "región", "sigue", "siendo",
+           "debe", "debería", "deberían", "ser", "siguen")
+
+stop_es <- bind_rows(stop_es, tibble(palabra = extra))
+```
+
+### Quitar stopwords, números y palabras cortas
+
+```{r limpiar}
+tokens_limpios <- tokens |>
+  anti_join(stop_es, by = "palabra") |>
+  filter(!str_detect(palabra, "^[0-9]+$")) |>
+  filter(nchar(palabra) > 2)
+
+# Comparar antes y después
+tibble(
+  etapa = c("con stopwords", "sin stopwords"),
+  n = c(nrow(tokens), nrow(tokens_limpios))
+)
+```
+
+## Frecuencias de palabras
+
+### Palabras más frecuentes del corpus
+
+```{r frecuencias}
+tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  head(10)
+```
+
+### Visualizar las más frecuentes
+
+```{r freq-plot, fig.height=4}
+tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  slice_head(n = 15) |>
+  mutate(palabra = fct_reorder(palabra, n)) |>
+  ggplot(aes(x = n, y = palabra)) +
+  geom_col(fill = "#2d4563") +
+  labs(title = "15 palabras más frecuentes",
+       x = "Frecuencia", y = NULL) +
+  theme_minimal()
+```
+
+### Nube de palabras con `ggwordcloud`
+
+`geom_text_wordcloud()` crea nubes de palabras con la estética de `ggplot2`.
+
+```{r nube, fig.height=4}
+tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  slice_head(n = 50) |>
+  ggplot(aes(label = palabra, size = n, colour = n)) +
+  geom_text_wordcloud(rm_outside = TRUE) +
+  scale_size_area(max_size = 14) +
+  scale_colour_gradient(low = "#457b9d", high = "#e63946") +
+  theme_minimal()
+```
+
+## Bag-of-words
+
+`Bag-of-words` es una representación donde cada documento es un vector de frecuencias. Ignora el orden pero funciona bien para muchos problemas.
+
+```{r bag-of-words}
+bow <- tokens_limpios |>
+  count(id, palabra) |>
+  pivot_wider(names_from = palabra,
+              values_from = n,
+              values_fill = 0)
+
+# Dimensiones: 20 documentos x N términos
+dim(bow)
+
+# Vista parcial
+bow[1:5, 1:6]
+```
+
+## TF-IDF
+
+### Calcular TF-IDF con `bind_tf_idf()`
+
+`bind_tf_idf()` añade tres columnas: `tf` (frecuencia en el documento), `idf` (rareza en el corpus) y `tf_idf` (producto de las dos).
+
+```{r tfidf-calc}
+tfidf <- tokens_limpios |>
+  count(tema, palabra) |>
+  bind_tf_idf(palabra, tema, n)
+
+head(tfidf, 10)
+```
+
+### Palabras más distintivas por tema
+
+Las palabras con `tf_idf` alto son frecuentes en un tema pero raras en el corpus global: son el "vocabulario característico" del tema.
+
+```{r tfidf-top}
+tfidf |>
+  group_by(tema) |>
+  slice_max(tf_idf, n = 3, with_ties = FALSE) |>
+  arrange(tema, desc(tf_idf)) |>
+  select(tema, palabra, tf_idf) |>
+  mutate(tf_idf = round(tf_idf, 3))
+```
+
+### Visualizar TF-IDF por tema
+
+```{r tfidf-viz, fig.height=5}
+tfidf |>
+  group_by(tema) |>
+  slice_max(tf_idf, n = 5, with_ties = FALSE) |>
+  ungroup() |>
+  mutate(palabra = reorder_within(palabra, tf_idf, tema)) |>
+  ggplot(aes(x = tf_idf, y = palabra, fill = tema)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ tema, scales = "free_y", ncol = 2) +
+  scale_y_reordered() +
+  labs(title = "Palabras más distintivas por tema (TF-IDF)",
+       x = "TF-IDF", y = NULL) +
+  theme_minimal()
+```
+
+## Análisis de sentimiento con diccionarios
+
+Un método simple: lista de palabras positivas y negativas, contar apariciones, sumar.
+
+```{r sentimiento}
+pos <- c("crecimiento", "inversión", "calidad", "gratuita",
+         "protegió", "atención", "estabilizar")
+neg <- c("inflación", "estancado", "deuda", "desempleo", "problema",
+         "dificultades", "deserción", "violencia", "crimen",
+         "narcotráfico", "delincuencia", "inseguridad", "pobres",
+         "robos", "grave", "amenaza")
+
+sentimiento <- tokens_limpios |>
+  mutate(valencia = case_when(
+    palabra %in% pos ~  1L,
+    palabra %in% neg ~ -1L,
+    TRUE ~ 0L
+  )) |>
+  group_by(id, tema) |>
+  summarise(puntaje = sum(valencia), .groups = "drop")
+
+# Puntaje promedio por tema
+sentimiento |>
+  group_by(tema) |>
+  summarise(promedio = round(mean(puntaje), 2),
+            n = n())
+```
+
+## Topic modeling con LDA
+
+### Crear la Document-Term Matrix
+
+LDA necesita una matriz documento-término. `cast_dtm()` la construye a partir del formato tidy.
+
+```{r dtm}
+dtm <- tokens_limpios |>
+  count(id, palabra) |>
+  cast_dtm(id, palabra, n)
+
+dtm
+```
+
+### Ajustar LDA
+
+Elegimos `k = 4` porque sabemos que hay 4 temas. En aplicaciones reales, hay que probar varios K y evaluar coherencia.
+
+```{r lda-fit}
+modelo_lda <- LDA(dtm, k = 4,
+                  control = list(seed = 2026))
+modelo_lda
+```
+
+### Palabras más probables por tema (beta)
+
+`beta` es la probabilidad de cada palabra dentro de cada tema. Los valores más altos muestran el "vocabulario característico" del tema según LDA.
+
+```{r lda-beta}
+lda_beta <- tidy(modelo_lda, matrix = "beta")
+
+lda_beta |>
+  group_by(topic) |>
+  slice_max(beta, n = 5, with_ties = FALSE) |>
+  summarise(palabras = paste(term, collapse = ", "))
+```
+
+### Visualizar palabras por tema
+
+```{r lda-viz, fig.height=5}
+lda_beta |>
+  group_by(topic) |>
+  slice_max(beta, n = 6, with_ties = FALSE) |>
+  ungroup() |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(x = beta, y = term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free_y", ncol = 2,
+             labeller = labeller(topic = function(x) paste("Tema", x))) +
+  scale_y_reordered() +
+  labs(title = "Palabras más probables por tema (LDA)",
+       x = "Probabilidad (beta)", y = NULL) +
+  theme_minimal()
+```
+
+### Proporción de temas por documento (gamma)
+
+`gamma` es la proporción de cada tema en cada documento. Suma 1 por documento. Permite asignar cada documento a su tema dominante.
+
+```{r lda-gamma}
+lda_gamma <- tidy(modelo_lda, matrix = "gamma") |>
+  mutate(document = as.integer(document))
+
+head(lda_gamma, 8)
+```
+
+### Validar contra las etiquetas reales
+
+Si LDA funciona, cada tema real debería concentrarse en un solo tema LDA. Una matriz de confusión muestra la correspondencia.
+
+```{r lda-validar}
+clasificacion <- lda_gamma |>
+  group_by(document) |>
+  slice_max(gamma, n = 1) |>
+  ungroup() |>
+  left_join(corpus |> select(id, tema),
+            by = c("document" = "id"))
+
+table(real = clasificacion$tema, lda = clasificacion$topic)
+```
+
+### Heatmap de correspondencia real ↔ LDA
+
+```{r lda-heatmap, fig.height=3.5}
+lda_gamma |>
+  left_join(corpus |> select(id, tema),
+            by = c("document" = "id")) |>
+  group_by(tema, topic) |>
+  summarise(gamma = mean(gamma), .groups = "drop") |>
+  ggplot(aes(x = factor(topic), y = tema, fill = gamma)) +
+  geom_tile() +
+  geom_text(aes(label = round(gamma, 2)), colour = "white") +
+  scale_fill_gradient(low = "#457b9d", high = "#e63946") +
+  labs(x = "Tema LDA", y = "Tema real", fill = "Gamma") +
+  theme_minimal()
+```
+
+## Recomendaciones prácticas
+
+- **Empezar simple**: frecuencias y TF-IDF revelan mucho antes de llegar a LDA.
+- **Ampliar stopwords** con vocabulario específico del corpus. Las listas estándar no cubren todo.
+- **Palabras cortas**: filtrar con `nchar(palabra) > 2` elimina muchas siglas poco útiles.
+- **LDA es inestable** con corpus pequeños: probar varias semillas y distintos K.
+- **Validar siempre** contra lectura manual de una muestra. La clasificación automática puede parecer convincente sin serlo.
+- **TF-IDF funciona por grupo**: si calculan por documento vs. por tema vs. por país, obtendrán resultados distintos.
+- **El orden importa**: anti-join de stopwords antes de filtrar por longitud evita contar tokens vacíos.
+
+## Resumen de funciones
+
+| Función | Paquete | Para qué sirve |
+|---------|---------|----------------|
+| `unnest_tokens()` | tidytext | Tokeniza texto (palabras, bigramas, oraciones) |
+| `anti_join()` | dplyr | Elimina filas que aparecen en otra tabla (útil para stopwords) |
+| `bind_tf_idf()` | tidytext | Calcula TF, IDF y TF-IDF |
+| `cast_dtm()` | tidytext | Convierte formato tidy en Document-Term Matrix |
+| `cast_sparse()` | tidytext | Convierte en matriz dispersa (para SVD, embeddings) |
+| `LDA()` | topicmodels | Ajusta Latent Dirichlet Allocation |
+| `tidy()` | broom / tidytext | Extrae beta o gamma de un modelo LDA |
+| `terms()` | topicmodels | Palabras más probables de cada tema |
+| `stopwords()` | tm | Listas de stopwords en varios idiomas |
+| `geom_text_wordcloud()` | ggwordcloud | Nubes de palabras con `ggplot2` |
+| `reorder_within()` | tidytext | Reordena factores dentro de facets |
+| `scale_y_reordered()` | tidytext | Acompaña `reorder_within()` en gráficos |
+
+Para la referencia de aprendizaje supervisado, ver [Referencia: tidymodels](referencia-tidymodels.qmd). Para clustering y PCA, ver [Referencia: aprendizaje no supervisado](referencia-no-supervisado.qmd).

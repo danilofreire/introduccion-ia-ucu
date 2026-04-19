@@ -28,8 +28,14 @@ website:
         text: Laboratorios
       - href: lecturas.qmd
         text: Lecturas
-      - href: referencia-tidymodels.qmd
-        text: Referencia R
+      - text: Referencia R
+        menu:
+          - href: referencia-tidymodels.qmd
+            text: Supervisado (tidymodels)
+          - href: referencia-no-supervisado.qmd
+            text: No supervisado (clustering y PCA)
+          - href: referencia-texto.qmd
+            text: Análisis de texto
     right:
       - icon: envelope
         href: mailto:danilofreire@gmail.com

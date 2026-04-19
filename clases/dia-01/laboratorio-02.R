@@ -65,7 +65,51 @@ satisfaccion |>
   scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
   labs(title = "Satisfacción por zona", y = "Proporción")
 
-# Más ejemplos (país, género, ingreso vs. educación) en el apéndice.
+
+# --- Apéndice 1: Exploración inicial -------------------------
+
+# 3. Valores faltantes por variable
+colSums(is.na(satisfaccion))
+
+# 4. Resumen de variables numéricas
+satisfaccion |>
+  select(where(is.numeric)) |>
+  summary()
+
+# 5. Distribución por país y zona
+satisfaccion |> count(pais, sort = TRUE)
+satisfaccion |> count(zona)
+
+
+# --- Apéndice 2: Más visualizaciones -------------------------
+
+# 2. Satisfacción por país
+satisfaccion |>
+  count(pais, satisfecho) |>
+  group_by(pais) |>
+  mutate(prop = n / sum(n)) |>
+  filter(satisfecho == "si") |>
+  ggplot(aes(x = reorder(pais, prop), y = prop)) +
+  geom_col(fill = "#27ae60", alpha = 0.8) +
+  coord_flip() +
+  labs(title = "Proporción de satisfechos por país", x = "", y = "Proporción")
+
+# 3. Satisfacción por género
+satisfaccion |>
+  count(genero, satisfecho) |>
+  group_by(genero) |>
+  mutate(prop = n / sum(n)) |>
+  ggplot(aes(x = genero, y = prop, fill = satisfecho)) +
+  geom_col(position = "dodge", alpha = 0.8) +
+  scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
+  labs(title = "Satisfacción por género", y = "Proporción")
+
+# 4. Ingreso vs. educación
+ggplot(satisfaccion, aes(x = educacion_anos, y = ingreso_hogar, color = satisfecho)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("#e74c3c", "#27ae60")) +
+  labs(title = "Ingreso vs. educación por satisfacción")
 
 
 # --- Parte 2: Feature engineering ----------------------------
@@ -96,15 +140,37 @@ satisfaccion <- satisfaccion |>
 # Ejemplo: educación alta
 satisfaccion <- satisfaccion |>
   mutate(
-    educacion_alta = if_else(educacion_anos > 12, "alta", "baja")
+    educacion_alta = if_else(educacion_anos > 12, "alta", "baja"),
+    educacion_alta = factor(educacion_alta)
   )
 
-# Otras opciones (pueden hacer una distinta):
-# grupo_ingreso = cut(ingreso_hogar,
-#                     breaks = quantile(ingreso_hogar, c(0, 1/3, 2/3, 1)),
-#                     labels = c("bajo", "medio", "alto"),
-#                     include.lowest = TRUE)
-# noticias_alto = if_else(consumo_noticias > 5, "alto", "bajo")
+
+# --- Apéndice 3: Crear más features --------------------------
+
+# Una posible solución para cada una de las cuatro opciones sugeridas
+satisfaccion <- satisfaccion |>
+  mutate(
+    # 1. Grupos de ingreso por terciles (ingreso_hogar)
+    grupo_ingreso = cut(ingreso_hogar,
+                        breaks = quantile(ingreso_hogar, c(0, 1/3, 2/3, 1)),
+                        labels = c("bajo", "medio", "alto"),
+                        include.lowest = TRUE),
+
+    # 2. Consumidor alto de noticias (consumo_noticias)
+    noticias_alto = if_else(consumo_noticias > 5, "alto", "bajo"),
+
+    # 3. Baja confianza en el gobierno (confianza_gobierno)
+    confianza_baja = if_else(confianza_gobierno <= 4, "si", "no"),
+
+    # 4. Interacción zona + género
+    zona_genero = paste(zona, genero, sep = "_")
+  )
+
+# Verificar las nuevas variables
+satisfaccion |> count(grupo_ingreso)
+satisfaccion |> count(noticias_alto)
+satisfaccion |> count(confianza_baja)
+satisfaccion |> count(zona_genero)
 
 
 # --- Parte 3: División y modelos -----------------------------

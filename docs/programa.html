@@ -144,10 +144,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="./lecturas.html"> 
 <span class="menu-text">Lecturas</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./referencia-tidymodels.html"> 
-<span class="menu-text">Referencia R</span></a>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-referencia-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Referencia R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
+        <li>
+    <a class="dropdown-item" href="./referencia-tidymodels.html">
+ <span class="dropdown-text">Supervisado (tidymodels)</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./referencia-no-supervisado.html">
+ <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./referencia-texto.html">
+ <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
@@ -355,11 +370,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Paso 2:</strong> Instalar RStudio desde <a href="https://posit.co/download/rstudio-desktop/" class="uri">https://posit.co/download/rstudio-desktop/</a>. RStudio es el entorno de desarrollo que usaremos en el curso. Las versiones recientes ya incluyen Quarto, que necesitaremos para los laboratorios.</p>
 <p><strong>Paso 3:</strong> Abrir RStudio y ejecutar el siguiente código en la consola para instalar todos los paquetes necesarios:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"tidymodels"</span>,</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ranger"</span>, <span class="st">"glmnet"</span>, <span class="st">"kknn"</span>, <span class="st">"rpart"</span>, <span class="st">"vip"</span>, <span class="st">"pdp"</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidytext"</span>, <span class="st">"topicmodels"</span>, <span class="st">"textrecipes"</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ellmer"</span>, <span class="st">"httr2"</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Núcleo</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"tidymodels"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 2: clasificación, regresión y regularización</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ranger"</span>, <span class="st">"xgboost"</span>, <span class="st">"glmnet"</span>, <span class="st">"kknn"</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"rpart"</span>, <span class="st">"rpart.plot"</span>, <span class="st">"broom"</span>, <span class="st">"vip"</span>, <span class="st">"pdp"</span>, <span class="st">"patchwork"</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 3: clustering, PCA y análisis de texto</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"cluster"</span>, <span class="st">"factoextra"</span>, <span class="st">"dendextend"</span>, <span class="st">"corrplot"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidytext"</span>, <span class="st">"topicmodels"</span>, <span class="st">"tm"</span>, <span class="st">"ggwordcloud"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 4: modelos de lenguaje (LLMs)</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ellmer"</span>, <span class="st">"jsonlite"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 5: auditoría de sesgo algorítmico</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fairmodels"</span>, <span class="st">"DALEX"</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <p>La instalación puede tomar unos minutos. Si aparecen errores, asegurarse de tener una conexión a internet estable y de estar usando una versión reciente de R (4.3 o superior).</p>
 <p><strong>Paso 4:</strong> Para verificar que todo funciona, ejecutar:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>

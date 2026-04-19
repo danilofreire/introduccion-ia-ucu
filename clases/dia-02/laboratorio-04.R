@@ -12,17 +12,24 @@
 
 # --- Parte 1: Preparación y baseline -------------------------
 
-# Instalar paquetes (solo la primera vez)
-# install.packages(c("tidyverse", "tidymodels", "glmnet"))
+# Paquetes necesarios
+paquetes <- c("tidyverse", "tidymodels", "glmnet", "ranger", "vip")
 
-library(tidyverse)
+for (pkg in paquetes) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+
 library(tidymodels)
-library(glmnet)   # Motor para LASSO y Ridge
+library(glmnet)   # Motor para LASSO, Ridge, Elastic Net
 
 set.seed(2026)
 
 # Cargar el dataset
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+glimpse(datos)
 
 datos <- datos |>
   mutate(
@@ -45,6 +52,12 @@ division <- initial_split(datos, prop = 0.75)
 datos_train <- training(division)
 datos_test  <- testing(division)
 
+cat("Observaciones en train:", nrow(datos_train), "\n")
+cat("Observaciones en test:", nrow(datos_test), "\n")
+
+cat("\nMedia satisfacción (train):", mean(datos_train$satisfaccion_vida))
+cat("\nMedia satisfacción (test):", mean(datos_test$satisfaccion_vida))
+
 # Receta de preprocesamiento
 receta <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
                  zona + genero + confianza_gobierno + confianza_justicia +
@@ -54,6 +67,9 @@ receta <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())
+
+# Verificar
+receta |> prep() |> juice() |> glimpse()
 
 
 # --- Modelo baseline: OLS ------------------------------------
@@ -78,6 +94,14 @@ metricas_ols <- pred_ols |>
 
 metricas_ols
 
+# Visualizar predicciones vs. reales
+ggplot(pred_ols, aes(x = satisfaccion_vida, y = .pred)) +
+  geom_point(alpha = 0.5) +
+  geom_abline(color = "red", linetype = "dashed") +
+  labs(title = "Predicciones OLS vs. valores reales",
+       x = "Satisfacción real", y = "Satisfacción predicha") +
+  theme_minimal()
+
 
 # --- Parte 2: LASSO con tuning -------------------------------
 
@@ -95,6 +119,8 @@ grilla_lambda <- grid_regular(
   penalty(range = c(-4, 0)),
   levels = 30
 )
+
+head(grilla_lambda)
 
 # 10-fold CV
 folds <- vfold_cv(datos_train, v = 10)
@@ -265,7 +291,66 @@ ggplot(todas_pred, aes(x = satisfaccion_vida, y = .pred)) +
 # ============================================================
 
 
-# --- Opcional: Elastic Net ----------------------------------
+# --- Apéndice 2: Interacciones -------------------------------
+
+receta_interact <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
+                          zona + genero + confianza_gobierno + confianza_justicia +
+                          satisfaccion_democracia + percepcion_economia +
+                          uso_internet + interes_politica,
+                          data = datos_train) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_interact(terms = ~ edad:educacion_anios) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_zv(all_predictors())
+
+wf_lasso_interact <- workflow() |>
+  add_recipe(receta_interact) |>
+  add_model(modelo_lasso)
+
+resultados_interact <- tune_grid(
+  wf_lasso_interact, resamples = folds,
+  grid = grilla_lambda, metrics = metric_set(rmse)
+)
+
+mejor_interact <- select_best(resultados_interact, metric = "rmse")
+ajuste_interact <- finalize_workflow(wf_lasso_interact, mejor_interact) |>
+  fit(data = datos_train)
+
+tidy(ajuste_interact) |>
+  filter(term != "(Intercept)") |>
+  arrange(desc(abs(estimate)))
+
+
+# --- Apéndice 3: Países como predictores ---------------------
+
+receta_pais <- recipe(satisfaccion_vida ~ ., data = datos_train) |>
+  step_rm(voto) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_zv(all_predictors())
+
+wf_lasso_pais <- workflow() |>
+  add_recipe(receta_pais) |>
+  add_model(modelo_lasso)
+
+resultados_pais <- tune_grid(
+  wf_lasso_pais, resamples = folds,
+  grid = grilla_lambda, metrics = metric_set(rmse)
+)
+
+mejor_pais <- select_best(resultados_pais, metric = "rmse")
+ajuste_pais <- finalize_workflow(wf_lasso_pais, mejor_pais) |>
+  fit(data = datos_train)
+
+coef_pais <- tidy(ajuste_pais) |>
+  filter(str_detect(term, "pais"), estimate != 0) |>
+  arrange(desc(abs(estimate)))
+
+cat("Países con coeficiente distinto de cero:", nrow(coef_pais), "\n")
+coef_pais
+
+
+# --- Apéndice 4: Elastic Net ---------------------------------
 
 modelo_enet <- linear_reg(penalty = tune(), mixture = tune()) |>
   set_engine("glmnet") |>
@@ -288,6 +373,8 @@ resultados_enet <- tune_grid(
 )
 
 mejor_enet <- select_best(resultados_enet, metric = "rmse")
+mejor_enet
+
 ajuste_enet <- finalize_workflow(wf_enet, mejor_enet) |>
   fit(data = datos_train)
 
@@ -297,10 +384,7 @@ pred_enet <- predict(ajuste_enet, datos_test) |>
 pred_enet |> metrics(truth = satisfaccion_vida, estimate = .pred)
 
 
-# --- Opcional: Random Forest para regresión -----------------
-
-# install.packages("ranger")
-# library(ranger)
+# --- Apéndice 5: Random Forest para regresión ----------------
 
 modelo_rf <- rand_forest(
   trees = 500,
@@ -333,62 +417,3 @@ pred_rf <- predict(ajuste_rf, datos_test) |>
   bind_cols(datos_test |> select(satisfaccion_vida))
 
 pred_rf |> metrics(truth = satisfaccion_vida, estimate = .pred)
-
-
-# --- Opcional: Agregar interacciones -------------------------
-
-receta_interact <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
-                          zona + genero + confianza_gobierno + confianza_justicia +
-                          satisfaccion_democracia + percepcion_economia +
-                          uso_internet + interes_politica,
-                          data = datos_train) |>
-  step_dummy(all_nominal_predictors()) |>
-  step_interact(terms = ~ edad:educacion_anios) |>
-  step_normalize(all_numeric_predictors()) |>
-  step_zv(all_predictors())
-
-wf_lasso_interact <- workflow() |>
-  add_recipe(receta_interact) |>
-  add_model(modelo_lasso)
-
-resultados_interact <- tune_grid(
-  wf_lasso_interact, resamples = folds,
-  grid = grilla_lambda, metrics = metric_set(rmse)
-)
-
-mejor_interact <- select_best(resultados_interact, metric = "rmse")
-ajuste_interact <- finalize_workflow(wf_lasso_interact, mejor_interact) |>
-  fit(data = datos_train)
-
-tidy(ajuste_interact) |>
-  filter(term != "(Intercept)") |>
-  arrange(desc(abs(estimate)))
-
-
-# --- Opcional: Países como predictores -----------------------
-
-receta_pais <- recipe(satisfaccion_vida ~ ., data = datos_train) |>
-  step_rm(voto) |>
-  step_dummy(all_nominal_predictors()) |>
-  step_normalize(all_numeric_predictors()) |>
-  step_zv(all_predictors())
-
-wf_lasso_pais <- workflow() |>
-  add_recipe(receta_pais) |>
-  add_model(modelo_lasso)
-
-resultados_pais <- tune_grid(
-  wf_lasso_pais, resamples = folds,
-  grid = grilla_lambda, metrics = metric_set(rmse)
-)
-
-mejor_pais <- select_best(resultados_pais, metric = "rmse")
-ajuste_pais <- finalize_workflow(wf_lasso_pais, mejor_pais) |>
-  fit(data = datos_train)
-
-coef_pais <- tidy(ajuste_pais) |>
-  filter(str_detect(term, "pais"), estimate != 0) |>
-  arrange(desc(abs(estimate)))
-
-cat("Países con coeficiente distinto de cero:", nrow(coef_pais), "\n")
-coef_pais

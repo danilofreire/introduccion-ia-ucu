@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Referencia rápida: análisis de texto en R – IA para Científicos Sociales</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">IA para Científicos Sociales</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./programa.html"> 
+<span class="menu-text">Programa</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./laboratorios.html"> 
+<span class="menu-text">Laboratorios</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./lecturas.html"> 
+<span class="menu-text">Lecturas</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-referencia-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Referencia R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
+        <li>
+    <a class="dropdown-item" href="./referencia-tidymodels.html">
+ <span class="dropdown-text">Supervisado (tidymodels)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./referencia-no-supervisado.html">
+ <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./referencia-texto.html">
+ <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:danilofreire@gmail.com"> <i class="bi bi-envelope" role="img" aria-label="Email">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/danilofreire/introduccion-ia-ucu"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Alternar modo lector">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#paquetes-y-corpus-simulado" id="toc-paquetes-y-corpus-simulado" class="nav-link active" data-scroll-target="#paquetes-y-corpus-simulado"><span class="header-section-number">1</span> Paquetes y corpus simulado</a>
+  <ul class="collapse">
+  <li><a href="#cargar-paquetes" id="toc-cargar-paquetes" class="nav-link" data-scroll-target="#cargar-paquetes"><span class="header-section-number">1.1</span> Cargar paquetes</a></li>
+  <li><a href="#crear-un-corpus-simulado" id="toc-crear-un-corpus-simulado" class="nav-link" data-scroll-target="#crear-un-corpus-simulado"><span class="header-section-number">1.2</span> Crear un corpus simulado</a></li>
+  </ul></li>
+  <li><a href="#tokenización" id="toc-tokenización" class="nav-link" data-scroll-target="#tokenización"><span class="header-section-number">2</span> Tokenización</a>
+  <ul class="collapse">
+  <li><a href="#tokenizar-con-unnest_tokens" id="toc-tokenizar-con-unnest_tokens" class="nav-link" data-scroll-target="#tokenizar-con-unnest_tokens"><span class="header-section-number">2.1</span> Tokenizar con <code>unnest_tokens()</code></a></li>
+  <li><a href="#otras-unidades-de-tokenización" id="toc-otras-unidades-de-tokenización" class="nav-link" data-scroll-target="#otras-unidades-de-tokenización"><span class="header-section-number">2.2</span> Otras unidades de tokenización</a></li>
+  </ul></li>
+  <li><a href="#limpieza" id="toc-limpieza" class="nav-link" data-scroll-target="#limpieza"><span class="header-section-number">3</span> Limpieza</a>
+  <ul class="collapse">
+  <li><a href="#stopwords-en-español" id="toc-stopwords-en-español" class="nav-link" data-scroll-target="#stopwords-en-español"><span class="header-section-number">3.1</span> Stopwords en español</a></li>
+  <li><a href="#quitar-stopwords-números-y-palabras-cortas" id="toc-quitar-stopwords-números-y-palabras-cortas" class="nav-link" data-scroll-target="#quitar-stopwords-números-y-palabras-cortas"><span class="header-section-number">3.2</span> Quitar stopwords, números y palabras cortas</a></li>
+  </ul></li>
+  <li><a href="#frecuencias-de-palabras" id="toc-frecuencias-de-palabras" class="nav-link" data-scroll-target="#frecuencias-de-palabras"><span class="header-section-number">4</span> Frecuencias de palabras</a>
+  <ul class="collapse">
+  <li><a href="#palabras-más-frecuentes-del-corpus" id="toc-palabras-más-frecuentes-del-corpus" class="nav-link" data-scroll-target="#palabras-más-frecuentes-del-corpus"><span class="header-section-number">4.1</span> Palabras más frecuentes del corpus</a></li>
+  <li><a href="#visualizar-las-más-frecuentes" id="toc-visualizar-las-más-frecuentes" class="nav-link" data-scroll-target="#visualizar-las-más-frecuentes"><span class="header-section-number">4.2</span> Visualizar las más frecuentes</a></li>
+  <li><a href="#nube-de-palabras-con-ggwordcloud" id="toc-nube-de-palabras-con-ggwordcloud" class="nav-link" data-scroll-target="#nube-de-palabras-con-ggwordcloud"><span class="header-section-number">4.3</span> Nube de palabras con <code>ggwordcloud</code></a></li>
+  </ul></li>
+  <li><a href="#bag-of-words" id="toc-bag-of-words" class="nav-link" data-scroll-target="#bag-of-words"><span class="header-section-number">5</span> Bag-of-words</a></li>
+  <li><a href="#tf-idf" id="toc-tf-idf" class="nav-link" data-scroll-target="#tf-idf"><span class="header-section-number">6</span> TF-IDF</a>
+  <ul class="collapse">
+  <li><a href="#calcular-tf-idf-con-bind_tf_idf" id="toc-calcular-tf-idf-con-bind_tf_idf" class="nav-link" data-scroll-target="#calcular-tf-idf-con-bind_tf_idf"><span class="header-section-number">6.1</span> Calcular TF-IDF con <code>bind_tf_idf()</code></a></li>
+  <li><a href="#palabras-más-distintivas-por-tema" id="toc-palabras-más-distintivas-por-tema" class="nav-link" data-scroll-target="#palabras-más-distintivas-por-tema"><span class="header-section-number">6.2</span> Palabras más distintivas por tema</a></li>
+  <li><a href="#visualizar-tf-idf-por-tema" id="toc-visualizar-tf-idf-por-tema" class="nav-link" data-scroll-target="#visualizar-tf-idf-por-tema"><span class="header-section-number">6.3</span> Visualizar TF-IDF por tema</a></li>
+  </ul></li>
+  <li><a href="#análisis-de-sentimiento-con-diccionarios" id="toc-análisis-de-sentimiento-con-diccionarios" class="nav-link" data-scroll-target="#análisis-de-sentimiento-con-diccionarios"><span class="header-section-number">7</span> Análisis de sentimiento con diccionarios</a></li>
+  <li><a href="#topic-modeling-con-lda" id="toc-topic-modeling-con-lda" class="nav-link" data-scroll-target="#topic-modeling-con-lda"><span class="header-section-number">8</span> Topic modeling con LDA</a>
+  <ul class="collapse">
+  <li><a href="#crear-la-document-term-matrix" id="toc-crear-la-document-term-matrix" class="nav-link" data-scroll-target="#crear-la-document-term-matrix"><span class="header-section-number">8.1</span> Crear la Document-Term Matrix</a></li>
+  <li><a href="#ajustar-lda" id="toc-ajustar-lda" class="nav-link" data-scroll-target="#ajustar-lda"><span class="header-section-number">8.2</span> Ajustar LDA</a></li>
+  <li><a href="#palabras-más-probables-por-tema-beta" id="toc-palabras-más-probables-por-tema-beta" class="nav-link" data-scroll-target="#palabras-más-probables-por-tema-beta"><span class="header-section-number">8.3</span> Palabras más probables por tema (beta)</a></li>
+  <li><a href="#visualizar-palabras-por-tema" id="toc-visualizar-palabras-por-tema" class="nav-link" data-scroll-target="#visualizar-palabras-por-tema"><span class="header-section-number">8.4</span> Visualizar palabras por tema</a></li>
+  <li><a href="#proporción-de-temas-por-documento-gamma" id="toc-proporción-de-temas-por-documento-gamma" class="nav-link" data-scroll-target="#proporción-de-temas-por-documento-gamma"><span class="header-section-number">8.5</span> Proporción de temas por documento (gamma)</a></li>
+  <li><a href="#validar-contra-las-etiquetas-reales" id="toc-validar-contra-las-etiquetas-reales" class="nav-link" data-scroll-target="#validar-contra-las-etiquetas-reales"><span class="header-section-number">8.6</span> Validar contra las etiquetas reales</a></li>
+  <li><a href="#heatmap-de-correspondencia-real-lda" id="toc-heatmap-de-correspondencia-real-lda" class="nav-link" data-scroll-target="#heatmap-de-correspondencia-real-lda"><span class="header-section-number">8.7</span> Heatmap de correspondencia real ↔︎ LDA</a></li>
+  </ul></li>
+  <li><a href="#recomendaciones-prácticas" id="toc-recomendaciones-prácticas" class="nav-link" data-scroll-target="#recomendaciones-prácticas"><span class="header-section-number">9</span> Recomendaciones prácticas</a></li>
+  <li><a href="#resumen-de-funciones" id="toc-resumen-de-funciones" class="nav-link" data-scroll-target="#resumen-de-funciones"><span class="header-section-number">10</span> Resumen de funciones</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/referencia-texto.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Referencia rápida: análisis de texto en R</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Esta página es una referencia rápida de las funciones de análisis computacional de texto que usamos en la Sesión 3.2 y en el Laboratorio 6. Todos los ejemplos son ejecutables con un corpus simulado pequeño. Pueden copiar y pegar el código en RStudio para practicar.</p>
+<p>El flujo típico de análisis de texto es:</p>
+<ol type="1">
+<li>Cargar el corpus</li>
+<li>Tokenizar (una fila por palabra)</li>
+<li>Limpiar: stopwords, números, palabras cortas</li>
+<li>Calcular frecuencias</li>
+<li>Aplicar una representación numérica (bag-of-words, TF-IDF)</li>
+<li>Ajustar un modelo (LDA, sentimiento, clasificación)</li>
+<li>Validar e interpretar</li>
+</ol>
+<section id="paquetes-y-corpus-simulado" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="paquetes-y-corpus-simulado"><span class="header-section-number">1</span> Paquetes y corpus simulado</h2>
+<section id="cargar-paquetes" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="cargar-paquetes"><span class="header-section-number">1.1</span> Cargar paquetes</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)    <span class="co"># manipulación de datos y visualización</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext)     <span class="co"># tokenización tidy, TF-IDF, cast_dtm</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(topicmodels)  <span class="co"># LDA</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tm)           <span class="co"># stopwords en español</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggwordcloud)  <span class="co"># nubes de palabras</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)        <span class="co"># fijar semilla para reproducibilidad</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="crear-un-corpus-simulado" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="crear-un-corpus-simulado"><span class="header-section-number">1.2</span> Crear un corpus simulado</h3>
+<p>Simulamos 20 textos cortos sobre 4 temas (economía, educación, salud, seguridad). Cada texto imita el vocabulario típico del tema. Usaremos este corpus en toda la página.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">tema =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"economia"</span>, <span class="st">"educacion"</span>, <span class="st">"salud"</span>, <span class="st">"seguridad"</span>), <span class="at">each =</span> <span class="dv">5</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">texto =</span> <span class="fu">c</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Economía</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La inflación subió y el empleo formal sigue estancado en la región"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El crecimiento económico depende de la inversión privada y el empleo"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La deuda pública aumenta y los precios siguen altos en el país"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Políticas fiscales y monetarias deberían estabilizar la inflación"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El desempleo juvenil es un problema grave para la economía"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Educación</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Las escuelas públicas necesitan más docentes y mejor infraestructura"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La educación universitaria debería ser gratuita y de calidad"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Los estudiantes enfrentan dificultades de aprendizaje tras la pandemia"</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Las universidades deben invertir en investigación y docencia"</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La deserción escolar aumenta en las escuelas rurales del país"</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Salud</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El sistema de salud pública requiere más hospitales y médicos"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La vacunación masiva protegió a millones de personas en la pandemia"</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Los hospitales públicos no tienen suficientes recursos ni médicos"</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La salud mental es un problema creciente tras la pandemia"</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Las políticas de salud deberían priorizar la atención primaria"</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Seguridad</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La violencia urbana y los robos aumentaron en las ciudades"</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El crimen organizado y el narcotráfico amenazan la seguridad pública"</span>,</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La policía necesita más recursos para combatir la delincuencia"</span>,</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La inseguridad afecta la calidad de vida en los barrios pobres"</span>,</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El gobierno debe reducir la violencia con políticas integrales"</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(corpus)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 20
+Columns: 3
+$ id    &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1…
+$ tema  &lt;chr&gt; "economia", "economia", "economia", "economia", "economia", "edu…
+$ texto &lt;chr&gt; "La inflación subió y el empleo formal sigue estancado en la reg…</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="tokenización" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="tokenización"><span class="header-section-number">2</span> Tokenización</h2>
+<section id="tokenizar-con-unnest_tokens" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="tokenizar-con-unnest_tokens"><span class="header-section-number">2.1</span> Tokenizar con <code>unnest_tokens()</code></h3>
+<p><code>unnest_tokens()</code> divide cada texto en palabras, genera una fila por token y convierte todo a minúsculas. Es la función central de <code>tidytext</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>tokens <span class="ot">&lt;-</span> corpus <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(palabra, texto)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tokens, <span class="dv">10</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 3
+      id tema     palabra  
+   &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;    
+ 1     1 economia la       
+ 2     1 economia inflación
+ 3     1 economia subió    
+ 4     1 economia y        
+ 5     1 economia el       
+ 6     1 economia empleo   
+ 7     1 economia formal   
+ 8     1 economia sigue    
+ 9     1 economia estancado
+10     1 economia en       </code></pre>
+</div>
+</div>
+</section>
+<section id="otras-unidades-de-tokenización" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="otras-unidades-de-tokenización"><span class="header-section-number">2.2</span> Otras unidades de tokenización</h3>
+<p>Cambiando el argumento <code>token</code>, podemos trabajar con bigramas, oraciones o caracteres.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bigramas (pares de palabras consecutivas)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>corpus <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(bigrama, texto, <span class="at">token =</span> <span class="st">"ngrams"</span>, <span class="at">n =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">6</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+     id tema     bigrama        
+  &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;          
+1     1 economia la inflación   
+2     1 economia inflación subió
+3     1 economia subió y        
+4     1 economia y el           
+5     1 economia el empleo      
+6     1 economia empleo formal  </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Oraciones</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>corpus <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(oracion, texto, <span class="at">token =</span> <span class="st">"sentences"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, oracion)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+     id oracion                                                             
+  &lt;int&gt; &lt;chr&gt;                                                               
+1     1 la inflación subió y el empleo formal sigue estancado en la región  
+2     2 el crecimiento económico depende de la inversión privada y el empleo</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="limpieza" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="limpieza"><span class="header-section-number">3</span> Limpieza</h2>
+<section id="stopwords-en-español" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="stopwords-en-español"><span class="header-section-number">3.1</span> Stopwords en español</h3>
+<p>Las stopwords son palabras muy frecuentes que aportan poco significado (“la”, “de”, “que”…). <code>tm::stopwords("spanish")</code> devuelve una lista estándar. Podemos ampliarla con términos específicos del dominio.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista base en español</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>stop_es <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">palabra =</span> tm<span class="sc">::</span><span class="fu">stopwords</span>(<span class="st">"spanish"</span>))</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(stop_es)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 308</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(stop_es<span class="sc">$</span>palabra, <span class="dv">15</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "de"   "la"   "que"  "el"   "en"   "y"    "a"    "los"  "del"  "se"  
+[11] "las"  "por"  "un"   "para" "con" </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ampliar con palabras frecuentes poco informativas para nuestro corpus</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>extra <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"más"</span>, <span class="st">"país"</span>, <span class="st">"países"</span>, <span class="st">"región"</span>, <span class="st">"sigue"</span>, <span class="st">"siendo"</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>           <span class="st">"debe"</span>, <span class="st">"debería"</span>, <span class="st">"deberían"</span>, <span class="st">"ser"</span>, <span class="st">"siguen"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>stop_es <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(stop_es, <span class="fu">tibble</span>(<span class="at">palabra =</span> extra))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="quitar-stopwords-números-y-palabras-cortas" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="quitar-stopwords-números-y-palabras-cortas"><span class="header-section-number">3.2</span> Quitar stopwords, números y palabras cortas</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>tokens_limpios <span class="ot">&lt;-</span> tokens <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(stop_es, <span class="at">by =</span> <span class="st">"palabra"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(palabra, <span class="st">"^[0-9]+$"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">nchar</span>(palabra) <span class="sc">&gt;</span> <span class="dv">2</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparar antes y después</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">etapa =</span> <span class="fu">c</span>(<span class="st">"con stopwords"</span>, <span class="st">"sin stopwords"</span>),</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">n =</span> <span class="fu">c</span>(<span class="fu">nrow</span>(tokens), <span class="fu">nrow</span>(tokens_limpios))</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  etapa             n
+  &lt;chr&gt;         &lt;int&gt;
+1 con stopwords   196
+2 sin stopwords   107</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="frecuencias-de-palabras" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="frecuencias-de-palabras"><span class="header-section-number">4</span> Frecuencias de palabras</h2>
+<section id="palabras-más-frecuentes-del-corpus" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="palabras-más-frecuentes-del-corpus"><span class="header-section-number">4.1</span> Palabras más frecuentes del corpus</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(palabra, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 2
+   palabra        n
+   &lt;chr&gt;      &lt;int&gt;
+ 1 pandemia       3
+ 2 políticas      3
+ 3 pública        3
+ 4 salud          3
+ 5 aumenta        2
+ 6 calidad        2
+ 7 empleo         2
+ 8 escuelas       2
+ 9 hospitales     2
+10 inflación      2</code></pre>
+</div>
+</div>
+</section>
+<section id="visualizar-las-más-frecuentes" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="visualizar-las-más-frecuentes"><span class="header-section-number">4.2</span> Visualizar las más frecuentes</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(palabra, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">15</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">palabra =</span> <span class="fu">fct_reorder</span>(palabra, n)) <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> n, <span class="at">y =</span> palabra)) <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2d4563"</span>) <span class="sc">+</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"15 palabras más frecuentes"</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Frecuencia"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-texto_files/figure-html/freq-plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="nube-de-palabras-con-ggwordcloud" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="nube-de-palabras-con-ggwordcloud"><span class="header-section-number">4.3</span> Nube de palabras con <code>ggwordcloud</code></h3>
+<p><code>geom_text_wordcloud()</code> crea nubes de palabras con la estética de <code>ggplot2</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(palabra, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">50</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">label =</span> palabra, <span class="at">size =</span> n, <span class="at">colour =</span> n)) <span class="sc">+</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_wordcloud</span>(<span class="at">rm_outside =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_size_area</span>(<span class="at">max_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_gradient</span>(<span class="at">low =</span> <span class="st">"#457b9d"</span>, <span class="at">high =</span> <span class="st">"#e63946"</span>) <span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-texto_files/figure-html/nube-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="bag-of-words" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="bag-of-words"><span class="header-section-number">5</span> Bag-of-words</h2>
+<p><code>Bag-of-words</code> es una representación donde cada documento es un vector de frecuencias. Ignora el orden pero funciona bien para muchos problemas.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>bow <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(id, palabra) <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> palabra,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_from =</span> n,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">values_fill =</span> <span class="dv">0</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Dimensiones: 20 documentos x N términos</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(bow)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20 89</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Vista parcial</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>bow[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 6
+     id empleo estancado formal inflación subió
+  &lt;int&gt;  &lt;int&gt;     &lt;int&gt;  &lt;int&gt;     &lt;int&gt; &lt;int&gt;
+1     1      1         1      1         1     1
+2     2      1         0      0         0     0
+3     3      0         0      0         0     0
+4     4      0         0      0         1     0
+5     5      0         0      0         0     0</code></pre>
+</div>
+</div>
+</section>
+<section id="tf-idf" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="tf-idf"><span class="header-section-number">6</span> TF-IDF</h2>
+<section id="calcular-tf-idf-con-bind_tf_idf" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="calcular-tf-idf-con-bind_tf_idf"><span class="header-section-number">6.1</span> Calcular TF-IDF con <code>bind_tf_idf()</code></h3>
+<p><code>bind_tf_idf()</code> añade tres columnas: <code>tf</code> (frecuencia en el documento), <code>idf</code> (rareza en el corpus) y <code>tf_idf</code> (producto de las dos).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>tfidf <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(tema, palabra) <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, tema, n)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tfidf, <span class="dv">10</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 6
+   tema     palabra         n     tf   idf tf_idf
+   &lt;chr&gt;    &lt;chr&gt;       &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+ 1 economia altos           1 0.0385 1.39  0.0533
+ 2 economia aumenta         1 0.0385 0.693 0.0267
+ 3 economia crecimiento     1 0.0385 1.39  0.0533
+ 4 economia depende         1 0.0385 1.39  0.0533
+ 5 economia desempleo       1 0.0385 1.39  0.0533
+ 6 economia deuda           1 0.0385 1.39  0.0533
+ 7 economia economía        1 0.0385 1.39  0.0533
+ 8 economia económico       1 0.0385 1.39  0.0533
+ 9 economia empleo          2 0.0769 1.39  0.107 
+10 economia estabilizar     1 0.0385 1.39  0.0533</code></pre>
+</div>
+</div>
+</section>
+<section id="palabras-más-distintivas-por-tema" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="palabras-más-distintivas-por-tema"><span class="header-section-number">6.2</span> Palabras más distintivas por tema</h3>
+<p>Las palabras con <code>tf_idf</code> alto son frecuentes en un tema pero raras en el corpus global: son el “vocabulario característico” del tema.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>tfidf <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tema) <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">3</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(tema, <span class="fu">desc</span>(tf_idf)) <span class="sc">|&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tema, palabra, tf_idf) <span class="sc">|&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tf_idf =</span> <span class="fu">round</span>(tf_idf, <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 12 × 3
+# Groups:   tema [4]
+   tema      palabra     tf_idf
+   &lt;chr&gt;     &lt;chr&gt;        &lt;dbl&gt;
+ 1 economia  empleo       0.107
+ 2 economia  inflación    0.107
+ 3 economia  altos        0.053
+ 4 educacion escuelas     0.107
+ 5 educacion aprendizaje  0.053
+ 6 educacion deben        0.053
+ 7 salud     salud        0.149
+ 8 salud     hospitales   0.099
+ 9 salud     médicos      0.099
+10 seguridad violencia    0.103
+11 seguridad afecta       0.051
+12 seguridad amenazan     0.051</code></pre>
+</div>
+</div>
+</section>
+<section id="visualizar-tf-idf-por-tema" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="visualizar-tf-idf-por-tema"><span class="header-section-number">6.3</span> Visualizar TF-IDF por tema</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>tfidf <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tema) <span class="sc">|&gt;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">palabra =</span> <span class="fu">reorder_within</span>(palabra, tf_idf, tema)) <span class="sc">|&gt;</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tf_idf, <span class="at">y =</span> palabra, <span class="at">fill =</span> tema)) <span class="sc">+</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> tema, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reordered</span>() <span class="sc">+</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Palabras más distintivas por tema (TF-IDF)"</span>,</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"TF-IDF"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-texto_files/figure-html/tfidf-viz-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="análisis-de-sentimiento-con-diccionarios" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="análisis-de-sentimiento-con-diccionarios"><span class="header-section-number">7</span> Análisis de sentimiento con diccionarios</h2>
+<p>Un método simple: lista de palabras positivas y negativas, contar apariciones, sumar.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>pos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"crecimiento"</span>, <span class="st">"inversión"</span>, <span class="st">"calidad"</span>, <span class="st">"gratuita"</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>         <span class="st">"protegió"</span>, <span class="st">"atención"</span>, <span class="st">"estabilizar"</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>neg <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"inflación"</span>, <span class="st">"estancado"</span>, <span class="st">"deuda"</span>, <span class="st">"desempleo"</span>, <span class="st">"problema"</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>         <span class="st">"dificultades"</span>, <span class="st">"deserción"</span>, <span class="st">"violencia"</span>, <span class="st">"crimen"</span>,</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>         <span class="st">"narcotráfico"</span>, <span class="st">"delincuencia"</span>, <span class="st">"inseguridad"</span>, <span class="st">"pobres"</span>,</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>         <span class="st">"robos"</span>, <span class="st">"grave"</span>, <span class="st">"amenaza"</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>sentimiento <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">valencia =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> pos <span class="sc">~</span>  <span class="dv">1</span>L,</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> neg <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span>L,</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>L</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id, tema) <span class="sc">|&gt;</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">puntaje =</span> <span class="fu">sum</span>(valencia), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Puntaje promedio por tema</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>sentimiento <span class="sc">|&gt;</span></span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tema) <span class="sc">|&gt;</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">promedio =</span> <span class="fu">round</span>(<span class="fu">mean</span>(puntaje), <span class="dv">2</span>),</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">n =</span> <span class="fu">n</span>())</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  tema      promedio     n
+  &lt;chr&gt;        &lt;dbl&gt; &lt;int&gt;
+1 economia      -0.8     5
+2 educacion      0       5
+3 salud          0.2     5
+4 seguridad     -1.4     5</code></pre>
+</div>
+</div>
+</section>
+<section id="topic-modeling-con-lda" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="topic-modeling-con-lda"><span class="header-section-number">8</span> Topic modeling con LDA</h2>
+<section id="crear-la-document-term-matrix" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="crear-la-document-term-matrix"><span class="header-section-number">8.1</span> Crear la Document-Term Matrix</h3>
+<p>LDA necesita una matriz documento-término. <code>cast_dtm()</code> la construye a partir del formato tidy.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>dtm <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(id, palabra) <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cast_dtm</span>(id, palabra, n)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>dtm</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;&lt;DocumentTermMatrix (documents: 20, terms: 88)&gt;&gt;
+Non-/sparse entries: 107/1653
+Sparsity           : 94%
+Maximal term length: 15
+Weighting          : term frequency (tf)</code></pre>
+</div>
+</div>
+</section>
+<section id="ajustar-lda" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="ajustar-lda"><span class="header-section-number">8.2</span> Ajustar LDA</h3>
+<p>Elegimos <code>k = 4</code> porque sabemos que hay 4 temas. En aplicaciones reales, hay que probar varios K y evaluar coherencia.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>modelo_lda <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dtm, <span class="at">k =</span> <span class="dv">4</span>,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">control =</span> <span class="fu">list</span>(<span class="at">seed =</span> <span class="dv">2026</span>))</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>modelo_lda</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>A LDA_VEM topic model with 4 topics.</code></pre>
+</div>
+</div>
+</section>
+<section id="palabras-más-probables-por-tema-beta" class="level3" data-number="8.3">
+<h3 data-number="8.3" class="anchored" data-anchor-id="palabras-más-probables-por-tema-beta"><span class="header-section-number">8.3</span> Palabras más probables por tema (beta)</h3>
+<p><code>beta</code> es la probabilidad de cada palabra dentro de cada tema. Los valores más altos muestran el “vocabulario característico” del tema según LDA.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>lda_beta <span class="ot">&lt;-</span> <span class="fu">tidy</span>(modelo_lda, <span class="at">matrix =</span> <span class="st">"beta"</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>lda_beta <span class="sc">|&gt;</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(topic) <span class="sc">|&gt;</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(beta, <span class="at">n =</span> <span class="dv">5</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">palabras =</span> <span class="fu">paste</span>(term, <span class="at">collapse =</span> <span class="st">", "</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  topic palabras                                              
+  &lt;int&gt; &lt;chr&gt;                                                 
+1     1 calidad, políticas, educación, gratuita, universitaria
+2     2 pandemia, tras, violencia, empleo, crecimiento        
+3     3 inflación, empleo, estancado, formal, subió           
+4     4 aumenta, pública, escuelas, altos, deuda              </code></pre>
+</div>
+</div>
+</section>
+<section id="visualizar-palabras-por-tema" class="level3" data-number="8.4">
+<h3 data-number="8.4" class="anchored" data-anchor-id="visualizar-palabras-por-tema"><span class="header-section-number">8.4</span> Visualizar palabras por tema</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>lda_beta <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(topic) <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(beta, <span class="at">n =</span> <span class="dv">6</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">term =</span> <span class="fu">reorder_within</span>(term, beta, topic)) <span class="sc">|&gt;</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> beta, <span class="at">y =</span> term, <span class="at">fill =</span> <span class="fu">factor</span>(topic))) <span class="sc">+</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> topic, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">2</span>,</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">labeller =</span> <span class="fu">labeller</span>(<span class="at">topic =</span> <span class="cf">function</span>(x) <span class="fu">paste</span>(<span class="st">"Tema"</span>, x))) <span class="sc">+</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_reordered</span>() <span class="sc">+</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Palabras más probables por tema (LDA)"</span>,</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Probabilidad (beta)"</span>, <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-texto_files/figure-html/lda-viz-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="proporción-de-temas-por-documento-gamma" class="level3" data-number="8.5">
+<h3 data-number="8.5" class="anchored" data-anchor-id="proporción-de-temas-por-documento-gamma"><span class="header-section-number">8.5</span> Proporción de temas por documento (gamma)</h3>
+<p><code>gamma</code> es la proporción de cada tema en cada documento. Suma 1 por documento. Permite asignar cada documento a su tema dominante.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>lda_gamma <span class="ot">&lt;-</span> <span class="fu">tidy</span>(modelo_lda, <span class="at">matrix =</span> <span class="st">"gamma"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">document =</span> <span class="fu">as.integer</span>(document))</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(lda_gamma, <span class="dv">8</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 3
+  document topic   gamma
+     &lt;int&gt; &lt;int&gt;   &lt;dbl&gt;
+1        1     1 0.00229
+2        2     1 0.00191
+3        3     1 0.00229
+4        4     1 0.00229
+5        5     1 0.00229
+6        6     1 0.00191
+7        7     1 0.991  
+8        8     1 0.00191</code></pre>
+</div>
+</div>
+</section>
+<section id="validar-contra-las-etiquetas-reales" class="level3" data-number="8.6">
+<h3 data-number="8.6" class="anchored" data-anchor-id="validar-contra-las-etiquetas-reales"><span class="header-section-number">8.6</span> Validar contra las etiquetas reales</h3>
+<p>Si LDA funciona, cada tema real debería concentrarse en un solo tema LDA. Una matriz de confusión muestra la correspondencia.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>clasificacion <span class="ot">&lt;-</span> lda_gamma <span class="sc">|&gt;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(document) <span class="sc">|&gt;</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(gamma, <span class="at">n =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(corpus <span class="sc">|&gt;</span> <span class="fu">select</span>(id, tema),</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"document"</span> <span class="ot">=</span> <span class="st">"id"</span>))</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">real =</span> clasificacion<span class="sc">$</span>tema, <span class="at">lda =</span> clasificacion<span class="sc">$</span>topic)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           lda
+real        1 2 3 4
+  economia  0 1 3 1
+  educacion 1 1 0 3
+  salud     2 1 1 1
+  seguridad 2 2 1 0</code></pre>
+</div>
+</div>
+</section>
+<section id="heatmap-de-correspondencia-real-lda" class="level3" data-number="8.7">
+<h3 data-number="8.7" class="anchored" data-anchor-id="heatmap-de-correspondencia-real-lda"><span class="header-section-number">8.7</span> Heatmap de correspondencia real ↔︎ LDA</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>lda_gamma <span class="sc">|&gt;</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(corpus <span class="sc">|&gt;</span> <span class="fu">select</span>(id, tema),</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"document"</span> <span class="ot">=</span> <span class="st">"id"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tema, topic) <span class="sc">|&gt;</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">gamma =</span> <span class="fu">mean</span>(gamma), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(topic), <span class="at">y =</span> tema, <span class="at">fill =</span> gamma)) <span class="sc">+</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(gamma, <span class="dv">2</span>)), <span class="at">colour =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"#457b9d"</span>, <span class="at">high =</span> <span class="st">"#e63946"</span>) <span class="sc">+</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Tema LDA"</span>, <span class="at">y =</span> <span class="st">"Tema real"</span>, <span class="at">fill =</span> <span class="st">"Gamma"</span>) <span class="sc">+</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-texto_files/figure-html/lda-heatmap-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="recomendaciones-prácticas" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="recomendaciones-prácticas"><span class="header-section-number">9</span> Recomendaciones prácticas</h2>
+<ul>
+<li><strong>Empezar simple</strong>: frecuencias y TF-IDF revelan mucho antes de llegar a LDA.</li>
+<li><strong>Ampliar stopwords</strong> con vocabulario específico del corpus. Las listas estándar no cubren todo.</li>
+<li><strong>Palabras cortas</strong>: filtrar con <code>nchar(palabra) &gt; 2</code> elimina muchas siglas poco útiles.</li>
+<li><strong>LDA es inestable</strong> con corpus pequeños: probar varias semillas y distintos K.</li>
+<li><strong>Validar siempre</strong> contra lectura manual de una muestra. La clasificación automática puede parecer convincente sin serlo.</li>
+<li><strong>TF-IDF funciona por grupo</strong>: si calculan por documento vs.&nbsp;por tema vs.&nbsp;por país, obtendrán resultados distintos.</li>
+<li><strong>El orden importa</strong>: anti-join de stopwords antes de filtrar por longitud evita contar tokens vacíos.</li>
+</ul>
+</section>
+<section id="resumen-de-funciones" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="resumen-de-funciones"><span class="header-section-number">10</span> Resumen de funciones</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 26%">
+<col style="width: 26%">
+<col style="width: 47%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Función</th>
+<th>Paquete</th>
+<th>Para qué sirve</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>unnest_tokens()</code></td>
+<td>tidytext</td>
+<td>Tokeniza texto (palabras, bigramas, oraciones)</td>
+</tr>
+<tr class="even">
+<td><code>anti_join()</code></td>
+<td>dplyr</td>
+<td>Elimina filas que aparecen en otra tabla (útil para stopwords)</td>
+</tr>
+<tr class="odd">
+<td><code>bind_tf_idf()</code></td>
+<td>tidytext</td>
+<td>Calcula TF, IDF y TF-IDF</td>
+</tr>
+<tr class="even">
+<td><code>cast_dtm()</code></td>
+<td>tidytext</td>
+<td>Convierte formato tidy en Document-Term Matrix</td>
+</tr>
+<tr class="odd">
+<td><code>cast_sparse()</code></td>
+<td>tidytext</td>
+<td>Convierte en matriz dispersa (para SVD, embeddings)</td>
+</tr>
+<tr class="even">
+<td><code>LDA()</code></td>
+<td>topicmodels</td>
+<td>Ajusta Latent Dirichlet Allocation</td>
+</tr>
+<tr class="odd">
+<td><code>tidy()</code></td>
+<td>broom / tidytext</td>
+<td>Extrae beta o gamma de un modelo LDA</td>
+</tr>
+<tr class="even">
+<td><code>terms()</code></td>
+<td>topicmodels</td>
+<td>Palabras más probables de cada tema</td>
+</tr>
+<tr class="odd">
+<td><code>stopwords()</code></td>
+<td>tm</td>
+<td>Listas de stopwords en varios idiomas</td>
+</tr>
+<tr class="even">
+<td><code>geom_text_wordcloud()</code></td>
+<td>ggwordcloud</td>
+<td>Nubes de palabras con <code>ggplot2</code></td>
+</tr>
+<tr class="odd">
+<td><code>reorder_within()</code></td>
+<td>tidytext</td>
+<td>Reordena factores dentro de facets</td>
+</tr>
+<tr class="even">
+<td><code>scale_y_reordered()</code></td>
+<td>tidytext</td>
+<td>Acompaña <code>reorder_within()</code> en gráficos</td>
+</tr>
+</tbody>
+</table>
+<p>Para la referencia de aprendizaje supervisado, ver <a href="./referencia-tidymodels.html">Referencia: tidymodels</a>. Para clustering y PCA, ver <a href="./referencia-no-supervisado.html">Referencia: aprendizaje no supervisado</a>.</p>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 <a href="https://danilofreire.github.io">Danilo Freire</a>. Contenido bajo licencia <a href="https://opensource.org/licenses/MIT">MIT</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/referencia-texto.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Hecho con <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

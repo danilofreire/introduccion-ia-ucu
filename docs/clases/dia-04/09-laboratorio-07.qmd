@@ -87,14 +87,14 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 | Parte | Contenido | Duración |
 |-------|-----------|----------|
-| 1 | Configuración y primer chat | ~25 min |
-| 2 | Clasificación de textos | ~35 min |
-| 3 | Extracción estructurada | ~30 min |
-| 4 | Comparación con LDA | ~30 min |
+| 1 | Configuración y primer chat | ~15 min |
+| 2 | Clasificación de textos | ~20 min |
+| 3 | Extracción estructurada | ~15 min |
+| 4 | Comparación con LDA | ~10 min |
 
 <br>
 
-[Usaremos los textos políticos del Día 3 para comparar LLMs con métodos clásicos.]{.alert}
+[Usaremos los textos políticos del Día 3 para comparar LLMs con métodos clásicos. Material extra en los apéndices.]{.alert}
 :::
 
 # Parte 1: Configuración {background-color="#2d4563"}
@@ -203,46 +203,6 @@ analista$chat("¿Cuáles son los principales desafíos democráticos en Uruguay?
 :::{.callout-tip}
 El system prompt define el "rol" del modelo para toda la conversación. Es clave para obtener respuestas consistentes.
 :::
-:::
-
-## Experimentar con system prompts
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-**Ejercicio**: Crear tres chats con diferentes personalidades y comparar las respuestas a la misma pregunta.
-
-```{r}
-#| label: ejercicio-system
-#| eval: false
-
-# Chat 1: Académico formal
-academico <- chat_openai(
-  model = "gpt-4o-mini",
-  system_prompt = "Eres un profesor universitario. Responde de forma
-                   formal y académica con referencias."
-)
-
-# Chat 2: Periodista
-periodista <- chat_openai(
-  model = "gpt-4o-mini",
-  system_prompt = "Eres un periodista. Responde de forma clara y
-                   accesible para el público general."
-)
-
-# Chat 3: Activista
-activista <- chat_openai(
-  model = "gpt-4o-mini",
-  system_prompt = "Eres un activista social. Responde con pasión
-                   y énfasis en la justicia social."
-)
-
-# Misma pregunta, diferentes respuestas
-pregunta <- "¿Qué opinas sobre la desigualdad en América Latina?"
-
-academico$chat(pregunta)
-periodista$chat(pregunta)
-activista$chat(pregunta)
-```
 :::
 
 # Parte 2: Clasificación de textos {background-color="#2d4563"}
@@ -398,27 +358,6 @@ table(Real = evaluacion$tema, LLM = evaluacion$tema_llm)
 ```
 :::
 
-## Analizar errores
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r}
-#| label: analizar-errores
-#| eval: false
-
-# Ver los errores
-errores <- evaluacion |>
-  filter(!correcto) |>
-  select(texto, tema, tema_llm)
-
-# Mostrar errores
-errores
-
-# Pregunta: ¿los errores son "razonables"?
-# A veces el LLM clasifica diferente pero no está "mal"
-```
-:::
-
 # Parte 3: Extracción estructurada {background-color="#2d4563"}
 
 ## ¿Por qué datos estructurados?
@@ -506,73 +445,6 @@ cat("Sentimiento:", resultado$sentimiento, "\n")
 cat("Confianza:", resultado$confianza, "\n")
 cat("Entidades:", paste(resultado$entidades, collapse = ", "), "\n")
 cat("Resumen:", resultado$resumen, "\n")
-```
-:::
-
-## Usar extract_data de ellmer
-
-:::{style="margin-top: 30px; font-size: 18px;"}
-
-```{r}
-#| label: extract-data
-#| eval: false
-
-# ellmer tiene una función que valida el JSON automáticamente
-
-chat_extractor <- chat_openai(model = "gpt-4o-mini")
-
-resultado <- chat_extractor$extract_data(
-  "El gobierno de Uruguay aumentó el salario mínimo en un 10%,
-   lo que beneficiará a miles de trabajadores.",
-  type = type_object(
-    tema = type_string("Tema: economia/educacion/seguridad/salud/medioambiente"),
-    sentimiento = type_string("Sentimiento: positivo/negativo/neutro"),
-    confianza = type_number("Confianza entre 0 y 1"),
-    pais = type_string("País mencionado, o 'no especificado'"),
-    impacto = type_string("Descripción breve del impacto")
-  )
-)
-
-# Resultado ya es una lista estructurada
-str(resultado)
-```
-:::
-
-## Extraer múltiples textos
-
-:::{style="margin-top: 30px; font-size: 18px;"}
-
-```{r}
-#| label: extraer-batch
-#| eval: false
-
-# Función para extraer de un texto
-extraer_info <- function(texto) {
-  chat_temp <- chat_openai(model = "gpt-4o-mini")
-
-  resultado <- chat_temp$extract_data(
-    texto,
-    type = type_object(
-      tema = type_string("economia/educacion/seguridad/salud/medioambiente"),
-      sentimiento = type_string("positivo/negativo/neutro"),
-      confianza = type_number("0 a 1")
-    )
-  )
-
-  return(as_tibble(resultado))
-}
-
-# Aplicar a varios textos
-extracciones <- textos |>
-  slice(1:10) |>
-  mutate(
-    info = map(texto, extraer_info)
-  ) |>
-  unnest(info)
-
-# Ver resultado
-extracciones |>
-  select(tema, sentimiento, confianza, texto)
 ```
 :::
 
@@ -704,34 +576,6 @@ clasificador_fewshot <- chat_openai(
 ```
 :::
 
-## Ejercicio 3: Extraer entidades
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-**Instrucciones:**
-
-1. Crear un extractor de entidades nombradas (NER)
-2. Extraer personas, organizaciones y lugares de los textos
-3. ¿Qué entidades aparecen más frecuentemente?
-
-```{r}
-#| label: ejercicio-3
-#| eval: false
-
-# Tu código aquí
-ner <- chat_openai(
-  model = "gpt-4o-mini",
-  system_prompt = "Extrae entidades nombradas del texto.
-  Responde en JSON:
-  {
-    'personas': [...],
-    'organizaciones': [...],
-    'lugares': [...]
-  }"
-)
-```
-:::
-
 ## Resumen del laboratorio
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -759,7 +603,153 @@ ner <- chat_openai(
 
 <br>
 
-[En el próximo laboratorio: análisis de sentimiento, datos sintéticos y auditoría de sesgos.]{.alert}
+[En el próximo laboratorio: análisis de sentimiento, datos sintéticos y auditoría de sesgos. Material extra en los apéndices.]{.alert}
+:::
+
+# Apéndice 1: Experimentar con system prompts {background-color="#2d4563"}
+
+## Tres personalidades, misma pregunta
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: ap-system-prompts
+#| eval: false
+
+# Chat 1: Académico formal
+academico <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un profesor universitario. Responde de forma
+                   formal y académica con referencias."
+)
+
+# Chat 2: Periodista
+periodista <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un periodista. Responde de forma clara y
+                   accesible para el público general."
+)
+
+# Chat 3: Activista
+activista <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = "Eres un activista social. Responde con pasión
+                   y énfasis en la justicia social."
+)
+
+# Misma pregunta, diferentes respuestas
+pregunta <- "¿Qué opinas sobre la desigualdad en América Latina?"
+
+academico$chat(pregunta)
+periodista$chat(pregunta)
+activista$chat(pregunta)
+```
+:::
+
+# Apéndice 2: extract_data y análisis de errores {background-color="#2d4563"}
+
+## Usar `extract_data` de ellmer
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+`ellmer` tiene una función que valida el JSON automáticamente sin necesidad de parsearlo.
+
+```{r}
+#| label: ap-extract-data
+#| eval: false
+
+chat_extractor <- chat_openai(model = "gpt-4o-mini")
+
+resultado <- chat_extractor$extract_data(
+  "El gobierno de Uruguay aumentó el salario mínimo en un 10%,
+   lo que beneficiará a miles de trabajadores.",
+  type = type_object(
+    tema = type_string("economia/educacion/seguridad/salud/medioambiente"),
+    sentimiento = type_string("positivo/negativo/neutro"),
+    confianza = type_number("Confianza entre 0 y 1"),
+    pais = type_string("País mencionado, o 'no especificado'"),
+    impacto = type_string("Descripción breve del impacto")
+  )
+)
+
+str(resultado)
+```
+:::
+
+## Extraer información en batch
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: ap-extraer-batch
+#| eval: false
+
+extraer_info <- function(texto) {
+  chat_temp <- chat_openai(model = "gpt-4o-mini")
+  resultado <- chat_temp$extract_data(
+    texto,
+    type = type_object(
+      tema = type_string("economia/educacion/seguridad/salud/medioambiente"),
+      sentimiento = type_string("positivo/negativo/neutro"),
+      confianza = type_number("0 a 1")
+    )
+  )
+  as_tibble(resultado)
+}
+
+extracciones <- textos |>
+  slice(1:10) |>
+  mutate(info = map(texto, extraer_info)) |>
+  unnest(info)
+```
+:::
+
+## Analizar errores de clasificación
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: ap-analizar-errores
+#| eval: false
+
+errores <- evaluacion |>
+  filter(!correcto) |>
+  select(texto, tema, tema_llm)
+
+errores
+
+# Pregunta: ¿los errores son "razonables"?
+# A veces el LLM clasifica diferente pero no está "mal"
+```
+:::
+
+# Apéndice 3: Ejercicio NER {background-color="#2d4563"}
+
+## Extraer entidades nombradas
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Crear un extractor de entidades nombradas (NER)
+2. Extraer personas, organizaciones y lugares de los textos
+3. ¿Qué entidades aparecen más frecuentemente?
+
+```{r}
+#| label: ap-ejercicio-ner
+#| eval: false
+
+ner <- chat_openai(
+  model = "gpt-4o-mini",
+  system_prompt = 'Extrae entidades nombradas del texto.
+  Responde en JSON:
+  {
+    "personas": [...],
+    "organizaciones": [...],
+    "lugares": [...]
+  }'
+)
+```
 :::
 
 # Continuar con el laboratorio avanzado {background-color="#2d4563"}

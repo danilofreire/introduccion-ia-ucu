@@ -47,6 +47,17 @@ if (!require("fontawesome", character.only = TRUE)) {
   install.packages("fontawesome", dependencies = TRUE)
   library(fontawesome, character.only = TRUE)
 }
+
+suppressPackageStartupMessages({
+  library(tidytext)
+  library(dplyr)
+  library(tidyr)
+  library(stringr)
+  library(tibble)
+  library(tm)
+  library(topicmodels)
+  library(ggplot2)
+})
 ```
 
 # Análisis computacional de texto {background-color="#2d4563"}
@@ -99,7 +110,6 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
 **El desafío central**
 
 Las computadoras trabajan con [números]{.alert}.
@@ -109,6 +119,7 @@ El texto son [palabras]{.alert}.
 ¿Cómo convertir palabras en números
 de forma que preserve el significado?
 
+:::{style="text-align: center; font-size: 24px;"}
 ```
 "La democracia es
  importante para el
@@ -119,28 +130,21 @@ de forma que preserve el significado?
 [0.23, 0.87, 0.12,
  0.45, 0.91, 0.33]
 ```
+:::
 
 [Esta es la pregunta central]{.alert}
 del análisis de texto.
 :::
 :::
 :::
-:::
 
 ## El pipeline de análisis de texto
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 
 :::{style="text-align: center; font-size: 20px;"}
-```
-┌─────────┐   ┌──────────────┐   ┌────────────┐   ┌───────────┐   ┌──────────┐
-│ 1. Texto │──▶│ 2. Preprocesar│──▶│ 3. Represen-│──▶│ 4. Analizar│──▶│ 5. Inter- │
-│ crudo    │   │ (limpiar)    │   │ tar (números)│   │ (modelo)  │   │ pretar   │
-└─────────┘   └──────────────┘   └────────────┘   └───────────┘   └──────────┘
-```
+[![Pipeline de análisis de texto](figures/pipeline-texto.png){width="50%"}](#){data-modal-type="image" data-modal-url="figures/pipeline-texto.png"}
 :::
-
-<br>
 
 :::{.columns}
 :::{.column width=50%}
@@ -160,6 +164,51 @@ del análisis de texto.
 
 # Preprocesamiento {background-color="#2d4563"}
 
+## Nuestro corpus de trabajo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Un corpus simulado de textos políticos**
+
+- [60 textos cortos]{.alert} en español sobre política pública
+- [5 temas]{.alert} (12 textos cada uno):
+    - economía, educación
+    - medio ambiente, salud, seguridad
+- [Varios países]{.alert} de América Latina, entre 2018 y 2024
+- Los textos son [simulados]{.alert}: no provienen de discursos reales, pero imitan el vocabulario típico de cada tema
+- Usaremos el mismo corpus en todos los ejemplos de hoy: tokenización, TF-IDF, sentimiento, LDA y embeddings
+:::
+
+:::{.column width=50%}
+:::{style="font-size: 18px;"}
+**Cargar y explorar el corpus**
+
+```{r corpus-demo, echo=TRUE, eval=TRUE}
+library(tidytext)
+library(dplyr)
+
+# Cargar el corpus simulado (60 textos x 5 temas)
+corpus <- read.csv(
+  "datos/textos_politicos.csv",
+  stringsAsFactors = FALSE,
+  encoding = "UTF-8"
+) |> as_tibble()
+
+# Estructura del corpus
+head(corpus)
+
+# Distribución por tema
+corpus |> count(tema)
+
+# Primer texto del corpus
+corpus$texto[1]
+```
+:::
+:::
+:::
+:::
+
 ## Tokenización
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -172,35 +221,27 @@ del análisis de texto.
         - Bigramas: ["la democracia", "democracia es", "es importante"]
     - [Subpalabras]{.alert}: para modelos de lenguaje (lo veremos mañana)
 - La tokenización es el [primer paso]{.alert} de casi todo análisis de texto
-- En R, usamos el paquete [tidytext]{.alert} con la función `unnest_tokens()`
+- En R, usamos el paquete [tidytext](https://juliasilge.github.io/tidytext/) con la función `unnest_tokens()`
 - tidytext sigue la filosofía de tidyverse: [una fila por token]{.alert}
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**Ejemplo con tidytext**
+:::{style="font-size: 22px;"}
+**Tokenización de nuestro corpus**
 
-```r
+```{r tok-demo, echo=TRUE, eval=TRUE}
 library(tidytext)
 
-tibble(texto = "La democracia es
-  importante para el desarrollo") |>
+# Tokenizar los 60 textos del corpus
+tokens <- corpus |>
+  select(id, tema, texto) |>
   unnest_tokens(palabra, texto)
 
-# Resultado:
-#   palabra
-#   <chr>
-# 1 la
-# 2 democracia
-# 3 es
-# 4 importante
-# 5 para
-# 6 el
-# 7 desarrollo
+head(tokens, 8)
 ```
 
-Noten que tidytext automáticamente
-convierte a [minúsculas]{.alert}.
+tidytext convierte a [minúsculas]{.alert}
+y genera [una fila por token]{.alert}.
 :::
 :::
 :::
@@ -208,43 +249,52 @@ convierte a [minúsculas]{.alert}.
 
 ## Stopwords y limpieza
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - [Stopwords]{.alert} (palabras vacías): palabras muy frecuentes que aportan poco significado
     - En español: "el", "la", "de", "en", "que", "y", "a", "los"...
 - Las eliminamos para centrarnos en las [palabras con contenido]{.alert}
 - Otros pasos de limpieza:
-    - Quitar [números]{.alert} y [puntuación]{.alert}
-    - Convertir a [minúsculas]{.alert}
-    - Opcionalmente, [stemming]{.alert}: reducir palabras a su raíz
-        - "democracia", "democrático", "democracias" → "democra-"
-    - O [lematización]{.alert}: reducir al lema (forma base)
-        - "gobierna", "gobernó", "gobernar" → "gobernar"
+- Quitar [números]{.alert} y [puntuación]{.alert}
+- Convertir a [minúsculas]{.alert}
+- Opcionalmente, [stemming]{.alert}: reducir palabras a su raíz
+    - "democracia", "democrático", "democracias" → "democra-"
+- O [lematización]{.alert}: reducir al lema (forma base)
+    - "gobierna", "gobernó", "gobernar" → "gobernar"
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**Antes y después**
+:::{style="font-size: 17px;"}
+```{r stop-demo, echo=TRUE, eval=TRUE}
+library(stringr)
 
+# Stopwords en español (paquete tm) ampliadas con algunos
+# verbos y palabras muy frecuentes en nuestro corpus
+extra_stop <- c("sigue", "siendo", "sido", "ser", "hacer",
+  "ha", "han", "hay", "más", "país", "países", "región",
+  "regiones", "gobierno", "toda", "todos", "todas")
+stop_es <- tibble(
+  palabra = unique(c(tm::stopwords("spanish"), extra_stop))
+)
+
+# Eliminar números y stopwords
+# !str_detect(palabra, "^[0-9]+$") filtra tokens 
+# que son solo números
+# anti_join() elimina las stopwords
+tokens_limpios <- tokens |>
+  filter(!str_detect(palabra, "^[0-9]+$")) |>
+  anti_join(stop_es, by = "palabra")
+
+tibble(
+  etapa = c("con stopwords", "sin stopwords"),
+  tokens = c(nrow(tokens), nrow(tokens_limpios))
+)
 ```
-Texto original:
-"El gobierno anunció un nuevo
-plan de estímulo fiscal para
-reactivar la economía."
 
-Después de limpiar:
-["gobierno", "anunció", "nuevo",
- "plan", "estímulo", "fiscal",
- "reactivar", "economía"]
-
-Palabras eliminadas:
-"el", "un", "de", "para", "la"
-
-Estas palabras son muy frecuentes
-en todos los textos; no distinguen
-un texto de otro.
-```
+Eliminar stopwords reduce el corpus
+en un [`r round(100*(1 - nrow(tokens_limpios)/nrow(tokens)))`%]{.alert}
+y deja solo palabras con contenido.
 :::
 :::
 :::
@@ -269,26 +319,36 @@ un texto de otro.
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**Ejemplo**
+:::{style="font-size: 17px; margin-top: 20px;"}
+```{r bow-demo, echo=TRUE, eval=TRUE}
+library(tidyr)
 
+# 6 términos de interés (uno representativo por tema)
+terminos <- c("salud", "educación", "violencia",
+              "economía", "pandemia", "estudiantes")
+
+# Construir la matriz término-documento:
+# pivot_wider: pasar de formato largo
+# (id, palabra, n) a formato ancho
+# (una columna por palabra). values_fill=0
+# rellena con cero los documentos donde
+# la palabra no aparece
+# n es la frecuencia de la palabra en el documento
+bow <- tokens_limpios |>
+  filter(id %in% c(1, 13, 25),
+         palabra %in% terminos) |>
+  count(id, palabra) |>
+  pivot_wider(names_from = palabra,
+              values_from = n,
+              values_fill = 0)
+bow
 ```
-Doc 1: "la economía crece"
-Doc 2: "la economía no crece"
-Doc 3: "la salud mejora"
 
-Matriz término-documento:
-
-          crece  economía  la  mejora  no  salud
-Doc 1:      1      1       1    0      0    0
-Doc 2:      1      1       1    0      1    0
-Doc 3:      0      0       1    1      0    1
-
-Cada fila es un "vector" que
-representa el documento.
-Los documentos se comparan
-por la similitud de sus vectores.
-```
+Docs 1 (economía, México), 13
+(educación, Paraguay) y 25
+(seguridad, Panamá).
+Cada fila es el [vector]{.alert}
+que representa al documento.
 :::
 :::
 :::
@@ -296,7 +356,7 @@ por la similitud de sus vectores.
 
 ## TF-IDF
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
 - [TF-IDF]{.alert}: Term Frequency - Inverse Document Frequency (el concepto de IDF viene de [Sparck Jones, 1972](https://doi.org/10.1108/eb026526))
@@ -312,28 +372,28 @@ $$\text{TF-IDF}(t, d) = \text{TF}(t, d) \times \log\left(\frac{N}{\text{DF}(t)}\
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**Intuición**
+:::{style="font-size: 17px;"}
+**Palabras más distintivas por tema (TF-IDF real)**
 
-"gobierno" aparece en muchos textos
-→ IDF bajo → poco distintiva
+```{r tfidf-demo, echo=TRUE, eval=TRUE}
+# Calcular TF-IDF de cada palabra en cada tema
+palabras_puntuadas <- tokens_limpios |>
+  count(tema, palabra) |>
+  bind_tf_idf(palabra, tema, n)
 
-"deforestación" aparece solo en
-textos de medio ambiente
-→ IDF alto → muy distintiva
-
-TF-IDF responde: [¿qué palabras
-caracterizan ESTE documento
-en particular?]{.alert}
-
-<br>
-
-En tidytext:
-```r
-datos_tfidf <- datos_tokens |>
-  count(documento, palabra) |>
-  bind_tf_idf(palabra, documento, n)
+# Top 3 palabras distintivas por tema
+palabras_puntuadas |>
+  group_by(tema) |>
+  slice_max(tf_idf, n = 3) |>
+  select(tema, palabra, tf_idf) |>
+  mutate(tf_idf = round(tf_idf, 3))
 ```
+
+TF-IDF identifica las [palabras
+características]{.alert} de cada tema:
+*biodiversidad* para medio ambiente,
+*violencia* para seguridad,
+*estudiantes* para educación.
 :::
 :::
 :::
@@ -360,28 +420,41 @@ datos_tfidf <- datos_tokens |>
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**Diccionarios disponibles en español**
+:::{style="font-size: 17px;"}
+**Sentimiento por tema en el corpus**
 
-- [NRC]{.alert}: 8 emociones + positivo/negativo (multilingüe)
-- [AFINN]{.alert}: puntuación -5 a +5 (necesita traducción)
-- Diccionarios académicos específicos para español
+```{r sent-demo, echo=TRUE, eval=TRUE}
+# Diccionario mínimo en español
+pos <- c("crecimiento", "sólido", "mejora",
+  "mejorado", "oportunidad", "beneficiará",
+  "innovadores", "fortalecido", "efectivos",
+  "estabilizar", "reducir", "renovables")
+neg <- c("inflación", "problema", "vulnerables",
+  "desempleo", "deuda", "riesgo", "crisis",
+  "violencia", "amenaza", "deficiencias",
+  "grave", "graves", "pobreza", "crimen",
+  "narcotráfico", "inseguridad", "deforestación",
+  "contaminación", "informalidad")
 
-**Ejemplo**
+sentimiento <- tokens_limpios |>
+  mutate(valencia = case_when(
+    palabra %in% pos ~  1L, # L para entero (integer)
+    palabra %in% neg ~ -1L,
+    TRUE ~ 0L
+  )) |>
+  group_by(id, tema) |>
+  summarise(puntaje = sum(valencia),
+            .groups = "drop") # desagrupar
 
+sentimiento |>
+  group_by(tema) |>
+  summarise(promedio = round(mean(puntaje), 2),
+            n = n())
 ```
-"El crecimiento económico ha sido
- sólido gracias a las exportaciones"
 
-Palabras positivas: crecimiento, sólido
-Palabras negativas: (ninguna)
-
-Sentimiento: POSITIVO (+2)
-```
-
-Para mayor precisión,
-los [LLMs]{.alert} (Día 4) superan
-ampliamente a los diccionarios.
+[Seguridad]{.alert} y [medio ambiente]{.alert}
+son los temas más negativos;
+[educación]{.alert}, el más positivo.
 :::
 :::
 :::
@@ -406,29 +479,33 @@ ampliamente a los diccionarios.
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**El proceso generativo de LDA**
+:::{style="font-size: 20px;"}
+**Ajustar LDA con K=5 en nuestro corpus**
 
+```{r lda-fit, echo=TRUE, eval=TRUE}
+library(topicmodels)
+
+# Construir matriz documento-término
+dtm <- tokens_limpios |>
+  count(id, palabra) |>
+  cast_dtm(id, palabra, n)
+
+# Ajustar LDA con 5 tópicos
+set.seed(123)
+modelo_lda <- LDA(
+  dtm,
+  k = 5,
+  control = list(seed = 123)
+)
+
+modelo_lda
 ```
-Para cada documento:
-  1. Elegir una mezcla de temas
-     (ej: 70% economía, 30% salud)
 
-  2. Para cada palabra:
-     a. Elegir un tema según la mezcla
-     b. Elegir una palabra del tema
-
-Resultado:
-  "El crecimiento [economía]
-   del sector [economía]
-   salud [salud]
-   ha mejorado [economía]
-   los hospitales [salud]
-   públicos" [salud]
-
-LDA hace el proceso INVERSO:
-dado el texto, recupera los temas.
-```
+El modelo fue ajustado sobre
+[`r nrow(corpus)` documentos]{.alert}
+y [`r ncol(dtm)` términos únicos]{.alert}.
+Veremos las palabras más probables
+de cada tópico en la próxima diapositiva.
 :::
 :::
 :::
@@ -445,27 +522,31 @@ dado el texto, recupera los temas.
 - La [proporción de cada tema]{.alert} en cada documento
 - Podemos [etiquetar]{.alert} los temas según las palabras más frecuentes
 
-**Ejemplo de resultado**
+:::{style="font-size: 18px;"}
+**Palabras principales de cada tópico (LDA real)**
 
-| Tema | Palabras principales |
-|------|---------------------|
-| 1 | economía, crecimiento, empleo, inversión |
-| 2 | educación, escuelas, docentes, estudiantes |
-| 3 | violencia, seguridad, crimen, policía |
+```{r lda-words, echo=TRUE, eval=TRUE}
+tidy(modelo_lda, matrix = "beta") |>
+  group_by(topic) |>
+  slice_max(beta, n = 5, with_ties = FALSE) |>
+  summarise(palabras = paste(term, collapse = ", "))
+```
+:::
 
-→ Etiquetamos: tema 1 = "economía", tema 2 = "educación", tema 3 = "seguridad"
+→ Interpretación tentativa: tópico 2 ≈ *educación*,
+tópico 3 ≈ *salud y políticas sociales*, tópico 5 ≈ *economía e inversión*.
+Los tópicos 1 y 4 son [ambiguos]{.alert}: LDA no siempre
+separa bien los temas en corpora pequeños.
 :::
 
 :::{.column width=50%}
 **Limitaciones de LDA**
 
-- Elegir K es [difícil]{.alert}: no hay un método definitivo
-- Los temas pueden ser [incoherentes]{.alert} (mezclar conceptos)
-- No captura [relaciones entre palabras]{.alert} (como lo hacen los embeddings)
-- Los temas no tienen [nombre]{.alert}: los nombres los pone el investigador
-- Es un [modelo probabilístico]{.alert}: resultados pueden variar entre ejecuciones
-- Para textos cortos (tweets, respuestas breves), LDA funciona mal porque cada documento tiene muy pocas palabras para estimar distribuciones de tópicos
-- Los [LLMs modernos]{.alert} pueden hacer este trabajo mucho mejor (Día 4)
+- Elegir K es [difícil]{.alert} y los temas pueden resultar [incoherentes]{.alert}
+- No captura [relaciones entre palabras]{.alert} (eso lo hacen los embeddings)
+- Los temas [no tienen nombre]{.alert}: los pone el investigador
+- Funciona mal en [textos cortos]{.alert} (tweets, respuestas breves)
+- Los [LLMs modernos]{.alert} lo hacen mucho mejor (Día 4)
 :::
 :::
 :::
@@ -474,7 +555,7 @@ dado el texto, recupera los temas.
 
 ## Limitaciones de bag-of-words y TF-IDF
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - Bag-of-words y TF-IDF son [representaciones dispersas]{.alert} (sparse)
@@ -489,7 +570,7 @@ dado el texto, recupera los temas.
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 24px;"}
 **Disperso vs. Denso**
 
 ```
@@ -568,35 +649,43 @@ Los embeddings capturan relaciones semánticas como operaciones vectoriales.
 :::{.column width=55%}
 - Entrenar embeddings requiere [muchísimos datos]{.alert} (miles de millones de palabras)
 - En la práctica, usamos [embeddings preentrenados]{.alert}:
-    - Word2Vec en Google News (inglés)
-    - [fastText]{.alert} (Facebook): disponible para español
-    - GloVe (Stanford)
+    - [Word2Vec](https://code.google.com/archive/p/word2vec/) en Google News (inglés)
+    - [fastText](https://fasttext.cc/) (Facebook): disponible para español
+    - [GloVe](https://nlp.stanford.edu/projects/glove/) (Stanford)
 - Para español:
-    - [Spanish Billion Words Corpus]{.alert}
-    - [fastText embeddings para español]{.alert}
+    - [Spanish Billion Words Corpus](https://crscardellino.ar/SBWCE/)
+    - [fastText embeddings para español](https://fasttext.cc/docs/en/crawl-vectors.html)
 - Cómo usarlos: cargar los embeddings y buscar el vector de cada palabra
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**Usando embeddings en R:**
+:::{style="font-size: 17px;"}
+**Mini-embeddings por LSA sobre nuestro corpus**
 
-```r
-# Con text2vec
-library(text2vec)
+```{r lsa-demo, echo=TRUE, eval=TRUE}
+# Matriz palabra x documento con TF-IDF
+matriz <- tokens_limpios |>
+  count(id, palabra) |>
+  bind_tf_idf(palabra, id, n) |>
+  cast_sparse(palabra, id, tf_idf) |>
+  as.matrix()
 
-# Cargar embeddings preentrenados
-embeddings <- readRDS("embeddings_es.rds")
+# SVD: cada palabra en 10 dimensiones
+reduccion <- svd(matriz, nu = 10, nv = 10)
+embeddings <- reduccion$u
+rownames(embeddings) <- rownames(matriz)
 
-# Obtener vector de una palabra
-vec_democracia <- embeddings["democracia", ]
+# Similitud coseno entre dos vectores
+coseno <- function(a, b) {
+  sum(a * b) /
+    (sqrt(sum(a^2)) * sqrt(sum(b^2)))
+}
 
-# Encontrar palabras similares
-sim <- sim2(
-  embeddings,
-  matrix(vec_democracia, nrow = 1)
-)
-head(sort(sim[,1], decreasing = TRUE))
+# Vecinos más cercanos de "salud"
+objetivo <- embeddings["salud", ]
+sims <- apply(embeddings, 1,
+              coseno, b = objetivo)
+head(sort(sims, decreasing = TRUE), 6)
 ```
 :::
 :::
@@ -620,171 +709,202 @@ head(sort(sim[,1], decreasing = TRUE))
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center;"}
-[![Búsqueda semántica](figures/semantic-search.webp){width="100%"}](#){data-modal-type="image" data-modal-url="figures/semantic-search.webp"}
+:::{style="font-size: 19px;"}
+**Búsqueda semántica en nuestro corpus**
 
-Con embeddings, podemos buscar textos por [significado]{.alert}, no solo por palabras exactas.
-:::
-:::
-:::
-:::
+```{r doc-emb-demo, echo=TRUE, eval=TRUE}
+# Embeddings de documentos desde el SVD
+doc_emb <- reduccion$v
+rownames(doc_emb) <- colnames(matriz)
 
-# Aplicaciones en América Latina {background-color="#2d4563"}
+# Consulta: documento 1 (tema economía)
+consulta <- doc_emb["1", ]
+sims <- apply(doc_emb, 1, coseno, b = consulta)
 
-## Análisis de discursos políticos
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-**Ejemplos de investigación:**
-
-- [Análisis de discursos presidenciales]{.alert}
-    - ¿Cómo cambia el tono según el contexto económico?
-    - ¿Qué temas dominan en cada país?
-- [Comparación de programas partidarios]{.alert}
-    - Posicionamiento ideológico automático
-    - Evolución de agendas a lo largo del tiempo
-- [Debates parlamentarios]{.alert}
-    - Polarización del lenguaje
-    - Redes de co-aparición de temas
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**Datos disponibles:**
-
-- [ParlSpeech]{.alert}: discursos parlamentarios de varios países
-- [Manifesto Project]{.alert}: programas de partidos codificados
-- [Latin American Presidential Speeches]{.alert}: colecciones académicas
-- [Repositorios gubernamentales]{.alert}: actas, leyes, decretos
-
-<br>
-
-[El desafío principal es el acceso a datos estructurados y digitalizados.]{.alert}
-:::
-:::
-:::
-:::
-
-## Análisis de redes sociales
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-**Aplicaciones:**
-
-- [Detección de desinformación]{.alert}
-    - Identificar narrativas falsas
-    - Mapear redes de difusión
-- [Sentimiento hacia políticas públicas]{.alert}
-    - Reacciones a anuncios gubernamentales
-    - Evolución de la opinión pública
-- [Movilización social]{.alert}
-    - Identificar hashtags emergentes
-    - Predecir protestas
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**Consideraciones:**
-
-- [Sesgos de representatividad]{.alert}: los usuarios de redes no son la población general
-- [Bots y cuentas falsas]{.alert}: distorsionan el análisis
-- [Cambios en APIs]{.alert}: X (Twitter) restringió acceso
-- [Ética]{.alert}: privacidad, consentimiento
-
-<br>
-
-[Los LLMs (Día 4) están transformando este campo: pueden clasificar, resumir y extraer información mucho mejor que los métodos clásicos.]{.alert}
-:::
-:::
-:::
-:::
-
-## Análisis de medios de comunicación
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-**Aplicaciones:**
-
-- [Agenda setting]{.alert}: ¿qué temas cubren los medios?
-- [Framing]{.alert}: ¿cómo se presenta cada tema?
-- [Sesgo mediático]{.alert}: diferencias entre medios
-- [Cobertura electoral]{.alert}: equidad y tono
-
-**Métodos:**
-
-- [TF-IDF]{.alert} para identificar temas distintivos
-- [LDA]{.alert} para descubrir frames
-- [Sentimiento]{.alert} para medir tono
-- [Embeddings]{.alert} para similaridad temática
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**Proyectos relevantes:**
-
-- [GDELT Project]{.alert}: noticias globales en tiempo real
-- [Media Cloud]{.alert}: análisis de ecosistemas mediáticos
-- [Observatorios de medios]{.alert}: en varios países latinoamericanos
-
-<br>
-
-**Ejemplo de pregunta:**
-
-¿La cobertura de la economía
-en medios argentinos es más
-negativa que en medios uruguayos?
-
-→ TF-IDF + sentimiento + comparación
-:::
-:::
-:::
-:::
-
-## Análisis de respuestas abiertas
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-**El problema:**
-
-- Las encuestas incluyen preguntas abiertas
-- "¿Cuál es el principal problema del país?"
-- Codificar manualmente miles de respuestas es [costoso]{.alert}
-
-**Solución con NLP:**
-
-1. [Tokenizar y limpiar]{.alert} las respuestas
-2. [TF-IDF]{.alert} para identificar categorías
-3. [Clustering]{.alert} para agrupar respuestas similares
-4. [LDA]{.alert} para descubrir temas
-5. O mejor: [usar un LLM]{.alert} para clasificar automáticamente
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**Ejemplo:**
-
+# Top 4 documentos más similares
+top <- head(sort(sims, decreasing = TRUE), 4)
+tibble(id = as.integer(names(top)),
+       sim = round(top, 3)) |>
+  left_join(corpus |> select(id, tema), by = "id")
 ```
-Respuestas abiertas:
-"La economía está muy mal"
-"No hay trabajo"
-"La inflación nos mata"
-"Mucha inseguridad"
-"Los políticos son corruptos"
 
-Clustering identifica:
-- Cluster 1: Economía (3)
-- Cluster 2: Seguridad (1)
-- Cluster 3: Política (1)
+Los documentos más cercanos al primero
+(tema [economía]{.alert}) son otros textos
+del mismo tema. LSA aprende la similitud
+sin conocer las etiquetas.
+:::
+:::
+:::
+:::
 
-Mucho más rápido que
-codificación manual.
+# Aplicaciones {background-color="#2d4563"}
+
+## Aplicaciones en política y medios
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Líneas de investigación activas**
+
+- [Discursos políticos]{.alert}: posicionamiento ideológico, agenda del gobierno, polarización entre bloques
+- [Cobertura mediática]{.alert}: sesgo editorial, framing, tono sobre temas económicos o electorales
+- [Manifiestos de partidos]{.alert}: clasificación automática de posiciones en escalas izquierda-derecha
+- [Detección de eventos]{.alert}: conflicto, protestas y corrupción a partir de noticias
+
+**Método dominante**: pipeline clásico (tokenización → TF-IDF / LDA / sentimiento) sobre corpus grandes, con validación humana en una muestra.
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px;"}
+**Lecturas fundacionales**
+
+- Grimmer & Stewart (2013) *"Text as Data"*, [Political Analysis](https://doi.org/10.1093/pan/mps028) — el manifiesto metodológico del campo
+- Laver, Benoit & Garry (2003) *"Extracting Policy Positions from Political Texts Using Words as Data"*, APSR — Wordscores sobre manifiestos
+- Roberts, Stewart & Tingley (2014) *"Structural Topic Models"*, AJPS — LDA con covariables
+
+**Fuentes de datos**
+
+- [Manifesto Project](https://manifesto-project.wzb.eu/): programas electorales (incluye América Latina)
+- [ParlSpeech](https://dataverse.harvard.edu/dataverse/ParlSpeech): discursos parlamentarios
+- [GDELT](https://www.gdeltproject.org/): noticias y eventos en tiempo real
+:::
+:::
+:::
+:::
+
+## Caso integrado (1/2): explorar las respuestas
+
+:::{style="margin-top: 30px; font-size: 21px;"}
+:::{.columns}
+:::{.column width=45%}
+**Pregunta de investigación**
+
+> ¿Cuál es el principal problema del país?
+
+- 18 respuestas cortas de una encuesta abierta simulada
+- Queremos [clasificar]{.alert} cada respuesta en un tema [sin leerlas todas]{.alert}
+- Pipeline simple en dos pasos:
+  - tokenizar y quitar stopwords; ver las palabras más frecuentes
+  - clasificar por tema con un [diccionario de palabras clave]{.alert} y medir el tono
+- Todo el análisis usa sólo verbos de tidyverse que ya conocemos
+:::
+
+:::{.column width=55%}
+:::{style="font-size: 16px;"}
+**Palabras más frecuentes en las respuestas**
+
+```{r caso-preparar, echo=TRUE, eval=TRUE}
+respuestas <- tibble::tibble(
+  id = 1:18,
+  texto = c(
+    "La economía está muy mal y no hay trabajo",
+    "La inflación y los precios de la economía suben cada mes",
+    "No hay trabajo ni empleo para los jóvenes",
+    "Los precios altos de la economía son un problema",
+    "La economía y el empleo son el mayor problema",
+    "Hay mucha inseguridad y violencia en las calles",
+    "Los robos y la inseguridad aumentan cada día",
+    "La violencia en los barrios es muy grave",
+    "La delincuencia y los robos son el principal problema",
+    "Los políticos son corruptos y no cumplen nada",
+    "Los políticos corruptos arruinan el gobierno",
+    "Los políticos siempre protegen a los corruptos",
+    "El gobierno permite a los políticos corruptos",
+    "Faltan docentes y recursos en las escuelas",
+    "La salud pública está mal, faltan médicos",
+    "La educación en las escuelas es deficiente",
+    "Los hospitales no tienen médicos ni medicinas",
+    "La educación y la salud pública están abandonadas"
+  )
+)
+
+# Tokenizar y quitar stopwords
+tokens_resp <- respuestas |>
+  unnest_tokens(palabra, texto) |>
+  anti_join(stop_es, by = "palabra")
+
+# Palabras más frecuentes en el conjunto
+tokens_resp |>
+  count(palabra, sort = TRUE) |>
+  head(8)
 ```
 :::
 :::
+:::
+:::
+
+## Caso integrado (2/2): clasificar e interpretar
+
+:::{style="margin-top: 30px; font-size: 21px;"}
+:::{.columns}
+:::{.column width=45%}
+**Lo que aprendemos**
+
+- Un [diccionario de palabras clave]{.alert} asigna cada respuesta al tema que más aparece en ella
+- Contar palabras negativas mide el [tono]{.alert} promedio de cada tema
+- Con 18 respuestas surgen 4 grupos claros: economía, seguridad, corrupción y servicios públicos
+- El pipeline escala a miles de respuestas con el mismo código
+- [Regla práctica:]{.alert} un humano siempre revisa una muestra para validar las etiquetas automáticas
+:::
+
+:::{.column width=55%}
+:::{style="font-size: 16px;"}
+**Respuestas y tono por tema**
+
+```{r caso-clasificar, echo=TRUE, eval=TRUE}
+# Asignar un tema a cada palabra del corpus
+tokens_etiq <- tokens_resp |>
+  mutate(tema = case_when(
+    palabra %in% c("economía", "inflación", "precios", "trabajo", "empleo") ~ "economía",
+    palabra %in% c("inseguridad", "violencia", "robos", "delincuencia") ~ "seguridad",
+    palabra %in% c("corruptos", "políticos", "gobierno") ~ "corrupción",
+    palabra %in% c("educación", "salud", "escuelas", "hospitales", "médicos", "docentes") ~ "servicios"
+  ))
+
+# Tema dominante de cada respuesta
+clasificacion <- tokens_etiq |>
+  filter(!is.na(tema)) |>
+  count(id, tema) |>
+  slice_max(n, by = id, n = 1)
+
+# Diccionario breve de palabras negativas
+neg <- c("mal", "inflación", "corruptos",
+         "inseguridad", "robos", "violencia",
+         "delincuencia", "grave", "deficiente",
+         "abandonadas", "faltan", "arruinan")
+
+# Palabras negativas por respuesta
+tono <- tokens_resp |>
+  summarise(n_neg = sum(palabra %in% neg), .by = id)
+
+# Resumen: cantidad de respuestas y tono por tema
+clasificacion |>
+  left_join(tono, by = "id") |>
+  summarise(respuestas = n(),
+            negativas = round(mean(n_neg), 2),
+            .by = tema) |>
+  arrange(desc(negativas))
+```
+:::
+:::
+:::
+:::
+
+## ¿Qué método para qué problema?
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+
+| Problema de investigación | Método recomendado | Por qué |
+|---------------------------|--------------------|---------|
+| Contar palabras y frases comunes | [Bag-of-words]{.alert} | Simple, interpretable, rápido |
+| Identificar términos [distintivos]{.alert} de un grupo | [TF-IDF]{.alert} | Pondera por rareza en el corpus |
+| Descubrir [temas latentes]{.alert} sin etiquetas | [LDA]{.alert} | No supervisado, útil si no sabes qué temas buscas |
+| Medir el [tono]{.alert} de un texto | [Diccionarios]{.alert} de sentimiento | Transparente y validable |
+| Medir [similitud semántica]{.alert} entre textos | [Embeddings]{.alert} (Word2Vec, LSA) | Capturan significado, no sólo palabras |
+| Clasificar, resumir, extraer información compleja | [LLMs]{.alert} (Día 4) | Estado del arte en casi todas las tareas |
+
+:::{style="text-align: center; font-size: 20px; margin-top: 30px;"}
+Regla práctica: [empezar simple]{.alert}, validar contra lectura manual y escalar a métodos complejos sólo si el simple falla.
 :::
 :::
 
@@ -820,50 +940,35 @@ Mañana veremos cómo BERT, GPT y otros modelos revolucionan el análisis de tex
 :::
 :::
 
-## Resumen de la sesión
+## Resumen y próximos pasos
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
-**Métodos clásicos:**
+**Lo que vimos hoy**
 
-- [Tokenización]{.alert}: dividir texto en palabras
-- [Stopwords]{.alert}: eliminar palabras vacías
-- [Bag-of-words]{.alert}: contar frecuencias
-- [TF-IDF]{.alert}: ponderar por rareza
-- [LDA]{.alert}: descubrir temas latentes
+- [Tokenización]{.alert} y stopwords
+- [Bag-of-words]{.alert} y [TF-IDF]{.alert}
+- [Sentimiento]{.alert} con diccionarios
+- [LDA]{.alert}: temas latentes
+- [Embeddings]{.alert}: representaciones densas
+- [Caso integrado]{.alert} sobre encuesta abierta
+
+Los métodos clásicos son el [fundamento]{.alert} del análisis de texto. Entenderlos es la base para usar bien los LLMs.
 :::
 
 :::{.column width=50%}
-**Representaciones:**
+**Qué viene**
 
-- [Dispersas]{.alert}: un vector enorme con casi todos ceros
-- [Densas (embeddings)]{.alert}: vectores compactos que capturan significado
-- [Word2Vec]{.alert}: embeddings de palabras
-- [Doc2Vec]{.alert}: embeddings de documentos
-:::
-:::
-
-<br>
-
-[Estos métodos son el fundamento. Los LLMs los mejoran en casi todo, pero entender los conceptos básicos es clave.]{.alert}
-:::
-
-## Próximos pasos
-
-:::{style="margin-top: 40px; font-size: 26px;"}
-
-- [Laboratorios (3.3 y 3.4):]{.alert}
+- [Laboratorios 3.3 y 3.4]{.alert}:
     - Clustering y PCA con datos de países latinoamericanos
     - Análisis de textos políticos con TF-IDF y LDA
-
-- [Mañana (Día 4):]{.alert} LLMs y aplicaciones avanzadas
-    - ¿Qué son los transformers?
-    - BERT, GPT y modelos de lenguaje
-    - Cómo usar LLMs para investigación
-    - APIs y aplicaciones prácticas
-
-[Nos vemos en el laboratorio.]{.alert}
+- [Día 4]{.alert}: LLMs y aplicaciones avanzadas
+    - Transformers, BERT, GPT
+    - APIs y casos de investigación
+    - Cuándo un LLM supera al pipeline clásico (y cuándo no)
+:::
+:::
 :::
 
-# Nos vemos en el laboratorio {background-color="#2d4563"}
+# Nos vemos en el laboratorio! 🤓 {background-color="#2d4563"}

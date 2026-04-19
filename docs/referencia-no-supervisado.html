@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Referencia rápida: aprendizaje no supervisado en R – IA para Científicos Sociales</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">IA para Científicos Sociales</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./programa.html"> 
+<span class="menu-text">Programa</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./laboratorios.html"> 
+<span class="menu-text">Laboratorios</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./lecturas.html"> 
+<span class="menu-text">Lecturas</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-referencia-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Referencia R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
+        <li>
+    <a class="dropdown-item" href="./referencia-tidymodels.html">
+ <span class="dropdown-text">Supervisado (tidymodels)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./referencia-no-supervisado.html">
+ <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./referencia-texto.html">
+ <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:danilofreire@gmail.com"> <i class="bi bi-envelope" role="img" aria-label="Email">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/danilofreire/introduccion-ia-ucu"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Alternar modo lector">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#paquetes-y-datos-simulados" id="toc-paquetes-y-datos-simulados" class="nav-link active" data-scroll-target="#paquetes-y-datos-simulados"><span class="header-section-number">1</span> Paquetes y datos simulados</a>
+  <ul class="collapse">
+  <li><a href="#cargar-paquetes" id="toc-cargar-paquetes" class="nav-link" data-scroll-target="#cargar-paquetes"><span class="header-section-number">1.1</span> Cargar paquetes</a></li>
+  <li><a href="#crear-datos-simulados" id="toc-crear-datos-simulados" class="nav-link" data-scroll-target="#crear-datos-simulados"><span class="header-section-number">1.2</span> Crear datos simulados</a></li>
+  <li><a href="#preparar-la-matriz-numérica" id="toc-preparar-la-matriz-numérica" class="nav-link" data-scroll-target="#preparar-la-matriz-numérica"><span class="header-section-number">1.3</span> Preparar la matriz numérica</a></li>
+  </ul></li>
+  <li><a href="#exploración-previa" id="toc-exploración-previa" class="nav-link" data-scroll-target="#exploración-previa"><span class="header-section-number">2</span> Exploración previa</a>
+  <ul class="collapse">
+  <li><a href="#matriz-de-correlación" id="toc-matriz-de-correlación" class="nav-link" data-scroll-target="#matriz-de-correlación"><span class="header-section-number">2.1</span> Matriz de correlación</a></li>
+  <li><a href="#distancias-entre-observaciones" id="toc-distancias-entre-observaciones" class="nav-link" data-scroll-target="#distancias-entre-observaciones"><span class="header-section-number">2.2</span> Distancias entre observaciones</a></li>
+  </ul></li>
+  <li><a href="#k-means" id="toc-k-means" class="nav-link" data-scroll-target="#k-means"><span class="header-section-number">3</span> K-means</a>
+  <ul class="collapse">
+  <li><a href="#ajustar-k-means" id="toc-ajustar-k-means" class="nav-link" data-scroll-target="#ajustar-k-means"><span class="header-section-number">3.1</span> Ajustar K-means</a></li>
+  <li><a href="#elegir-k-método-del-codo" id="toc-elegir-k-método-del-codo" class="nav-link" data-scroll-target="#elegir-k-método-del-codo"><span class="header-section-number">3.2</span> Elegir K: método del codo</a></li>
+  <li><a href="#elegir-k-método-de-la-silueta" id="toc-elegir-k-método-de-la-silueta" class="nav-link" data-scroll-target="#elegir-k-método-de-la-silueta"><span class="header-section-number">3.3</span> Elegir K: método de la silueta</a></li>
+  <li><a href="#silueta-detallada-por-observación" id="toc-silueta-detallada-por-observación" class="nav-link" data-scroll-target="#silueta-detallada-por-observación"><span class="header-section-number">3.4</span> Silueta detallada por observación</a></li>
+  <li><a href="#visualizar-los-clusters-con-fviz_cluster" id="toc-visualizar-los-clusters-con-fviz_cluster" class="nav-link" data-scroll-target="#visualizar-los-clusters-con-fviz_cluster"><span class="header-section-number">3.5</span> Visualizar los clusters con <code>fviz_cluster()</code></a></li>
+  <li><a href="#validar-contra-una-etiqueta-conocida" id="toc-validar-contra-una-etiqueta-conocida" class="nav-link" data-scroll-target="#validar-contra-una-etiqueta-conocida"><span class="header-section-number">3.6</span> Validar contra una etiqueta conocida</a></li>
+  <li><a href="#perfil-de-cada-cluster" id="toc-perfil-de-cada-cluster" class="nav-link" data-scroll-target="#perfil-de-cada-cluster"><span class="header-section-number">3.7</span> Perfil de cada cluster</a></li>
+  </ul></li>
+  <li><a href="#clustering-jerárquico" id="toc-clustering-jerárquico" class="nav-link" data-scroll-target="#clustering-jerárquico"><span class="header-section-number">4</span> Clustering jerárquico</a>
+  <ul class="collapse">
+  <li><a href="#ajustar-con-distintos-métodos-de-enlace" id="toc-ajustar-con-distintos-métodos-de-enlace" class="nav-link" data-scroll-target="#ajustar-con-distintos-métodos-de-enlace"><span class="header-section-number">4.1</span> Ajustar con distintos métodos de enlace</a></li>
+  <li><a href="#cortar-el-dendrograma" id="toc-cortar-el-dendrograma" class="nav-link" data-scroll-target="#cortar-el-dendrograma"><span class="header-section-number">4.2</span> Cortar el dendrograma</a></li>
+  <li><a href="#visualizar-el-dendrograma" id="toc-visualizar-el-dendrograma" class="nav-link" data-scroll-target="#visualizar-el-dendrograma"><span class="header-section-number">4.3</span> Visualizar el dendrograma</a></li>
+  <li><a href="#dendrograma-coloreado-con-dendextend" id="toc-dendrograma-coloreado-con-dendextend" class="nav-link" data-scroll-target="#dendrograma-coloreado-con-dendextend"><span class="header-section-number">4.4</span> Dendrograma coloreado con <code>dendextend</code></a></li>
+  <li><a href="#k-means-vs.-jerárquico" id="toc-k-means-vs.-jerárquico" class="nav-link" data-scroll-target="#k-means-vs.-jerárquico"><span class="header-section-number">4.5</span> K-means vs.&nbsp;jerárquico</a></li>
+  </ul></li>
+  <li><a href="#análisis-de-componentes-principales-pca" id="toc-análisis-de-componentes-principales-pca" class="nav-link" data-scroll-target="#análisis-de-componentes-principales-pca"><span class="header-section-number">5</span> Análisis de componentes principales (PCA)</a>
+  <ul class="collapse">
+  <li><a href="#ajustar-pca-con-prcomp" id="toc-ajustar-pca-con-prcomp" class="nav-link" data-scroll-target="#ajustar-pca-con-prcomp"><span class="header-section-number">5.1</span> Ajustar PCA con <code>prcomp()</code></a></li>
+  <li><a href="#elegir-cuántos-componentes-conservar" id="toc-elegir-cuántos-componentes-conservar" class="nav-link" data-scroll-target="#elegir-cuántos-componentes-conservar"><span class="header-section-number">5.2</span> Elegir cuántos componentes conservar</a></li>
+  <li><a href="#loadings-qué-mide-cada-componente" id="toc-loadings-qué-mide-cada-componente" class="nav-link" data-scroll-target="#loadings-qué-mide-cada-componente"><span class="header-section-number">5.3</span> Loadings: ¿qué mide cada componente?</a></li>
+  <li><a href="#contribución-de-variables" id="toc-contribución-de-variables" class="nav-link" data-scroll-target="#contribución-de-variables"><span class="header-section-number">5.4</span> Contribución de variables</a></li>
+  <li><a href="#scores-posición-de-cada-observación" id="toc-scores-posición-de-cada-observación" class="nav-link" data-scroll-target="#scores-posición-de-cada-observación"><span class="header-section-number">5.5</span> Scores: posición de cada observación</a></li>
+  <li><a href="#biplot-observaciones-y-variables-juntos" id="toc-biplot-observaciones-y-variables-juntos" class="nav-link" data-scroll-target="#biplot-observaciones-y-variables-juntos"><span class="header-section-number">5.6</span> Biplot: observaciones y variables juntos</a></li>
+  </ul></li>
+  <li><a href="#combinar-pca-y-clustering" id="toc-combinar-pca-y-clustering" class="nav-link" data-scroll-target="#combinar-pca-y-clustering"><span class="header-section-number">6</span> Combinar PCA y clustering</a></li>
+  <li><a href="#recomendaciones-prácticas" id="toc-recomendaciones-prácticas" class="nav-link" data-scroll-target="#recomendaciones-prácticas"><span class="header-section-number">7</span> Recomendaciones prácticas</a></li>
+  <li><a href="#resumen-de-funciones" id="toc-resumen-de-funciones" class="nav-link" data-scroll-target="#resumen-de-funciones"><span class="header-section-number">8</span> Resumen de funciones</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/referencia-no-supervisado.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Referencia rápida: aprendizaje no supervisado en R</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Esta página es una referencia rápida de los comandos de <span class="alert">clustering</span> y <span class="alert">PCA</span> que usamos en la Sesión 3.1 y en el Laboratorio 5. Todos los ejemplos son ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.</p>
+<p>El flujo típico de un análisis no supervisado es:</p>
+<ol type="1">
+<li>Seleccionar variables numéricas y escalarlas</li>
+<li>Explorar correlaciones</li>
+<li>Aplicar K-means (o clustering jerárquico) y elegir K</li>
+<li>Evaluar la calidad de los clusters con la silueta</li>
+<li>Reducir dimensionalidad con PCA</li>
+<li>Interpretar los componentes y visualizar con un biplot</li>
+<li>Caracterizar los grupos con variables sustantivas</li>
+</ol>
+<section id="paquetes-y-datos-simulados" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="paquetes-y-datos-simulados"><span class="header-section-number">1</span> Paquetes y datos simulados</h2>
+<section id="cargar-paquetes" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="cargar-paquetes"><span class="header-section-number">1.1</span> Cargar paquetes</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)   <span class="co"># manipulación de datos y visualización</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)     <span class="co"># silhouette(), distancias</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)  <span class="co"># fviz_cluster, fviz_pca, fviz_nbclust, fviz_eig</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dendextend)  <span class="co"># dendrogramas coloreados</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)    <span class="co"># matrices de correlación</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)       <span class="co"># fijar semilla para reproducibilidad</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="crear-datos-simulados" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="crear-datos-simulados"><span class="header-section-number">1.2</span> Crear datos simulados</h3>
+<p>Simulamos 90 “países” distribuidos en 3 niveles de desarrollo (alto, medio, bajo) con 5 indicadores correlacionados. Usaremos este mismo tibble en toda la página.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Sigma <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fl">0.3</span>, <span class="dv">5</span>, <span class="dv">5</span>); <span class="fu">diag</span>(Sigma) <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sim_grupo <span class="ot">&lt;-</span> <span class="cf">function</span>(n, mu, g) {</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  MASS<span class="sc">::</span><span class="fu">mvrnorm</span>(n, mu, Sigma) <span class="sc">|&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>(<span class="at">.name_repair =</span> <span class="sc">~</span> <span class="fu">c</span>(<span class="st">"pib"</span>, <span class="st">"educacion"</span>, <span class="st">"internet"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"salud"</span>, <span class="st">"desigualdad"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">grupo_real =</span> g)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sim_grupo</span>(<span class="dv">30</span>, <span class="fu">c</span>( <span class="fl">2.5</span>,  <span class="fl">2.5</span>,  <span class="fl">2.5</span>,  <span class="fl">2.0</span>, <span class="sc">-</span><span class="fl">1.0</span>), <span class="st">"alto"</span>),</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sim_grupo</span>(<span class="dv">30</span>, <span class="fu">c</span>( <span class="fl">0.0</span>,  <span class="fl">0.0</span>,  <span class="fl">0.0</span>,  <span class="fl">0.5</span>,  <span class="fl">2.0</span>), <span class="st">"medio"</span>),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sim_grupo</span>(<span class="dv">30</span>, <span class="fu">c</span>(<span class="sc">-</span><span class="fl">2.5</span>, <span class="sc">-</span><span class="fl">2.5</span>, <span class="sc">-</span><span class="fl">2.5</span>, <span class="sc">-</span><span class="fl">1.5</span>, <span class="sc">-</span><span class="fl">1.0</span>), <span class="st">"bajo"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 90
+Columns: 6
+$ pib         &lt;dbl&gt; 0.6890635, 4.3189195, 2.0522693, 3.2904571, 1.5769763, 3.9…
+$ educacion   &lt;dbl&gt; 3.9022606, 4.4851366, 2.6641886, 3.0225546, 2.0236293, 4.5…
+$ internet    &lt;dbl&gt; 1.9640495, 2.5399324, 2.3047820, 1.9570903, 2.5186439, 3.9…
+$ salud       &lt;dbl&gt; 1.9219549, 1.7700314, 2.1591763, 1.5586122, 3.6879433, 3.0…
+$ desigualdad &lt;dbl&gt; -1.7039272, -1.0330909, -1.1422167, -1.0476344, 0.9038007,…
+$ grupo_real  &lt;chr&gt; "alto", "alto", "alto", "alto", "alto", "alto", "alto", "a…</code></pre>
+</div>
+</div>
+</section>
+<section id="preparar-la-matriz-numérica" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="preparar-la-matriz-numérica"><span class="header-section-number">1.3</span> Preparar la matriz numérica</h3>
+<p>K-means y PCA requieren una <span class="alert">matriz numérica escalada</span>. Guardamos los nombres de grupo aparte para usarlos en la validación.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Separar la etiqueta sustantiva (grupo_real) de las variables</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>grupo_real <span class="ot">&lt;-</span> datos<span class="sc">$</span>grupo_real</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>datos_scaled <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datos_scaled, <span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           pib educacion  internet     salud desigualdad
+[1,] 0.3153484  1.564242 0.8534460 0.9228415  -0.9422918
+[2,] 1.9307527  1.803582 1.1011165 0.8353421  -0.5611013
+[3,] 0.9220194  1.055867 0.9999851 1.0594677  -0.6231101</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="exploración-previa" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="exploración-previa"><span class="header-section-number">2</span> Exploración previa</h2>
+<section id="matriz-de-correlación" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="matriz-de-correlación"><span class="header-section-number">2.1</span> Matriz de correlación</h3>
+<p>Antes de aplicar cualquier técnica, conviene ver qué variables están correlacionadas. Las correlaciones altas anticipan buenos resultados de PCA.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(cor_matrix, <span class="at">method =</span> <span class="st">"color"</span>, <span class="at">type =</span> <span class="st">"upper"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">addCoef.col =</span> <span class="st">"black"</span>, <span class="at">number.cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">tl.col =</span> <span class="st">"black"</span>, <span class="at">tl.srt =</span> <span class="dv">45</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/correlacion-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="distancias-entre-observaciones" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="distancias-entre-observaciones"><span class="header-section-number">2.2</span> Distancias entre observaciones</h3>
+<p>La distancia euclidiana es la métrica por defecto de K-means y clustering jerárquico. También existen <code>manhattan</code>, <code>maximum</code>, <code>canberra</code>, <code>binary</code> y <code>minkowski</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">dist</span>(datos_scaled, <span class="at">method =</span> <span class="st">"euclidean"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Ver las primeras 5 observaciones</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(d)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     1    2    3    4    5
+1 0.00 1.70 0.88 1.29 2.01
+2 1.70 0.00 1.28 0.80 2.22
+3 0.88 1.28 0.00 0.69 1.50
+4 1.29 0.80 0.69 0.00 1.88
+5 2.01 2.22 1.50 1.88 0.00</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="k-means" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="k-means"><span class="header-section-number">3</span> K-means</h2>
+<section id="ajustar-k-means" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="ajustar-k-means"><span class="header-section-number">3.1</span> Ajustar K-means</h3>
+<p><code>nstart = 25</code> ejecuta 25 inicializaciones aleatorias y devuelve la mejor. Protege contra mínimos locales. Siempre escalar las variables antes de llamar a <code>kmeans()</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Estructura del objeto</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(km)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "cluster"      "centers"      "totss"        "withinss"     "tot.withinss"
+[6] "betweenss"    "size"         "iter"         "ifault"      </code></pre>
+</div>
+</div>
+<ul>
+<li><code>km$cluster</code>: vector de asignación (1, 2, 3, …)</li>
+<li><code>km$centers</code>: centros de cada cluster (en escala escalada)</li>
+<li><code>km$totss</code>, <code>km$withinss</code>, <code>km$tot.withinss</code>, <code>km$betweenss</code>: descomposición de varianza</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Asignación de cada observación</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(km<span class="sc">$</span>cluster, <span class="dv">15</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Centros de los clusters</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(km<span class="sc">$</span>centers, <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    pib educacion internet salud desigualdad
+1  1.07      1.11     1.10  1.02       -0.59
+2  0.00     -0.12    -0.04 -0.04        1.11
+3 -1.19     -1.10    -1.18 -1.08       -0.71</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamaño de cada cluster</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>km<span class="sc">$</span>size</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 30 33 27</code></pre>
+</div>
+</div>
+</section>
+<section id="elegir-k-método-del-codo" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="elegir-k-método-del-codo"><span class="header-section-number">3.2</span> Elegir K: método del codo</h3>
+<p>El “codo” aparece donde la suma de distancias intra-cluster (<code>wss</code>) deja de caer bruscamente. Se busca el punto donde añadir un cluster más ya no mejora mucho.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(datos_scaled, kmeans, <span class="at">method =</span> <span class="st">"wss"</span>,</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">k.max =</span> <span class="dv">8</span>, <span class="at">nstart =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Método del codo"</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="cn">NULL</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Suma de distancias intra-cluster (WSS)"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/metodo-codo-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="elegir-k-método-de-la-silueta" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="elegir-k-método-de-la-silueta"><span class="header-section-number">3.3</span> Elegir K: método de la silueta</h3>
+<p>La silueta mide qué tan bien cada punto encaja en su cluster. El K óptimo maximiza la silueta promedio.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_nbclust</span>(datos_scaled, kmeans, <span class="at">method =</span> <span class="st">"silhouette"</span>,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">k.max =</span> <span class="dv">8</span>, <span class="at">nstart =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Método de la silueta"</span>, <span class="at">subtitle =</span> <span class="cn">NULL</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/metodo-silueta-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="silueta-detallada-por-observación" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="silueta-detallada-por-observación"><span class="header-section-number">3.4</span> Silueta detallada por observación</h3>
+<p>Una vez elegido K, podemos inspeccionar la silueta de cada punto. Valores negativos indican puntos mal clasificados.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sil <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Silueta promedio</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(sil[, <span class="dv">3</span>]), <span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.504</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar por observación</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_silhouette</span>(sil) <span class="sc">+</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  cluster size ave.sil.width
+1       1   30          0.51
+2       2   33          0.50
+3       3   27          0.50</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/silueta-detalle-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Valor</th>
+<th>Interpretación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.71 – 1.00</td>
+<td>Estructura fuerte</td>
+</tr>
+<tr class="even">
+<td>0.51 – 0.70</td>
+<td>Estructura razonable</td>
+</tr>
+<tr class="odd">
+<td>0.26 – 0.50</td>
+<td>Estructura débil</td>
+</tr>
+<tr class="even">
+<td>&lt; 0.25</td>
+<td>Sin estructura clara</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="visualizar-los-clusters-con-fviz_cluster" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="visualizar-los-clusters-con-fviz_cluster"><span class="header-section-number">3.5</span> Visualizar los clusters con <code>fviz_cluster()</code></h3>
+<p><code>factoextra</code> proyecta automáticamente los datos en los dos primeros componentes principales para visualizar en 2D.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(km, <span class="at">data =</span> datos_scaled,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">geom =</span> <span class="st">"point"</span>,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">ellipse.type =</span> <span class="st">"convex"</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"#2d4563"</span>, <span class="st">"#b85450"</span>, <span class="st">"#6b8e23"</span>),</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>())</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/viz-kmeans-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="validar-contra-una-etiqueta-conocida" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="validar-contra-una-etiqueta-conocida"><span class="header-section-number">3.6</span> Validar contra una etiqueta conocida</h3>
+<p>Si tenemos una etiqueta sustantiva (como <code>grupo_real</code>), podemos cruzarla con la asignación del modelo. Los números de cluster son arbitrarios: lo que importa es si cada grupo real cae en un solo cluster.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">real =</span> grupo_real, <span class="at">cluster =</span> km<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       cluster
+real     1  2  3
+  alto  30  0  0
+  bajo   0  3 27
+  medio  0 30  0</code></pre>
+</div>
+</div>
+</section>
+<section id="perfil-de-cada-cluster" class="level3" data-number="3.7">
+<h3 data-number="3.7" class="anchored" data-anchor-id="perfil-de-cada-cluster"><span class="header-section-number">3.7</span> Perfil de cada cluster</h3>
+<p>Para dar sentido sustantivo a los clusters, calculamos la media de cada variable dentro de cada grupo.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>datos <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> km<span class="sc">$</span>cluster) <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">|&gt;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                   \(x) <span class="fu">round</span>(<span class="fu">mean</span>(x), <span class="dv">2</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 6
+  cluster   pib educacion internet salud desigualdad
+    &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;
+1       1  2.38      2.81     2.54  2.09       -1.08
+2       2 -0.02     -0.19    -0.1   0.25        1.91
+3       3 -2.68     -2.58    -2.77 -1.56       -1.29</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="clustering-jerárquico" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="clustering-jerárquico"><span class="header-section-number">4</span> Clustering jerárquico</h2>
+<section id="ajustar-con-distintos-métodos-de-enlace" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="ajustar-con-distintos-métodos-de-enlace"><span class="header-section-number">4.1</span> Ajustar con distintos métodos de enlace</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Método</th>
+<th>Cómo mide la distancia entre clusters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>single</code></td>
+<td>Puntos más cercanos (puede crear cadenas)</td>
+</tr>
+<tr class="even">
+<td><code>complete</code></td>
+<td>Puntos más lejanos (clusters compactos)</td>
+</tr>
+<tr class="odd">
+<td><code>average</code></td>
+<td>Promedio de todas las distancias</td>
+</tr>
+<tr class="even">
+<td><code>ward.D2</code></td>
+<td>Minimiza la varianza interna (muy usado)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>hc <span class="ot">&lt;-</span> <span class="fu">hclust</span>(d, <span class="at">method =</span> <span class="st">"ward.D2"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="cortar-el-dendrograma" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="cortar-el-dendrograma"><span class="header-section-number">4.2</span> Cortar el dendrograma</h3>
+<p><code>cutree()</code> corta el dendrograma a una altura que produce K clusters.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>grupos_hc <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc, <span class="at">k =</span> <span class="dv">3</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">real =</span> grupo_real, <span class="at">jerarquico =</span> grupos_hc)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       jerarquico
+real     1  2  3
+  alto  30  0  0
+  bajo   0  1 29
+  medio  0 29  1</code></pre>
+</div>
+</div>
+</section>
+<section id="visualizar-el-dendrograma" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="visualizar-el-dendrograma"><span class="header-section-number">4.3</span> Visualizar el dendrograma</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hc, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">labels =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">""</span>, <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">sub =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">"Altura"</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rect.hclust</span>(hc, <span class="at">k =</span> <span class="dv">3</span>,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">border =</span> <span class="fu">c</span>(<span class="st">"#2d4563"</span>, <span class="st">"#b85450"</span>, <span class="st">"#6b8e23"</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/hclust-plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="dendrograma-coloreado-con-dendextend" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="dendrograma-coloreado-con-dendextend"><span class="header-section-number">4.4</span> Dendrograma coloreado con <code>dendextend</code></h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>dend <span class="ot">&lt;-</span> <span class="fu">as.dendrogram</span>(hc) <span class="sc">|&gt;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  dendextend<span class="sc">::</span><span class="fu">color_branches</span>(<span class="at">k =</span> <span class="dv">3</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2d4563"</span>, <span class="st">"#b85450"</span>, <span class="st">"#6b8e23"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  dendextend<span class="sc">::</span><span class="fu">set</span>(<span class="st">"labels_cex"</span>, <span class="fl">0.6</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dend, <span class="at">main =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">"Altura"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/dendextend-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="k-means-vs.-jerárquico" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="k-means-vs.-jerárquico"><span class="header-section-number">4.5</span> K-means vs.&nbsp;jerárquico</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Criterio</th>
+<th>K-means</th>
+<th>Jerárquico</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Elegir K</td>
+<td>Antes de ejecutar</td>
+<td>Después, cortando</td>
+</tr>
+<tr class="even">
+<td>Forma de clusters</td>
+<td>Esféricos</td>
+<td>Cualquier forma</td>
+</tr>
+<tr class="odd">
+<td>Escalabilidad</td>
+<td>Muy rápido</td>
+<td>Lento con n grande</td>
+</tr>
+<tr class="even">
+<td>Reproducibilidad</td>
+<td>Depende de la semilla</td>
+<td>Determinístico</td>
+</tr>
+<tr class="odd">
+<td>Visualización</td>
+<td>Scatter plot</td>
+<td>Dendrograma</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="análisis-de-componentes-principales-pca" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="análisis-de-componentes-principales-pca"><span class="header-section-number">5</span> Análisis de componentes principales (PCA)</h2>
+<section id="ajustar-pca-con-prcomp" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="ajustar-pca-con-prcomp"><span class="header-section-number">5.1</span> Ajustar PCA con <code>prcomp()</code></h3>
+<p><code>prcomp()</code> espera datos numéricos. Como ya escalamos antes, no necesitamos <code>scale. = TRUE</code>. Si los datos no estuvieran escalados, sí habría que pasarlo.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(datos_scaled)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Resumen: varianza explicada y acumulada</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Importance of components:
+                          PC1    PC2     PC3     PC4     PC5
+Standard deviation     1.8829 0.9957 0.44434 0.38634 0.34117
+Proportion of Variance 0.7091 0.1983 0.03949 0.02985 0.02328
+Cumulative Proportion  0.7091 0.9074 0.94687 0.97672 1.00000</code></pre>
+</div>
+</div>
+</section>
+<section id="elegir-cuántos-componentes-conservar" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="elegir-cuántos-componentes-conservar"><span class="header-section-number">5.2</span> Elegir cuántos componentes conservar</h3>
+<p>Tres criterios comunes:</p>
+<ul>
+<li><strong>Varianza acumulada</strong> cerca del 70-80%</li>
+<li><strong>Método del codo</strong> en el scree plot</li>
+<li><strong>Regla de Kaiser</strong>: conservar componentes con eigenvalue &gt; 1</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_eig</span>(pca, <span class="at">addlabels =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">barfill =</span> <span class="st">"#2d4563"</span>, <span class="at">barcolor =</span> <span class="st">"#2d4563"</span>) <span class="sc">+</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Varianza explicada (%)"</span>) <span class="sc">+</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/scree-plot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="loadings-qué-mide-cada-componente" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="loadings-qué-mide-cada-componente"><span class="header-section-number">5.3</span> Loadings: ¿qué mide cada componente?</h3>
+<p>Los loadings (matriz de rotación) indican cuánto pesa cada variable en cada componente. Un loading grande (positivo o negativo) significa que la variable contribuye mucho al componente.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(pca<span class="sc">$</span>rotation[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              PC1   PC2   PC3
+pib         -0.50 -0.01  0.04
+educacion   -0.50 -0.07  0.27
+internet    -0.50 -0.06  0.49
+salud       -0.49  0.01 -0.82
+desigualdad -0.07  1.00  0.06</code></pre>
+</div>
+</div>
+<p>Para ordenar por valor absoluto del primer componente:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.frame</span>(pca<span class="sc">$</span>rotation[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]) <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(PC1)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     variable         PC1         PC2         PC3
+1   educacion -0.50460453 -0.07166984  0.26627562
+2         pib -0.50097962 -0.01370075  0.03829003
+3    internet -0.49876169 -0.06143075  0.49497724
+4       salud -0.49079071  0.01024873 -0.82412329
+5 desigualdad -0.06895608  0.99538784  0.05873245</code></pre>
+</div>
+</div>
+</section>
+<section id="contribución-de-variables" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="contribución-de-variables"><span class="header-section-number">5.4</span> Contribución de variables</h3>
+<p><code>fviz_contrib()</code> muestra qué variables contribuyen más a un componente específico. La línea roja es el umbral “esperado” bajo una contribución uniforme.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_contrib</span>(pca, <span class="at">choice =</span> <span class="st">"var"</span>, <span class="at">axes =</span> <span class="dv">1</span>,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> <span class="st">"#2d4563"</span>, <span class="at">color =</span> <span class="st">"#2d4563"</span>) <span class="sc">+</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Contribución de variables a PC1"</span>) <span class="sc">+</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/contrib-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="scores-posición-de-cada-observación" class="level3" data-number="5.5">
+<h3 data-number="5.5" class="anchored" data-anchor-id="scores-posición-de-cada-observación"><span class="header-section-number">5.5</span> Scores: posición de cada observación</h3>
+<p>Los scores (<code>pca$x</code>) son las coordenadas de cada observación en el nuevo espacio de componentes. Sirven para ranking y para visualización.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">|&gt;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PC1 =</span> <span class="fu">round</span>(PC1, <span class="dv">2</span>),</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">PC2 =</span> <span class="fu">round</span>(PC2, <span class="dv">2</span>),</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">grupo_real =</span> grupo_real) <span class="sc">|&gt;</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">6</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    PC1   PC2 grupo_real
+1 -1.76 -1.10       alto
+2 -2.80 -0.77       alto
+3 -1.97 -0.76       alto
+4 -2.08 -0.72       alto
+5 -2.29  0.42       alto
+6 -3.48  0.57       alto</code></pre>
+</div>
+</div>
+</section>
+<section id="biplot-observaciones-y-variables-juntos" class="level3" data-number="5.6">
+<h3 data-number="5.6" class="anchored" data-anchor-id="biplot-observaciones-y-variables-juntos"><span class="header-section-number">5.6</span> Biplot: observaciones y variables juntos</h3>
+<p>Un biplot muestra las observaciones (puntos) y las variables (flechas) en el mismo plano. Flechas cercanas indican variables correlacionadas; observaciones cercanas a una flecha tienen valores altos en esa variable.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_pca_biplot</span>(pca,</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">geom.ind =</span> <span class="st">"point"</span>,</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">habillage =</span> grupo_real,</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">addEllipses =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"#2d4563"</span>, <span class="st">"#b85450"</span>, <span class="st">"#6b8e23"</span>),</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">col.var =</span> <span class="st">"black"</span>,</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">repel =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">legend.title =</span> <span class="st">"Grupo real"</span>) <span class="sc">+</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/biplot-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="combinar-pca-y-clustering" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="combinar-pca-y-clustering"><span class="header-section-number">6</span> Combinar PCA y clustering</h2>
+<p>Una práctica común es ejecutar K-means en las variables originales y visualizar los clusters en el plano PC1-PC2.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>pca_coords <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]) <span class="sc">|&gt;</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> <span class="fu">factor</span>(km<span class="sc">$</span>cluster),</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">grupo_real =</span> grupo_real)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pca_coords, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">colour =</span> cluster, <span class="at">shape =</span> grupo_real)) <span class="sc">+</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#2d4563"</span>, <span class="st">"#b85450"</span>, <span class="st">"#6b8e23"</span>)) <span class="sc">+</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Clusters de K-means sobre PC1-PC2"</span>,</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">colour =</span> <span class="st">"Cluster"</span>, <span class="at">shape =</span> <span class="st">"Grupo real"</span>) <span class="sc">+</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="referencia-no-supervisado_files/figure-html/pca-km-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Otra opción es ejecutar K-means directamente sobre los primeros componentes (útil cuando hay muchas variables correlacionadas).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>km_pca <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">real =</span> grupo_real, <span class="at">cluster =</span> km_pca<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       cluster
+real     1  2  3
+  alto   0  0 30
+  bajo   3 27  0
+  medio 30  0  0</code></pre>
+</div>
+</div>
+</section>
+<section id="recomendaciones-prácticas" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="recomendaciones-prácticas"><span class="header-section-number">7</span> Recomendaciones prácticas</h2>
+<ul>
+<li><strong>Siempre escalar</strong> antes de K-means o PCA. Las variables con mayor varianza dominan el resultado si no lo hacemos.</li>
+<li><strong>Fijar la semilla</strong> con <code>set.seed()</code>. K-means depende de inicialización aleatoria.</li>
+<li><strong>Usar <code>nstart = 25</code></strong> o más en <code>kmeans()</code> para evitar mínimos locales.</li>
+<li><strong>Combinar métricas</strong>: codo, silueta y conocimiento del dominio. Si los tres coinciden, el K elegido es defendible.</li>
+<li><strong>Nombrar los clusters</strong> con etiquetas sustantivas (“alto desarrollo”) en lugar de dejar “1, 2, 3”.</li>
+<li><strong>No reificar</strong>: los clusters son un resumen útil, no categorías naturales. Dependen de K, de las variables elegidas y del escalado.</li>
+<li><strong>PCA sólo captura relaciones lineales</strong>. Si sospechan no linealidad, considerar UMAP o t-SNE.</li>
+</ul>
+</section>
+<section id="resumen-de-funciones" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="resumen-de-funciones"><span class="header-section-number">8</span> Resumen de funciones</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Función</th>
+<th>Paquete</th>
+<th>Para qué sirve</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>scale()</code></td>
+<td>base</td>
+<td>Estandariza variables (media 0, sd 1)</td>
+</tr>
+<tr class="even">
+<td><code>dist()</code></td>
+<td>base</td>
+<td>Matriz de distancias entre observaciones</td>
+</tr>
+<tr class="odd">
+<td><code>kmeans()</code></td>
+<td>base</td>
+<td>Ajusta K-means</td>
+</tr>
+<tr class="even">
+<td><code>hclust()</code></td>
+<td>base</td>
+<td>Ajusta clustering jerárquico</td>
+</tr>
+<tr class="odd">
+<td><code>cutree()</code></td>
+<td>base</td>
+<td>Corta un dendrograma en K grupos</td>
+</tr>
+<tr class="even">
+<td><code>rect.hclust()</code></td>
+<td>base</td>
+<td>Dibuja rectángulos sobre el dendrograma</td>
+</tr>
+<tr class="odd">
+<td><code>prcomp()</code></td>
+<td>base</td>
+<td>Ajusta PCA</td>
+</tr>
+<tr class="even">
+<td><code>silhouette()</code></td>
+<td>cluster</td>
+<td>Calcula la silueta por observación</td>
+</tr>
+<tr class="odd">
+<td><code>fviz_cluster()</code></td>
+<td>factoextra</td>
+<td>Visualiza clusters en 2D</td>
+</tr>
+<tr class="even">
+<td><code>fviz_nbclust()</code></td>
+<td>factoextra</td>
+<td>Elige K con codo o silueta</td>
+</tr>
+<tr class="odd">
+<td><code>fviz_silhouette()</code></td>
+<td>factoextra</td>
+<td>Silueta por observación</td>
+</tr>
+<tr class="even">
+<td><code>fviz_eig()</code></td>
+<td>factoextra</td>
+<td>Scree plot de PCA</td>
+</tr>
+<tr class="odd">
+<td><code>fviz_contrib()</code></td>
+<td>factoextra</td>
+<td>Contribución de variables a un PC</td>
+</tr>
+<tr class="even">
+<td><code>fviz_pca_biplot()</code></td>
+<td>factoextra</td>
+<td>Biplot de PCA</td>
+</tr>
+<tr class="odd">
+<td><code>color_branches()</code></td>
+<td>dendextend</td>
+<td>Colorea ramas del dendrograma</td>
+</tr>
+<tr class="even">
+<td><code>corrplot()</code></td>
+<td>corrplot</td>
+<td>Matriz de correlaciones visual</td>
+</tr>
+</tbody>
+</table>
+<p>Para la referencia de aprendizaje supervisado (clasificación y regresión con <code>tidymodels</code>), ver <a href="./referencia-tidymodels.html">Referencia: tidymodels</a>. Para análisis de texto, ver <a href="./referencia-texto.html">Referencia: análisis de texto</a>.</p>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 <a href="https://danilofreire.github.io">Danilo Freire</a>. Contenido bajo licencia <a href="https://opensource.org/licenses/MIT">MIT</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/referencia-no-supervisado.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Hecho con <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

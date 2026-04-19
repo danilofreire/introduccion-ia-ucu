@@ -1,0 +1,413 @@
+---
+title: "Referencia rápida: aprendizaje no supervisado en R"
+toc: true
+toc-depth: 3
+number-sections: true
+code-fold: false
+lang: es
+engine: knitr
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4,
+  cache = TRUE
+)
+```
+
+Esta página es una referencia rápida de los comandos de [clustering]{.alert} y [PCA]{.alert} que usamos en la Sesión 3.1 y en el Laboratorio 5. Todos los ejemplos son ejecutables con datos simulados. Pueden copiar y pegar el código en RStudio para practicar.
+
+El flujo típico de un análisis no supervisado es:
+
+1. Seleccionar variables numéricas y escalarlas
+2. Explorar correlaciones
+3. Aplicar K-means (o clustering jerárquico) y elegir K
+4. Evaluar la calidad de los clusters con la silueta
+5. Reducir dimensionalidad con PCA
+6. Interpretar los componentes y visualizar con un biplot
+7. Caracterizar los grupos con variables sustantivas
+
+## Paquetes y datos simulados
+
+### Cargar paquetes
+
+```{r paquetes}
+library(tidyverse)   # manipulación de datos y visualización
+library(cluster)     # silhouette(), distancias
+library(factoextra)  # fviz_cluster, fviz_pca, fviz_nbclust, fviz_eig
+library(dendextend)  # dendrogramas coloreados
+library(corrplot)    # matrices de correlación
+
+set.seed(2026)       # fijar semilla para reproducibilidad
+```
+
+### Crear datos simulados
+
+Simulamos 90 "países" distribuidos en 3 niveles de desarrollo (alto, medio, bajo) con 5 indicadores correlacionados. Usaremos este mismo tibble en toda la página.
+
+```{r datos-simulados}
+Sigma <- matrix(0.3, 5, 5); diag(Sigma) <- 1
+
+sim_grupo <- function(n, mu, g) {
+  MASS::mvrnorm(n, mu, Sigma) |>
+    as_tibble(.name_repair = ~ c("pib", "educacion", "internet",
+                                 "salud", "desigualdad")) |>
+    mutate(grupo_real = g)
+}
+
+datos <- bind_rows(
+  sim_grupo(30, c( 2.5,  2.5,  2.5,  2.0, -1.0), "alto"),
+  sim_grupo(30, c( 0.0,  0.0,  0.0,  0.5,  2.0), "medio"),
+  sim_grupo(30, c(-2.5, -2.5, -2.5, -1.5, -1.0), "bajo")
+)
+
+glimpse(datos)
+```
+
+### Preparar la matriz numérica
+
+K-means y PCA requieren una [matriz numérica escalada]{.alert}. Guardamos los nombres de grupo aparte para usarlos en la validación.
+
+```{r preparar-datos}
+# Separar la etiqueta sustantiva (grupo_real) de las variables
+grupo_real <- datos$grupo_real
+
+datos_scaled <- datos |>
+  select(where(is.numeric)) |>
+  scale()
+
+head(datos_scaled, 3)
+```
+
+## Exploración previa
+
+### Matriz de correlación
+
+Antes de aplicar cualquier técnica, conviene ver qué variables están correlacionadas. Las correlaciones altas anticipan buenos resultados de PCA.
+
+```{r correlacion}
+cor_matrix <- datos |>
+  select(where(is.numeric)) |>
+  cor()
+
+corrplot(cor_matrix, method = "color", type = "upper",
+         addCoef.col = "black", number.cex = 0.8,
+         tl.col = "black", tl.srt = 45)
+```
+
+### Distancias entre observaciones
+
+La distancia euclidiana es la métrica por defecto de K-means y clustering jerárquico. También existen `manhattan`, `maximum`, `canberra`, `binary` y `minkowski`.
+
+```{r distancias}
+d <- dist(datos_scaled, method = "euclidean")
+
+# Ver las primeras 5 observaciones
+as.matrix(d)[1:5, 1:5] |> round(2)
+```
+
+## K-means
+
+### Ajustar K-means
+
+`nstart = 25` ejecuta 25 inicializaciones aleatorias y devuelve la mejor. Protege contra mínimos locales. Siempre escalar las variables antes de llamar a `kmeans()`.
+
+```{r kmeans-fit}
+km <- kmeans(datos_scaled, centers = 3, nstart = 25)
+
+# Estructura del objeto
+names(km)
+```
+
+- `km$cluster`: vector de asignación (1, 2, 3, ...)
+- `km$centers`: centros de cada cluster (en escala escalada)
+- `km$totss`, `km$withinss`, `km$tot.withinss`, `km$betweenss`: descomposición de varianza
+
+```{r kmeans-resultados}
+# Asignación de cada observación
+head(km$cluster, 15)
+
+# Centros de los clusters
+round(km$centers, 2)
+
+# Tamaño de cada cluster
+km$size
+```
+
+### Elegir K: método del codo
+
+El "codo" aparece donde la suma de distancias intra-cluster (`wss`) deja de caer bruscamente. Se busca el punto donde añadir un cluster más ya no mejora mucho.
+
+```{r metodo-codo}
+fviz_nbclust(datos_scaled, kmeans, method = "wss",
+             k.max = 8, nstart = 25) +
+  labs(title = "Método del codo",
+       subtitle = NULL,
+       y = "Suma de distancias intra-cluster (WSS)")
+```
+
+### Elegir K: método de la silueta
+
+La silueta mide qué tan bien cada punto encaja en su cluster. El K óptimo maximiza la silueta promedio.
+
+```{r metodo-silueta}
+fviz_nbclust(datos_scaled, kmeans, method = "silhouette",
+             k.max = 8, nstart = 25) +
+  labs(title = "Método de la silueta", subtitle = NULL)
+```
+
+### Silueta detallada por observación
+
+Una vez elegido K, podemos inspeccionar la silueta de cada punto. Valores negativos indican puntos mal clasificados.
+
+```{r silueta-detalle}
+sil <- silhouette(km$cluster, dist(datos_scaled))
+
+# Silueta promedio
+round(mean(sil[, 3]), 3)
+
+# Visualizar por observación
+fviz_silhouette(sil) +
+  theme(axis.text.x = element_blank())
+```
+
+| Valor | Interpretación |
+|-------|----------------|
+| 0.71 – 1.00 | Estructura fuerte |
+| 0.51 – 0.70 | Estructura razonable |
+| 0.26 – 0.50 | Estructura débil |
+| < 0.25 | Sin estructura clara |
+
+### Visualizar los clusters con `fviz_cluster()`
+
+`factoextra` proyecta automáticamente los datos en los dos primeros componentes principales para visualizar en 2D.
+
+```{r viz-kmeans}
+fviz_cluster(km, data = datos_scaled,
+             geom = "point",
+             ellipse.type = "convex",
+             palette = c("#2d4563", "#b85450", "#6b8e23"),
+             ggtheme = theme_minimal())
+```
+
+### Validar contra una etiqueta conocida
+
+Si tenemos una etiqueta sustantiva (como `grupo_real`), podemos cruzarla con la asignación del modelo. Los números de cluster son arbitrarios: lo que importa es si cada grupo real cae en un solo cluster.
+
+```{r kmeans-validar}
+table(real = grupo_real, cluster = km$cluster)
+```
+
+### Perfil de cada cluster
+
+Para dar sentido sustantivo a los clusters, calculamos la media de cada variable dentro de cada grupo.
+
+```{r kmeans-perfil}
+datos |>
+  mutate(cluster = km$cluster) |>
+  group_by(cluster) |>
+  summarise(across(where(is.numeric),
+                   \(x) round(mean(x), 2)))
+```
+
+## Clustering jerárquico
+
+### Ajustar con distintos métodos de enlace
+
+| Método | Cómo mide la distancia entre clusters |
+|--------|--------------------------------------|
+| `single` | Puntos más cercanos (puede crear cadenas) |
+| `complete` | Puntos más lejanos (clusters compactos) |
+| `average` | Promedio de todas las distancias |
+| `ward.D2` | Minimiza la varianza interna (muy usado) |
+
+```{r hclust-fit}
+hc <- hclust(d, method = "ward.D2")
+```
+
+### Cortar el dendrograma
+
+`cutree()` corta el dendrograma a una altura que produce K clusters.
+
+```{r hclust-cutree}
+grupos_hc <- cutree(hc, k = 3)
+
+table(real = grupo_real, jerarquico = grupos_hc)
+```
+
+### Visualizar el dendrograma
+
+```{r hclust-plot, fig.height=3.5}
+plot(hc, hang = -1, labels = FALSE,
+     main = "", xlab = "", sub = "", ylab = "Altura")
+rect.hclust(hc, k = 3,
+            border = c("#2d4563", "#b85450", "#6b8e23"))
+```
+
+### Dendrograma coloreado con `dendextend`
+
+```{r dendextend, fig.height=3.5}
+dend <- as.dendrogram(hc) |>
+  dendextend::color_branches(k = 3,
+                             col = c("#2d4563", "#b85450", "#6b8e23")) |>
+  dendextend::set("labels_cex", 0.6)
+
+plot(dend, main = "", ylab = "Altura")
+```
+
+### K-means vs. jerárquico
+
+| Criterio | K-means | Jerárquico |
+|----------|---------|------------|
+| Elegir K | Antes de ejecutar | Después, cortando |
+| Forma de clusters | Esféricos | Cualquier forma |
+| Escalabilidad | Muy rápido | Lento con n grande |
+| Reproducibilidad | Depende de la semilla | Determinístico |
+| Visualización | Scatter plot | Dendrograma |
+
+## Análisis de componentes principales (PCA)
+
+### Ajustar PCA con `prcomp()`
+
+`prcomp()` espera datos numéricos. Como ya escalamos antes, no necesitamos `scale. = TRUE`. Si los datos no estuvieran escalados, sí habría que pasarlo.
+
+```{r pca-fit}
+pca <- prcomp(datos_scaled)
+
+# Resumen: varianza explicada y acumulada
+summary(pca)
+```
+
+### Elegir cuántos componentes conservar
+
+Tres criterios comunes:
+
+- **Varianza acumulada** cerca del 70-80%
+- **Método del codo** en el scree plot
+- **Regla de Kaiser**: conservar componentes con eigenvalue > 1
+
+```{r scree-plot, fig.height=3.2}
+fviz_eig(pca, addlabels = TRUE,
+         barfill = "#2d4563", barcolor = "#2d4563") +
+  labs(title = NULL, y = "Varianza explicada (%)") +
+  theme_minimal()
+```
+
+### Loadings: ¿qué mide cada componente?
+
+Los loadings (matriz de rotación) indican cuánto pesa cada variable en cada componente. Un loading grande (positivo o negativo) significa que la variable contribuye mucho al componente.
+
+```{r pca-loadings}
+round(pca$rotation[, 1:3], 2)
+```
+
+Para ordenar por valor absoluto del primer componente:
+
+```{r pca-loadings-orden}
+as.data.frame(pca$rotation[, 1:3]) |>
+  rownames_to_column("variable") |>
+  arrange(desc(abs(PC1)))
+```
+
+### Contribución de variables
+
+`fviz_contrib()` muestra qué variables contribuyen más a un componente específico. La línea roja es el umbral "esperado" bajo una contribución uniforme.
+
+```{r contrib, fig.height=3}
+fviz_contrib(pca, choice = "var", axes = 1,
+             fill = "#2d4563", color = "#2d4563") +
+  labs(title = "Contribución de variables a PC1") +
+  theme_minimal()
+```
+
+### Scores: posición de cada observación
+
+Los scores (`pca$x`) son las coordenadas de cada observación en el nuevo espacio de componentes. Sirven para ranking y para visualización.
+
+```{r pca-scores}
+pca$x[, 1:2] |>
+  as.data.frame() |>
+  mutate(PC1 = round(PC1, 2),
+         PC2 = round(PC2, 2),
+         grupo_real = grupo_real) |>
+  slice_head(n = 6)
+```
+
+### Biplot: observaciones y variables juntos
+
+Un biplot muestra las observaciones (puntos) y las variables (flechas) en el mismo plano. Flechas cercanas indican variables correlacionadas; observaciones cercanas a una flecha tienen valores altos en esa variable.
+
+```{r biplot, fig.height=4}
+fviz_pca_biplot(pca,
+                geom.ind = "point",
+                habillage = grupo_real,
+                addEllipses = TRUE,
+                palette = c("#2d4563", "#b85450", "#6b8e23"),
+                col.var = "black",
+                repel = TRUE,
+                legend.title = "Grupo real") +
+  labs(title = NULL) +
+  theme_minimal()
+```
+
+## Combinar PCA y clustering
+
+Una práctica común es ejecutar K-means en las variables originales y visualizar los clusters en el plano PC1-PC2.
+
+```{r pca-km}
+pca_coords <- as.data.frame(pca$x[, 1:2]) |>
+  mutate(cluster = factor(km$cluster),
+         grupo_real = grupo_real)
+
+ggplot(pca_coords, aes(x = PC1, y = PC2,
+                       colour = cluster, shape = grupo_real)) +
+  geom_point(size = 3) +
+  scale_colour_manual(values = c("#2d4563", "#b85450", "#6b8e23")) +
+  labs(title = "Clusters de K-means sobre PC1-PC2",
+       colour = "Cluster", shape = "Grupo real") +
+  theme_minimal()
+```
+
+Otra opción es ejecutar K-means directamente sobre los primeros componentes (útil cuando hay muchas variables correlacionadas).
+
+```{r kmeans-on-pca}
+km_pca <- kmeans(pca$x[, 1:2], centers = 3, nstart = 25)
+
+table(real = grupo_real, cluster = km_pca$cluster)
+```
+
+## Recomendaciones prácticas
+
+- **Siempre escalar** antes de K-means o PCA. Las variables con mayor varianza dominan el resultado si no lo hacemos.
+- **Fijar la semilla** con `set.seed()`. K-means depende de inicialización aleatoria.
+- **Usar `nstart = 25`** o más en `kmeans()` para evitar mínimos locales.
+- **Combinar métricas**: codo, silueta y conocimiento del dominio. Si los tres coinciden, el K elegido es defendible.
+- **Nombrar los clusters** con etiquetas sustantivas ("alto desarrollo") en lugar de dejar "1, 2, 3".
+- **No reificar**: los clusters son un resumen útil, no categorías naturales. Dependen de K, de las variables elegidas y del escalado.
+- **PCA sólo captura relaciones lineales**. Si sospechan no linealidad, considerar UMAP o t-SNE.
+
+## Resumen de funciones
+
+| Función | Paquete | Para qué sirve |
+|---------|---------|----------------|
+| `scale()` | base | Estandariza variables (media 0, sd 1) |
+| `dist()` | base | Matriz de distancias entre observaciones |
+| `kmeans()` | base | Ajusta K-means |
+| `hclust()` | base | Ajusta clustering jerárquico |
+| `cutree()` | base | Corta un dendrograma en K grupos |
+| `rect.hclust()` | base | Dibuja rectángulos sobre el dendrograma |
+| `prcomp()` | base | Ajusta PCA |
+| `silhouette()` | cluster | Calcula la silueta por observación |
+| `fviz_cluster()` | factoextra | Visualiza clusters en 2D |
+| `fviz_nbclust()` | factoextra | Elige K con codo o silueta |
+| `fviz_silhouette()` | factoextra | Silueta por observación |
+| `fviz_eig()` | factoextra | Scree plot de PCA |
+| `fviz_contrib()` | factoextra | Contribución de variables a un PC |
+| `fviz_pca_biplot()` | factoextra | Biplot de PCA |
+| `color_branches()` | dendextend | Colorea ramas del dendrograma |
+| `corrplot()` | corrplot | Matriz de correlaciones visual |
+
+Para la referencia de aprendizaje supervisado (clasificación y regresión con `tidymodels`), ver [Referencia: tidymodels](referencia-tidymodels.qmd). Para análisis de texto, ver [Referencia: análisis de texto](referencia-texto.qmd).

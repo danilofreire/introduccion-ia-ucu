@@ -87,14 +87,14 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 | Parte | Contenido | Duración |
 |-------|-----------|----------|
-| 1 | Tokenización y limpieza | ~25 min |
-| 2 | Frecuencias y TF-IDF | ~30 min |
-| 3 | Topic Modeling (LDA) | ~35 min |
-| 4 | Interpretación y ejercicios | ~30 min |
+| 1 | Tokenización y limpieza | ~15 min |
+| 2 | Frecuencias y TF-IDF | ~15 min |
+| 3 | Topic Modeling (LDA) | ~20 min |
+| 4 | Ejercicios | ~10 min |
 
 <br>
 
-[Los textos están etiquetados por tema. Vamos a ver si los métodos recuperan esas etiquetas.]{.alert}
+[Los textos están etiquetados por tema. Vamos a ver si los métodos recuperan esas etiquetas. Material extra en los apéndices.]{.alert}
 :::
 
 # Parte 1: Tokenización y limpieza {background-color="#2d4563"}
@@ -265,31 +265,6 @@ tokens_limpios |>
   labs(title = "20 palabras más frecuentes (sin stopwords)",
        x = "Frecuencia", y = NULL) +
   theme_minimal()
-```
-:::
-
-## Nube de palabras
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r}
-#| label: wordcloud
-#| eval: true
-#| fig-width: 8
-#| fig-height: 6
-
-# Contar frecuencias
-freq <- tokens_limpios |>
-  count(palabra, sort = TRUE) |>
-  head(100)
-
-# Nube de palabras
-ggplot(freq, aes(label = palabra, size = n, color = n)) +
-  geom_text_wordcloud(rm_outside = TRUE) +
-  scale_size_area(max_size = 15) +
-  scale_color_gradient(low = "#457b9d", high = "#e63946") +
-  theme_minimal() +
-  labs(title = "Nube de palabras del corpus")
 ```
 :::
 
@@ -536,57 +511,6 @@ validacion
 Si LDA funciona bien, cada tema real debería tener un gamma alto en un solo tema LDA.
 :::
 
-## Visualizar la validación
-
-:::{style="margin-top: 30px; font-size: 18px;"}
-
-```{r}
-#| label: validar-viz
-#| eval: true
-#| fig-width: 10
-#| fig-height: 6
-
-# Formato largo para graficar
-validacion_long <- lda_gamma |>
-  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
-  group_by(tema, topic) |>
-  summarise(gamma_promedio = mean(gamma), .groups = "drop")
-
-# Heatmap
-ggplot(validacion_long, aes(x = factor(topic), y = tema, fill = gamma_promedio)) +
-  geom_tile() +
-  geom_text(aes(label = round(gamma_promedio, 2)), color = "white", size = 4) +
-  scale_fill_gradient(low = "#457b9d", high = "#e63946") +
-  labs(title = "Correspondencia entre temas reales y temas LDA",
-       x = "Tema LDA", y = "Tema real",
-       fill = "Gamma\npromedio") +
-  theme_minimal()
-```
-:::
-
-## Asignar tema dominante a cada documento
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r}
-#| label: tema-dominante
-#| eval: true
-
-# Asignar cada documento al tema con mayor gamma
-clasificacion <- lda_gamma |>
-  group_by(document) |>
-  slice_max(gamma, n = 1) |>
-  ungroup() |>
-  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
-  rename(tema_real = tema, tema_lda = topic)
-
-# Tabla de confusión
-table(Real = clasificacion$tema_real, LDA = clasificacion$tema_lda)
-```
-
-¿Cuántos documentos fueron clasificados correctamente?
-:::
-
 # Parte 4: Ejercicios {background-color="#2d4563"}
 
 ## Ejercicio 1: Probar diferentes K
@@ -640,40 +564,6 @@ tfidf_pais |>
 ```
 :::
 
-## Ejercicio 3: Análisis de sentimiento simple
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-**Instrucciones:**
-
-1. Crear una lista de palabras positivas y negativas (5-10 cada una)
-2. Contar cuántas de cada tipo aparecen en cada texto
-3. Calcular un "score" de sentimiento
-4. ¿Correlaciona con el tema?
-
-```{r}
-#| label: ejercicio-3
-#| eval: false
-
-# Tu código aquí
-positivas <- c("crecimiento", "mejora", "éxito", "avance", "beneficio")
-negativas <- c("crisis", "problema", "violencia", "pobreza", "amenaza")
-
-# Contar en cada documento
-sentimiento <- tokens_limpios |>
-  mutate(
-    positivo = palabra %in% positivas,
-    negativo = palabra %in% negativas
-  ) |>
-  group_by(id, tema) |>
-  summarise(
-    n_pos = sum(positivo),
-    n_neg = sum(negativo),
-    score = n_pos - n_neg
-  )
-```
-:::
-
 ## Resumen del laboratorio
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -683,7 +573,7 @@ sentimiento <- tokens_limpios |>
 
 - Tokenización con `unnest_tokens()`
 - Limpieza: stopwords, números
-- Frecuencias y nubes de palabras
+- Frecuencias de palabras
 - TF-IDF con `bind_tf_idf()`
 - LDA con `topicmodels`
 - Validación contra etiquetas reales
@@ -703,7 +593,116 @@ sentimiento <- tokens_limpios |>
 
 <br>
 
-[Mañana veremos cómo los LLMs superan estas limitaciones.]{.alert}
+[Mañana veremos cómo los LLMs superan estas limitaciones. Material extra en los apéndices.]{.alert}
+:::
+
+# Apéndice 1: Nube de palabras {background-color="#2d4563"}
+
+## Visualizar frecuencias como wordcloud
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: wordcloud
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+
+# Contar frecuencias
+freq <- tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  head(100)
+
+# Nube de palabras
+ggplot(freq, aes(label = palabra, size = n, color = n)) +
+  geom_text_wordcloud(rm_outside = TRUE) +
+  scale_size_area(max_size = 15) +
+  scale_color_gradient(low = "#457b9d", high = "#e63946") +
+  theme_minimal() +
+  labs(title = "Nube de palabras del corpus")
+```
+:::
+
+# Apéndice 2: Validación visual de LDA {background-color="#2d4563"}
+
+## Heatmap de correspondencia
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: validar-viz
+#| eval: true
+#| fig-width: 10
+#| fig-height: 6
+
+validacion_long <- lda_gamma |>
+  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
+  group_by(tema, topic) |>
+  summarise(gamma_promedio = mean(gamma), .groups = "drop")
+
+ggplot(validacion_long, aes(x = factor(topic), y = tema, fill = gamma_promedio)) +
+  geom_tile() +
+  geom_text(aes(label = round(gamma_promedio, 2)), color = "white", size = 4) +
+  scale_fill_gradient(low = "#457b9d", high = "#e63946") +
+  labs(title = "Correspondencia entre temas reales y temas LDA",
+       x = "Tema LDA", y = "Tema real", fill = "Gamma\npromedio") +
+  theme_minimal()
+```
+:::
+
+## Tema dominante por documento
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: tema-dominante
+#| eval: true
+
+# Asignar cada documento al tema con mayor gamma
+clasificacion <- lda_gamma |>
+  group_by(document) |>
+  slice_max(gamma, n = 1) |>
+  ungroup() |>
+  left_join(textos |> select(id, tema), by = c("document" = "id")) |>
+  rename(tema_real = tema, tema_lda = topic)
+
+# Tabla de confusión
+table(Real = clasificacion$tema_real, LDA = clasificacion$tema_lda)
+```
+:::
+
+# Apéndice 3: Ejercicio opcional {background-color="#2d4563"}
+
+## Ejercicio: análisis de sentimiento simple
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Crear una lista de palabras positivas y negativas (5-10 cada una)
+2. Contar cuántas de cada tipo aparecen en cada texto
+3. Calcular un "score" de sentimiento
+4. ¿Correlaciona con el tema?
+
+```{r}
+#| label: ejercicio-sentimiento
+#| eval: false
+
+positivas <- c("crecimiento", "mejora", "éxito", "avance", "beneficio")
+negativas <- c("crisis", "problema", "violencia", "pobreza", "amenaza")
+
+sentimiento <- tokens_limpios |>
+  mutate(
+    positivo = palabra %in% positivas,
+    negativo = palabra %in% negativas
+  ) |>
+  group_by(id, tema) |>
+  summarise(
+    n_pos = sum(positivo),
+    n_neg = sum(negativo),
+    score = n_pos - n_neg
+  )
+```
 :::
 
 ## Resumen del Día 3

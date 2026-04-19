@@ -905,10 +905,12 @@ modelo <- logistic_reg() |>
   set_engine("glm")
 
 # 3. Ajustar
-ajuste <- fit(modelo, formula, training(datos_split))
+ajuste <- fit(modelo, formula,
+              training(datos_split))
 
 # 4. Evaluar
-predicciones <- predict(ajuste, testing(datos_split))
+predicciones <- predict(ajuste,
+                        testing(datos_split))
 ```
 :::
 :::
