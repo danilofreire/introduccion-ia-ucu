@@ -88,15 +88,17 @@ Cada jornada combina exposición teórica con laboratorios prácticos en R. Las 
 ::: {.day-card}
 [Día 3]{.day-number}
 
-[Texto y aprendizaje no supervisado]{.day-title}
+[Aprendizaje no supervisado y análisis de texto]{.day-title}
 
-[Sesión 3.1: Clustering y PCA (versión express).]{.day-topics}
+[Sesión 3.1: Clustering y reducción de dimensionalidad. K-means, jerárquico, PCA.]{.day-topics}
 
 [Sesión 3.2: Análisis de texto. Tokenización, TF-IDF, sentimiento, LDA.]{.day-topics}
 
 ::: {.resource-links}
 [Sesión 3.1: Clustering y PCA](clases/dia-03/05-clustering-pca.html) |
-[Sesión 3.2: Análisis de texto](clases/dia-03/06-analisis-texto.html)
+[Sesión 3.2: Análisis de texto](clases/dia-03/06-analisis-texto.html) |
+[Lab 5: Clustering y PCA](clases/dia-03/07-laboratorio-05.html) |
+[Lab 6: Análisis de texto](clases/dia-03/08-laboratorio-06.html)
 :::
 :::
 
