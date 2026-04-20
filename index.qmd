@@ -43,7 +43,7 @@ toc: false
 
 Este curso introduce a estudiantes de ciencias sociales en los fundamentos de la Inteligencia Artificial y el Machine Learning usando R. Se cubren conceptos básicos de IA, aprendizaje supervisado y no supervisado, análisis de texto y modelos de lenguaje extensos (LLMs).
 
-El enfoque es aplicado: priorizamos la intuición y el uso de herramientas computacionales sobre la teoría matemática. Usaremos [RStudio](https://posit.co/download/rstudio-desktop/) como entorno de desarrollo y los ecosistemas [`tidyverse`](https://www.tidyverse.org/) y [`tidymodels`](https://www.tidymodels.org/) para todos los ejercicios prácticos.
+El enfoque es aplicado: priorizamos la intuición y el uso de herramientas computacionales sobre la teoría matemática. Usaremos [RStudio](https://posit.co/download/rstudio-desktop/) como entorno de desarrollo y los ecosistemas [`tidyverse`](https://www.tidyverse.org/) y [`tidymodels`](https://www.tidymodels.org/) como base, junto con otros paquetes especializados según el tema de cada sesión (clustering, análisis de texto, LLMs). La lista completa está en el [Programa](programa.qmd#software-necesario).
 
 El curso está diseñado para quienes ya tienen una base en R y buscan expandir sus capacidades analíticas hacia métodos computacionales modernos.
 
