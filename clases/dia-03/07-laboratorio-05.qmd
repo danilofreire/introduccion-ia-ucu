@@ -150,7 +150,7 @@ glimpse(paises)
 
 ## Estadísticas descriptivas
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r}
 #| label: estadisticas
@@ -192,7 +192,7 @@ corrplot(cor_matrix, method = "color", type = "upper",
 
 ## Interpretación de correlaciones
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=50%}
 **Correlaciones positivas fuertes:**
@@ -223,24 +223,23 @@ Los países más desiguales tienden a ser menos urbanos y con menor acceso a int
 :::
 :::
 
-## Ejercicio rápido: dos países
+## Ejercicio rápido: dos países {#sec:ejercicio-paises}
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-Elige dos países del dataset que te interesen. Compara sus valores en las 8 variables.
+Elige dos países del dataset que te interesen (por ejemplo, Uruguay vs. Honduras, Chile vs. Bolivia, o Argentina vs. Venezuela). Compara sus valores en las 8 variables.
 
-```{r}
-#| label: ejercicio-dos-paises
-#| echo: true
-#| eval: true
+**Preguntas:**
 
-paises |>
-  filter(pais %in% c("Uruguay", "Honduras")) |>
-  select(pais, pib_per_capita, esperanza_vida, anios_educacion,
-         acceso_internet, indice_gini, indice_democracia)
-```
+- ¿Cuál parece más [desarrollado]{.alert}?
+- ¿En qué variable es mayor la diferencia?
+- ¿Hay alguna variable en la que el "menos desarrollado" supere al otro?
 
-¿Cuál parece más [desarrollado]{.alert}? ¿En qué variable es mayor la diferencia? Prueba con otros pares (por ejemplo, Chile vs. Bolivia, Argentina vs. Venezuela).
+*Pista:* usen `paises |> filter(pais %in% c("...", "..."))` y `select()` con las variables que quieran comparar.
+
+[Tómense 3 minutos para experimentar.]{.alert}
+
+[[Apéndice: Solución]{.button}](#sec:sol-paises)
 :::
 
 ## Preparar datos para clustering
@@ -484,25 +483,27 @@ Están mal clasificadas (más cerca del otro cluster).
 :::
 :::
 
-## Ejercicio rápido: ¿y si probamos K=3?
+## Ejercicio rápido: ¿y si probamos K=3? {#sec:ejercicio-k3}
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 Codo y silueta apuntan a K=2, pero K=3 está muy cerca. Prueba a dividir los países en 3 grupos y compara.
 
-```{r}
-#| label: ejercicio-k3
-#| echo: true
-#| eval: true
+**Instrucciones:**
 
-km3 <- kmeans(datos_scaled, centers = 3, nstart = 25)
-sil3 <- silhouette(km3$cluster, dist(datos_scaled))
-mean(sil3[, 3])
-```
+1. Ejecuta `kmeans(datos_scaled, centers = 3, nstart = 25)` y guárdalo en `km3`
+2. Calcula la silueta promedio con `silhouette(km3$cluster, dist(datos_scaled))`
+3. Compara con la silueta de K=2 (≈ 0.29)
 
-¿La silueta sube o baja? Mira qué países quedan en el cluster "intermedio": ¿tiene sentido como "desarrollo medio"?
+**Preguntas:**
 
-[Con K=2 la silueta es 0.289; con K=3 es 0.272. La diferencia es chica, pero K=2 gana.]{.alert}
+- ¿La silueta sube o baja al pasar de K=2 a K=3?
+- ¿Qué países quedan en el cluster "intermedio"?
+- ¿Tiene sentido ese cluster como "desarrollo medio"?
+
+[Tómense 3 minutos para experimentar.]{.alert}
+
+[[Apéndice: Solución]{.button}](#sec:sol-k3)
 :::
 
 # Parte 3: PCA e interpretación {background-color="#2d4563"}
@@ -618,25 +619,27 @@ Separa países desiguales pero con buena salud de países más urbanos y educado
 :::
 :::
 
-## Ejercicio rápido: ¿qué país está en los extremos?
+## Ejercicio rápido: ¿qué país está en los extremos? {#sec:ejercicio-pc1}
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 Ordena los países por su valor en PC1 para identificar los más "desarrollados" y los menos, según esta medida resumen.
 
-```{r}
-#| label: ejercicio-extremos-pc1
-#| echo: true
-#| eval: true
+**Instrucciones:**
 
-pca$x[, 1:2] |>
-  as.data.frame() |>
-  rownames_to_column("pais") |>
-  arrange(PC1) |>
-  mutate(PC1 = round(PC1, 2), PC2 = round(PC2, 2))
-```
+1. Extrae las coordenadas PC1 y PC2 desde `pca$x[, 1:2]`
+2. Convierte a `data.frame` y agrega los nombres de países con `rownames_to_column("pais")`
+3. Ordena por PC1 con `arrange(PC1)`
 
-¿Coincide el ranking con tu intuición? ¿Qué país te sorprende más (arriba o abajo)?
+**Preguntas:**
+
+- ¿Coincide el ranking con tu intuición sobre el desarrollo latinoamericano?
+- ¿Qué país te sorprende más (arriba o abajo)?
+- ¿Qué países están cerca de PC1 = 0, en el "medio"?
+
+[Tómense 3 minutos para experimentar.]{.alert}
+
+[[Apéndice: Solución]{.button}](#sec:sol-pc1)
 :::
 
 ## Biplot
@@ -722,6 +725,80 @@ fviz_cluster(km4, data = datos_scaled,
 <br>
 
 [En el próximo laboratorio aplicaremos análisis de texto. En los apéndices: clustering jerárquico y ejercicios adicionales.]{.alert}
+:::
+
+# Apéndice: Soluciones de ejercicios rápidos {background-color="#2d4563"}
+
+## Solución: dos países {#sec:sol-paises}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r}
+#| label: sol-dos-paises
+#| echo: true
+#| eval: true
+
+paises |>
+  filter(pais %in% c("Uruguay", "Honduras")) |>
+  select(pais, pib_per_capita, esperanza_vida, anios_educacion,
+         acceso_internet, indice_gini, indice_democracia)
+```
+
+- Uruguay tiene PIB per cápita [más de seis veces mayor]{.alert} que Honduras (17 185 vs. 2 658)
+- Uruguay supera a Honduras en internet (88% vs. 39%), democracia (8.7 vs. 5.4) y urbanización (95% vs. 59%)
+- Pero Honduras tiene Gini [más alto]{.alert} (52.3 vs. 38.9): es más desigual
+- El "desarrollo" no es una sola cosa: hay variables que van en distintas direcciones
+
+[[Volver al ejercicio]{.button}](#sec:ejercicio-paises)
+:::
+
+## Solución: ¿y si probamos K=3? {#sec:sol-k3}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r}
+#| label: sol-k3
+#| echo: true
+#| eval: true
+
+km3 <- kmeans(datos_scaled, centers = 3, nstart = 25)
+sil3 <- silhouette(km3$cluster, dist(datos_scaled))
+mean(sil3[, 3])
+
+# ¿Qué países quedan en cada cluster?
+data.frame(pais = rownames(datos_scaled), cluster = km3$cluster) |>
+  arrange(cluster)
+```
+
+- Silueta con K=3: [≈ 0.27]{.alert} (con K=2 era ≈ 0.29, así que baja un poco)
+- El cluster "intermedio" suele contener países como Bolivia, Ecuador, México, Perú, Paraguay y República Dominicana: desarrollo medio
+- El cluster "bajo" queda como Guatemala, Honduras y Nicaragua: los más pobres
+- [Lección:]{.alert} K=3 tiene sentido sustantivo aunque la silueta sea levemente peor
+
+[[Volver al ejercicio]{.button}](#sec:ejercicio-k3)
+:::
+
+## Solución: ¿qué país está en los extremos? {#sec:sol-pc1}
+
+:::{style="margin-top: 20px; font-size: 18px;"}
+
+```{r}
+#| label: sol-extremos-pc1
+#| echo: true
+#| eval: true
+
+pca$x[, 1:2] |>
+  as.data.frame() |>
+  rownames_to_column("pais") |>
+  arrange(PC1) |>
+  mutate(PC1 = round(PC1, 2), PC2 = round(PC2, 2))
+```
+
+- Los valores más negativos de PC1 (Uruguay, Chile, Argentina, Costa Rica, Panamá) son los países más "desarrollados" en este conjunto
+- Los valores más positivos (Honduras, Nicaragua, Guatemala) son los menos desarrollados
+- [Sorpresas posibles:]{.alert} Venezuela aparece relativamente "alta" en PC2 por su desigualdad; México sorprende por estar cerca del medio pese a su PIB
+
+[[Volver al ejercicio]{.button}](#sec:ejercicio-pc1)
 :::
 
 # Apéndice 1: Clustering jerárquico {background-color="#2d4563"}

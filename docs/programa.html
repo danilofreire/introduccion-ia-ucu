@@ -204,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#día-1-fundamentos-de-ia-y-machine-learning" id="toc-día-1-fundamentos-de-ia-y-machine-learning" class="nav-link" data-scroll-target="#día-1-fundamentos-de-ia-y-machine-learning">Día 1: Fundamentos de IA y Machine Learning</a></li>
   <li><a href="#día-2-aprendizaje-supervisado" id="toc-día-2-aprendizaje-supervisado" class="nav-link" data-scroll-target="#día-2-aprendizaje-supervisado">Día 2: Aprendizaje supervisado</a></li>
-  <li><a href="#día-3-texto-y-aprendizaje-no-supervisado" id="toc-día-3-texto-y-aprendizaje-no-supervisado" class="nav-link" data-scroll-target="#día-3-texto-y-aprendizaje-no-supervisado">Día 3: Texto y aprendizaje no supervisado</a></li>
+  <li><a href="#día-3-aprendizaje-no-supervisado-y-análisis-de-texto" id="toc-día-3-aprendizaje-no-supervisado-y-análisis-de-texto" class="nav-link" data-scroll-target="#día-3-aprendizaje-no-supervisado-y-análisis-de-texto">Día 3: Aprendizaje no supervisado y análisis de texto</a></li>
   <li><a href="#día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones" id="toc-día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones" class="nav-link" data-scroll-target="#día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones">Día 4: Modelos de lenguaje extensos (LLMs) y aplicaciones</a></li>
   <li><a href="#día-5-ética-sesgo-algorítmico-y-cierre" id="toc-día-5-ética-sesgo-algorítmico-y-cierre" class="nav-link" data-scroll-target="#día-5-ética-sesgo-algorítmico-y-cierre">Día 5: Ética, sesgo algorítmico y cierre</a></li>
   </ul></li>
@@ -273,8 +273,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong><a href="clases/dia-01/02-fundamentos-ml.html">Sesión 1.2: Fundamentos de Machine Learning</a></strong></p>
 <ul>
 <li>Flujo de trabajo: datos, entrenamiento, evaluación</li>
-<li>División de datos (train/test)</li>
-<li>Compromiso sesgo-varianza y métricas de evaluación</li>
+<li>División train/test y validación cruzada</li>
+<li>Sobreajuste, compromiso sesgo-varianza y métricas de evaluación</li>
+<li>Reproducibilidad en ML</li>
 </ul>
 <p><strong><a href="clases/dia-01/03-laboratorio-01.html">Laboratorio 1: Primer flujo de trabajo con tidymodels</a></strong></p>
 <ul>
@@ -309,19 +310,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Comparación de modelos de regresión y selección de variables</li>
 </ul>
 </section>
-<section id="día-3-texto-y-aprendizaje-no-supervisado" class="level3">
-<h3 class="anchored" data-anchor-id="día-3-texto-y-aprendizaje-no-supervisado">Día 3: Texto y aprendizaje no supervisado</h3>
-<p><strong><a href="clases/dia-03/05-clustering-pca.html">Sesión 3.1: Clustering y reducción de dimensionalidad (versión express)</a></strong></p>
+<section id="día-3-aprendizaje-no-supervisado-y-análisis-de-texto" class="level3">
+<h3 class="anchored" data-anchor-id="día-3-aprendizaje-no-supervisado-y-análisis-de-texto">Día 3: Aprendizaje no supervisado y análisis de texto</h3>
+<p><strong><a href="clases/dia-03/05-clustering-pca.html">Sesión 3.1: Clustering y reducción de dimensionalidad</a></strong></p>
 <ul>
-<li>K-means y PCA: conceptos e intuición</li>
-<li>Laboratorio breve: segmentación de países latinoamericanos por indicadores socioeconómicos</li>
+<li>K-means y clustering jerárquico</li>
+<li>Evaluación de clusters: método del codo y coeficiente de silueta</li>
+<li>PCA: componentes principales, loadings y biplot</li>
+<li>Aplicaciones: tipologías de países y actores políticos</li>
 </ul>
 <p><strong><a href="clases/dia-03/06-analisis-texto.html">Sesión 3.2: Análisis computacional de texto</a></strong></p>
 <ul>
-<li>Preprocesamiento, tokenización, Bag-of-words, TF-IDF</li>
-<li>Análisis de sentimiento</li>
+<li>Tokenización y preprocesamiento de texto</li>
+<li>Bag-of-words y TF-IDF</li>
+<li>Análisis de sentimiento con diccionarios</li>
 <li>Topic Modeling (LDA)</li>
-<li>Laboratorio: extracción de tópicos en discursos políticos con <code>tidytext</code> y <code>topicmodels</code></li>
+</ul>
+<p><strong><a href="clases/dia-03/07-laboratorio-05.html">Laboratorio 5: Clustering y PCA</a></strong></p>
+<ul>
+<li>Segmentación de países latinoamericanos con indicadores del Banco Mundial</li>
+<li>K-means y clustering jerárquico con evaluación (codo, silueta)</li>
+<li>PCA e interpretación de componentes con biplot</li>
+</ul>
+<p><strong><a href="clases/dia-03/08-laboratorio-06.html">Laboratorio 6: Análisis de texto</a></strong></p>
+<ul>
+<li>Tokenización y limpieza de discursos políticos con <code>tidytext</code></li>
+<li>TF-IDF para identificar vocabulario distintivo</li>
+<li>Topic Modeling (LDA) con <code>topicmodels</code></li>
 </ul>
 </section>
 <section id="día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones" class="level3">

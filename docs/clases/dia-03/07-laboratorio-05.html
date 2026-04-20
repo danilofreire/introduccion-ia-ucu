@@ -1424,7 +1424,7 @@ $ indice_democracia &lt;dbl&gt; 6.7, 4.4, 7.0, 8.1, 7.0, 8.3, 5.7, 5.8, 4.9, 5.4
 </section>
 <section id="estadísticas-descriptivas" class="slide level2">
 <h2>Estadísticas descriptivas</h2>
-<div style="margin-top: 30px; font-size: 20px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Resumen de cada variable</span></span>
 <span id="cb4-2"><a></a>R<span class="sc">&gt;</span> paises <span class="sc">|&gt;</span></span>
@@ -1476,7 +1476,7 @@ $ indice_democracia &lt;dbl&gt; 6.7, 4.4, 7.0, 8.1, 7.0, 8.3, 5.7, 5.8, 4.9, 5.4
 </section>
 <section id="interpretación-de-correlaciones" class="slide level2">
 <h2>Interpretación de correlaciones</h2>
-<div style="margin-top: 30px; font-size: 22px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><strong>Correlaciones positivas fuertes:</strong></p>
@@ -1502,47 +1502,41 @@ $ indice_democracia &lt;dbl&gt; 6.7, 4.4, 7.0, 8.1, 7.0, 8.3, 5.7, 5.8, 4.9, 5.4
 </div></div>
 </div>
 </section>
-<section id="ejercicio-rápido-dos-países" class="slide level2">
+<section id="sec:ejercicio-paises" class="slide level2">
 <h2>Ejercicio rápido: dos países</h2>
 <div style="margin-top: 30px; font-size: 24px;">
-<p>Elige dos países del dataset que te interesen. Compara sus valores en las 8 variables.</p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a>R<span class="sc">&gt;</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb7-2"><a></a><span class="sc">+</span>   <span class="fu">filter</span>(pais <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Uruguay&quot;</span>, <span class="st">&quot;Honduras&quot;</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb7-3"><a></a><span class="sc">+</span>   <span class="fu">select</span>(pais, pib_per_capita, esperanza_vida, anios_educacion,</span>
-<span id="cb7-4"><a></a><span class="sc">+</span>          acceso_internet, indice_gini, indice_democracia)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 7
-  pais     pib_per_capita esperanza_vida anios_educacion acceso_internet
-  &lt;chr&gt;             &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;
-1 Honduras           2658           75.1             6.9            38.7
-2 Uruguay           17185           78.1             8.4            88.2
-# ℹ 2 more variables: indice_gini &lt;dbl&gt;, indice_democracia &lt;dbl&gt;</code></pre>
-</div>
-</div>
-<p>¿Cuál parece más <span class="alert">desarrollado</span>? ¿En qué variable es mayor la diferencia? Prueba con otros pares (por ejemplo, Chile vs. Bolivia, Argentina vs. Venezuela).</p>
+<p>Elige dos países del dataset que te interesen (por ejemplo, Uruguay vs. Honduras, Chile vs. Bolivia, o Argentina vs. Venezuela). Compara sus valores en las 8 variables.</p>
+<p><strong>Preguntas:</strong></p>
+<ul>
+<li>¿Cuál parece más <span class="alert">desarrollado</span>?</li>
+<li>¿En qué variable es mayor la diferencia?</li>
+<li>¿Hay alguna variable en la que el “menos desarrollado” supere al otro?</li>
+</ul>
+<p><em>Pista:</em> usen <code>paises |&gt; filter(pais %in% c(&quot;...&quot;, &quot;...&quot;))</code> y <code>select()</code> con las variables que quieran comparar.</p>
+<p><span class="alert">Tómense 3 minutos para experimentar.</span></p>
+<p><a href="#/sec:sol-paises"><span class="button">Apéndice: Solución</span></a></p>
 </div>
 </section>
 <section id="preparar-datos-para-clustering" class="slide level2">
 <h2>Preparar datos para clustering</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Guardar nombres de países</span></span>
-<span id="cb9-2"><a></a>R<span class="sc">&gt;</span> nombres <span class="ot">&lt;-</span> paises<span class="sc">$</span>pais</span>
-<span id="cb9-3"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb9-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Seleccionar solo variables numéricas</span></span>
-<span id="cb9-5"><a></a>R<span class="sc">&gt;</span> datos_num <span class="ot">&lt;-</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb9-6"><a></a><span class="sc">+</span>   <span class="fu">select</span>(<span class="sc">-</span>pais)</span>
-<span id="cb9-7"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb9-8"><a></a>R<span class="sc">&gt;</span> <span class="co"># Escalar (media = 0, sd = 1)</span></span>
-<span id="cb9-9"><a></a>R<span class="sc">&gt;</span> datos_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(datos_num) <span class="sc">|&gt;</span></span>
-<span id="cb9-10"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>()</span>
-<span id="cb9-11"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb9-12"><a></a>R<span class="sc">&gt;</span> <span class="co"># Asignar nombres de países como rownames</span></span>
-<span id="cb9-13"><a></a>R<span class="sc">&gt;</span> <span class="fu">rownames</span>(datos_scaled) <span class="ot">&lt;-</span> nombres</span>
-<span id="cb9-14"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb9-15"><a></a>R<span class="sc">&gt;</span> <span class="co"># Verificar</span></span>
-<span id="cb9-16"><a></a>R<span class="sc">&gt;</span> <span class="fu">head</span>(datos_scaled, <span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Guardar nombres de países</span></span>
+<span id="cb7-2"><a></a>R<span class="sc">&gt;</span> nombres <span class="ot">&lt;-</span> paises<span class="sc">$</span>pais</span>
+<span id="cb7-3"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb7-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Seleccionar solo variables numéricas</span></span>
+<span id="cb7-5"><a></a>R<span class="sc">&gt;</span> datos_num <span class="ot">&lt;-</span> paises <span class="sc">|&gt;</span></span>
+<span id="cb7-6"><a></a><span class="sc">+</span>   <span class="fu">select</span>(<span class="sc">-</span>pais)</span>
+<span id="cb7-7"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb7-8"><a></a>R<span class="sc">&gt;</span> <span class="co"># Escalar (media = 0, sd = 1)</span></span>
+<span id="cb7-9"><a></a>R<span class="sc">&gt;</span> datos_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(datos_num) <span class="sc">|&gt;</span></span>
+<span id="cb7-10"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>()</span>
+<span id="cb7-11"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb7-12"><a></a>R<span class="sc">&gt;</span> <span class="co"># Asignar nombres de países como rownames</span></span>
+<span id="cb7-13"><a></a>R<span class="sc">&gt;</span> <span class="fu">rownames</span>(datos_scaled) <span class="ot">&lt;-</span> nombres</span>
+<span id="cb7-14"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb7-15"><a></a>R<span class="sc">&gt;</span> <span class="co"># Verificar</span></span>
+<span id="cb7-16"><a></a>R<span class="sc">&gt;</span> <span class="fu">head</span>(datos_scaled, <span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          pib_per_capita esperanza_vida anios_educacion acceso_internet
 Argentina      0.5937295     0.17882893       1.6006861       1.1829170
@@ -1583,11 +1577,11 @@ Colombia        0.4134233  1.29516821    0.4447288         0.5636882</code></pre
 <h2>Ejecutar K-means con K=2</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># K-means con 2 clusters</span></span>
-<span id="cb11-2"><a></a>R<span class="sc">&gt;</span> km2 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
-<span id="cb11-3"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb11-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Ver resultados</span></span>
-<span id="cb11-5"><a></a>R<span class="sc">&gt;</span> km2<span class="sc">$</span>cluster</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># K-means con 2 clusters</span></span>
+<span id="cb9-2"><a></a>R<span class="sc">&gt;</span> km2 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">2</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb9-3"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb9-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Ver resultados</span></span>
+<span id="cb9-5"><a></a>R<span class="sc">&gt;</span> km2<span class="sc">$</span>cluster</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>           Argentina              Bolivia               Brasil 
                    1                    2                    1 
@@ -1602,8 +1596,8 @@ Colombia        0.4134233  1.29516821    0.4447288         0.5636882</code></pre
 República Dominicana              Uruguay            Venezuela 
                    2                    1                    2 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Agregar al dataframe original</span></span>
-<span id="cb13-2"><a></a>R<span class="sc">&gt;</span> paises<span class="sc">$</span>cluster_km2 <span class="ot">&lt;-</span> <span class="fu">factor</span>(km2<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Agregar al dataframe original</span></span>
+<span id="cb11-2"><a></a>R<span class="sc">&gt;</span> paises<span class="sc">$</span>cluster_km2 <span class="ot">&lt;-</span> <span class="fu">factor</span>(km2<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
@@ -1611,14 +1605,14 @@ República Dominicana              Uruguay            Venezuela
 <h2>Visualizar los clusters</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Visualización con factoextra (usa PCA automáticamente)</span></span>
-<span id="cb14-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_cluster</span>(km2, <span class="at">data =</span> datos_scaled,</span>
-<span id="cb14-3"><a></a><span class="sc">+</span>              <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>),</span>
-<span id="cb14-4"><a></a><span class="sc">+</span>              <span class="at">geom =</span> <span class="st">&quot;point&quot;</span>,</span>
-<span id="cb14-5"><a></a><span class="sc">+</span>              <span class="at">ellipse.type =</span> <span class="st">&quot;convex&quot;</span>,</span>
-<span id="cb14-6"><a></a><span class="sc">+</span>              <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()) <span class="sc">+</span></span>
-<span id="cb14-7"><a></a><span class="sc">+</span>   <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> nombres), <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb14-8"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;K-means con K=2&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Visualización con factoextra (usa PCA automáticamente)</span></span>
+<span id="cb12-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_cluster</span>(km2, <span class="at">data =</span> datos_scaled,</span>
+<span id="cb12-3"><a></a><span class="sc">+</span>              <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>),</span>
+<span id="cb12-4"><a></a><span class="sc">+</span>              <span class="at">geom =</span> <span class="st">&quot;point&quot;</span>,</span>
+<span id="cb12-5"><a></a><span class="sc">+</span>              <span class="at">ellipse.type =</span> <span class="st">&quot;convex&quot;</span>,</span>
+<span id="cb12-6"><a></a><span class="sc">+</span>              <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()) <span class="sc">+</span></span>
+<span id="cb12-7"><a></a><span class="sc">+</span>   <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> nombres), <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb12-8"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;K-means con K=2&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1633,12 +1627,12 @@ República Dominicana              Uruguay            Venezuela
 <h2>¿Qué países están en cada cluster?</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Listar países por cluster</span></span>
-<span id="cb15-2"><a></a>R<span class="sc">&gt;</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb15-3"><a></a><span class="sc">+</span>   <span class="fu">select</span>(pais, cluster_km2) <span class="sc">|&gt;</span></span>
-<span id="cb15-4"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(cluster_km2) <span class="sc">|&gt;</span></span>
-<span id="cb15-5"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(cluster_km2) <span class="sc">|&gt;</span></span>
-<span id="cb15-6"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(<span class="at">paises =</span> <span class="fu">paste</span>(pais, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Listar países por cluster</span></span>
+<span id="cb13-2"><a></a>R<span class="sc">&gt;</span> paises <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a></a><span class="sc">+</span>   <span class="fu">select</span>(pais, cluster_km2) <span class="sc">|&gt;</span></span>
+<span id="cb13-4"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(cluster_km2) <span class="sc">|&gt;</span></span>
+<span id="cb13-5"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(cluster_km2) <span class="sc">|&gt;</span></span>
+<span id="cb13-6"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(<span class="at">paises =</span> <span class="fu">paste</span>(pais, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   cluster_km2 paises                                                            
@@ -1653,18 +1647,18 @@ República Dominicana              Uruguay            Venezuela
 <h2>Perfil de cada cluster</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Medias por cluster (datos originales, no escalados)</span></span>
-<span id="cb17-2"><a></a>R<span class="sc">&gt;</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb17-3"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(cluster_km2) <span class="sc">|&gt;</span></span>
-<span id="cb17-4"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(</span>
-<span id="cb17-5"><a></a><span class="sc">+</span>     <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb17-6"><a></a><span class="sc">+</span>     <span class="at">pib_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pib_per_capita)),</span>
-<span id="cb17-7"><a></a><span class="sc">+</span>     <span class="at">vida_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(esperanza_vida), <span class="dv">1</span>),</span>
-<span id="cb17-8"><a></a><span class="sc">+</span>     <span class="at">educ_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(anios_educacion), <span class="dv">1</span>),</span>
-<span id="cb17-9"><a></a><span class="sc">+</span>     <span class="at">inet_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(acceso_internet), <span class="dv">1</span>),</span>
-<span id="cb17-10"><a></a><span class="sc">+</span>     <span class="at">gini_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(indice_gini), <span class="dv">1</span>),</span>
-<span id="cb17-11"><a></a><span class="sc">+</span>     <span class="at">demo_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(indice_democracia), <span class="dv">1</span>)</span>
-<span id="cb17-12"><a></a><span class="sc">+</span>   )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Medias por cluster (datos originales, no escalados)</span></span>
+<span id="cb15-2"><a></a>R<span class="sc">&gt;</span> paises <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(cluster_km2) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(</span>
+<span id="cb15-5"><a></a><span class="sc">+</span>     <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb15-6"><a></a><span class="sc">+</span>     <span class="at">pib_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pib_per_capita)),</span>
+<span id="cb15-7"><a></a><span class="sc">+</span>     <span class="at">vida_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(esperanza_vida), <span class="dv">1</span>),</span>
+<span id="cb15-8"><a></a><span class="sc">+</span>     <span class="at">educ_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(anios_educacion), <span class="dv">1</span>),</span>
+<span id="cb15-9"><a></a><span class="sc">+</span>     <span class="at">inet_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(acceso_internet), <span class="dv">1</span>),</span>
+<span id="cb15-10"><a></a><span class="sc">+</span>     <span class="at">gini_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(indice_gini), <span class="dv">1</span>),</span>
+<span id="cb15-11"><a></a><span class="sc">+</span>     <span class="at">demo_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(indice_democracia), <span class="dv">1</span>)</span>
+<span id="cb15-12"><a></a><span class="sc">+</span>   )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 8
   cluster_km2     n pib_mean vida_mean educ_mean inet_mean gini_mean demo_mean
@@ -1680,14 +1674,14 @@ República Dominicana              Uruguay            Venezuela
 <h2>Método del codo</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Calcular WSS para K=1 a K=8</span></span>
-<span id="cb19-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_nbclust</span>(datos_scaled, kmeans,</span>
-<span id="cb19-3"><a></a><span class="sc">+</span>              <span class="at">method =</span> <span class="st">&quot;wss&quot;</span>,</span>
-<span id="cb19-4"><a></a><span class="sc">+</span>              <span class="at">k.max =</span> <span class="dv">8</span>,</span>
-<span id="cb19-5"><a></a><span class="sc">+</span>              <span class="at">nstart =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
-<span id="cb19-6"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Método del codo&quot;</span>,</span>
-<span id="cb19-7"><a></a><span class="sc">+</span>        <span class="at">subtitle =</span> <span class="st">&quot;¿Dónde se &#39;aplana&#39; la curva?&quot;</span>) <span class="sc">+</span></span>
-<span id="cb19-8"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Calcular WSS para K=1 a K=8</span></span>
+<span id="cb17-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_nbclust</span>(datos_scaled, kmeans,</span>
+<span id="cb17-3"><a></a><span class="sc">+</span>              <span class="at">method =</span> <span class="st">&quot;wss&quot;</span>,</span>
+<span id="cb17-4"><a></a><span class="sc">+</span>              <span class="at">k.max =</span> <span class="dv">8</span>,</span>
+<span id="cb17-5"><a></a><span class="sc">+</span>              <span class="at">nstart =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb17-6"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Método del codo&quot;</span>,</span>
+<span id="cb17-7"><a></a><span class="sc">+</span>        <span class="at">subtitle =</span> <span class="st">&quot;¿Dónde se &#39;aplana&#39; la curva?&quot;</span>) <span class="sc">+</span></span>
+<span id="cb17-8"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1703,14 +1697,14 @@ República Dominicana              Uruguay            Venezuela
 <h2>Método de la silueta</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Calcular silueta promedio para K=2 a K=8</span></span>
-<span id="cb20-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_nbclust</span>(datos_scaled, kmeans,</span>
-<span id="cb20-3"><a></a><span class="sc">+</span>              <span class="at">method =</span> <span class="st">&quot;silhouette&quot;</span>,</span>
-<span id="cb20-4"><a></a><span class="sc">+</span>              <span class="at">k.max =</span> <span class="dv">8</span>,</span>
-<span id="cb20-5"><a></a><span class="sc">+</span>              <span class="at">nstart =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
-<span id="cb20-6"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Método de la silueta&quot;</span>,</span>
-<span id="cb20-7"><a></a><span class="sc">+</span>        <span class="at">subtitle =</span> <span class="st">&quot;K óptimo maximiza la silueta promedio&quot;</span>) <span class="sc">+</span></span>
-<span id="cb20-8"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Calcular silueta promedio para K=2 a K=8</span></span>
+<span id="cb18-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_nbclust</span>(datos_scaled, kmeans,</span>
+<span id="cb18-3"><a></a><span class="sc">+</span>              <span class="at">method =</span> <span class="st">&quot;silhouette&quot;</span>,</span>
+<span id="cb18-4"><a></a><span class="sc">+</span>              <span class="at">k.max =</span> <span class="dv">8</span>,</span>
+<span id="cb18-5"><a></a><span class="sc">+</span>              <span class="at">nstart =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb18-6"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Método de la silueta&quot;</span>,</span>
+<span id="cb18-7"><a></a><span class="sc">+</span>        <span class="at">subtitle =</span> <span class="st">&quot;K óptimo maximiza la silueta promedio&quot;</span>) <span class="sc">+</span></span>
+<span id="cb18-8"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1726,14 +1720,14 @@ República Dominicana              Uruguay            Venezuela
 <h2>Silueta detallada para K=2</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Calcular silueta para cada observación</span></span>
-<span id="cb21-2"><a></a>R<span class="sc">&gt;</span> sil <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km2<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
-<span id="cb21-3"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb21-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Visualizar</span></span>
-<span id="cb21-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_silhouette</span>(sil, <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb21-6"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Silueta por observación (K=2)&quot;</span>) <span class="sc">+</span></span>
-<span id="cb21-7"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb21-8"><a></a><span class="sc">+</span>   <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">8</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Calcular silueta para cada observación</span></span>
+<span id="cb19-2"><a></a>R<span class="sc">&gt;</span> sil <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km2<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
+<span id="cb19-3"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb19-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Visualizar</span></span>
+<span id="cb19-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_silhouette</span>(sil, <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb19-6"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Silueta por observación (K=2)&quot;</span>) <span class="sc">+</span></span>
+<span id="cb19-7"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb19-8"><a></a><span class="sc">+</span>   <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">8</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  cluster size ave.sil.width
 1       1    7          0.32
@@ -1756,7 +1750,7 @@ República Dominicana              Uruguay            Venezuela
 <div class="column" style="width:50%;">
 <p><strong>Silueta promedio:</strong></p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">mean</span>(sil[, <span class="dv">3</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">mean</span>(sil[, <span class="dv">3</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.2888078</code></pre>
 </div>
@@ -1797,20 +1791,24 @@ República Dominicana              Uruguay            Venezuela
 </div></div>
 </div>
 </section>
-<section id="ejercicio-rápido-y-si-probamos-k3" class="slide level2">
+<section id="sec:ejercicio-k3" class="slide level2 scrollable">
 <h2>Ejercicio rápido: ¿y si probamos K=3?</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Codo y silueta apuntan a K=2, pero K=3 está muy cerca. Prueba a dividir los países en 3 grupos y compara.</p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a>R<span class="sc">&gt;</span> km3 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
-<span id="cb25-2"><a></a>R<span class="sc">&gt;</span> sil3 <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km3<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
-<span id="cb25-3"><a></a>R<span class="sc">&gt;</span> <span class="fu">mean</span>(sil3[, <span class="dv">3</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2716258</code></pre>
-</div>
-</div>
-<p>¿La silueta sube o baja? Mira qué países quedan en el cluster “intermedio”: ¿tiene sentido como “desarrollo medio”?</p>
-<p><span class="alert">Con K=2 la silueta es 0.289; con K=3 es 0.272. La diferencia es chica, pero K=2 gana.</span></p>
+<p><strong>Instrucciones:</strong></p>
+<ol type="1">
+<li>Ejecuta <code>kmeans(datos_scaled, centers = 3, nstart = 25)</code> y guárdalo en <code>km3</code></li>
+<li>Calcula la silueta promedio con <code>silhouette(km3$cluster, dist(datos_scaled))</code></li>
+<li>Compara con la silueta de K=2 (≈ 0.29)</li>
+</ol>
+<p><strong>Preguntas:</strong></p>
+<ul>
+<li>¿La silueta sube o baja al pasar de K=2 a K=3?</li>
+<li>¿Qué países quedan en el cluster “intermedio”?</li>
+<li>¿Tiene sentido ese cluster como “desarrollo medio”?</li>
+</ul>
+<p><span class="alert">Tómense 3 minutos para experimentar.</span></p>
+<p><a href="#/sec:sol-k3"><span class="button">Apéndice: Solución</span></a></p>
 </div>
 </section></section>
 <section>
@@ -1836,11 +1834,11 @@ República Dominicana              Uruguay            Venezuela
 <h2>Ejecutar PCA</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># PCA sobre datos escalados</span></span>
-<span id="cb27-2"><a></a>R<span class="sc">&gt;</span> pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(datos_scaled)</span>
-<span id="cb27-3"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb27-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Resumen de varianza explicada</span></span>
-<span id="cb27-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">summary</span>(pca)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># PCA sobre datos escalados</span></span>
+<span id="cb23-2"><a></a>R<span class="sc">&gt;</span> pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(datos_scaled)</span>
+<span id="cb23-3"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb23-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Resumen de varianza explicada</span></span>
+<span id="cb23-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">summary</span>(pca)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Importance of components:
                           PC1    PC2    PC3     PC4     PC5    PC6     PC7
@@ -1860,11 +1858,11 @@ Cumulative Proportion  1.00000</code></pre>
 <h2>Scree plot</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Varianza explicada por componente</span></span>
-<span id="cb29-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_eig</span>(pca, <span class="at">addlabels =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb29-3"><a></a><span class="sc">+</span>          <span class="at">barfill =</span> <span class="st">&quot;#2d4563&quot;</span>, <span class="at">barcolor =</span> <span class="st">&quot;#2d4563&quot;</span>) <span class="sc">+</span></span>
-<span id="cb29-4"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Scree plot: varianza explicada por componente&quot;</span>) <span class="sc">+</span></span>
-<span id="cb29-5"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Varianza explicada por componente</span></span>
+<span id="cb25-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_eig</span>(pca, <span class="at">addlabels =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb25-3"><a></a><span class="sc">+</span>          <span class="at">barfill =</span> <span class="st">&quot;#2d4563&quot;</span>, <span class="at">barcolor =</span> <span class="st">&quot;#2d4563&quot;</span>) <span class="sc">+</span></span>
+<span id="cb25-4"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Scree plot: varianza explicada por componente&quot;</span>) <span class="sc">+</span></span>
+<span id="cb25-5"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1879,13 +1877,13 @@ Cumulative Proportion  1.00000</code></pre>
 <h2>Loadings: ¿qué mide cada componente?</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Loadings de los primeros 3 componentes</span></span>
-<span id="cb30-2"><a></a>R<span class="sc">&gt;</span> loadings <span class="ot">&lt;-</span> pca<span class="sc">$</span>rotation[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>] <span class="sc">|&gt;</span></span>
-<span id="cb30-3"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb30-4"><a></a><span class="sc">+</span>   <span class="fu">rownames_to_column</span>(<span class="st">&quot;variable&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb30-5"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(PC1)))</span>
-<span id="cb30-6"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb30-7"><a></a>R<span class="sc">&gt;</span> loadings</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Loadings de los primeros 3 componentes</span></span>
+<span id="cb26-2"><a></a>R<span class="sc">&gt;</span> loadings <span class="ot">&lt;-</span> pca<span class="sc">$</span>rotation[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>] <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb26-4"><a></a><span class="sc">+</span>   <span class="fu">rownames_to_column</span>(<span class="st">&quot;variable&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb26-5"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(PC1)))</span>
+<span id="cb26-6"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb26-7"><a></a>R<span class="sc">&gt;</span> loadings</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>           variable        PC1         PC2         PC3
 1    pib_per_capita -0.4387072  0.07337917 -0.03316035
@@ -1931,53 +1929,38 @@ Cumulative Proportion  1.00000</code></pre>
 </div></div>
 </div>
 </section>
-<section id="ejercicio-rápido-qué-país-está-en-los-extremos" class="slide level2">
+<section id="sec:ejercicio-pc1" class="slide level2 scrollable">
 <h2>Ejercicio rápido: ¿qué país está en los extremos?</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Ordena los países por su valor en PC1 para identificar los más “desarrollados” y los menos, según esta medida resumen.</p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a>R<span class="sc">&gt;</span> pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">|&gt;</span></span>
-<span id="cb32-2"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb32-3"><a></a><span class="sc">+</span>   <span class="fu">rownames_to_column</span>(<span class="st">&quot;pais&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb32-4"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(PC1) <span class="sc">|&gt;</span></span>
-<span id="cb32-5"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">PC1 =</span> <span class="fu">round</span>(PC1, <span class="dv">2</span>), <span class="at">PC2 =</span> <span class="fu">round</span>(PC2, <span class="dv">2</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                   pais   PC1   PC2
-1               Uruguay -3.45 -0.26
-2                 Chile -3.35  0.63
-3             Argentina -2.52 -0.89
-4            Costa Rica -2.26  1.35
-5                Panamá -1.26  1.03
-6                Brasil -1.17  0.68
-7              Colombia -0.43  0.94
-8                México -0.09 -0.92
-9  República Dominicana -0.02 -1.56
-10                 Perú  0.00 -0.94
-11              Ecuador  0.45  0.70
-12             Paraguay  0.83  0.05
-13          El Salvador  1.33 -0.78
-14            Venezuela  1.37 -2.99
-15              Bolivia  1.97 -1.12
-16             Honduras  2.47  1.87
-17            Guatemala  3.03  1.15
-18            Nicaragua  3.11  1.05</code></pre>
-</div>
-</div>
-<p>¿Coincide el ranking con tu intuición? ¿Qué país te sorprende más (arriba o abajo)?</p>
+<p><strong>Instrucciones:</strong></p>
+<ol type="1">
+<li>Extrae las coordenadas PC1 y PC2 desde <code>pca$x[, 1:2]</code></li>
+<li>Convierte a <code>data.frame</code> y agrega los nombres de países con <code>rownames_to_column(&quot;pais&quot;)</code></li>
+<li>Ordena por PC1 con <code>arrange(PC1)</code></li>
+</ol>
+<p><strong>Preguntas:</strong></p>
+<ul>
+<li>¿Coincide el ranking con tu intuición sobre el desarrollo latinoamericano?</li>
+<li>¿Qué país te sorprende más (arriba o abajo)?</li>
+<li>¿Qué países están cerca de PC1 = 0, en el “medio”?</li>
+</ul>
+<p><span class="alert">Tómense 3 minutos para experimentar.</span></p>
+<p><a href="#/sec:sol-pc1"><span class="button">Apéndice: Solución</span></a></p>
 </div>
 </section>
 <section id="biplot" class="slide level2">
 <h2>Biplot</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Biplot con factoextra</span></span>
-<span id="cb34-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_pca_biplot</span>(pca,</span>
-<span id="cb34-3"><a></a><span class="sc">+</span>                 <span class="at">repel =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb34-4"><a></a><span class="sc">+</span>                 <span class="at">col.var =</span> <span class="st">&quot;#e63946&quot;</span>,</span>
-<span id="cb34-5"><a></a><span class="sc">+</span>                 <span class="at">col.ind =</span> <span class="st">&quot;#2d4563&quot;</span>,</span>
-<span id="cb34-6"><a></a><span class="sc">+</span>                 <span class="at">label =</span> <span class="st">&quot;all&quot;</span>) <span class="sc">+</span></span>
-<span id="cb34-7"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Biplot: países y variables&quot;</span>) <span class="sc">+</span></span>
-<span id="cb34-8"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Biplot con factoextra</span></span>
+<span id="cb28-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_pca_biplot</span>(pca,</span>
+<span id="cb28-3"><a></a><span class="sc">+</span>                 <span class="at">repel =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb28-4"><a></a><span class="sc">+</span>                 <span class="at">col.var =</span> <span class="st">&quot;#e63946&quot;</span>,</span>
+<span id="cb28-5"><a></a><span class="sc">+</span>                 <span class="at">col.ind =</span> <span class="st">&quot;#2d4563&quot;</span>,</span>
+<span id="cb28-6"><a></a><span class="sc">+</span>                 <span class="at">label =</span> <span class="st">&quot;all&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-7"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Biplot: países y variables&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-8"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2004,19 +1987,19 @@ Cumulative Proportion  1.00000</code></pre>
 <li>¿Mejora respecto a K=2?</li>
 </ol>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>R<span class="sc">&gt;</span> km4 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
-<span id="cb35-2"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb35-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># Silueta promedio</span></span>
-<span id="cb35-4"><a></a>R<span class="sc">&gt;</span> sil4 <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km4<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
-<span id="cb35-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">mean</span>(sil4[, <span class="dv">3</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>R<span class="sc">&gt;</span> km4 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb29-2"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb29-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># Silueta promedio</span></span>
+<span id="cb29-4"><a></a>R<span class="sc">&gt;</span> sil4 <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km4<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
+<span id="cb29-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">mean</span>(sil4[, <span class="dv">3</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.2354994</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Visualizar</span></span>
-<span id="cb37-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_cluster</span>(km4, <span class="at">data =</span> datos_scaled,</span>
-<span id="cb37-3"><a></a><span class="sc">+</span>              <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>, <span class="st">&quot;#457b9d&quot;</span>, <span class="st">&quot;#f4a261&quot;</span>),</span>
-<span id="cb37-4"><a></a><span class="sc">+</span>              <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()) <span class="sc">+</span></span>
-<span id="cb37-5"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;K-means con K=4&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Visualizar</span></span>
+<span id="cb31-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_cluster</span>(km4, <span class="at">data =</span> datos_scaled,</span>
+<span id="cb31-3"><a></a><span class="sc">+</span>              <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>, <span class="st">&quot;#457b9d&quot;</span>, <span class="st">&quot;#f4a261&quot;</span>),</span>
+<span id="cb31-4"><a></a><span class="sc">+</span>              <span class="at">ggtheme =</span> <span class="fu">theme_minimal</span>()) <span class="sc">+</span></span>
+<span id="cb31-5"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;K-means con K=4&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2054,6 +2037,120 @@ Cumulative Proportion  1.00000</code></pre>
 </div>
 </section></section>
 <section>
+<section id="apéndice-soluciones-de-ejercicios-rápidos" class="title-slide slide level1 center" data-background-color="#2d4563">
+<h1>Apéndice: Soluciones de ejercicios rápidos</h1>
+
+</section>
+<section id="sec:sol-paises" class="slide level2">
+<h2>Solución: dos países</h2>
+<div style="margin-top: 20px; font-size: 20px;">
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a>R<span class="sc">&gt;</span> paises <span class="sc">|&gt;</span></span>
+<span id="cb32-2"><a></a><span class="sc">+</span>   <span class="fu">filter</span>(pais <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Uruguay&quot;</span>, <span class="st">&quot;Honduras&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a></a><span class="sc">+</span>   <span class="fu">select</span>(pais, pib_per_capita, esperanza_vida, anios_educacion,</span>
+<span id="cb32-4"><a></a><span class="sc">+</span>          acceso_internet, indice_gini, indice_democracia)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 7
+  pais     pib_per_capita esperanza_vida anios_educacion acceso_internet
+  &lt;chr&gt;             &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt;
+1 Honduras           2658           75.1             6.9            38.7
+2 Uruguay           17185           78.1             8.4            88.2
+# ℹ 2 more variables: indice_gini &lt;dbl&gt;, indice_democracia &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<ul>
+<li>Uruguay tiene PIB per cápita <span class="alert">más de seis veces mayor</span> que Honduras (17 185 vs. 2 658)</li>
+<li>Uruguay supera a Honduras en internet (88% vs. 39%), democracia (8.7 vs. 5.4) y urbanización (95% vs. 59%)</li>
+<li>Pero Honduras tiene Gini <span class="alert">más alto</span> (52.3 vs. 38.9): es más desigual</li>
+<li>El “desarrollo” no es una sola cosa: hay variables que van en distintas direcciones</li>
+</ul>
+<p><a href="#/sec:ejercicio-paises"><span class="button">Volver al ejercicio</span></a></p>
+</div>
+</section>
+<section id="sec:sol-k3" class="slide level2">
+<h2>Solución: ¿y si probamos K=3?</h2>
+<div style="margin-top: 20px; font-size: 20px;">
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>R<span class="sc">&gt;</span> km3 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb34-2"><a></a>R<span class="sc">&gt;</span> sil3 <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km3<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
+<span id="cb34-3"><a></a>R<span class="sc">&gt;</span> <span class="fu">mean</span>(sil3[, <span class="dv">3</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.2716258</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># ¿Qué países quedan en cada cluster?</span></span>
+<span id="cb36-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">data.frame</span>(<span class="at">pais =</span> <span class="fu">rownames</span>(datos_scaled), <span class="at">cluster =</span> km3<span class="sc">$</span>cluster) <span class="sc">|&gt;</span></span>
+<span id="cb36-3"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                     pais cluster
+Bolivia                           Bolivia       1
+Ecuador                           Ecuador       1
+El Salvador                   El Salvador       1
+México                             México       1
+Paraguay                         Paraguay       1
+Perú                                 Perú       1
+República Dominicana República Dominicana       1
+Venezuela                       Venezuela       1
+Guatemala                       Guatemala       2
+Honduras                         Honduras       2
+Nicaragua                       Nicaragua       2
+Argentina                       Argentina       3
+Brasil                             Brasil       3
+Chile                               Chile       3
+Colombia                         Colombia       3
+Costa Rica                     Costa Rica       3
+Panamá                             Panamá       3
+Uruguay                           Uruguay       3</code></pre>
+</div>
+</div>
+<ul>
+<li>Silueta con K=3: <span class="alert">≈ 0.27</span> (con K=2 era ≈ 0.29, así que baja un poco)</li>
+<li>El cluster “intermedio” suele contener países como Bolivia, Ecuador, México, Perú, Paraguay y República Dominicana: desarrollo medio</li>
+<li>El cluster “bajo” queda como Guatemala, Honduras y Nicaragua: los más pobres</li>
+<li><span class="alert">Lección:</span> K=3 tiene sentido sustantivo aunque la silueta sea levemente peor</li>
+</ul>
+<p><a href="#/sec:ejercicio-k3"><span class="button">Volver al ejercicio</span></a></p>
+</div>
+</section>
+<section id="sec:sol-pc1" class="slide level2">
+<h2>Solución: ¿qué país está en los extremos?</h2>
+<div style="margin-top: 20px; font-size: 18px;">
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>R<span class="sc">&gt;</span> pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">|&gt;</span></span>
+<span id="cb38-2"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb38-3"><a></a><span class="sc">+</span>   <span class="fu">rownames_to_column</span>(<span class="st">&quot;pais&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb38-4"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(PC1) <span class="sc">|&gt;</span></span>
+<span id="cb38-5"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">PC1 =</span> <span class="fu">round</span>(PC1, <span class="dv">2</span>), <span class="at">PC2 =</span> <span class="fu">round</span>(PC2, <span class="dv">2</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   pais   PC1   PC2
+1               Uruguay -3.45 -0.26
+2                 Chile -3.35  0.63
+3             Argentina -2.52 -0.89
+4            Costa Rica -2.26  1.35
+5                Panamá -1.26  1.03
+6                Brasil -1.17  0.68
+7              Colombia -0.43  0.94
+8                México -0.09 -0.92
+9  República Dominicana -0.02 -1.56
+10                 Perú  0.00 -0.94
+11              Ecuador  0.45  0.70
+12             Paraguay  0.83  0.05
+13          El Salvador  1.33 -0.78
+14            Venezuela  1.37 -2.99
+15              Bolivia  1.97 -1.12
+16             Honduras  2.47  1.87
+17            Guatemala  3.03  1.15
+18            Nicaragua  3.11  1.05</code></pre>
+</div>
+</div>
+<ul>
+<li>Los valores más negativos de PC1 (Uruguay, Chile, Argentina, Costa Rica, Panamá) son los países más “desarrollados” en este conjunto</li>
+<li>Los valores más positivos (Honduras, Nicaragua, Guatemala) son los menos desarrollados</li>
+<li><span class="alert">Sorpresas posibles:</span> Venezuela aparece relativamente “alta” en PC2 por su desigualdad; México sorprende por estar cerca del medio pese a su PIB</li>
+</ul>
+<p><a href="#/sec:ejercicio-pc1"><span class="button">Volver al ejercicio</span></a></p>
+</div>
+</section></section>
+<section>
 <section id="apéndice-1-clustering-jerárquico" class="title-slide slide level1 center" data-background-color="#2d4563">
 <h1>Apéndice 1: Clustering jerárquico</h1>
 
@@ -2062,17 +2159,17 @@ Cumulative Proportion  1.00000</code></pre>
 <h2>Calcular distancias y dendrograma</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Matriz de distancias euclidianas</span></span>
-<span id="cb38-2"><a></a>R<span class="sc">&gt;</span> d <span class="ot">&lt;-</span> <span class="fu">dist</span>(datos_scaled, <span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span>)</span>
-<span id="cb38-3"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb38-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Clustering jerárquico con método Ward</span></span>
-<span id="cb38-5"><a></a>R<span class="sc">&gt;</span> hc <span class="ot">&lt;-</span> <span class="fu">hclust</span>(d, <span class="at">method =</span> <span class="st">&quot;ward.D2&quot;</span>)</span>
-<span id="cb38-6"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb38-7"><a></a>R<span class="sc">&gt;</span> <span class="co"># Dendrograma con rectángulos para K=2</span></span>
-<span id="cb38-8"><a></a>R<span class="sc">&gt;</span> <span class="fu">plot</span>(hc, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">cex =</span> <span class="fl">0.9</span>,</span>
-<span id="cb38-9"><a></a><span class="sc">+</span>      <span class="at">main =</span> <span class="st">&quot;Dendrograma: Países latinoamericanos&quot;</span>,</span>
-<span id="cb38-10"><a></a><span class="sc">+</span>      <span class="at">xlab =</span> <span class="st">&quot;País&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Altura&quot;</span>)</span>
-<span id="cb38-11"><a></a>R<span class="sc">&gt;</span> <span class="fu">rect.hclust</span>(hc, <span class="at">k =</span> <span class="dv">2</span>, <span class="at">border =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Matriz de distancias euclidianas</span></span>
+<span id="cb40-2"><a></a>R<span class="sc">&gt;</span> d <span class="ot">&lt;-</span> <span class="fu">dist</span>(datos_scaled, <span class="at">method =</span> <span class="st">&quot;euclidean&quot;</span>)</span>
+<span id="cb40-3"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb40-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Clustering jerárquico con método Ward</span></span>
+<span id="cb40-5"><a></a>R<span class="sc">&gt;</span> hc <span class="ot">&lt;-</span> <span class="fu">hclust</span>(d, <span class="at">method =</span> <span class="st">&quot;ward.D2&quot;</span>)</span>
+<span id="cb40-6"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb40-7"><a></a>R<span class="sc">&gt;</span> <span class="co"># Dendrograma con rectángulos para K=2</span></span>
+<span id="cb40-8"><a></a>R<span class="sc">&gt;</span> <span class="fu">plot</span>(hc, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">cex =</span> <span class="fl">0.9</span>,</span>
+<span id="cb40-9"><a></a><span class="sc">+</span>      <span class="at">main =</span> <span class="st">&quot;Dendrograma: Países latinoamericanos&quot;</span>,</span>
+<span id="cb40-10"><a></a><span class="sc">+</span>      <span class="at">xlab =</span> <span class="st">&quot;País&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Altura&quot;</span>)</span>
+<span id="cb40-11"><a></a>R<span class="sc">&gt;</span> <span class="fu">rect.hclust</span>(hc, <span class="at">k =</span> <span class="dv">2</span>, <span class="at">border =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2087,11 +2184,11 @@ Cumulative Proportion  1.00000</code></pre>
 <h2>Cortar y comparar con K-means</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Cortar para obtener K=2 clusters</span></span>
-<span id="cb39-2"><a></a>R<span class="sc">&gt;</span> grupos_hc <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc, <span class="at">k =</span> <span class="dv">2</span>)</span>
-<span id="cb39-3"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb39-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Comparar con K-means</span></span>
-<span id="cb39-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">table</span>(<span class="at">K_means =</span> km2<span class="sc">$</span>cluster, <span class="at">Jerarquico =</span> grupos_hc)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Cortar para obtener K=2 clusters</span></span>
+<span id="cb41-2"><a></a>R<span class="sc">&gt;</span> grupos_hc <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc, <span class="at">k =</span> <span class="dv">2</span>)</span>
+<span id="cb41-3"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb41-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Comparar con K-means</span></span>
+<span id="cb41-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">table</span>(<span class="at">K_means =</span> km2<span class="sc">$</span>cluster, <span class="at">Jerarquico =</span> grupos_hc)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       Jerarquico
 K_means  1  2
@@ -2111,18 +2208,18 @@ K_means  1  2
 <h2>PCA coloreado por cluster K-means</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>R<span class="sc">&gt;</span> pca_coords <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">|&gt;</span></span>
-<span id="cb41-2"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb41-3"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">pais =</span> nombres, <span class="at">cluster =</span> paises<span class="sc">$</span>cluster_km2)</span>
-<span id="cb41-4"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb41-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">ggplot</span>(pca_coords, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> cluster, <span class="at">label =</span> pais)) <span class="sc">+</span></span>
-<span id="cb41-6"><a></a><span class="sc">+</span>   <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb41-7"><a></a><span class="sc">+</span>   <span class="fu">geom_text</span>(<span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.8</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb41-8"><a></a><span class="sc">+</span>   <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb41-9"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;PCA coloreado por cluster K-means&quot;</span>,</span>
-<span id="cb41-10"><a></a><span class="sc">+</span>        <span class="at">x =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC1 (&quot;</span>, <span class="fu">round</span>(<span class="fu">summary</span>(pca)<span class="sc">$</span>importance[<span class="dv">2</span>,<span class="dv">1</span>]<span class="sc">*</span><span class="dv">100</span>, <span class="dv">1</span>), <span class="st">&quot;%)&quot;</span>),</span>
-<span id="cb41-11"><a></a><span class="sc">+</span>        <span class="at">y =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC2 (&quot;</span>, <span class="fu">round</span>(<span class="fu">summary</span>(pca)<span class="sc">$</span>importance[<span class="dv">2</span>,<span class="dv">2</span>]<span class="sc">*</span><span class="dv">100</span>, <span class="dv">1</span>), <span class="st">&quot;%)&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb41-12"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a>R<span class="sc">&gt;</span> pca_coords <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">|&gt;</span></span>
+<span id="cb43-2"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb43-3"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">pais =</span> nombres, <span class="at">cluster =</span> paises<span class="sc">$</span>cluster_km2)</span>
+<span id="cb43-4"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb43-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">ggplot</span>(pca_coords, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> cluster, <span class="at">label =</span> pais)) <span class="sc">+</span></span>
+<span id="cb43-6"><a></a><span class="sc">+</span>   <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb43-7"><a></a><span class="sc">+</span>   <span class="fu">geom_text</span>(<span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.8</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb43-8"><a></a><span class="sc">+</span>   <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb43-9"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;PCA coloreado por cluster K-means&quot;</span>,</span>
+<span id="cb43-10"><a></a><span class="sc">+</span>        <span class="at">x =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC1 (&quot;</span>, <span class="fu">round</span>(<span class="fu">summary</span>(pca)<span class="sc">$</span>importance[<span class="dv">2</span>,<span class="dv">1</span>]<span class="sc">*</span><span class="dv">100</span>, <span class="dv">1</span>), <span class="st">&quot;%)&quot;</span>),</span>
+<span id="cb43-11"><a></a><span class="sc">+</span>        <span class="at">y =</span> <span class="fu">paste0</span>(<span class="st">&quot;PC2 (&quot;</span>, <span class="fu">round</span>(<span class="fu">summary</span>(pca)<span class="sc">$</span>importance[<span class="dv">2</span>,<span class="dv">2</span>]<span class="sc">*</span><span class="dv">100</span>, <span class="dv">1</span>), <span class="st">&quot;%)&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb43-12"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2137,9 +2234,9 @@ K_means  1  2
 <h2>Contribución de variables a cada componente</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_contrib</span>(pca, <span class="at">choice =</span> <span class="st">&quot;var&quot;</span>, <span class="at">axes =</span> <span class="dv">1</span>, <span class="at">fill =</span> <span class="st">&quot;#2d4563&quot;</span>) <span class="sc">+</span></span>
-<span id="cb42-2"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Contribución de variables a PC1&quot;</span>) <span class="sc">+</span></span>
-<span id="cb42-3"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_contrib</span>(pca, <span class="at">choice =</span> <span class="st">&quot;var&quot;</span>, <span class="at">axes =</span> <span class="dv">1</span>, <span class="at">fill =</span> <span class="st">&quot;#2d4563&quot;</span>) <span class="sc">+</span></span>
+<span id="cb44-2"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Contribución de variables a PC1&quot;</span>) <span class="sc">+</span></span>
+<span id="cb44-3"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2165,16 +2262,16 @@ K_means  1  2
 <li>¿El tercer componente agrega información útil?</li>
 </ol>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a>R<span class="sc">&gt;</span> pca_3d <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>] <span class="sc">|&gt;</span></span>
-<span id="cb43-2"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb43-3"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">pais =</span> nombres, <span class="at">cluster =</span> paises<span class="sc">$</span>cluster_km2)</span>
-<span id="cb43-4"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb43-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">ggplot</span>(pca_3d, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC3, <span class="at">color =</span> cluster, <span class="at">label =</span> pais)) <span class="sc">+</span></span>
-<span id="cb43-6"><a></a><span class="sc">+</span>   <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb43-7"><a></a><span class="sc">+</span>   <span class="fu">geom_text</span>(<span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.8</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb43-8"><a></a><span class="sc">+</span>   <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb43-9"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;PC1 vs PC3&quot;</span>) <span class="sc">+</span></span>
-<span id="cb43-10"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a>R<span class="sc">&gt;</span> pca_3d <span class="ot">&lt;-</span> pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>] <span class="sc">|&gt;</span></span>
+<span id="cb45-2"><a></a><span class="sc">+</span>   <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb45-3"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">pais =</span> nombres, <span class="at">cluster =</span> paises<span class="sc">$</span>cluster_km2)</span>
+<span id="cb45-4"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb45-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">ggplot</span>(pca_3d, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC3, <span class="at">color =</span> cluster, <span class="at">label =</span> pais)) <span class="sc">+</span></span>
+<span id="cb45-6"><a></a><span class="sc">+</span>   <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb45-7"><a></a><span class="sc">+</span>   <span class="fu">geom_text</span>(<span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.8</span>, <span class="at">size =</span> <span class="dv">3</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb45-8"><a></a><span class="sc">+</span>   <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#e63946&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb45-9"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;PC1 vs PC3&quot;</span>) <span class="sc">+</span></span>
+<span id="cb45-10"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
