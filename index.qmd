@@ -49,7 +49,7 @@ El curso está diseñado para quienes ya tienen una base en R y buscan expandir 
 
 ## Diapositivas y materiales
 
-Cada jornada combina exposición teórica con laboratorios prácticos en R. Las diapositivas de cada sesión están disponibles abajo. Los ejercicios de laboratorio, tareas y lecturas complementarias se encuentran en las pestañas [Laboratorios](laboratorios.qmd) y [Lecturas](lecturas.qmd). El [Programa](programa.qmd) contiene la descripción completa del curso, los objetivos de aprendizaje y los requisitos de software.
+Cada jornada combina exposición teórica con laboratorios prácticos en R. Las diapositivas de cada sesión están disponibles abajo. Los ejercicios de laboratorio, tareas y lecturas complementarias se encuentran en las pestañas [Laboratorios](laboratorios.qmd) y [Lecturas](lecturas.qmd). El [Programa](programa.qmd) contiene la descripción completa del curso, los objetivos de aprendizaje y los requisitos de software. Las páginas de Referencia R ([supervisado](referencia-tidymodels.qmd), [no supervisado](referencia-no-supervisado.qmd) y [análisis de texto](referencia-texto.qmd)) resumen las funciones principales de cada tema para consulta rápida.
 
 ::: {.day-card}
 [Día 1]{.day-number}
