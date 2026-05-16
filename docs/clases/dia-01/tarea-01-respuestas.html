@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -407,17 +407,15 @@ indice_gobierno_digital                    1.00</code></pre>
 <p>Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por <code>crecimiento_alto</code>. Usen <code>set.seed(42)</code>. Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de <code>"si"</code> y <code>"no"</code> son similares en ambos.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>datos_modelo <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(crecimiento_alto, gasto_educacion, acceso_internet,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>         urbanizacion, gasto_salud, inflacion, desempleo,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         inversion_extranjera, indice_gobierno_digital)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.80</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Entrenamiento:"</span>, <span class="fu">nrow</span>(train), <span class="st">"observaciones</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>pais, <span class="sc">-</span>continente)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.80</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> <span class="fu">training</span>(split)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(split)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Entrenamiento:"</span>, <span class="fu">nrow</span>(train), <span class="st">"observaciones</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Entrenamiento: 142 observaciones</code></pre>
 </div>
@@ -679,18 +677,19 @@ Prediction no si
 <span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  modelo_log,</span>
 <span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  crecimiento_alto <span class="sc">~</span> .,</span>
 <span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds_10,</span>
-<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(accuracy, precision, recall),</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(accuracy, precision, recall, roc_auc),</span>
 <span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
 <span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(cv_10)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 6
+<pre><code># A tibble: 4 × 6
   .metric   .estimator  mean     n std_err .config        
   &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          
 1 accuracy  binary     0.793    10  0.0322 pre0_mod0_post0
 2 precision binary     0.790    10  0.0364 pre0_mod0_post0
-3 recall    binary     0.774    10  0.0535 pre0_mod0_post0</code></pre>
+3 recall    binary     0.774    10  0.0535 pre0_mod0_post0
+4 roc_auc   binary     0.883    10  0.0413 pre0_mod0_post0</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> La accuracy media con 10 folds es similar a la obtenida con 5 folds en el laboratorio. Con más folds, cada fold de entrenamiento es más grande (90% vs.&nbsp;80% de los datos), lo que produce estimaciones ligeramente más estables. El error estándar puede ser algo menor con 10 folds. En la práctica, la diferencia entre 5 y 10 folds suele ser pequeña para datasets de este tamaño, pero 10 folds es la opción más común en la literatura.</p>
@@ -781,6 +780,7 @@ Accuracy modelo reducido (4 predictores):</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> El modelo reducido con 4 predictores tiene una accuracy similar a la del modelo completo con 8. Esto sugiere que los 4 predictores más significativos capturan la mayor parte de la información relevante para predecir el crecimiento del PIB. En la práctica, un modelo más simple tiene ventajas: es más facil de interpretar, menos propenso a sobreajuste, y requiere menos datos para estimar. Si la diferencia de accuracy es menor a 2-3 puntos porcentuales, el modelo reducido es preferible por parsimonia.</p>
+<p><strong>Nota técnica:</strong> seleccionar variables por p-valor del mismo modelo es una técnica introductoria con limitaciones conocidas (sesgo de inferencia post-selección, p-valores inflados). En el Día 2 veremos métodos más principiados como <a href="https://es.wikipedia.org/wiki/LASSO_(estad%C3%ADstica)">LASSO</a> y <a href="https://en.wikipedia.org/wiki/Ridge_regression">Ridge</a>, que realizan selección y regularización de forma más rigurosa.</p>
 </section>
 </section>
 <section id="reflexion" class="level2" data-number="6">

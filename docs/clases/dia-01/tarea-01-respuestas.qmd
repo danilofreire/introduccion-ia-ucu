@@ -105,9 +105,7 @@ Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `c
 
 ```{r p4}
 datos_modelo <- datos |>
-  select(crecimiento_alto, gasto_educacion, acceso_internet,
-         urbanizacion, gasto_salud, inflacion, desempleo,
-         inversion_extranjera, indice_gobierno_digital)
+  select(-pais, -continente)
 
 set.seed(42)
 split <- initial_split(datos_modelo, prop = 0.80, strata = crecimiento_alto)
@@ -305,7 +303,7 @@ cv_10 <- fit_resamples(
   modelo_log,
   crecimiento_alto ~ .,
   resamples = folds_10,
-  metrics   = metric_set(accuracy, precision, recall),
+  metrics   = metric_set(accuracy, precision, recall, roc_auc),
   control   = control_resamples(event_level = "second")
 )
 
@@ -365,6 +363,8 @@ collect_metrics(cv_reducido)
 ```
 
 **Respuesta:** El modelo reducido con 4 predictores tiene una accuracy similar a la del modelo completo con 8. Esto sugiere que los 4 predictores más significativos capturan la mayor parte de la información relevante para predecir el crecimiento del PIB. En la práctica, un modelo más simple tiene ventajas: es más facil de interpretar, menos propenso a sobreajuste, y requiere menos datos para estimar. Si la diferencia de accuracy es menor a 2-3 puntos porcentuales, el modelo reducido es preferible por parsimonia.
+
+**Nota técnica:** seleccionar variables por p-valor del mismo modelo es una técnica introductoria con limitaciones conocidas (sesgo de inferencia post-selección, p-valores inflados). En el Día 2 veremos métodos más principiados como [LASSO](https://es.wikipedia.org/wiki/LASSO_(estad%C3%ADstica)) y [Ridge](https://en.wikipedia.org/wiki/Ridge_regression), que realizan selección y regularización de forma más rigurosa.
 
 ## Reflexion
 

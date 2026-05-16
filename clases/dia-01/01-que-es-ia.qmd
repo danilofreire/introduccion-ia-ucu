@@ -153,26 +153,39 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 
 :::{style="margin-top: 40px; font-size: 30px;"}
 
-- `r fa('comment-dots')` [Explicar]{.alert} cómo funcionan los sistemas de IA actuales
-- `r fa('triangle-exclamation')` [Identificar]{.alert} fallos comunes y problemas de datos
-- `r fa('newspaper')` [Evaluar]{.alert} afirmaciones sobre IA en noticias y políticas públicas
-- `r fa('pencil-ruler')` [Diseñar]{.alert} un plan realista para una aplicación de IA
-- `r fa('scale-balanced')` [Reflexionar]{.alert} sobre las cuestiones éticas y sociales de la IA
+:::{.incremental}
+- [Explicar]{.alert} cómo funcionan los sistemas de IA actuales
+- [Identificar]{.alert} fallos comunes y problemas de datos
+- [Evaluar]{.alert} afirmaciones sobre IA en noticias y políticas públicas
+- [Diseñar]{.alert} un plan realista para una aplicación de IA
+- [Reflexionar]{.alert} sobre las cuestiones éticas y sociales de la IA
+:::
 :::
 
 # ¿Qué es la Inteligencia Artificial? {background-color="#2d4563"}
 
 ## Definición de IA
 
-:::{style="margin-top: 40px; font-size: 25px;"}
-:::{.incremental}
+:::{style="margin-top: 20px; font-size: 25px;"}
 - Una definición sencilla: [la Inteligencia Artificial (IA) es una rama de la informática centrada en crear sistemas capaces de realizar tareas que normalmente requieren inteligencia humana]{.alert}
-- Estas tareas incluyen aprender, razonar, resolver problemas, percibir, entender el lenguaje y muchas más
-- La IA se puede clasificar en [tres categorías principales:]{.alert}
-    - [IA estrecha (narrow):]{.alert} diseñada para tareas específicas (asistentes virtuales, sistemas de recomendación)
-    - [IA general:]{.alert} sistemas hipotéticos con inteligencia similar a la humana en una amplia gama de tareas
-    - [IA superinteligente:]{.alert} superaría la inteligencia humana en todos los aspectos (hipotética; no existe ni está claro que sea posible)
-- Técnicas comunes de IA: [aprendizaje automático]{.alert} (ML), [aprendizaje profundo]{.alert} (un subconjunto de ML que usa redes neuronales) y [procesamiento del lenguaje natural]{.alert} (NLP, un área de aplicación)
+- Estas tareas incluyen aprender, razonar, resolver problemas, percibir y entender el lenguaje
+
+:::{.columns style="margin-top: 20px;"}
+:::{.column width=50%}
+**Tres categorías principales**
+
+- La [IA estrecha (narrow)]{.alert} resuelve tareas específicas, como asistentes virtuales o recomendaciones
+- La [IA general]{.alert} alcanzaría, en teoría, la inteligencia humana en muchas tareas
+- La [IA superinteligente]{.alert} la superaría en todo (no existe ni sabemos si será posible)
+:::
+
+:::{.column width=50%}
+**Técnicas comunes**
+
+- [Aprendizaje automático]{.alert} (ML)
+- [Aprendizaje profundo]{.alert} (DP), un subconjunto de ML basado en redes neuronales
+- [Procesamiento del lenguaje natural]{.alert} (NLP), un área de aplicación
+:::
 :::
 :::
 
@@ -204,7 +217,7 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 
 <br>
 
-[Entender qué NO es la IA es tan importante como entender qué es.]{.alert}
+[Entender qué NO es la IA es tan importante como entender qué es!]{.alert}
 :::
 :::
 :::
@@ -219,27 +232,31 @@ Fuente: [McKinsey & Company (2024)](https://www.mckinsey.com/featured-insights/m
 
 ## IA en América Latina
 
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=50%}
+:::{style="margin-top: 30px; font-size: 24px;"}
 - La región [produce y adapta]{.alert} IA, no solo la consume
-- [Agricultura:]{.alert} predicción de cosechas, monitoreo de deforestación
-- [Fintech:]{.alert} detección de fraude (MercadoLibre, Nubank)
-- [Salud:]{.alert} triaje automático en hospitales públicos
-- [Justicia:]{.alert} clasificación de procesos (Uruguay, Brasil)
-- [Logística:]{.alert} optimización de rutas (Rappi)
-- [Desafíos:]{.alert}
-    - Pocos datos en español/portugués
-    - Brecha digital urbano-rural
-    - Infraestructura desigual
-    - Dependencia de cloud extranjero
-- [¿Quién diseñará la IA para la región?]{.alert}
+
+:::{.columns style="margin-top: 20px;"}
+:::{.column width=50%}
+**Aplicaciones**
+
+- [Agricultura]{.alert}: predicción de cosechas y monitoreo de deforestación
+- Detección de fraude en [fintech]{.alert} (MercadoLibre, Nubank)
+- En [salud]{.alert}, triaje automático en hospitales públicos
+- [Justicia]{.alert}: clasificación de procesos (Uruguay, Brasil)
+- Rutas optimizadas en [logística]{.alert} (Rappi)
 :::
 
 :::{.column width=50%}
-:::{style="text-align: center;"}
-[![](figures/wave.jpg){width="100%"}](#){data-modal-type="image" data-modal-url="figures/wave.jpg"}
-:::
+**Desafíos**
+
+- Pocos datos en español y portugués
+- Brecha digital urbano-rural
+- Infraestructura desigual
+- Dependencia de cloud extranjero
+
+<br>
+
+[¿Quién diseñará la IA para la región?]{.alert}
 :::
 :::
 :::
@@ -254,35 +271,35 @@ Fuente: [Artificial Intelligence Index Report (2025)](https://hai.stanford.edu/a
 
 ## El estado actual de la IA (2025)
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-**Lo que la IA ya hace bien:**
+**Lo que ya hace bien**
 
-- [Generación de texto:]{.alert} redacción, resumen, traducción, código
-- [Análisis de imágenes:]{.alert} diagnóstico médico, reconocimiento facial
-- [Predicción:]{.alert} demanda, riesgo crediticio, mantenimiento preventivo
-- [Automatización:]{.alert} atención al cliente, clasificación de documentos
+- [Generación de texto]{.alert}: resúmenes, traducción y código
+- [Análisis de imágenes]{.alert} para diagnóstico médico y reconocimiento facial
+- [Predicción]{.alert} de demanda o riesgo crediticio
+- [Automatización]{.alert} en atención al cliente y clasificación de documentos
 
-**Lo que todavía le cuesta:**
+**Lo que todavía le cuesta**
 
-- [Razonamiento causal:]{.alert} entender por qué, no solo correlaciones
-- [Sentido común:]{.alert} cosas obvias para humanos pero difíciles para máquinas
-- [Explicabilidad:]{.alert} justificar sus decisiones de forma comprensible
+- El [razonamiento causal]{.alert}: entender el porqué, no solo las correlaciones
+- El [sentido común]{.alert}, eso que para nosotros es obvio
+- La [explicabilidad]{.alert} de sus propias decisiones
 :::
 
 :::{.column width=45%}
-**Tendencias actuales:**
+**Tendencias actuales**
 
-- Modelos cada vez [más grandes]{.alert} (pero con rendimientos decrecientes)
-- Énfasis en [eficiencia]{.alert} (modelos más pequeños y rápidos)
-- [Multimodalidad:]{.alert} texto + imagen + audio + video
-- [Agentes:]{.alert} sistemas que pueden realizar tareas complejas de forma autónoma
-- [IA abierta vs. cerrada:]{.alert} debate sobre transparencia y acceso
+- Modelos cada vez más [grandes]{.alert}, con rendimientos decrecientes
+- Énfasis en la [eficiencia]{.alert}: modelos pequeños y rápidos
+- [Multimodalidad]{.alert} (texto, imagen, audio y video)
+- [Agentes]{.alert} autónomos para tareas complejas
+- Debate sobre [IA abierta y cerrada]{.alert} y el acceso a los modelos
 
 <br>
 
-[Estamos en un momento de experimentación activa: nadie sabe exactamente a dónde va esto!]{.alert}
+[Momento de experimentación activa: nadie sabe exactamente a dónde va esto]{.alert}
 :::
 :::
 :::
@@ -393,34 +410,35 @@ Fuente: [IEEE Spectrum](https://spectrum.ieee.org/dartmouth-ai-workshop)
 
 ## Los inviernos de la IA
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=50%}
 
 **Primer invierno (1974-1980)**
 
-- [Explosión combinatoria]{.alert}, [poder computacional limitado]{.alert}, [fragilidad]{.alert}
-- El financiamiento colapsó, los investigadores abandonaron el campo
-- [Lección: la IA es más difícil de lo que los pioneros pensaban]{.alert}
+- [Explosión combinatoria]{.alert}, [poco poder de cómputo]{.alert}, [fragilidad]{.alert}
+- Colapso del financiamiento; éxodo de investigadores
+- [Lección: la IA era más difícil de lo que pensaban]{.alert}
 
 **Segundo invierno (1987-1993)**
 
-- Sistemas [costosos de mantener]{.alert}, [cuello de botella del conocimiento]{.alert}, [no podían aprender]{.alert}
-- Las computadoras de escritorio hicieron obsoleto el hardware especializado
-- El mercado colapsó en 1987 y "IA" se convirtió en una mala palabra
+- [Mantenimiento costoso]{.alert}, [cuello de botella del conocimiento]{.alert}, [no aprendían]{.alert}
+- Las PCs hicieron obsoleto el hardware especializado
+- "IA" se convirtió en una mala palabra
 :::
 
 :::{.column width=50%}
 
 **El patrón**
 
-1. Grandes promesas atraen financiamiento
-2. Los éxitos iniciales generan entusiasmo
+1. Promesas atraen financiamiento
+2. Éxitos iniciales generan entusiasmo
 3. Las limitaciones se hacen evidentes a escala
-4. El financiamiento se seca, los investigadores se van
-5. La investigación silenciosa continúa, preparando el terreno...
+4. El financiamiento se seca y los investigadores se van
+5. La investigación silenciosa continúa, preparando el terreno
 
 <br>
+
 ¿Les resulta familiar este patrón?
 
 ¿Será que esta vez es diferente?
@@ -496,8 +514,8 @@ Fuente: [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762)
 :::{style="margin-top: 30px;"}
 :::
 
-- ChatGPT (nov. 2022) no fue simplemente un modelo más grande
-- Tres innovaciones: [[ajuste de instrucciones](https://en.wikipedia.org/wiki/Fine-tuning_(deep_learning))]{.alert}, [[RLHF](https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback)]{.alert} (aprendizaje por refuerzo con retroalimentación humana) y [[entrenamiento de seguridad](https://en.wikipedia.org/wiki/AI_safety)]{.alert}
+- ChatGPT (nov. 2022): no solo un modelo más grande
+- Tres innovaciones: [[ajuste de instrucciones](https://en.wikipedia.org/wiki/Fine-tuning_(deep_learning))]{.alert}, [[RLHF](https://en.wikipedia.org/wiki/Reinforcement_learning_from_human_feedback)]{.alert}, [[entrenamiento de seguridad](https://en.wikipedia.org/wiki/AI_safety)]{.alert}
 - [100 millones de usuarios en 2 meses]{.alert} ([Reuters, 2023](https://www.reuters.com/technology/chatgpt-sets-record-fastest-growing-user-base-analyst-note-2023-02-01/))
 :::
 
@@ -538,37 +556,31 @@ Fuente: [Tarun Sharma](https://www.linkedin.com/pulse/multimodal-generative-ai-t
 
 ## Capacidades emergentes
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
 - A medida que los modelos crecen, aparecen [capacidades que no fueron entrenadas explícitamente]{.alert}
-- Ejemplos de capacidades emergentes:
-    - [Razonamiento matemático:]{.alert} resolver problemas paso a paso
-    - [Traducción zero-shot:]{.alert} traducir entre idiomas que nunca vio juntos
-    - [Programación:]{.alert} escribir código funcional en múltiples lenguajes
-    - [Seguimiento de instrucciones:]{.alert} entender y ejecutar indicaciones complejas
-- Nadie diseñó estas capacidades: [emergieron del entrenamiento a escala]{.alert}
-- Esto genera tanto entusiasmo como preocupación: [no siempre sabemos qué puede hacer un modelo hasta que lo probamos]{.alert}
+
+**Ejemplos**
+
+- [Razonamiento matemático]{.alert}: resolver problemas paso a paso
+- [Traducción zero-shot]{.alert} entre idiomas que nunca vio juntos
+- Escribir [código]{.alert} en múltiples lenguajes
+- [Seguir instrucciones complejas]{.alert}
+
+- Nadie las diseñó: [emergieron del entrenamiento a escala]{.alert}
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**¿Por qué ocurre esto?**
+**Implicancia**
 
-Los modelos grandes ven tantos ejemplos durante el entrenamiento que [internalizan patrones abstractos]{.alert} sin que nadie se los enseñe explícitamente.
-
-<br>
-
-**Implicancia para investigadores:**
-
-- No podemos predecir exactamente qué hará un modelo nuevo
+- No podemos predecir qué hará un modelo nuevo
 - La evaluación post-hoc es necesaria
-- Nuevas capacidades pueden aparecer (o desaparecer) con cambios de escala
+- Las capacidades pueden aparecer (o desaparecer) con la escala
 
 <br>
 
-[Es un área de investigación activa: ¿cómo predecir y controlar capacidades emergentes?]{.alert}
-:::
+[¿Cómo predecir y controlar capacidades emergentes? Es un área de investigación activa]{.alert}
 :::
 :::
 :::
@@ -618,7 +630,7 @@ Entrada: casa con 3 habitaciones, 120 m²
 Salida: USD 250.000
 
 El modelo aprende la relación entre
-características y precio.
+características y precio
 ```
 :::
 :::
@@ -656,8 +668,7 @@ Grupo A: compras frecuentes, bajo valor
 Grupo B: compras ocasionales, alto valor
 Grupo C: nuevos clientes, sin patrón claro
 
-Nadie le dijo que estos grupos existían;
-el algoritmo los encontró solo.
+Nadie le dijo que estos grupos existían; el algoritmo los encontró solo!
 ```
 :::
 :::
@@ -684,10 +695,10 @@ el algoritmo los encontró solo.
 :::{style="text-align: center; font-size: 20px;"}
 **El ciclo del aprendizaje por refuerzo**
 
-[![Ciclo de aprendizaje por refuerzo](figures/rl-cycle.png){width="95%"}](#){data-modal-type="image" data-modal-url="figures/rl-cycle.png"}
+[![Ciclo de aprendizaje por refuerzo](figures/rl-cycle.png){width="90%"}](#){data-modal-type="image" data-modal-url="figures/rl-cycle.png"}
 
 El agente aprende qué acciones
-llevan a mejores resultados.
+llevan a mejores resultados
 :::
 :::
 :::
@@ -731,7 +742,6 @@ Fuente: [Joy Buolamwini / Medium](https://medium.com/@Joy.Buolamwini/ibm-leads-m
     - **Citas fabricadas**: inventar papers que no existen
     - **Estadísticas falsas**: "el 73% de los científicos coinciden..."
     - **Datos biográficos incorrectos**: fechas, eventos, logros equivocados
-- **Caso real (2023)**: [dos abogados presentaron un escrito legal citando seis casos judiciales inexistentes]{.alert} generados por ChatGPT. Fueron sancionados por el tribunal
 - ¿Por qué ocurre? Porque los modelos están entrenados para predecir [texto probable]{.alert}, no [texto verdadero]{.alert}:
 
 $$P(\text{siguiente palabra} | \text{contexto}) \neq P(\text{afirmación verdadera})$$
@@ -750,9 +760,9 @@ $$P(\text{siguiente palabra} | \text{contexto}) \neq P(\text{afirmación verdade
 
 <br>
 
-[La IA es una herramienta, no un oráculo.]{.alert}
+[La IA es una herramienta, no un oráculo!]{.alert} 😅
 
-Siempre mantengan el pensamiento crítico.
+Siempre mantengan el pensamiento crítico 😉
 :::
 :::
 :::
@@ -766,8 +776,8 @@ Siempre mantengan el pensamiento crítico.
 :::{.columns}
 :::{.column width=50%}
 :::{.incremental}
-- [Un modelo con 95% de accuracy siempre es mejor que uno con 80%]{.alert}
-    - [Falso.]{.alert} Con clases desbalanceadas, predecir siempre la clase mayoritaria da 95% sin aprender nada
+- [Un modelo con 99% de accuracy siempre es mejor que uno con 80%]{.alert}
+    - [Falso.]{.alert} Con clases desbalanceadas, predecir siempre la clase mayoritaria da 99% sin aprender nada
 
 - [Los LLMs "entienden" el significado de las palabras como los humanos]{.alert}
     - [Falso.]{.alert} Procesan patrones estadísticos de co-ocurrencia, sin comprensión real

@@ -22,6 +22,7 @@ Esta es la clave de respuestas de la Tarea 2. Cada pregunta incluye el código R
 ```{r setup, message=FALSE, warning=FALSE}
 library(tidymodels)
 library(tidyverse)
+library(kknn)
 
 satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
 
@@ -249,11 +250,9 @@ cat("Tasa de error:", round(errores / nrow(datos_test), 3), "\n")
 ### Pregunta 10: Precisión, recall y AUC
 
 ```{r p10}
-# Agregar probabilidades
-pred_probs <- ajuste |>
-  predict(datos_test, type = "prob") |>
-  bind_cols(predict(ajuste, datos_test)) |>
-  bind_cols(datos_test)
+# augment() junta predicciones (clases + probabilidades) con los datos
+# originales en una sola línea
+pred_probs <- ajuste |> augment(datos_test)
 
 # Precision
 prec <- pred_probs |>

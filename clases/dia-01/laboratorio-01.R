@@ -3,7 +3,7 @@
 # Laboratorio 1: Primer flujo de trabajo con tidymodels
 #
 # Autor: Danilo Freire
-# Fecha: abril de 2026
+# Fecha: mayo de 2026
 #
 # Este script contiene todo el código del Laboratorio 1.
 # Ejecuten cada sección en orden dentro de RStudio.
@@ -34,12 +34,130 @@ datos |>
   mutate(prop = n / sum(n))
 
 
-# --- Ejercicio 1: Exploración --------------------------------
+# --- Ejercicio 1: Inténtenlo ustedes --------------------------
+#
+# (Borren este bloque cuando tengan su respuesta)
+#
+# 1. ¿Cuántas observaciones y variables tiene el dataset?
+# 2. ¿Hay valores faltantes (NA)?
+# 3. ¿Cómo se distribuye cada variable numérica?
+# 4. ¿Hay correlaciones fuertes entre las variables?
+#
+# Pistas: dim(), nrow(), ncol(), sum(is.na()), colSums(is.na()),
+#         summary(), cor(), select(where(is.numeric))
+
+
+# --- Parte 2: Preprocesamiento y división --------------------
+
+# Convertir el outcome a factor y descartar columnas no numéricas.
+# pais tiene 179 valores únicos y rompería el modelo;
+# continente lo dejamos fuera para usar solo predictores numéricos.
+datos_modelo <- datos |>
+  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si"))) |>
+  select(-pais, -continente)
+
+glimpse(datos_modelo)
+
+# Ver los niveles del factor
+# (el primer nivel es la clase "negativa", el segundo la "positiva")
+levels(datos_modelo$crecimiento_alto)
+
+# Dividir: 75% entrenamiento, 25% prueba
+set.seed(2026)
+datos_split <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
+
+datos_train <- training(datos_split)
+datos_test  <- testing(datos_split)
+
+cat("Entrenamiento:", nrow(datos_train), "filas\n")
+cat("Prueba:", nrow(datos_test), "filas\n")
+
+# Verificar la estratificación: las proporciones deben ser similares
+datos_train |>
+  count(crecimiento_alto) |>
+  mutate(prop = round(n / sum(n), 3))
+
+datos_test |>
+  count(crecimiento_alto) |>
+  mutate(prop = round(n / sum(n), 3))
+
+
+# --- Parte 3: Entrenamiento y evaluación ---------------------
+
+# Especificar el modelo (todavía no entrena, solo declara)
+modelo_log <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+modelo_log
+
+# Ajustar el modelo a los datos de entrenamiento
+ajuste <- modelo_log |>
+  fit(crecimiento_alto ~ ., data = datos_train)
+
+# Ver los coeficientes en escala log-odds
+tidy(ajuste)
+
+# Odds ratios = exp(coeficiente)
+tidy(ajuste) |>
+  mutate(odds_ratio = exp(estimate)) |>
+  select(term, estimate, odds_ratio, p.value)
+
+# Predecir clases en los datos de prueba.
+# .pred_class es la columna que tidymodels crea por ti;
+# el punto al principio evita chocar con columnas del usuario.
+predicciones <- ajuste |>
+  predict(datos_test) |>
+  bind_cols(datos_test)
+
+predicciones |>
+  select(crecimiento_alto, .pred_class) |>
+  head(8)
+
+# Matriz de confusión
+conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
+
+# Conjunto completo de métricas
+predicciones |>
+  conf_mat(truth = crecimiento_alto, estimate = .pred_class) |>
+  summary()
+
+
+# --- Parte 4: Más allá de la clasificación binaria -----------
+
+# Probabilidades en lugar de clases.
+# .pred_no y .pred_si son las probabilidades por nivel del factor.
+pred_probs <- ajuste |>
+  predict(datos_test, type = "prob") |>
+  bind_cols(datos_test)
+
+pred_probs |>
+  select(crecimiento_alto, .pred_no, .pred_si) |>
+  head(5)
+
+# Curva ROC y AUC.
+# event_level = "second" fija "si" como el evento positivo
+# (es el segundo nivel del factor; sin esto el AUC sale invertido).
+pred_probs |>
+  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second") |>
+  autoplot()
+
+pred_probs |>
+  roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
+
+
+# ============================================================
+# MATERIAL OPCIONAL (apéndices del laboratorio)
+# Estas secciones expanden conceptos mencionados en clase.
+# La validación cruzada aparece formalmente en el Laboratorio 2.
+# ============================================================
+
+# --- Apéndice 1: Solución del Ejercicio 1 ---------------------
 
 # 1. Dimensiones del dataset
 dim(datos)
-nrow(datos)           # solo filas
-ncol(datos)           # solo columnas
+nrow(datos)
+ncol(datos)
 
 # 2. Valores faltantes
 sum(is.na(datos))
@@ -57,103 +175,8 @@ datos |>
   round(2)
 
 
-# --- Parte 2: Preprocesamiento y división --------------------
+# --- Apéndice 2: Precisión y recall por separado -------------
 
-# Convertir el outcome a factor
-datos <- datos |>
-  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si")))
-
-# Seleccionar variables para el modelo (solo numéricas)
-datos_modelo <- datos |>
-  select(crecimiento_alto, gasto_educacion, acceso_internet,
-         urbanizacion, gasto_salud, inflacion, desempleo,
-         inversion_extranjera, indice_gobierno_digital)
-
-glimpse(datos_modelo)
-
-# Ver los niveles del factor
-levels(datos_modelo$crecimiento_alto)
-
-# Dividir: 75% entrenamiento, 25% prueba
-set.seed(2026)
-datos_split <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
-
-datos_train <- training(datos_split)
-datos_test  <- testing(datos_split)
-
-cat("Entrenamiento:", nrow(datos_train), "filas\n")
-cat("Prueba:", nrow(datos_test), "filas\n")
-
-# Verificar estratificación
-datos_train |>
-  count(crecimiento_alto) |>
-  mutate(prop = round(n / sum(n), 3), conjunto = "train")
-
-datos_test |>
-  count(crecimiento_alto) |>
-  mutate(prop = round(n / sum(n), 3), conjunto = "test")
-
-
-# --- Variaciones de la división (demo) -----------------------
-
-# prop baja: menos datos de entrenamiento
-set.seed(2026)
-split_50 <- initial_split(datos_modelo, prop = 0.50, strata = crecimiento_alto)
-cat("Train:", nrow(training(split_50)), "/ Test:", nrow(testing(split_50)))
-
-# Sin estratificación: las proporciones pueden diferir
-set.seed(1234)
-split_sin <- initial_split(datos_modelo, prop = 0.75)
-training(split_sin) |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
-
-# Otra semilla: otra partición (pero strata mantiene las proporciones)
-set.seed(999)
-split_999 <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
-training(split_999) |> count(crecimiento_alto) |> mutate(prop = round(n / sum(n), 3))
-
-
-# --- Parte 3: Entrenamiento y evaluación ----------------------
-
-# Especificar el modelo
-modelo_log <- logistic_reg() |>
-  set_engine("glm") |>
-  set_mode("classification")
-
-modelo_log
-
-# Ajustar el modelo
-ajuste <- modelo_log |>
-  fit(crecimiento_alto ~ ., data = datos_train)
-
-# Ver los coeficientes
-tidy(ajuste)
-
-# Odds ratios
-tidy(ajuste) |>
-  mutate(odds_ratio = exp(estimate)) |>
-  select(term, estimate, odds_ratio, p.value)
-
-# Predecir clases en datos de prueba
-predicciones <- ajuste |>
-  predict(datos_test) |>  # predice clases por defecto
-  bind_cols(datos_test)   # combinar con datos originales para evaluación
-
-predicciones |>
-  select(crecimiento_alto, .pred_class) |>
-  head(8)
-
-# Matriz de confusión
-conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
-
-# Conjunto completo de métricas
-predicciones |>
-  conf_mat(truth = crecimiento_alto, estimate = .pred_class) |>
-  summary()
-
-
-# --- Ejercicio 3: Interpretación ------------------------------
-
-# Precisión y recall
 predicciones |>
   precision(truth = crecimiento_alto,
             estimate = .pred_class,
@@ -164,15 +187,28 @@ predicciones |>
          estimate = .pred_class,
          event_level = "second")
 
+# O ambas a la vez con event_level dentro de summary()
+predicciones |>
+  conf_mat(truth = crecimiento_alto, estimate = .pred_class) |>
+  summary(event_level = "second")
 
-# --- Probabilidades y umbral (demo) --------------------------
 
-# Obtener probabilidades en test
-pred_probs <- ajuste |>
-  predict(datos_test, type = "prob") |>
-  bind_cols(datos_test)
+# --- Apéndice 3: Observaciones inciertas ---------------------
 
-# Comparar precision y recall para tres umbrales
+# Observaciones con probabilidad cercana a 0.5: las más difíciles
+# de clasificar. En contextos reales merecen revisión manual.
+pred_probs |>
+  select(crecimiento_alto, .pred_no, .pred_si) |>
+  mutate(incertidumbre = abs(.pred_si - 0.5)) |>
+  filter(incertidumbre < 0.1) |>
+  arrange(incertidumbre)
+
+
+# --- Apéndice 4: Comparar precisión y recall por umbral ------
+
+# Para cada umbral, recalculamos la clase predicha y medimos:
+# - umbral bajo  -> recall alto, precisión baja
+# - umbral alto  -> precisión alta, recall bajo
 purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
   pred_probs |>
     mutate(.pred_u = factor(
@@ -187,52 +223,25 @@ purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
 })
 
 
-# --- Curva ROC y AUC (demo) ----------------------------------
+# --- Apéndice 5: Validación cruzada --------------------------
 
-# event_level = "second" fija "si" como el evento positivo.
-# Sin esto, el AUC sale invertido.
-pred_probs |>
-  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second") |>
-  autoplot()
-
-pred_probs |>
-  roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
-
-
-# ============================================================
-# MATERIAL OPCIONAL
-# Estas secciones no se cubren en clase, pero están aquí
-# para quienes quieran profundizar. Validación cruzada aparece
-# formalmente en el Laboratorio 2.
-# ============================================================
-
-
-# --- Opcional: observaciones inciertas -----------------------
-
-# Observaciones con probabilidad cercana a 0.5
-pred_probs |>
-  select(crecimiento_alto, .pred_no, .pred_si) |>
-  mutate(incertidumbre = abs(.pred_si - 0.5)) |>
-  filter(incertidumbre < 0.1) |>
-  arrange(incertidumbre)
-
-
-# --- Opcional: validación cruzada ----------------------------
-
+# Crear 5 folds estratificados
 set.seed(2026)
 folds <- vfold_cv(datos_train, v = 5, strata = crecimiento_alto)
 folds
 
-cv_results <- fit_resamples(
-  modelo_log,
-  crecimiento_alto ~ .,
-  resamples = folds,
-  metrics = metric_set(accuracy, precision, recall),
-  control = control_resamples(event_level = "second")
-)
+# Ajustar el modelo en cada fold
+cv_results <- modelo_log |>
+  fit_resamples(
+    crecimiento_alto ~ .,
+    resamples = folds,
+    metrics = metric_set(accuracy, roc_auc),
+    control = control_resamples(event_level = "second")
+  )
 
+# collect_metrics() devuelve la media y el error estándar por métrica
 collect_metrics(cv_results)
 
-# Comparar con la división única
+# Comparar con las métricas de la división única
 predicciones |>
   metrics(truth = crecimiento_alto, estimate = .pred_class)

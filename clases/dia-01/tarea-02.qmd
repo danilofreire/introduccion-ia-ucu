@@ -29,6 +29,7 @@ Esta tarea usa el dataset del Laboratorio 2 (`satisfaccion_democracia.csv`). Res
 ```{r setup, message=FALSE, warning=FALSE}
 library(tidymodels)
 library(tidyverse)
+library(kknn)  # Para KNN en la Pregunta 7. Si no está instalado: install.packages("kknn")
 
 satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
 
@@ -174,7 +175,7 @@ Grafiquen la curva ROC del modelo logístico. Agreguen un titulo al gráfico con
 
 ### Pregunta 12: Coeficientes del modelo
 
-Extraigan los coeficientes del modelo logístico con `tidy()` y calculen los odds ratios. Cuál variable tiene el efecto más fuerte? Cuál tiene el efecto más débil? Ordenen por p-valor.
+Usen el modelo logístico para esta pregunta (los coeficientes de un árbol no se interpretan con odds ratios). Extraigan los coeficientes con `tidy()` y calculen los odds ratios. ¿Cuál variable tiene el efecto más fuerte? ¿Cuál tiene el efecto más débil? Ordenen por p-valor.
 
 ```{r p12}
 # Escriban su codigo aqui

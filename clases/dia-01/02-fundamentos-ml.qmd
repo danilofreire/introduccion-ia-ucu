@@ -98,22 +98,23 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 
 :::{.columns}
 :::{.column width=50%}
-- [Paso 1: Recoger datos]{.alert}: obtener observaciones relevantes al problema
-- [Paso 2: Preprocesar]{.alert}: limpiar valores faltantes, transformar variables, codificar categorías
-- [Paso 3: Dividir]{.alert}: separar en entrenamiento y prueba
+1. [Recoger datos]{.alert}: obtener observaciones relevantes al problema
+2. [Preprocesar]{.alert}: limpiar, transformar variables y codificar categorías
+3. [Dividir]{.alert} en entrenamiento y prueba
 :::
 
 :::{.column width=50%}
-- [Paso 4: Entrenar]{.alert}: ajustar un modelo a los datos de entrenamiento
-- [Paso 5: Evaluar]{.alert}: medir el rendimiento en datos que el modelo nunca vio
-- En la práctica, [este proceso es iterativo]{.alert}: volvemos a pasos anteriores cuando algo falla
+4. [Entrenar]{.alert} un modelo con los datos de entrenamiento
+5. [Evaluar]{.alert} el rendimiento con datos que el modelo nunca vio
+
+En la práctica, [el proceso es iterativo]{.alert}: volvemos a pasos anteriores cuando algo falla
 :::
 :::
 :::
 
 ## Pasos 1-2: recolección y preprocesamiento
 
-:::{style="margin-top: 30px; font-size: 21px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 **Recolección de datos**
@@ -124,11 +125,11 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 
 **Preprocesamiento**
 
-- [Valores faltantes:]{.alert} imputar, eliminar o marcar
-- [Variables categóricas:]{.alert} convertir a numéricas ([one-hot encoding](https://en.wikipedia.org/wiki/One-hot), [label encoding](https://en.wikipedia.org/wiki/Feature_engineering#Categorical_data))
-- [Escalado:]{.alert} [normalizar](https://es.wikipedia.org/wiki/Normalización_(estadística)) o [estandarizar](https://es.wikipedia.org/wiki/Puntuación_estándar) variables numéricas
-- [Outliers:]{.alert} detectar y decidir qué hacer con ellos
-- [[Feature engineering:](https://en.wikipedia.org/wiki/Feature_engineering)]{.alert} crear nuevas variables a partir de las existentes
+- [Valores faltantes]{.alert}: imputar, eliminar o marcar
+- Convertir [variables categóricas]{.alert} a numéricas con [one-hot encoding](https://en.wikipedia.org/wiki/One-hot) o [label encoding](https://en.wikipedia.org/wiki/Feature_engineering#Categorical_data)
+- [Escalar]{.alert} variables numéricas ([normalizar](https://es.wikipedia.org/wiki/Normalización_(estadística)))
+- Detectar [outliers]{.alert} y decidir qué hacer con ellos
+- [[Feature engineering](https://en.wikipedia.org/wiki/Feature_engineering)]{.alert}, crear nuevas variables a partir de las existentes
 :::
 
 :::{.column width=45%}
@@ -149,7 +150,7 @@ Después de preprocesar:
   Chile    | 15,346 | 5.4  | 72.3   ← imputado
 ```
 
-El preprocesamiento es [la mayor parte del trabajo]{.alert} en un proyecto real de ML.
+El preprocesamiento es [la mayor parte del trabajo]{.alert} en un proyecto real de ML
 :::
 :::
 :::
@@ -162,14 +163,14 @@ El preprocesamiento es [la mayor parte del trabajo]{.alert} en un proyecto real 
 :::{.column width=55%}
 **Problemas comunes en datos reales:**
 
-- [Valores faltantes:]{.alert} ¿aleatorios o sistemáticos?
-    - [MCAR](https://en.wikipedia.org/wiki/Missing_data#Missing_completely_at_random): faltantes completamente al azar
-    - [MAR](https://en.wikipedia.org/wiki/Missing_data#Missing_at_random): faltantes que dependen de otras variables observadas
-    - [MNAR](https://en.wikipedia.org/wiki/Missing_data#Missing_not_at_random): faltantes que dependen de la variable misma (más difícil)
-- [Errores de medición:]{.alert} datos mal cargados, unidades inconsistentes
-- [Duplicados:]{.alert} registros repetidos que sesgan el modelo
-- [Desbalance de clases:]{.alert} mucho más de una categoría que de otra
-- [[Data leakage:](https://en.wikipedia.org/wiki/Leakage_(machine_learning))]{.alert} información del futuro que "se filtra" al entrenamiento
+- [Valores faltantes]{.alert}, ¿aleatorios o sistemáticos?
+    - [MCAR](https://en.wikipedia.org/wiki/Missing_data#Missing_completely_at_random): completamente al azar
+    - [MAR](https://en.wikipedia.org/wiki/Missing_data#Missing_at_random): dependen de otras variables observadas
+    - [MNAR](https://en.wikipedia.org/wiki/Missing_data#Missing_not_at_random): dependen de la variable misma (más difícil)
+- Errores de [medición]{.alert}: datos mal cargados o unidades inconsistentes
+- [Duplicados]{.alert} que sesgan el modelo
+- [Desbalance de clases]{.alert} (mucho más de una categoría que de otra)
+- [[Data leakage](https://en.wikipedia.org/wiki/Leakage_(machine_learning))]{.alert}: información del futuro que se filtra al entrenamiento
 :::
 
 :::{.column width=45%}
@@ -191,7 +192,7 @@ al momento de la predicción!
 
 <br>
 
-[El data leakage es uno de los errores más difíciles de detectar]{.alert} y puede inflar artificialmente las métricas.
+[El data leakage es uno de los errores más difíciles de detectar]{.alert} y puede inflar artificialmente las métricas
 :::
 :::
 :::
@@ -203,15 +204,15 @@ al momento de la predicción!
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- [[Feature engineering:](https://en.wikipedia.org/wiki/Feature_engineering)]{.alert} crear nuevas variables a partir de las existentes
+- [[Feature engineering](https://en.wikipedia.org/wiki/Feature_engineering)]{.alert}, crear nuevas variables a partir de las existentes
 - Puede mejorar mucho el rendimiento de un modelo simple
 - Ejemplos comunes:
-    - [Transformaciones:]{.alert} log(ingreso), raíz cuadrada, bins
-    - [Interacciones:]{.alert} edad × educación
-    - [Agregaciones:]{.alert} promedio de compras últimos 3 meses
-    - [Variables temporales:]{.alert} día de la semana, mes, año
-    - [Variables de texto:]{.alert} largo del texto, cantidad de palabras
-- [El conocimiento del dominio es clave:]{.alert} ¿qué variables tienen sentido para el problema?
+    - [Transformaciones]{.alert}: log(ingreso), raíz cuadrada, bins
+    - [Interacciones]{.alert} entre variables (edad × educación)
+    - [Agregaciones]{.alert}, como el promedio de compras de los últimos 3 meses
+    - Variables [temporales]{.alert}: día de la semana, mes, año
+    - Variables [de texto]{.alert} (largo, cantidad de palabras)
+- El [conocimiento del dominio]{.alert} es clave: ¿qué variables tienen sentido para el problema?
 :::
 
 :::{.column width=45%}
@@ -235,7 +236,7 @@ tendencia_reciente       ← ¿aumenta o baja?
 
 <br>
 
-[Un buen feature engineering puede valer más que un modelo complejo.]{.alert}
+[Un buen feature engineering puede valer más que un modelo complejo]{.alert}
 :::
 :::
 :::
@@ -311,25 +312,24 @@ tendencia_reciente       ← ¿aumenta o baja?
 
 ## Estratificación y otras estrategias
 
-:::{style="margin-top: 30px; font-size: 19px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 **Estratificación**
 
-- Asegura que cada fold tenga la [misma proporción de clases]{.alert} que el dataset completo
-- Necesaria cuando las clases están [desbalanceadas]{.alert}
+- Cada fold mantiene la [misma proporción de clases]{.alert} que el dataset
+- Útil cuando las clases están [desbalanceadas]{.alert}
 - En tidymodels: `initial_split(datos, strata = variable_respuesta)`
 
-**Validación temporal (time series split)**
+**Validación temporal**
 
 - Para datos con [estructura temporal]{.alert} ([series de tiempo](https://es.wikipedia.org/wiki/Serie_temporal))
-- [Nunca entrenar con datos del futuro]{.alert} para predecir el pasado
-- Se entrena con datos anteriores, se valida con datos posteriores
+- [Nunca entrenar con el futuro]{.alert} para predecir el pasado
 
 **[Leave-One-Out](https://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation) (LOO)**
 
-- K = N (cada observación es un fold)
-- Útil con [muy pocos datos]{.alert}, pero costoso computacionalmente
+- K = N, una observación por fold
+- Útil con [muy pocos datos]{.alert}, pero costoso
 :::
 
 :::{.column width=45%}
@@ -356,7 +356,7 @@ Fold 3:
 
 <br>
 
-[La validación temporal es necesaria para datos con dependencia temporal.]{.alert}
+[La validación temporal es necesaria para datos con dependencia temporal]{.alert}
 :::
 :::
 :::
@@ -368,14 +368,14 @@ Fold 3:
 :::{.columns}
 :::{.column width=55%}
 - Pregunta frecuente sin respuesta universal
-- Depende de:
-    - [Complejidad del problema:]{.alert} ¿cuántas variables? ¿relaciones lineales o no lineales?
-    - [Ruido en los datos:]{.alert} datos limpios necesitan menos observaciones
-    - [Complejidad del modelo:]{.alert} modelos complejos necesitan más datos
-    - [Número de clases:]{.alert} más clases = más datos por clase
+- Depende de varios factores:
+    - [Complejidad del problema]{.alert}: número de variables y tipo de relaciones
+    - Cantidad de [ruido]{.alert} en los datos (con datos limpios bastan menos)
+    - [Complejidad del modelo]{.alert}, ya que los más complejos piden más datos
+    - [Número de clases]{.alert}: más clases = más datos por clase
 - Reglas prácticas (muy aproximadas):
-    - [Clasificación:]{.alert} al menos 50-100 por clase minoritaria
-    - [[Deep learning:](https://es.wikipedia.org/wiki/Aprendizaje_profundo)]{.alert} miles a millones de ejemplos
+    - Para [clasificación]{.alert}, al menos 50-100 por clase minoritaria
+    - [[Deep learning](https://es.wikipedia.org/wiki/Aprendizaje_profundo)]{.alert}: miles o millones de ejemplos
 :::
 
 :::{.column width=45%}
@@ -386,7 +386,7 @@ Fold 3:
 
 Con más datos, el rendimiento mejora, pero con [[rendimientos decrecientes](https://es.wikipedia.org/wiki/Rendimientos_decrecientes)]{.alert}.
 
-A veces [más datos ayudan más]{.alert} que un modelo más complejo.
+A veces [más datos ayudan más]{.alert} que un modelo más complejo
 :::
 :::
 :::
@@ -465,14 +465,14 @@ Fuente: [X.com](https://x.com/MaartenvSmeden/status/1522230905468862464)
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- [[Sesgo (bias):](https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff)]{.alert} error por suposiciones simplificadoras del modelo. Un modelo con alto sesgo "no presta atención" a los datos
-- [[Varianza:](https://es.wikipedia.org/wiki/Varianza)]{.alert} error por sensibilidad excesiva a los datos de entrenamiento. Un modelo con alta varianza cambia mucho con cada muestra
-- [No se pueden minimizar ambos al mismo tiempo]{.alert}: al reducir uno, el otro tiende a aumentar
+- El [sesgo (bias)](https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff){.alert} es el error por suposiciones simplificadoras: un modelo con alto sesgo "no presta atención" a los datos
+- La [varianza](https://es.wikipedia.org/wiki/Varianza){.alert}, en cambio, es el error por sensibilidad excesiva al entrenamiento: cambia mucho con cada muestra
+- [No se pueden minimizar ambos al mismo tiempo]{.alert}, ya que al reducir uno el otro tiende a aumentar
 - El objetivo es encontrar el [punto medio]{.alert} donde el error total es mínimo
 - En la práctica:
-    - Modelos simples ([regresión lineal](https://es.wikipedia.org/wiki/Regresión_lineal)): alto sesgo, baja varianza
-    - Modelos complejos ([redes neuronales profundas](https://es.wikipedia.org/wiki/Aprendizaje_profundo)): bajo sesgo, alta varianza
-    - [Regularización]{.alert} ayuda a controlar la varianza sin aumentar demasiado el sesgo
+    - Los modelos simples ([regresión lineal](https://es.wikipedia.org/wiki/Regresión_lineal)) tienden a alto sesgo y baja varianza
+    - Los modelos complejos ([redes neuronales profundas](https://es.wikipedia.org/wiki/Aprendizaje_profundo)) muestran bajo sesgo y alta varianza
+    - La [regularización]{.alert} controla la varianza sin aumentar mucho el sesgo
 :::
 
 :::{.column width=45%}
@@ -500,11 +500,11 @@ aumenta (la curva sube).
 
 **Tipos principales:**
 
-- [[L1 (LASSO):](https://en.wikipedia.org/wiki/Lasso_(statistics))]{.alert} puede llevar coeficientes a exactamente cero (selección de variables)
-- [[L2 (Ridge):](https://en.wikipedia.org/wiki/Ridge_regression)]{.alert} reduce coeficientes pero no los elimina
-- [[Elastic Net:](https://en.wikipedia.org/wiki/Elastic_net_regularization)]{.alert} combinación de L1 y L2
+- [[L1 (LASSO)](https://en.wikipedia.org/wiki/Lasso_(statistics))]{.alert} puede llevar coeficientes a exactamente cero (selección de variables)
+- [[L2 (Ridge)](https://en.wikipedia.org/wiki/Ridge_regression)]{.alert} reduce los coeficientes, pero no los elimina
+- [[Elastic Net](https://en.wikipedia.org/wiki/Elastic_net_regularization)]{.alert}, combinación de L1 y L2
 
-Lo veremos en detalle en el [Día 2]{.alert} cuando trabajemos con regresión.
+Lo veremos en detalle en el [Día 2]{.alert} cuando trabajemos con regresión
 :::
 
 :::{.column width=45%}
@@ -529,7 +529,7 @@ estable y generalizable
 
 <br>
 
-[La regularización es como pedirle al modelo que sea "parsimonioso".]{.alert}
+[La regularización es como pedirle al modelo que sea "parsimonioso"]{.alert}
 :::
 :::
 :::
@@ -561,7 +561,7 @@ estable y generalizable
 
 [![](figures/learning-curve-overfit.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/learning-curve-overfit.png"}
 
-Cuando las curvas se separan, [el modelo está sobreajustando]{.alert}.
+Cuando las curvas se separan, [el modelo está sobreajustando]{.alert}
 
 El punto donde se cruzan es donde deberíamos detenernos.
 :::
@@ -574,7 +574,7 @@ El punto donde se cruzan es donde deberíamos detenernos.
 ## La paradoja de la precisión
 
 :::{style="margin-top: 40px; font-size: 26px;"}
-**Escenario**: están construyendo un modelo para predecir si los pacientes tienen una enfermedad rara que afecta a [1 de cada 1.000 personas]{.alert}.
+**Escenario**: están construyendo un modelo para predecir si los pacientes tienen una enfermedad rara que afecta a [1 de cada 1.000 personas]{.alert}
 
 Un colega les muestra un modelo y les dice con orgullo: ["Logra un 99,9% de accuracy (exactitud)"]{.alert}
 
@@ -585,9 +585,9 @@ Piénsenlo 30 segundos...
 :::
 
 :::{.fragment}
-**La verdad incómoda**: ese modelo "99,9% preciso" [no detecta ni un solo caso real]{.alert}. Simplemente predice "sano" para todos. Cada paciente enfermo es ignorado.
+**La verdad incómoda**: ese modelo "99,9% preciso" [no detecta ni un solo caso real]{.alert}. Simplemente predice "sano" para todos. Cada paciente enfermo es ignorado
 
-[La accuracy (exactitud) no basta]{.alert}, especialmente con clases desbalanceadas.
+[La accuracy (exactitud) no basta]{.alert}, especialmente con clases desbalanceadas
 :::
 :::
 
@@ -615,22 +615,22 @@ Piénsenlo 30 segundos...
 
 ## Precisión y recall
 
-:::{style="margin-top: 20px; font-size: 21px;"}
+:::{style="margin-top: 20px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
 **[Precision](https://es.wikipedia.org/wiki/Precisi%C3%B3n_y_exhaustividad)** = VP / (VP + FP)
 
-- Cuando el modelo dice "sí", [¿con qué frecuencia acierta?]{.alert}
+- De las predicciones "sí" del modelo, [¿cuántas son correctas?]{.alert}
 - Alta precisión = [pocas falsas alarmas]{.alert}
-- Importante cuando **los falsos positivos son costosos** (spam, fraude)
+- Importa cuando los **falsos positivos** son costosos (spam, fraude)
 
 **[Recall](https://es.wikipedia.org/wiki/Precisi%C3%B3n_y_exhaustividad)** = VP / (VP + FN)
 
-- De todos los positivos reales, [¿cuántos encontramos?]{.alert}
-- Alto recall = [no nos perdemos muchos positivos]{.alert}
-- Importante cuando **los falsos negativos son costosos** (enfermedades, seguridad)
+- De los positivos reales, [¿cuántos encontramos?]{.alert}
+- Alto recall = [no se nos escapan positivos]{.alert}
+- Importa cuando los **falsos negativos** son costosos (enfermedades, seguridad)
 
-La mayoría de los clasificadores generan una [puntuación de probabilidad]{.alert}. Mover el umbral cambia el equilibrio entre precisión y recall. [No se pueden maximizar ambos]{.alert}
+Los clasificadores devuelven una [puntuación de probabilidad]{.alert}. Mover el umbral cambia el equilibrio entre precisión y recall, y [no se pueden maximizar ambos]{.alert}
 :::
 
 :::{.column width=50%}
@@ -650,10 +650,10 @@ Fuente: [Analytics Vidhya](https://www.analyticsvidhya.com/blog/2020/10/how-to-c
 :::{.column width=50%}
 **[AUC-ROC](https://es.wikipedia.org/wiki/Curva_ROC)**
 
-- [[Curva ROC:](https://es.wikipedia.org/wiki/Curva_ROC)]{.alert} grafica tasa de verdaderos positivos vs. falsos positivos
-- [[AUC:](https://en.wikipedia.org/wiki/Receiver_operating_characteristic#AUC)]{.alert} área bajo la curva ROC (0.5 = azar, 1.0 = perfecto)
-- Mide qué tan bien el modelo [separa las clases]{.alert} en general
-- [Independiente del umbral:]{.alert} evalúa todas las probabilidades
+- La [curva ROC](https://es.wikipedia.org/wiki/Curva_ROC){.alert} grafica tasa de verdaderos positivos vs. falsos positivos
+- El [AUC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic#AUC){.alert} es el área bajo esa curva (0.5 = azar, 1.0 = perfecto)
+- Mide qué tan bien el modelo [separa las clases]{.alert}
+- [Independiente del umbral]{.alert}, ya que evalúa todas las probabilidades
 - Muy usado para comparar clasificadores
 
 :::{style="text-align: center;"}
@@ -760,7 +760,7 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 
 <br>
 
-[En la práctica, probar varios modelos y comparar con validación cruzada.]{.alert}
+[En la práctica, probar varios modelos y comparar con validación cruzada]{.alert}
 :::
 :::
 :::
@@ -823,16 +823,16 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 :::{.column width=50%}
 **En R:**
 
-- [[renv:](https://rstudio.github.io/renv/)]{.alert} gestión de dependencias (versiones de paquetes)
-- [[targets:](https://docs.ropensci.org/targets/)]{.alert} pipelines reproducibles
-- [Quarto/RMarkdown:]{.alert} código + documentación juntos
-- [Git:]{.alert} control de versiones
+- [[renv](https://rstudio.github.io/renv/)]{.alert} para gestionar dependencias y versiones de paquetes
+- [[targets](https://docs.ropensci.org/targets/)]{.alert}: pipelines reproducibles
+- [Quarto/RMarkdown]{.alert}, código y documentación juntos
+- [Git]{.alert} para control de versiones
 
 **En general:**
 
-- [[Docker:](https://www.docker.com/)]{.alert} contenedores con ambiente completo
-- [[MLflow:](https://mlflow.org/)]{.alert} tracking de experimentos
-- [[DVC:](https://dvc.org/)]{.alert} versionado de datos
+- [[Docker](https://www.docker.com/)]{.alert}: contenedores con ambiente completo
+- [[MLflow](https://mlflow.org/)]{.alert} para tracking de experimentos
+- [[DVC](https://dvc.org/)]{.alert}, versionado de datos
 :::
 
 :::{.column width=50%}
@@ -856,7 +856,7 @@ mi_proyecto/
 
 <br>
 
-[Invertir en reproducibilidad ahorra tiempo a futuro.]{.alert}
+[Invertir en reproducibilidad ahorra tiempo a futuro]{.alert}
 :::
 :::
 :::
@@ -872,11 +872,11 @@ mi_proyecto/
 - [tidymodels](https://www.tidymodels.org/) es un conjunto de paquetes de R para modelado de datos
 - Sigue la filosofía del [[tidyverse](https://www.tidyverse.org/)]{.alert}: código legible, consistente y modular
 - Paquetes principales:
-    - [[rsample:](https://rsample.tidymodels.org/)]{.alert} división de datos (train/test, validación cruzada)
-    - [[parsnip:](https://parsnip.tidymodels.org/)]{.alert} especificación de modelos (interfaz unificada)
-    - [[yardstick:](https://yardstick.tidymodels.org/)]{.alert} métricas de evaluación
-    - [[workflows:](https://workflows.tidymodels.org/)]{.alert} combinar preprocesamiento + modelo
-    - [[recipes:](https://recipes.tidymodels.org/)]{.alert} preprocesamiento de datos
+    - [[rsample](https://rsample.tidymodels.org/)]{.alert} divide los datos (train/test, validación cruzada)
+    - [[parsnip](https://parsnip.tidymodels.org/)]{.alert} para especificar modelos con una interfaz unificada
+    - [[yardstick](https://yardstick.tidymodels.org/)]{.alert}: métricas de evaluación
+    - [[workflows](https://workflows.tidymodels.org/)]{.alert} combina preprocesamiento y modelo
+    - [[recipes](https://recipes.tidymodels.org/)]{.alert} para preprocesar los datos
 - Ventaja: [misma sintaxis]{.alert} para todos los modelos, ya sea regresión logística, random forest o redes neuronales
 :::
 

@@ -77,7 +77,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::{style="margin-top: 30px; font-size: 28px;"}
 [Hay menos código predefinido. Ustedes van a escribir más!]{.alert} 
 
-[¡No se preocupen! Les damos una estructura para que puedan completar.]{.alert} 😉
+[¡No se preocupen! Les damos una estructura para que puedan completar]{.alert} 😉
 :::
 :::
 :::
@@ -94,6 +94,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 # install.packages("tidymodels", "tidyverse") # Instalar si es necesario
 library(tidymodels)
 library(tidyverse)
+library(rpart) # Para el motor de árbol de decisión
 
 # Configurar tema de ggplot
 theme_set(theme_minimal(base_size = 14))
@@ -151,24 +152,28 @@ glimpse(satisfaccion) # Ver las variables y tipos
 
 :::
 
-## Visualizar distribuciones
+## Estadísticas descriptivas
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-```{r lab2-boxplots, prompt=FALSE, fig.width=10, fig.height=4.5, echo=TRUE}
-# Variables numéricas por nivel de satisfacción
+Antes de modelar, conviene ver [cómo se distribuyen las variables]{.alert} y si difieren entre los grupos de `satisfecho`:
+
+```{r lab2-stats, prompt=FALSE, echo=TRUE}
+# Resumen rápido de las variables numéricas
+satisfaccion |> select(where(is.numeric)) |> summary()
+
+# Medias por nivel de satisfacción (predictores clave)
 satisfaccion |>
-  select(satisfecho, confianza_gobierno, participacion_politica, edad) |>
-  pivot_longer(-satisfecho, names_to = "variable", values_to = "valor") |>
-  ggplot(aes(x = satisfecho, y = valor, fill = satisfecho)) +
-  geom_boxplot(alpha = 0.7) +
-  facet_wrap(~variable, scales = "free_y") +
-  scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
-  labs(title = "Variables numéricas por nivel de satisfacción") +
-  theme(legend.position = "none")
+  group_by(satisfecho) |>
+  summarise(
+    confianza_media     = mean(confianza_gobierno),
+    educacion_media     = mean(educacion_anos),
+    ingreso_mediano     = median(ingreso_hogar),
+    participacion_media = mean(participacion_politica)
+  )
 ```
 
-Quienes tengan tiempo pueden ver también `geom_histogram()` por variable. Ejemplo completo en [Apéndice 1]{.alert}.
+[Más estadísticas en Apéndices 2 y 3; visualizaciones (incluidos boxplots) en Apéndice 4]{.alert}
 :::
 
 ## Ejercicio 1: Exploración {#sec:exercise01}
@@ -198,7 +203,7 @@ satisfaccion |>
 
 [Tómense 5-10 minutos.]{.alert}
 
-[[Ir al Apéndice 1]{.button}](#sec:appendix01) · [[Más visualizaciones: Apéndice 2]{.button}](#sec:appendix02)
+[[App 1: dim y conteos]{.button}](#sec:appendix01) · [[App 2: estadísticas]{.button}](#sec:appendix02) · [[App 3: relaciones]{.button}](#sec:appendix03) · [[App 4: visualizaciones]{.button}](#sec:appendix04)
 :::
 
 # Parte 2: Feature engineering {background-color="#2d4563"}
@@ -255,7 +260,7 @@ satisfaccion |> select(grupo_edad, ingreso_percapita, alta_participacion) |> hea
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-**Tarea:** Elijan [una]{.alert} variable derivada y créenla.
+**Tarea:** Elijan [una]{.alert} variable derivada y créenla
 
 Opciones sugeridas (elijan la que más les interese). Entre paréntesis, la variable base:
 
@@ -274,7 +279,7 @@ satisfaccion <- satisfaccion |>
 
 [Tómense 5 minutos.]{.alert}
 
-[[Más ejemplos en el Apéndice 3]{.button}](#sec:appendix03)
+[[Más ejemplos en el Apéndice 5]{.button}](#sec:appendix05)
 :::
 
 ## Dividir los datos
@@ -307,7 +312,7 @@ cat("Train:", nrow(datos_train), "| Test:", nrow(datos_test))
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-Vamos a comparar dos modelos de naturaleza distinta: uno lineal y uno no lineal.
+Vamos a comparar dos modelos de naturaleza distinta: uno lineal y uno no lineal
 
 ```{r lab2-modelos, prompt=FALSE, echo=TRUE}
 # 1. Regresión logística (lineal)
@@ -321,7 +326,7 @@ modelo_arbol <- decision_tree() |>
   set_mode("classification")
 ```
 
-La [misma sintaxis]{.alert} sirve para ambos: esa es la ventaja de `parsnip`. Otros motores (`kknn`, `ranger`, `xgboost`) funcionan igual cambiando solo `set_engine()`.
+La [misma sintaxis]{.alert} sirve para ambos: esa es la ventaja de `parsnip`. Otros motores (`kknn`, `ranger`, `xgboost`) funcionan igual cambiando solo `set_engine()`
 :::
 
 ## Crear una fórmula
@@ -348,17 +353,15 @@ Creemos una función que facilite la evaluación:
 
 ```{r lab2-funcion-evaluar, prompt=FALSE, echo=TRUE}
 evaluar_modelo <- function(modelo, formula, folds, nombre = "modelo") {
-  # Validación cruzada
-  # event_level = "second" porque "si" es el segundo nivel del factor
+  # 1. fit_resamples ajusta el modelo en cada fold de la validación cruzada
   resultados <- fit_resamples(
     modelo,
     formula,
     resamples = folds,
-    metrics = metric_set(accuracy, precision, recall, roc_auc),
-    control = control_resamples(event_level = "second")
+    metrics  = metric_set(accuracy, precision, recall, roc_auc),  # 2. métricas que queremos
+    control  = control_resamples(event_level = "second")          # 3. "si" es la clase positiva
   )
-
-  # Extraer métricas
+  # 4. collect_metrics() devuelve la media y el error estándar de cada métrica
   collect_metrics(resultados) |>
     mutate(modelo = nombre)
 }
@@ -387,23 +390,8 @@ resultados |>
   select(modelo, .metric, mean, std_err) |>
   pivot_wider(names_from = .metric, values_from = c(mean, std_err))
 ```
-:::
 
-## Visualizar la comparación
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r lab2-visualizar-comparacion, prompt=FALSE, fig.width=10, fig.height=5, echo=TRUE}
-resultados |>
-  ggplot(aes(x = modelo, y = mean, fill = modelo)) +
-  geom_col(alpha = 0.8) +
-  geom_errorbar(aes(ymin = mean - std_err, ymax = mean + std_err),
-                width = 0.2) +
-  facet_wrap(~.metric, scales = "free_y") +
-  scale_fill_manual(values = c("#2d4563", "#27ae60")) +
-  labs(title = "Comparación de modelos", y = "Valor", x = "") +
-  theme(legend.position = "none")
-```
+[Versión visual de esta comparación (barras con error estándar) en [[Apéndice 7]{.button}](#sec:appendix07)]{.alert}
 :::
 
 ## Ejercicio 3: ¿Ayuda el feature engineering? {#sec:exercise04}
@@ -429,34 +417,32 @@ bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
 
 [Tómense 10 minutos.]{.alert}
 
-[[Ir al Apéndice 4]{.button}](#sec:appendix04)
+[[Ir al Apéndice 6]{.button}](#sec:appendix06)
 :::
 
 ## Modelo final en datos de test
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-Una vez elegido el mejor modelo, evaluamos en test:
+Una vez elegido el mejor modelo por validación cruzada, lo entrenamos con todos los datos de train y lo evaluamos [una sola vez]{.alert} en test (los datos que el modelo nunca vio):
 
 ```{r lab2-test-final, prompt=FALSE, echo=TRUE}
-# Elegimos el modelo logístico (por ejemplo)
+# Entrenar el modelo elegido con todos los datos de train
 ajuste_final <- modelo_logistico |>
   fit(formula_basica, data = datos_train)
 
-# Predicciones en test
-pred_test <- ajuste_final |>
-  predict(datos_test, type = "prob") |>
-  bind_cols(predict(ajuste_final, datos_test)) |>
-  bind_cols(datos_test)
+# augment() junta predicciones (clases + probabilidades) con los datos originales
+# en una sola línea. Equivale a hacer dos predict() + bind_cols().
+pred_test <- ajuste_final |> augment(datos_test)
 
-# Métricas finales
-pred_test |>
-  metrics(truth = satisfecho, estimate = .pred_class)
-
-# AUC-ROC
-pred_test |>
-  roc_auc(truth = satisfecho, .pred_si, event_level = "second")
+# Métricas finales y AUC-ROC
+pred_test |> metrics(truth = satisfecho, estimate = .pred_class)
+pred_test |> roc_auc(truth = satisfecho, .pred_si, event_level = "second")
 ```
+
+- [`augment()`]{.alert} toma un modelo ajustado y un conjunto de datos, y añade las predicciones como columnas nuevas: `.pred_class` (clase predicha), `.pred_no`, `.pred_si` (probabilidades)
+- El prefijo `.` es la convención de tidymodels para columnas que el paquete crea por ti
+- Reemplaza dos llamadas a `predict()` y dos `bind_cols()` por una sola línea
 :::
 
 ## Tarea para casa
@@ -515,48 +501,21 @@ Hay una [tarea para esta sesión]{.alert} con preguntas prácticas que aplican t
 
 ## Para mañana
 
-:::{style="margin-top: 40px; font-size: 28px;"}
+:::{style="margin-top: 40px; font-size: 26px;"}
 
 **Día 2: Aprendizaje supervisado**
 
 - Sesión 2.1: Métodos de clasificación
-    - Regresión logística en detalle
-    - Árboles de decisión
-    - Random Forests
+    - Regresión logística en detalle, árboles de decisión, Random Forests
 
 - Sesión 2.2: Regresión y predicción
-    - Regularización: LASSO, Ridge, Elastic Net
-    - Ingeniería de variables para datos sociales
+    - Regularización (LASSO, Ridge, Elastic Net) e ingeniería de variables
 
 - Sesiones 2.3 y 2.4: Laboratorios con datos de Latinobarómetro
 
+**Para profundizar (todo gratis):** [Tidy Modeling with R](https://www.tmwr.org/) · [R for Data Science](https://r4ds.hadley.nz/) · [Get Started with tidymodels](https://www.tidymodels.org/start/)
+
 [Descansen y vengan con energía mañana!]{.alert} 😄
-:::
-
-## Recursos adicionales
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=50%}
-**Documentación oficial:**
-
-- [tidymodels.org](https://www.tidymodels.org/)
-- [Tidy Modeling with R](https://www.tmwr.org/) (libro gratuito)
-- [parsnip models](https://parsnip.tidymodels.org/reference/index.html)
-:::
-
-:::{.column width=50%}
-**Tutoriales recomendados:**
-
-- [Get Started with tidymodels](https://www.tidymodels.org/start/)
-- [Julia Silge's blog](https://juliasilge.com/)
-- [R for Data Science](https://r4ds.hadley.nz/)
-:::
-:::
-
-<br>
-
-[Todos estos recursos están disponibles gratuitamente en línea.]{.alert}
 :::
 
 # Fin del Día 1 🥳 {background-color="#2d4563"}
@@ -592,11 +551,106 @@ satisfaccion |> count(zona)
 [[Volver al Ejercicio 1]{.button}](#sec:exercise01)
 :::
 
-## Apéndice 2: Más visualizaciones {#sec:appendix02}
+## Apéndice 2: Estadísticas por variable {#sec:appendix02}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r appendix02univar, prompt=FALSE, echo=TRUE, eval=FALSE}
+# Estadísticas detalladas de una variable numérica
+satisfaccion |>
+  summarise(
+    media   = mean(ingreso_hogar),
+    mediana = median(ingreso_hogar),
+    sd      = sd(ingreso_hogar),
+    p25     = quantile(ingreso_hogar, 0.25),
+    p75     = quantile(ingreso_hogar, 0.75),
+    min     = min(ingreso_hogar),
+    max     = max(ingreso_hogar)
+  )
+
+# Variables categóricas: conteos y proporciones
+satisfaccion |> count(zona)   |> mutate(prop = n / sum(n))
+satisfaccion |> count(genero) |> mutate(prop = n / sum(n))
+satisfaccion |> count(pais, sort = TRUE)
+
+# Histograma de una variable numérica
+ggplot(satisfaccion, aes(x = ingreso_hogar)) +
+  geom_histogram(bins = 30, fill = "#2d4563")
+
+# Densidad (versión suavizada del histograma)
+ggplot(satisfaccion, aes(x = confianza_gobierno)) +
+  geom_density(fill = "#2d4563", alpha = 0.5)
+```
+
+[Cambien el nombre de la variable para explorar otras: `educacion_anos`, `consumo_noticias`, `participacion_politica`, `edad`]{.alert}
+
+[[Volver al Ejercicio 1]{.button}](#sec:exercise01)
+:::
+
+## Apéndice 3: Relaciones con la satisfacción {#sec:appendix03}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r appendix03bivar, prompt=FALSE, echo=TRUE, eval=FALSE}
+# Numéricas vs satisfacción: medias por grupo
+satisfaccion |>
+  group_by(satisfecho) |>
+  summarise(
+    edad          = mean(edad),
+    educacion     = mean(educacion_anos),
+    ingreso       = median(ingreso_hogar),
+    confianza     = mean(confianza_gobierno),
+    consumo       = mean(consumo_noticias),
+    participacion = mean(participacion_politica)
+  )
+
+# Correlaciones entre todas las variables numéricas
+satisfaccion |>
+  select(where(is.numeric)) |>
+  cor() |>
+  round(2)
+
+# Categórica vs satisfacción: tabla cruzada
+satisfaccion |>
+  count(zona, satisfecho) |>
+  group_by(zona) |>
+  mutate(prop = round(n / sum(n), 3))
+
+# Diferencia de medias (numérica vs categórica)
+t.test(confianza_gobierno ~ satisfecho, data = satisfaccion)
+
+# Independencia (categórica vs categórica)
+chisq.test(satisfaccion$zona, satisfaccion$satisfecho)
+```
+
+[Las medias por grupo son la pista más rápida: si difieren mucho, la variable probablemente ayudará al modelo]{.alert}
+
+[[Volver al Ejercicio 1]{.button}](#sec:exercise01)
+:::
+
+## Apéndice 4: Más visualizaciones {#sec:appendix04}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r appendix04-box, prompt=FALSE, fig.width=10, fig.height=4.5, echo=TRUE}
+# Boxplots: variables numéricas por nivel de satisfacción
+satisfaccion |>
+  select(satisfecho, confianza_gobierno, participacion_politica, edad) |>
+  pivot_longer(-satisfecho, names_to = "variable", values_to = "valor") |>
+  ggplot(aes(x = satisfecho, y = valor, fill = satisfecho)) +
+  geom_boxplot(alpha = 0.7) +
+  facet_wrap(~variable, scales = "free_y") +
+  scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
+  labs(title = "Variables numéricas por nivel de satisfacción") +
+  theme(legend.position = "none")
+```
+:::
+
+## Apéndice 4 (cont.) — Satisfacción por zona
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
-```{r appendix02a, prompt=FALSE, fig.width=10, fig.height=4, echo=TRUE}
+```{r appendix04a, prompt=FALSE, fig.width=10, fig.height=4, echo=TRUE}
 # 1. Satisfacción por zona
 satisfaccion |>
   count(zona, satisfecho) |>
@@ -609,7 +663,7 @@ satisfaccion |>
 ```
 :::
 
-## Apéndice 2 (cont.)
+## Apéndice 4 (cont.)
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -627,7 +681,7 @@ satisfaccion |>
 ```
 :::
 
-## Apéndice 2 (cont.)
+## Apéndice 4 (cont.)
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -655,7 +709,7 @@ ggplot(satisfaccion, aes(x = educacion_anos, y = ingreso_hogar, color = satisfec
 [[Volver al Ejercicio 1]{.button}](#sec:exercise01)
 :::
 
-## Apéndice 3: Crear más features {#sec:appendix03}
+## Apéndice 5: Crear más features {#sec:appendix05}
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -689,7 +743,7 @@ satisfaccion |> count(zona_genero)
 [[Volver al Ejercicio 3]{.button}](#sec:exercise03)
 :::
 
-## Apéndice 4: ¿Ayuda el feature engineering? {#sec:appendix04}
+## Apéndice 6: ¿Ayuda el feature engineering? {#sec:appendix06}
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -723,4 +777,26 @@ bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
 La mejora por agregar una sola variable derivada suele ser modesta. El feature engineering rinde cuando las variables nuevas capturan relaciones no lineales o interacciones que el modelo no puede descubrir por sí solo (en un árbol esto pesa menos, porque ya captura no linealidades automáticamente).
 
 [[Volver al Ejercicio 3]{.button}](#sec:exercise04)
+:::
+
+## Apéndice 7: Visualizar la comparación de modelos {#sec:appendix07}
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Una alternativa visual al cuadro de comparación:
+
+```{r appendix07-viz, prompt=FALSE, fig.width=10, fig.height=5, echo=TRUE}
+resultados |>
+  ggplot(aes(x = modelo, y = mean, fill = modelo)) +
+  geom_col(alpha = 0.8) +
+  geom_errorbar(aes(ymin = mean - std_err, ymax = mean + std_err),
+                width = 0.2) +
+  facet_wrap(~.metric, scales = "free_y") +
+  scale_fill_manual(values = c("#2d4563", "#27ae60")) +
+  labs(title = "Comparación de modelos", y = "Valor", x = "") +
+  theme(legend.position = "none")
+```
+
+- Las barras muestran la media de cada métrica; las líneas verticales son el error estándar (variabilidad entre folds)
+- Si las barras de error se superponen, la diferencia entre modelos no es robusta: probablemente no podamos decir cuál es "mejor" con confianza
 :::
