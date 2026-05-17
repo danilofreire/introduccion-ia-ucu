@@ -345,47 +345,48 @@ formula_basica <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
 Más adelante añadiremos una variable derivada para ver si mejora el ajuste
 :::
 
-## Función para evaluar un modelo
+## Evaluar el modelo logístico
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
-Creemos una función que facilite la evaluación:
+Validación cruzada en 5 folds y resumen de métricas:
 
-```{r lab2-funcion-evaluar, prompt=FALSE, echo=TRUE}
-evaluar_modelo <- function(modelo, formula, folds, nombre = "modelo") {
-  # 1. fit_resamples ajusta el modelo en cada fold de la validación cruzada
-  resultados <- fit_resamples(
-    modelo, 
-    formula,
-    resamples = folds,
-    metrics  = metric_set(accuracy, precision, recall, roc_auc),  # 2. métricas que queremos
-    control  = control_resamples(event_level = "second")          # 3. "si" es la clase positiva
-  )
-  # 4. collect_metrics() devuelve la media y el error estándar de cada métrica
-  collect_metrics(resultados) |>
-    mutate(modelo = nombre)
-}
-```
+```{r lab2-eval-logistico, prompt=FALSE, echo=TRUE}
+eval_logistico <- fit_resamples(
+  modelo_logistico, formula_basica,
+  resamples = folds,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")   # "si" es la clase positiva
+) |>
+  collect_metrics() |>
+  mutate(modelo = "Logístico")
 
-```{r lab2-evaluar-logistico, prompt=FALSE, echo=TRUE}
-# Evaluar regresión logística
-eval_logistico <- evaluar_modelo(modelo_logistico, formula_basica, folds, "Logístico")
 eval_logistico
 ```
+
+- `fit_resamples()` ajusta el modelo en cada fold de la validación cruzada
+- `collect_metrics()` devuelve la media y el error estándar de cada métrica entre folds
+- Usamos [precision, recall y roc_auc]{.alert} en lugar de accuracy: con clases desbalanceadas, la accuracy puede ser engañosa
 :::
 
-## Evaluar todos los modelos {#sec:evaluar-todos}
+## Evaluar el árbol y comparar {#sec:evaluar-todos}
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r lab2-evaluar-todos, prompt=FALSE, echo=TRUE}
-# Evaluar el árbol con la misma fórmula
-eval_arbol <- evaluar_modelo(modelo_arbol, formula_basica, folds, "Árbol")
+# El mismo bloque que antes, cambiando modelo_logistico → modelo_arbol
+eval_arbol <- fit_resamples(
+  modelo_arbol, formula_basica,
+  resamples = folds,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |>
+  mutate(modelo = "Árbol")
 
-# Combinar resultados
+# Combinar y mostrar la comparación
 resultados <- bind_rows(eval_logistico, eval_arbol)
 
-# Mostrar comparación
 resultados |>
   select(modelo, .metric, mean, std_err) |>
   pivot_wider(names_from = .metric, values_from = c(mean, std_err))
@@ -404,15 +405,30 @@ resultados |>
 2. ¿Cuál de los dos modelos es más sensible al feature nuevo?
 
 ```{r ej4-features-nuevos, eval=FALSE, prompt=FALSE, echo=TRUE}
-# Ejemplo con la variable educacion_alta
+# Fórmula con el feature nuevo
 formula_ext <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
                             confianza_gobierno + consumo_noticias +
                             participacion_politica + zona + educacion_alta
 
-eval_log_ext <- evaluar_modelo(modelo_logistico, formula_ext, folds, "Logístico (ext)")
-eval_arb_ext <- evaluar_modelo(modelo_arbol,     formula_ext, folds, "Árbol (ext)")
+# Repetir el mismo bloque de antes, ahora con formula_ext
+eval_log_ext <- fit_resamples(
+  modelo_logistico, formula_ext, resamples = folds,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |> mutate(modelo = "Logístico (ext)")
+
+# Lo mismo cambiando modelo_logistico → modelo_arbol
+eval_arb_ext <- fit_resamples(
+  modelo_arbol, formula_ext, resamples = folds,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |> mutate(modelo = "Árbol (ext)")
+
+# Comparar los 4 modelos por roc_auc
 bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
-  filter(.metric == "accuracy") |> select(modelo, mean, std_err)
+  filter(.metric == "roc_auc") |> select(modelo, mean, std_err)
 ```
 
 [Tómense 5 minutos!]{.alert}
@@ -435,8 +451,9 @@ ajuste_final <- modelo_logistico |>
 # en una sola línea. Equivale a hacer dos predict() + bind_cols().
 pred_test <- ajuste_final |> augment(datos_test)
 
-# Métricas finales y AUC-ROC
-pred_test |> metrics(truth = satisfecho, estimate = .pred_class)
+# Métricas finales (las mismas que usamos en validación cruzada)
+pred_test |> precision(truth = satisfecho, estimate = .pred_class, event_level = "second")
+pred_test |> recall(truth = satisfecho, estimate = .pred_class, event_level = "second")
 pred_test |> roc_auc(truth = satisfecho, .pred_si, event_level = "second")
 ```
 
@@ -766,12 +783,24 @@ formula_ext <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
                             confianza_gobierno + consumo_noticias +
                             participacion_politica + zona + educacion_alta
 
-# Evaluar los dos modelos con y sin feature nuevo
-eval_log_ext <- evaluar_modelo(modelo_logistico, formula_ext, folds_ext, "Logístico (ext)")
-eval_arb_ext <- evaluar_modelo(modelo_arbol,     formula_ext, folds_ext, "Árbol (ext)")
+# Evaluar el logístico con folds_ext (mismo patrón que el cuerpo del lab)
+eval_log_ext <- fit_resamples(
+  modelo_logistico, formula_ext, resamples = folds_ext,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |> mutate(modelo = "Logístico (ext)")
+
+# Evaluar el árbol con folds_ext
+eval_arb_ext <- fit_resamples(
+  modelo_arbol, formula_ext, resamples = folds_ext,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |> mutate(modelo = "Árbol (ext)")
 
 bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
-  filter(.metric == "accuracy") |>
+  filter(.metric == "roc_auc") |>
   select(modelo, mean, std_err) |>
   arrange(desc(mean))
 ```

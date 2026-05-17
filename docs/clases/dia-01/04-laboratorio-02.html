@@ -1686,63 +1686,64 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <p>Más adelante añadiremos una variable derivada para ver si mejora el ajuste</p>
 </div>
 </section>
-<section id="función-para-evaluar-un-modelo" class="slide level2">
-<h2>Función para evaluar un modelo</h2>
+<section id="evaluar-el-modelo-logístico" class="slide level2">
+<h2>Evaluar el modelo logístico</h2>
 <div style="margin-top: 30px; font-size: 20px;">
-<p>Creemos una función que facilite la evaluación:</p>
+<p>Validación cruzada en 5 folds y resumen de métricas:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>evaluar_modelo <span class="ot">&lt;-</span> <span class="cf">function</span>(modelo, formula, folds, <span class="at">nombre =</span> <span class="st">&quot;modelo&quot;</span>) {</span>
-<span id="cb19-2"><a></a>  <span class="co"># 1. fit_resamples ajusta el modelo en cada fold de la validación cruzada</span></span>
-<span id="cb19-3"><a></a>  resultados <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb19-4"><a></a>    modelo, </span>
-<span id="cb19-5"><a></a>    formula,</span>
-<span id="cb19-6"><a></a>    <span class="at">resamples =</span> folds,</span>
-<span id="cb19-7"><a></a>    <span class="at">metrics  =</span> <span class="fu">metric_set</span>(accuracy, precision, recall, roc_auc),  <span class="co"># 2. métricas que queremos</span></span>
-<span id="cb19-8"><a></a>    <span class="at">control  =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)          <span class="co"># 3. &quot;si&quot; es la clase positiva</span></span>
-<span id="cb19-9"><a></a>  )</span>
-<span id="cb19-10"><a></a>  <span class="co"># 4. collect_metrics() devuelve la media y el error estándar de cada métrica</span></span>
-<span id="cb19-11"><a></a>  <span class="fu">collect_metrics</span>(resultados) <span class="sc">|&gt;</span></span>
-<span id="cb19-12"><a></a>    <span class="fu">mutate</span>(<span class="at">modelo =</span> nombre)</span>
-<span id="cb19-13"><a></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="co"># Evaluar regresión logística</span></span>
-<span id="cb20-2"><a></a>eval_logistico <span class="ot">&lt;-</span> <span class="fu">evaluar_modelo</span>(modelo_logistico, formula_basica, folds, <span class="st">&quot;Logístico&quot;</span>)</span>
-<span id="cb20-3"><a></a>eval_logistico</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>eval_logistico <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb19-2"><a></a>  modelo_logistico, formula_basica,</span>
+<span id="cb19-3"><a></a>  <span class="at">resamples =</span> folds,</span>
+<span id="cb19-4"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb19-5"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)   <span class="co"># &quot;si&quot; es la clase positiva</span></span>
+<span id="cb19-6"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb19-7"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span></span>
+<span id="cb19-8"><a></a>  <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Logístico&quot;</span>)</span>
+<span id="cb19-9"><a></a></span>
+<span id="cb19-10"><a></a>eval_logistico</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 7
+<pre><code># A tibble: 3 × 7
   .metric   .estimator  mean     n std_err .config         modelo   
   &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;    
-1 accuracy  binary     0.695     5  0.0249 pre0_mod0_post0 Logístico
-2 precision binary     0.727     5  0.0143 pre0_mod0_post0 Logístico
-3 recall    binary     0.909     5  0.0204 pre0_mod0_post0 Logístico
-4 roc_auc   binary     0.691     5  0.0477 pre0_mod0_post0 Logístico</code></pre>
+1 precision binary     0.727     5  0.0143 pre0_mod0_post0 Logístico
+2 recall    binary     0.909     5  0.0204 pre0_mod0_post0 Logístico
+3 roc_auc   binary     0.691     5  0.0477 pre0_mod0_post0 Logístico</code></pre>
 </div>
 </div>
+<ul>
+<li><code>fit_resamples()</code> ajusta el modelo en cada fold de la validación cruzada</li>
+<li><code>collect_metrics()</code> devuelve la media y el error estándar de cada métrica entre folds</li>
+<li>Usamos <span class="alert">precision, recall y roc_auc</span> en lugar de accuracy: con clases desbalanceadas, la accuracy puede ser engañosa</li>
+</ul>
 </div>
 </section>
 <section id="sec:evaluar-todos" class="slide level2">
-<h2>Evaluar todos los modelos</h2>
+<h2>Evaluar el árbol y comparar</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a><span class="co"># Evaluar el árbol con la misma fórmula</span></span>
-<span id="cb22-2"><a></a>eval_arbol <span class="ot">&lt;-</span> <span class="fu">evaluar_modelo</span>(modelo_arbol, formula_basica, folds, <span class="st">&quot;Árbol&quot;</span>)</span>
-<span id="cb22-3"><a></a></span>
-<span id="cb22-4"><a></a><span class="co"># Combinar resultados</span></span>
-<span id="cb22-5"><a></a>resultados <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(eval_logistico, eval_arbol)</span>
-<span id="cb22-6"><a></a></span>
-<span id="cb22-7"><a></a><span class="co"># Mostrar comparación</span></span>
-<span id="cb22-8"><a></a>resultados <span class="sc">|&gt;</span></span>
-<span id="cb22-9"><a></a>  <span class="fu">select</span>(modelo, .metric, mean, std_err) <span class="sc">|&gt;</span></span>
-<span id="cb22-10"><a></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> <span class="fu">c</span>(mean, std_err))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a><span class="co"># El mismo bloque que antes, cambiando modelo_logistico → modelo_arbol</span></span>
+<span id="cb21-2"><a></a>eval_arbol <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb21-3"><a></a>  modelo_arbol, formula_basica,</span>
+<span id="cb21-4"><a></a>  <span class="at">resamples =</span> folds,</span>
+<span id="cb21-5"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb21-6"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb21-7"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb21-8"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span></span>
+<span id="cb21-9"><a></a>  <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Árbol&quot;</span>)</span>
+<span id="cb21-10"><a></a></span>
+<span id="cb21-11"><a></a><span class="co"># Combinar y mostrar la comparación</span></span>
+<span id="cb21-12"><a></a>resultados <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(eval_logistico, eval_arbol)</span>
+<span id="cb21-13"><a></a></span>
+<span id="cb21-14"><a></a>resultados <span class="sc">|&gt;</span></span>
+<span id="cb21-15"><a></a>  <span class="fu">select</span>(modelo, .metric, mean, std_err) <span class="sc">|&gt;</span></span>
+<span id="cb21-16"><a></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> <span class="fu">c</span>(mean, std_err))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 9
-  modelo  mean_accuracy mean_precision mean_recall mean_roc_auc std_err_accuracy
-  &lt;chr&gt;           &lt;dbl&gt;          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;            &lt;dbl&gt;
-1 Logíst…         0.695          0.727       0.909        0.691           0.0249
-2 Árbol           0.636          0.715       0.807        0.576           0.0134
-# ℹ 3 more variables: std_err_precision &lt;dbl&gt;, std_err_recall &lt;dbl&gt;,
-#   std_err_roc_auc &lt;dbl&gt;</code></pre>
+<pre><code># A tibble: 2 × 7
+  modelo    mean_precision mean_recall mean_roc_auc std_err_precision
+  &lt;chr&gt;              &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;             &lt;dbl&gt;
+1 Logístico          0.727       0.909        0.691           0.0143 
+2 Árbol              0.715       0.807        0.576           0.00775
+# ℹ 2 more variables: std_err_recall &lt;dbl&gt;, std_err_roc_auc &lt;dbl&gt;</code></pre>
 </div>
 </div>
 <p><span class="alert">Versión visual de esta comparación (barras con error estándar) en <a href="#/sec:appendix07"><span class="button">Apéndice 7</span></a></span></p>
@@ -1757,15 +1758,30 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <li>¿Cuál de los dos modelos es más sensible al feature nuevo?</li>
 </ol>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="co"># Ejemplo con la variable educacion_alta</span></span>
-<span id="cb24-2"><a></a>formula_ext <span class="ot">&lt;-</span> satisfecho <span class="sc">~</span> edad <span class="sc">+</span> educacion_anos <span class="sc">+</span> ingreso_hogar <span class="sc">+</span></span>
-<span id="cb24-3"><a></a>                            confianza_gobierno <span class="sc">+</span> consumo_noticias <span class="sc">+</span></span>
-<span id="cb24-4"><a></a>                            participacion_politica <span class="sc">+</span> zona <span class="sc">+</span> educacion_alta</span>
-<span id="cb24-5"><a></a></span>
-<span id="cb24-6"><a></a>eval_log_ext <span class="ot">&lt;-</span> <span class="fu">evaluar_modelo</span>(modelo_logistico, formula_ext, folds, <span class="st">&quot;Logístico (ext)&quot;</span>)</span>
-<span id="cb24-7"><a></a>eval_arb_ext <span class="ot">&lt;-</span> <span class="fu">evaluar_modelo</span>(modelo_arbol,     formula_ext, folds, <span class="st">&quot;Árbol (ext)&quot;</span>)</span>
-<span id="cb24-8"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) <span class="sc">|&gt;</span></span>
-<span id="cb24-9"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;accuracy&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(modelo, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="co"># Fórmula con el feature nuevo</span></span>
+<span id="cb23-2"><a></a>formula_ext <span class="ot">&lt;-</span> satisfecho <span class="sc">~</span> edad <span class="sc">+</span> educacion_anos <span class="sc">+</span> ingreso_hogar <span class="sc">+</span></span>
+<span id="cb23-3"><a></a>                            confianza_gobierno <span class="sc">+</span> consumo_noticias <span class="sc">+</span></span>
+<span id="cb23-4"><a></a>                            participacion_politica <span class="sc">+</span> zona <span class="sc">+</span> educacion_alta</span>
+<span id="cb23-5"><a></a></span>
+<span id="cb23-6"><a></a><span class="co"># Repetir el mismo bloque de antes, ahora con formula_ext</span></span>
+<span id="cb23-7"><a></a>eval_log_ext <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb23-8"><a></a>  modelo_logistico, formula_ext, <span class="at">resamples =</span> folds,</span>
+<span id="cb23-9"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb23-10"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb23-11"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb23-12"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Logístico (ext)&quot;</span>)</span>
+<span id="cb23-13"><a></a></span>
+<span id="cb23-14"><a></a><span class="co"># Lo mismo cambiando modelo_logistico → modelo_arbol</span></span>
+<span id="cb23-15"><a></a>eval_arb_ext <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb23-16"><a></a>  modelo_arbol, formula_ext, <span class="at">resamples =</span> folds,</span>
+<span id="cb23-17"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb23-18"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb23-19"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb23-20"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Árbol (ext)&quot;</span>)</span>
+<span id="cb23-21"><a></a></span>
+<span id="cb23-22"><a></a><span class="co"># Comparar los 4 modelos por roc_auc</span></span>
+<span id="cb23-23"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) <span class="sc">|&gt;</span></span>
+<span id="cb23-24"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;roc_auc&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(modelo, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><span class="alert">Tómense 5 minutos!</span></p>
 <p><a href="#/sec:appendix06"><span class="button">Ir al Apéndice 6</span></a></p>
@@ -1776,24 +1792,30 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Una vez elegido el mejor modelo por validación cruzada, lo entrenamos con todos los datos de train y lo evaluamos <span class="alert">una sola vez</span> en test (los datos que el modelo nunca vio):</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="co"># Entrenar el modelo elegido con todos los datos de train</span></span>
-<span id="cb25-2"><a></a>ajuste_final <span class="ot">&lt;-</span> modelo_logistico <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a></a>  <span class="fu">fit</span>(formula_basica, <span class="at">data =</span> datos_train)</span>
-<span id="cb25-4"><a></a></span>
-<span id="cb25-5"><a></a><span class="co"># augment() junta predicciones (clases + probabilidades) con los datos originales</span></span>
-<span id="cb25-6"><a></a><span class="co"># en una sola línea. Equivale a hacer dos predict() + bind_cols().</span></span>
-<span id="cb25-7"><a></a>pred_test <span class="ot">&lt;-</span> ajuste_final <span class="sc">|&gt;</span> <span class="fu">augment</span>(datos_test)</span>
-<span id="cb25-8"><a></a></span>
-<span id="cb25-9"><a></a><span class="co"># Métricas finales y AUC-ROC</span></span>
-<span id="cb25-10"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfecho, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="co"># Entrenar el modelo elegido con todos los datos de train</span></span>
+<span id="cb24-2"><a></a>ajuste_final <span class="ot">&lt;-</span> modelo_logistico <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a></a>  <span class="fu">fit</span>(formula_basica, <span class="at">data =</span> datos_train)</span>
+<span id="cb24-4"><a></a></span>
+<span id="cb24-5"><a></a><span class="co"># augment() junta predicciones (clases + probabilidades) con los datos originales</span></span>
+<span id="cb24-6"><a></a><span class="co"># en una sola línea. Equivale a hacer dos predict() + bind_cols().</span></span>
+<span id="cb24-7"><a></a>pred_test <span class="ot">&lt;-</span> ajuste_final <span class="sc">|&gt;</span> <span class="fu">augment</span>(datos_test)</span>
+<span id="cb24-8"><a></a></span>
+<span id="cb24-9"><a></a><span class="co"># Métricas finales (las mismas que usamos en validación cruzada)</span></span>
+<span id="cb24-10"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">precision</span>(<span class="at">truth =</span> satisfecho, <span class="at">estimate =</span> .pred_class, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 3
-  .metric  .estimator .estimate
-  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy binary         0.730
-2 kap      binary         0.182</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric   .estimator .estimate
+  &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;
+1 precision binary         0.739</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(<span class="at">truth =</span> satisfecho, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">recall</span>(<span class="at">truth =</span> satisfecho, <span class="at">estimate =</span> .pred_class, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 recall  binary         0.955</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(<span class="at">truth =</span> satisfecho, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
@@ -1897,15 +1919,15 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <h2>Apéndice 1: Exploración inicial</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a><span class="co"># 1. Dimensiones</span></span>
-<span id="cb29-2"><a></a><span class="fu">dim</span>(satisfaccion)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="co"># 1. Dimensiones</span></span>
+<span id="cb30-2"><a></a><span class="fu">dim</span>(satisfaccion)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 500  13</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a><span class="co"># 2. Distribución de la variable objetivo</span></span>
-<span id="cb31-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb31-3"><a></a>  <span class="fu">count</span>(satisfecho) <span class="sc">|&gt;</span></span>
-<span id="cb31-4"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a></a><span class="co"># 2. Distribución de la variable objetivo</span></span>
+<span id="cb32-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb32-3"><a></a>  <span class="fu">count</span>(satisfecho) <span class="sc">|&gt;</span></span>
+<span id="cb32-4"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 3
   satisfecho     n  prop
@@ -1913,8 +1935,8 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 1 no           147 0.294
 2 si           353 0.706</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a><span class="co"># 3. Valores faltantes por variable</span></span>
-<span id="cb33-2"><a></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(satisfaccion))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a><span class="co"># 3. Valores faltantes por variable</span></span>
+<span id="cb34-2"><a></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(satisfaccion))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                  pais                   edad         educacion_anos 
                      0                      0                      0 
@@ -1927,10 +1949,10 @@ participacion_politica                   zona                 genero
     alta_participacion 
                      0 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a><span class="co"># 4. Resumen de variables numéricas</span></span>
-<span id="cb35-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb35-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
-<span id="cb35-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="co"># 4. Resumen de variables numéricas</span></span>
+<span id="cb36-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb36-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb36-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      edad       educacion_anos   ingreso_hogar    confianza_gobierno
  Min.   :18.00   Min.   : 0.000   Min.   : 100.0   Min.   : 1.00     
@@ -1947,8 +1969,8 @@ participacion_politica                   zona                 genero
  3rd Qu.:12.000   3rd Qu.: 53.00         3rd Qu.: 305.14  
  Max.   :28.900   Max.   :100.00         Max.   :1743.71  </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a><span class="co"># 5. Distribución por país y zona</span></span>
-<span id="cb37-2"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(pais, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="co"># 5. Distribución por país y zona</span></span>
+<span id="cb38-2"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(pais, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 18 × 2
    pais                     n
@@ -1972,7 +1994,7 @@ participacion_politica                   zona                 genero
 17 México                  19
 18 Ecuador                 15</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(zona)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(zona)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   zona       n
@@ -1988,30 +2010,30 @@ participacion_politica                   zona                 genero
 <h2>Apéndice 2: Estadísticas por variable</h2>
 <div style="margin-top: 20px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a><span class="co"># Estadísticas detalladas de una variable numérica</span></span>
-<span id="cb41-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb41-3"><a></a>  <span class="fu">summarise</span>(</span>
-<span id="cb41-4"><a></a>    <span class="at">media   =</span> <span class="fu">mean</span>(ingreso_hogar),</span>
-<span id="cb41-5"><a></a>    <span class="at">mediana =</span> <span class="fu">median</span>(ingreso_hogar),</span>
-<span id="cb41-6"><a></a>    <span class="at">sd      =</span> <span class="fu">sd</span>(ingreso_hogar),</span>
-<span id="cb41-7"><a></a>    <span class="at">p25     =</span> <span class="fu">quantile</span>(ingreso_hogar, <span class="fl">0.25</span>),</span>
-<span id="cb41-8"><a></a>    <span class="at">p75     =</span> <span class="fu">quantile</span>(ingreso_hogar, <span class="fl">0.75</span>),</span>
-<span id="cb41-9"><a></a>    <span class="at">min     =</span> <span class="fu">min</span>(ingreso_hogar),</span>
-<span id="cb41-10"><a></a>    <span class="at">max     =</span> <span class="fu">max</span>(ingreso_hogar)</span>
-<span id="cb41-11"><a></a>  )</span>
-<span id="cb41-12"><a></a></span>
-<span id="cb41-13"><a></a><span class="co"># Variables categóricas: conteos y proporciones</span></span>
-<span id="cb41-14"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(zona)   <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))</span>
-<span id="cb41-15"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(genero) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))</span>
-<span id="cb41-16"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(pais, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb41-17"><a></a></span>
-<span id="cb41-18"><a></a><span class="co"># Histograma de una variable numérica</span></span>
-<span id="cb41-19"><a></a><span class="fu">ggplot</span>(satisfaccion, <span class="fu">aes</span>(<span class="at">x =</span> ingreso_hogar)) <span class="sc">+</span></span>
-<span id="cb41-20"><a></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, <span class="at">fill =</span> <span class="st">&quot;#2d4563&quot;</span>)</span>
-<span id="cb41-21"><a></a></span>
-<span id="cb41-22"><a></a><span class="co"># Densidad (versión suavizada del histograma)</span></span>
-<span id="cb41-23"><a></a><span class="fu">ggplot</span>(satisfaccion, <span class="fu">aes</span>(<span class="at">x =</span> confianza_gobierno)) <span class="sc">+</span></span>
-<span id="cb41-24"><a></a>  <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;#2d4563&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a><span class="co"># Estadísticas detalladas de una variable numérica</span></span>
+<span id="cb42-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb42-3"><a></a>  <span class="fu">summarise</span>(</span>
+<span id="cb42-4"><a></a>    <span class="at">media   =</span> <span class="fu">mean</span>(ingreso_hogar),</span>
+<span id="cb42-5"><a></a>    <span class="at">mediana =</span> <span class="fu">median</span>(ingreso_hogar),</span>
+<span id="cb42-6"><a></a>    <span class="at">sd      =</span> <span class="fu">sd</span>(ingreso_hogar),</span>
+<span id="cb42-7"><a></a>    <span class="at">p25     =</span> <span class="fu">quantile</span>(ingreso_hogar, <span class="fl">0.25</span>),</span>
+<span id="cb42-8"><a></a>    <span class="at">p75     =</span> <span class="fu">quantile</span>(ingreso_hogar, <span class="fl">0.75</span>),</span>
+<span id="cb42-9"><a></a>    <span class="at">min     =</span> <span class="fu">min</span>(ingreso_hogar),</span>
+<span id="cb42-10"><a></a>    <span class="at">max     =</span> <span class="fu">max</span>(ingreso_hogar)</span>
+<span id="cb42-11"><a></a>  )</span>
+<span id="cb42-12"><a></a></span>
+<span id="cb42-13"><a></a><span class="co"># Variables categóricas: conteos y proporciones</span></span>
+<span id="cb42-14"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(zona)   <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))</span>
+<span id="cb42-15"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(genero) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))</span>
+<span id="cb42-16"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(pais, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb42-17"><a></a></span>
+<span id="cb42-18"><a></a><span class="co"># Histograma de una variable numérica</span></span>
+<span id="cb42-19"><a></a><span class="fu">ggplot</span>(satisfaccion, <span class="fu">aes</span>(<span class="at">x =</span> ingreso_hogar)) <span class="sc">+</span></span>
+<span id="cb42-20"><a></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, <span class="at">fill =</span> <span class="st">&quot;#2d4563&quot;</span>)</span>
+<span id="cb42-21"><a></a></span>
+<span id="cb42-22"><a></a><span class="co"># Densidad (versión suavizada del histograma)</span></span>
+<span id="cb42-23"><a></a><span class="fu">ggplot</span>(satisfaccion, <span class="fu">aes</span>(<span class="at">x =</span> confianza_gobierno)) <span class="sc">+</span></span>
+<span id="cb42-24"><a></a>  <span class="fu">geom_density</span>(<span class="at">fill =</span> <span class="st">&quot;#2d4563&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><span class="alert">Cambien el nombre de la variable para explorar otras: <code>educacion_anos</code>, <code>consumo_noticias</code>, <code>participacion_politica</code>, <code>edad</code></span></p>
 <p><a href="#/sec:exercise01"><span class="button">Volver al Ejercicio 1</span></a></p>
@@ -2021,35 +2043,35 @@ participacion_politica                   zona                 genero
 <h2>Apéndice 3: Relaciones con la satisfacción</h2>
 <div style="margin-top: 20px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a><span class="co"># Numéricas vs satisfacción: medias por grupo</span></span>
-<span id="cb42-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb42-3"><a></a>  <span class="fu">group_by</span>(satisfecho) <span class="sc">|&gt;</span></span>
-<span id="cb42-4"><a></a>  <span class="fu">summarise</span>(</span>
-<span id="cb42-5"><a></a>    <span class="at">edad          =</span> <span class="fu">mean</span>(edad),</span>
-<span id="cb42-6"><a></a>    <span class="at">educacion     =</span> <span class="fu">mean</span>(educacion_anos),</span>
-<span id="cb42-7"><a></a>    <span class="at">ingreso       =</span> <span class="fu">median</span>(ingreso_hogar),</span>
-<span id="cb42-8"><a></a>    <span class="at">confianza     =</span> <span class="fu">mean</span>(confianza_gobierno),</span>
-<span id="cb42-9"><a></a>    <span class="at">consumo       =</span> <span class="fu">mean</span>(consumo_noticias),</span>
-<span id="cb42-10"><a></a>    <span class="at">participacion =</span> <span class="fu">mean</span>(participacion_politica)</span>
-<span id="cb42-11"><a></a>  )</span>
-<span id="cb42-12"><a></a></span>
-<span id="cb42-13"><a></a><span class="co"># Correlaciones entre todas las variables numéricas</span></span>
-<span id="cb42-14"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb42-15"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
-<span id="cb42-16"><a></a>  <span class="fu">cor</span>() <span class="sc">|&gt;</span></span>
-<span id="cb42-17"><a></a>  <span class="fu">round</span>(<span class="dv">2</span>)</span>
-<span id="cb42-18"><a></a></span>
-<span id="cb42-19"><a></a><span class="co"># Categórica vs satisfacción: tabla cruzada</span></span>
-<span id="cb42-20"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb42-21"><a></a>  <span class="fu">count</span>(zona, satisfecho) <span class="sc">|&gt;</span></span>
-<span id="cb42-22"><a></a>  <span class="fu">group_by</span>(zona) <span class="sc">|&gt;</span></span>
-<span id="cb42-23"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span>
-<span id="cb42-24"><a></a></span>
-<span id="cb42-25"><a></a><span class="co"># Diferencia de medias (numérica vs categórica)</span></span>
-<span id="cb42-26"><a></a><span class="fu">t.test</span>(confianza_gobierno <span class="sc">~</span> satisfecho, <span class="at">data =</span> satisfaccion)</span>
-<span id="cb42-27"><a></a></span>
-<span id="cb42-28"><a></a><span class="co"># Independencia (categórica vs categórica)</span></span>
-<span id="cb42-29"><a></a><span class="fu">chisq.test</span>(satisfaccion<span class="sc">$</span>zona, satisfaccion<span class="sc">$</span>satisfecho)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a><span class="co"># Numéricas vs satisfacción: medias por grupo</span></span>
+<span id="cb43-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb43-3"><a></a>  <span class="fu">group_by</span>(satisfecho) <span class="sc">|&gt;</span></span>
+<span id="cb43-4"><a></a>  <span class="fu">summarise</span>(</span>
+<span id="cb43-5"><a></a>    <span class="at">edad          =</span> <span class="fu">mean</span>(edad),</span>
+<span id="cb43-6"><a></a>    <span class="at">educacion     =</span> <span class="fu">mean</span>(educacion_anos),</span>
+<span id="cb43-7"><a></a>    <span class="at">ingreso       =</span> <span class="fu">median</span>(ingreso_hogar),</span>
+<span id="cb43-8"><a></a>    <span class="at">confianza     =</span> <span class="fu">mean</span>(confianza_gobierno),</span>
+<span id="cb43-9"><a></a>    <span class="at">consumo       =</span> <span class="fu">mean</span>(consumo_noticias),</span>
+<span id="cb43-10"><a></a>    <span class="at">participacion =</span> <span class="fu">mean</span>(participacion_politica)</span>
+<span id="cb43-11"><a></a>  )</span>
+<span id="cb43-12"><a></a></span>
+<span id="cb43-13"><a></a><span class="co"># Correlaciones entre todas las variables numéricas</span></span>
+<span id="cb43-14"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb43-15"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb43-16"><a></a>  <span class="fu">cor</span>() <span class="sc">|&gt;</span></span>
+<span id="cb43-17"><a></a>  <span class="fu">round</span>(<span class="dv">2</span>)</span>
+<span id="cb43-18"><a></a></span>
+<span id="cb43-19"><a></a><span class="co"># Categórica vs satisfacción: tabla cruzada</span></span>
+<span id="cb43-20"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb43-21"><a></a>  <span class="fu">count</span>(zona, satisfecho) <span class="sc">|&gt;</span></span>
+<span id="cb43-22"><a></a>  <span class="fu">group_by</span>(zona) <span class="sc">|&gt;</span></span>
+<span id="cb43-23"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span>
+<span id="cb43-24"><a></a></span>
+<span id="cb43-25"><a></a><span class="co"># Diferencia de medias (numérica vs categórica)</span></span>
+<span id="cb43-26"><a></a><span class="fu">t.test</span>(confianza_gobierno <span class="sc">~</span> satisfecho, <span class="at">data =</span> satisfaccion)</span>
+<span id="cb43-27"><a></a></span>
+<span id="cb43-28"><a></a><span class="co"># Independencia (categórica vs categórica)</span></span>
+<span id="cb43-29"><a></a><span class="fu">chisq.test</span>(satisfaccion<span class="sc">$</span>zona, satisfaccion<span class="sc">$</span>satisfecho)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><span class="alert">Las medias por grupo son la pista más rápida: si difieren mucho, la variable probablemente ayudará al modelo</span></p>
 <p><a href="#/sec:exercise01"><span class="button">Volver al Ejercicio 1</span></a></p>
@@ -2059,16 +2081,16 @@ participacion_politica                   zona                 genero
 <h2>Apéndice 4: Más visualizaciones</h2>
 <div style="margin-top: 20px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a><span class="co"># Boxplots: variables numéricas por nivel de satisfacción</span></span>
-<span id="cb43-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb43-3"><a></a>  <span class="fu">select</span>(satisfecho, confianza_gobierno, participacion_politica, edad) <span class="sc">|&gt;</span></span>
-<span id="cb43-4"><a></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>satisfecho, <span class="at">names_to =</span> <span class="st">&quot;variable&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;valor&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb43-5"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> satisfecho, <span class="at">y =</span> valor, <span class="at">fill =</span> satisfecho)) <span class="sc">+</span></span>
-<span id="cb43-6"><a></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb43-7"><a></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>variable, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
-<span id="cb43-8"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb43-9"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Variables numéricas por nivel de satisfacción&quot;</span>) <span class="sc">+</span></span>
-<span id="cb43-10"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="co"># Boxplots: variables numéricas por nivel de satisfacción</span></span>
+<span id="cb44-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb44-3"><a></a>  <span class="fu">select</span>(satisfecho, confianza_gobierno, participacion_politica, edad) <span class="sc">|&gt;</span></span>
+<span id="cb44-4"><a></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>satisfecho, <span class="at">names_to =</span> <span class="st">&quot;variable&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;valor&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb44-5"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> satisfecho, <span class="at">y =</span> valor, <span class="at">fill =</span> satisfecho)) <span class="sc">+</span></span>
+<span id="cb44-6"><a></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb44-7"><a></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>variable, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb44-8"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb44-9"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Variables numéricas por nivel de satisfacción&quot;</span>) <span class="sc">+</span></span>
+<span id="cb44-10"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2083,15 +2105,15 @@ participacion_politica                   zona                 genero
 <h2>Apéndice 4 (cont.) — Satisfacción por zona</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="co"># 1. Satisfacción por zona</span></span>
-<span id="cb44-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb44-3"><a></a>  <span class="fu">count</span>(zona, satisfecho) <span class="sc">|&gt;</span></span>
-<span id="cb44-4"><a></a>  <span class="fu">group_by</span>(zona) <span class="sc">|&gt;</span></span>
-<span id="cb44-5"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
-<span id="cb44-6"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> zona, <span class="at">y =</span> prop, <span class="at">fill =</span> satisfecho)) <span class="sc">+</span></span>
-<span id="cb44-7"><a></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb44-8"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb44-9"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Satisfacción por zona&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Proporción&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a><span class="co"># 1. Satisfacción por zona</span></span>
+<span id="cb45-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb45-3"><a></a>  <span class="fu">count</span>(zona, satisfecho) <span class="sc">|&gt;</span></span>
+<span id="cb45-4"><a></a>  <span class="fu">group_by</span>(zona) <span class="sc">|&gt;</span></span>
+<span id="cb45-5"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb45-6"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> zona, <span class="at">y =</span> prop, <span class="at">fill =</span> satisfecho)) <span class="sc">+</span></span>
+<span id="cb45-7"><a></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb45-8"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb45-9"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Satisfacción por zona&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Proporción&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2106,16 +2128,16 @@ participacion_politica                   zona                 genero
 <h2>Apéndice 4 (cont.)</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a><span class="co"># 2. Satisfacción por país</span></span>
-<span id="cb45-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb45-3"><a></a>  <span class="fu">count</span>(pais, satisfecho) <span class="sc">|&gt;</span></span>
-<span id="cb45-4"><a></a>  <span class="fu">group_by</span>(pais) <span class="sc">|&gt;</span></span>
-<span id="cb45-5"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
-<span id="cb45-6"><a></a>  <span class="fu">filter</span>(satisfecho <span class="sc">==</span> <span class="st">&quot;si&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb45-7"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(pais, prop), <span class="at">y =</span> prop)) <span class="sc">+</span></span>
-<span id="cb45-8"><a></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#27ae60&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb45-9"><a></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb45-10"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Proporción de satisfechos por país&quot;</span>, <span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Proporción&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a><span class="co"># 2. Satisfacción por país</span></span>
+<span id="cb46-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb46-3"><a></a>  <span class="fu">count</span>(pais, satisfecho) <span class="sc">|&gt;</span></span>
+<span id="cb46-4"><a></a>  <span class="fu">group_by</span>(pais) <span class="sc">|&gt;</span></span>
+<span id="cb46-5"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb46-6"><a></a>  <span class="fu">filter</span>(satisfecho <span class="sc">==</span> <span class="st">&quot;si&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb46-7"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(pais, prop), <span class="at">y =</span> prop)) <span class="sc">+</span></span>
+<span id="cb46-8"><a></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">&quot;#27ae60&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb46-9"><a></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb46-10"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Proporción de satisfechos por país&quot;</span>, <span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Proporción&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2130,15 +2152,15 @@ participacion_politica                   zona                 genero
 <h2>Apéndice 4 (cont.)</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a><span class="co"># 3. Satisfacción por género</span></span>
-<span id="cb46-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb46-3"><a></a>  <span class="fu">count</span>(genero, satisfecho) <span class="sc">|&gt;</span></span>
-<span id="cb46-4"><a></a>  <span class="fu">group_by</span>(genero) <span class="sc">|&gt;</span></span>
-<span id="cb46-5"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
-<span id="cb46-6"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> genero, <span class="at">y =</span> prop, <span class="at">fill =</span> satisfecho)) <span class="sc">+</span></span>
-<span id="cb46-7"><a></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb46-8"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb46-9"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Satisfacción por género&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Proporción&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a><span class="co"># 3. Satisfacción por género</span></span>
+<span id="cb47-2"><a></a>satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb47-3"><a></a>  <span class="fu">count</span>(genero, satisfecho) <span class="sc">|&gt;</span></span>
+<span id="cb47-4"><a></a>  <span class="fu">group_by</span>(genero) <span class="sc">|&gt;</span></span>
+<span id="cb47-5"><a></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb47-6"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> genero, <span class="at">y =</span> prop, <span class="at">fill =</span> satisfecho)) <span class="sc">+</span></span>
+<span id="cb47-7"><a></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb47-8"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb47-9"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Satisfacción por género&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Proporción&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2148,12 +2170,12 @@ participacion_politica                   zona                 genero
 </div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a></a><span class="co"># 4. Ingreso vs. educación</span></span>
-<span id="cb47-2"><a></a><span class="fu">ggplot</span>(satisfaccion, <span class="fu">aes</span>(<span class="at">x =</span> educacion_anos, <span class="at">y =</span> ingreso_hogar, <span class="at">color =</span> satisfecho)) <span class="sc">+</span></span>
-<span id="cb47-3"><a></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
-<span id="cb47-4"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb47-5"><a></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb47-6"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Ingreso vs. educación por satisfacción&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a></a><span class="co"># 4. Ingreso vs. educación</span></span>
+<span id="cb48-2"><a></a><span class="fu">ggplot</span>(satisfaccion, <span class="fu">aes</span>(<span class="at">x =</span> educacion_anos, <span class="at">y =</span> ingreso_hogar, <span class="at">color =</span> satisfecho)) <span class="sc">+</span></span>
+<span id="cb48-3"><a></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
+<span id="cb48-4"><a></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb48-5"><a></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#e74c3c&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb48-6"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Ingreso vs. educación por satisfacción&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2169,27 +2191,27 @@ participacion_politica                   zona                 genero
 <h2>Apéndice 5: Crear más features</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a></a><span class="co"># Una posible solución para cada una de las cuatro opciones sugeridas</span></span>
-<span id="cb48-2"><a></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb48-3"><a></a>  <span class="fu">mutate</span>(</span>
-<span id="cb48-4"><a></a>    <span class="co"># 1. Grupos de ingreso por terciles (ingreso_hogar)</span></span>
-<span id="cb48-5"><a></a>    <span class="at">grupo_ingreso =</span> <span class="fu">cut</span>(ingreso_hogar,</span>
-<span id="cb48-6"><a></a>                        <span class="at">breaks =</span> <span class="fu">quantile</span>(ingreso_hogar, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">1</span>)),</span>
-<span id="cb48-7"><a></a>                        <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;bajo&quot;</span>, <span class="st">&quot;medio&quot;</span>, <span class="st">&quot;alto&quot;</span>),</span>
-<span id="cb48-8"><a></a>                        <span class="at">include.lowest =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb48-9"><a></a></span>
-<span id="cb48-10"><a></a>    <span class="co"># 2. Consumidor alto de noticias (consumo_noticias)</span></span>
-<span id="cb48-11"><a></a>    <span class="at">noticias_alto =</span> <span class="fu">if_else</span>(consumo_noticias <span class="sc">&gt;</span> <span class="dv">5</span>, <span class="st">&quot;alto&quot;</span>, <span class="st">&quot;bajo&quot;</span>),</span>
-<span id="cb48-12"><a></a></span>
-<span id="cb48-13"><a></a>    <span class="co"># 3. Baja confianza en el gobierno (confianza_gobierno)</span></span>
-<span id="cb48-14"><a></a>    <span class="at">confianza_baja =</span> <span class="fu">if_else</span>(confianza_gobierno <span class="sc">&lt;=</span> <span class="dv">4</span>, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
-<span id="cb48-15"><a></a></span>
-<span id="cb48-16"><a></a>    <span class="co"># 4. Interacción zona + género</span></span>
-<span id="cb48-17"><a></a>    <span class="at">zona_genero =</span> <span class="fu">paste</span>(zona, genero, <span class="at">sep =</span> <span class="st">&quot;_&quot;</span>)</span>
-<span id="cb48-18"><a></a>  )</span>
-<span id="cb48-19"><a></a></span>
-<span id="cb48-20"><a></a><span class="co"># Verificar las nuevas variables</span></span>
-<span id="cb48-21"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(grupo_ingreso)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a></a><span class="co"># Una posible solución para cada una de las cuatro opciones sugeridas</span></span>
+<span id="cb49-2"><a></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb49-3"><a></a>  <span class="fu">mutate</span>(</span>
+<span id="cb49-4"><a></a>    <span class="co"># 1. Grupos de ingreso por terciles (ingreso_hogar)</span></span>
+<span id="cb49-5"><a></a>    <span class="at">grupo_ingreso =</span> <span class="fu">cut</span>(ingreso_hogar,</span>
+<span id="cb49-6"><a></a>                        <span class="at">breaks =</span> <span class="fu">quantile</span>(ingreso_hogar, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">1</span>)),</span>
+<span id="cb49-7"><a></a>                        <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;bajo&quot;</span>, <span class="st">&quot;medio&quot;</span>, <span class="st">&quot;alto&quot;</span>),</span>
+<span id="cb49-8"><a></a>                        <span class="at">include.lowest =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb49-9"><a></a></span>
+<span id="cb49-10"><a></a>    <span class="co"># 2. Consumidor alto de noticias (consumo_noticias)</span></span>
+<span id="cb49-11"><a></a>    <span class="at">noticias_alto =</span> <span class="fu">if_else</span>(consumo_noticias <span class="sc">&gt;</span> <span class="dv">5</span>, <span class="st">&quot;alto&quot;</span>, <span class="st">&quot;bajo&quot;</span>),</span>
+<span id="cb49-12"><a></a></span>
+<span id="cb49-13"><a></a>    <span class="co"># 3. Baja confianza en el gobierno (confianza_gobierno)</span></span>
+<span id="cb49-14"><a></a>    <span class="at">confianza_baja =</span> <span class="fu">if_else</span>(confianza_gobierno <span class="sc">&lt;=</span> <span class="dv">4</span>, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
+<span id="cb49-15"><a></a></span>
+<span id="cb49-16"><a></a>    <span class="co"># 4. Interacción zona + género</span></span>
+<span id="cb49-17"><a></a>    <span class="at">zona_genero =</span> <span class="fu">paste</span>(zona, genero, <span class="at">sep =</span> <span class="st">&quot;_&quot;</span>)</span>
+<span id="cb49-18"><a></a>  )</span>
+<span id="cb49-19"><a></a></span>
+<span id="cb49-20"><a></a><span class="co"># Verificar las nuevas variables</span></span>
+<span id="cb49-21"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(grupo_ingreso)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 2
   grupo_ingreso     n
@@ -2198,7 +2220,7 @@ participacion_politica                   zona                 genero
 2 medio           166
 3 alto            167</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(noticias_alto)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(noticias_alto)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   noticias_alto     n
@@ -2206,7 +2228,7 @@ participacion_politica                   zona                 genero
 1 alto            359
 2 bajo            141</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(confianza_baja)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(confianza_baja)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   confianza_baja     n
@@ -2214,7 +2236,7 @@ participacion_politica                   zona                 genero
 1 no               240
 2 si               260</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(zona_genero)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a></a>satisfaccion <span class="sc">|&gt;</span> <span class="fu">count</span>(zona_genero)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 2
   zona_genero          n
@@ -2234,38 +2256,50 @@ participacion_politica                   zona                 genero
 <h2>Apéndice 6: ¿Ayuda el feature engineering?</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a></a><span class="co"># Crear el feature derivado (si no lo hicieron antes)</span></span>
-<span id="cb56-2"><a></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb56-3"><a></a>  <span class="fu">mutate</span>(<span class="at">educacion_alta =</span> <span class="fu">if_else</span>(educacion_anos <span class="sc">&gt;</span> <span class="dv">12</span>, <span class="st">&quot;alta&quot;</span>, <span class="st">&quot;baja&quot;</span>),</span>
-<span id="cb56-4"><a></a>         <span class="at">educacion_alta =</span> <span class="fu">factor</span>(educacion_alta))</span>
-<span id="cb56-5"><a></a></span>
-<span id="cb56-6"><a></a><span class="co"># Re-crear folds con la columna nueva disponible</span></span>
-<span id="cb56-7"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb56-8"><a></a>split_ext <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(satisfaccion, <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> satisfecho)</span>
-<span id="cb56-9"><a></a>train_ext <span class="ot">&lt;-</span> <span class="fu">training</span>(split_ext)</span>
-<span id="cb56-10"><a></a>folds_ext <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train_ext, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> satisfecho)</span>
-<span id="cb56-11"><a></a></span>
-<span id="cb56-12"><a></a><span class="co"># Fórmula con el feature nuevo</span></span>
-<span id="cb56-13"><a></a>formula_ext <span class="ot">&lt;-</span> satisfecho <span class="sc">~</span> edad <span class="sc">+</span> educacion_anos <span class="sc">+</span> ingreso_hogar <span class="sc">+</span></span>
-<span id="cb56-14"><a></a>                            confianza_gobierno <span class="sc">+</span> consumo_noticias <span class="sc">+</span></span>
-<span id="cb56-15"><a></a>                            participacion_politica <span class="sc">+</span> zona <span class="sc">+</span> educacion_alta</span>
-<span id="cb56-16"><a></a></span>
-<span id="cb56-17"><a></a><span class="co"># Evaluar los dos modelos con y sin feature nuevo</span></span>
-<span id="cb56-18"><a></a>eval_log_ext <span class="ot">&lt;-</span> <span class="fu">evaluar_modelo</span>(modelo_logistico, formula_ext, folds_ext, <span class="st">&quot;Logístico (ext)&quot;</span>)</span>
-<span id="cb56-19"><a></a>eval_arb_ext <span class="ot">&lt;-</span> <span class="fu">evaluar_modelo</span>(modelo_arbol,     formula_ext, folds_ext, <span class="st">&quot;Árbol (ext)&quot;</span>)</span>
-<span id="cb56-20"><a></a></span>
-<span id="cb56-21"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) <span class="sc">|&gt;</span></span>
-<span id="cb56-22"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;accuracy&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb56-23"><a></a>  <span class="fu">select</span>(modelo, mean, std_err) <span class="sc">|&gt;</span></span>
-<span id="cb56-24"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a></a><span class="co"># Crear el feature derivado (si no lo hicieron antes)</span></span>
+<span id="cb57-2"><a></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb57-3"><a></a>  <span class="fu">mutate</span>(<span class="at">educacion_alta =</span> <span class="fu">if_else</span>(educacion_anos <span class="sc">&gt;</span> <span class="dv">12</span>, <span class="st">&quot;alta&quot;</span>, <span class="st">&quot;baja&quot;</span>),</span>
+<span id="cb57-4"><a></a>         <span class="at">educacion_alta =</span> <span class="fu">factor</span>(educacion_alta))</span>
+<span id="cb57-5"><a></a></span>
+<span id="cb57-6"><a></a><span class="co"># Re-crear folds con la columna nueva disponible</span></span>
+<span id="cb57-7"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb57-8"><a></a>split_ext <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(satisfaccion, <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> satisfecho)</span>
+<span id="cb57-9"><a></a>train_ext <span class="ot">&lt;-</span> <span class="fu">training</span>(split_ext)</span>
+<span id="cb57-10"><a></a>folds_ext <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train_ext, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> satisfecho)</span>
+<span id="cb57-11"><a></a></span>
+<span id="cb57-12"><a></a><span class="co"># Fórmula con el feature nuevo</span></span>
+<span id="cb57-13"><a></a>formula_ext <span class="ot">&lt;-</span> satisfecho <span class="sc">~</span> edad <span class="sc">+</span> educacion_anos <span class="sc">+</span> ingreso_hogar <span class="sc">+</span></span>
+<span id="cb57-14"><a></a>                            confianza_gobierno <span class="sc">+</span> consumo_noticias <span class="sc">+</span></span>
+<span id="cb57-15"><a></a>                            participacion_politica <span class="sc">+</span> zona <span class="sc">+</span> educacion_alta</span>
+<span id="cb57-16"><a></a></span>
+<span id="cb57-17"><a></a><span class="co"># Evaluar el logístico con folds_ext (mismo patrón que el cuerpo del lab)</span></span>
+<span id="cb57-18"><a></a>eval_log_ext <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb57-19"><a></a>  modelo_logistico, formula_ext, <span class="at">resamples =</span> folds_ext,</span>
+<span id="cb57-20"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb57-21"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb57-22"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb57-23"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Logístico (ext)&quot;</span>)</span>
+<span id="cb57-24"><a></a></span>
+<span id="cb57-25"><a></a><span class="co"># Evaluar el árbol con folds_ext</span></span>
+<span id="cb57-26"><a></a>eval_arb_ext <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb57-27"><a></a>  modelo_arbol, formula_ext, <span class="at">resamples =</span> folds_ext,</span>
+<span id="cb57-28"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb57-29"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb57-30"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb57-31"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Árbol (ext)&quot;</span>)</span>
+<span id="cb57-32"><a></a></span>
+<span id="cb57-33"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) <span class="sc">|&gt;</span></span>
+<span id="cb57-34"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;roc_auc&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb57-35"><a></a>  <span class="fu">select</span>(modelo, mean, std_err) <span class="sc">|&gt;</span></span>
+<span id="cb57-36"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 3
   modelo           mean std_err
   &lt;chr&gt;           &lt;dbl&gt;   &lt;dbl&gt;
-1 Logístico       0.695  0.0249
-2 Logístico (ext) 0.690  0.0171
-3 Árbol           0.636  0.0134
-4 Árbol (ext)     0.636  0.0134</code></pre>
+1 Logístico (ext) 0.693  0.0468
+2 Logístico       0.691  0.0477
+3 Árbol           0.576  0.0309
+4 Árbol (ext)     0.576  0.0309</code></pre>
 </div>
 </div>
 <p>La mejora por agregar una sola variable derivada suele ser modesta. El feature engineering rinde cuando las variables nuevas capturan relaciones no lineales o interacciones que el modelo no puede descubrir por sí solo (en un árbol esto pesa menos, porque ya captura no linealidades automáticamente).</p>
@@ -2277,15 +2311,15 @@ participacion_politica                   zona                 genero
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Una alternativa visual al cuadro de comparación:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a></a>resultados <span class="sc">|&gt;</span></span>
-<span id="cb58-2"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> modelo, <span class="at">y =</span> mean, <span class="at">fill =</span> modelo)) <span class="sc">+</span></span>
-<span id="cb58-3"><a></a>  <span class="fu">geom_col</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
-<span id="cb58-4"><a></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> std_err, <span class="at">ymax =</span> mean <span class="sc">+</span> std_err),</span>
-<span id="cb58-5"><a></a>                <span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb58-6"><a></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>.metric, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
-<span id="cb58-7"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb58-8"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Comparación de modelos&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Valor&quot;</span>, <span class="at">x =</span> <span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
-<span id="cb58-9"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a></a>resultados <span class="sc">|&gt;</span></span>
+<span id="cb59-2"><a></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> modelo, <span class="at">y =</span> mean, <span class="at">fill =</span> modelo)) <span class="sc">+</span></span>
+<span id="cb59-3"><a></a>  <span class="fu">geom_col</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb59-4"><a></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> std_err, <span class="at">ymax =</span> mean <span class="sc">+</span> std_err),</span>
+<span id="cb59-5"><a></a>                <span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb59-6"><a></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>.metric, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb59-7"><a></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#2d4563&quot;</span>, <span class="st">&quot;#27ae60&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb59-8"><a></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Comparación de modelos&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Valor&quot;</span>, <span class="at">x =</span> <span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
+<span id="cb59-9"><a></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
