@@ -44,8 +44,8 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Día 2. Clasificación avanzada con datos simulados de Latinobarómetro. Random Forest con tuning de hiperparámetros, XGBoost, interpretación con VIP y Partial Dependence Plots.]{.resource-meta}
 
 ::: {.resource-links}
-[Diapositivas (.html)](clases/dia-02/05-laboratorio-03.html) |
-[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/05-laboratorio-03.qmd) |
+[Diapositivas (.html)](clases/dia-02/07-laboratorio-03.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/07-laboratorio-03.qmd) |
 [Código (.R)](clases/dia-02/laboratorio-03.R) |
 [Tarea 3 (.html)](clases/dia-02/tarea-03.html) |
 [Tarea 3 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-03.qmd) |
@@ -60,8 +60,8 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Día 2. Regresión lineal, LASSO, Ridge y Elastic Net con `glmnet`. Selección de variables, comparación de modelos de regresión y predicción con datos de Latinobarómetro.]{.resource-meta}
 
 ::: {.resource-links}
-[Diapositivas (.html)](clases/dia-02/06-laboratorio-04.html) |
-[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/06-laboratorio-04.qmd) |
+[Diapositivas (.html)](clases/dia-02/08-laboratorio-04.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/08-laboratorio-04.qmd) |
 [Código (.R)](clases/dia-02/laboratorio-04.R) |
 [Tarea 4 (.html)](clases/dia-02/tarea-04.html) |
 [Tarea 4 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-04.qmd) |

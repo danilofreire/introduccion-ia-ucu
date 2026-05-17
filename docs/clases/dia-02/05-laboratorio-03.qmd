@@ -75,7 +75,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 <br>
 
-[Trabajen en sus computadoras y pregunten si tienen dudas.]{.alert}
+[Trabajen en sus computadoras y pregunten si tienen dudas!]{.alert}
 :::
 :::
 :::
@@ -87,26 +87,14 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r cargar-paquetes, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
-# Instalar si es necesario
-paquetes <- c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "xgboost")
-
-# require(): intenta cargar el paquete y devuelve TRUE/FALSE
-# Si no está instalado (FALSE), lo instala y carga
-for (pkg in paquetes) {
-  if (!require(pkg, character.only = TRUE)) {
-    install.packages(pkg, dependencies = TRUE)
-    library(pkg, character.only = TRUE)
-  }
-}
-
-# Cargar tidymodels (carga varios paquetes a la vez:
-# rsample, parsnip, recipes, workflows, tune, yardstick, etc.)
-library(tidymodels)
-library(ranger)      # Motor rápido para Random Forest
+# Si algún paquete falta:
+# install.packages(c("ranger", "vip", "pdp", "xgboost"))
+library(tidyverse)   # readr, dplyr, ggplot2, etc
+library(tidymodels)  # rsample, parsnip, recipes, workflows, tune, yardstick
+library(ranger)      # motor rápido para Random Forest
 library(vip)         # Variable Importance Plots
 library(pdp)         # Partial Dependence Plots
 
-# Configurar semilla para reproducibilidad
 set.seed(2026)
 ```
 :::
@@ -166,11 +154,9 @@ prop.table(table(datos_test$voto))
 ```{r crear-receta, prompt=FALSE, echo=TRUE}
 # recipe(): define el preprocesamiento como una "receta de cocina"
 # voto ~ ...: la fórmula indica variable objetivo ~ predictores
-receta <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +
-                 genero + confianza_gobierno + confianza_justicia +
-                 satisfaccion_democracia + percepcion_economia +
-                 uso_internet + interes_politica,
-                 data = datos_train) |>
+receta <- recipe(voto ~ ., data = datos_train) |>
+  # step_rm(): excluir pais (alta cardinalidad) y satisfaccion_vida (outcome del Lab 4)
+  step_rm(pais, satisfaccion_vida) |>
   # step_dummy(): convierte categóricas a variables indicadoras (0/1)
   step_dummy(all_nominal_predictors()) |>
   # step_normalize(): centra (media = 0) y escala (sd = 1) las numéricas
@@ -224,7 +210,7 @@ metricas_logit
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-```{r confusion-baseline, prompt=FALSE, echo=TRUE, fig.width=6, fig.height=5}
+```{r confusion-baseline, prompt=FALSE, echo=TRUE, fig.width=5, fig.height=4, out.width="50%"}
 # conf_mat(): construye la tabla de predicho vs. real
 # autoplot(type = "heatmap"): visualización como mapa de calor
 conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
@@ -236,19 +222,31 @@ conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
 
 ## Ejercicio 1: Threshold óptimo {#sec:exercise01}
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
-**Instrucciones:**
+Por defecto, clasificamos como "sí" si P(sí) > 0.5. Pero este valor puede no ser óptimo
 
-1. Por defecto, clasificamos como "sí" si P(sí) > 0.5
-2. Pero este threshold puede no ser óptimo
-3. Usando `pred_logit`, creen predicciones con thresholds de 0.3, 0.5 y 0.7
-4. Calculen el F1-score con `f_meas()` para cada threshold
-5. ¿Cuál threshold maximiza el F1-score?
+**Tarea:** ejecuten el código abajo (compara F1-score con tres thresholds) y respondan:
 
-*Pista:* usen `ifelse(.pred_si > t, "si", "no")` para reclasificar y un `for` loop para probar varios valores.
+1. ¿Qué threshold da el F1-score más alto?
+2. ¿Cómo cambia el F1 cuando subimos el threshold? ¿Por qué?
 
-[Tómense 5 minutos para experimentar.]{.alert}
+```{r ej1-codigo, eval=FALSE, prompt=FALSE, echo=TRUE}
+# Calcular F1 para tres thresholds distintos
+for (t in c(0.3, 0.5, 0.7)) {
+  pred_nuevo <- pred_logit |>
+    mutate(.pred_class_nuevo = factor(
+      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
+  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
+  cat("Threshold", t, "→ F1 =", round(f1$.estimate, 3), "\n")
+}
+```
+
+:::{.callout-note}
+**¿Por qué F1 y no precisión o recall?** F1 [combina ambas]{.alert} y obliga al modelo a encontrar un equilibrio. Si fuera un test de cáncer (falso negativo = paciente sin diagnosticar) usaríamos [recall]{.alert}. Si fuera un sistema de recomendación (falso positivo = recomendar algo malo) usaríamos [precisión]{.alert}. Aquí ambos errores son igual de problemáticos, así que F1 nos da el equilibrio.
+:::
+
+[Tómense 3-5 minutos!]{.alert}
 
 [[Apéndice 1: Solución]{.button}](#sec:appendix01)
 :::
@@ -308,23 +306,23 @@ grilla_rf
 
 ## Configurar validación cruzada
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
 ```{r crear-folds, prompt=FALSE, echo=TRUE}
 # vfold_cv(): divide los datos en v grupos (folds) para validación cruzada
 # strata = voto: estratificar para que cada fold mantenga la proporción de clases
-folds <- vfold_cv(datos_train, v = 5, strata = voto)
+folds <- vfold_cv(datos_train, v = 10, strata = voto)
 
 # Ver los folds
 folds
 
-# Cada fold tiene ~300 obs en training y ~75 en assessment
+# Cada fold tiene 9/10 de los datos en training y 1/10 en assessment
 ```
 
 <br>
 
 :::{.callout-note}
-Usamos 5 folds para equilibrar entre precisión de la estimación y tiempo de cómputo. Con más folds (10) las estimaciones son más estables pero toma más tiempo.
+Con 10 folds las estimaciones son más estables que con 5, y para este tamaño de dataset corre en pocos segundos. Para datasets mucho más grandes (>10K observaciones), 5 folds es un compromiso razonable entre estabilidad y tiempo de cómputo.
 :::
 :::
 
@@ -337,7 +335,7 @@ Usamos 5 folds para equilibrar entre precisión de la estimación y tiempo de c�
 # Para cada combinación de la grilla, entrena el modelo en cada fold
 # y calcula las métricas especificadas
 resultados_tune <- tune_grid(
-  wf_rf_tune,               # el workflow con tune() pendientes
+  wf_rf_tune,                # el workflow con tune() pendientes
   resamples = folds,         # los folds de validación cruzada
   grid = grilla_rf,          # la grilla de combinaciones a probar
   # metric_set(): define qué métricas calcular en cada evaluación
@@ -350,18 +348,6 @@ resultados_tune |>
   collect_metrics() |>
   filter(.metric == "roc_auc") |>
   arrange(desc(mean))
-```
-:::
-
-## Visualizar los resultados del tuning
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r viz-tuning, prompt=FALSE, echo=TRUE, fig.width=10, fig.height=5}
-# autoplot(): método genérico que sabe graficar objetos de tidymodels
-autoplot(resultados_tune) +
-  theme_minimal() +
-  labs(title = "Resultados del tuning de Random Forest")
 ```
 :::
 
@@ -425,47 +411,29 @@ bind_rows(roc_logit, roc_rf) |>
 
 ## Importancia de variables (Gini)
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=60%}
 
-```{r vip-gini, prompt=FALSE, echo=TRUE, fig.width=10, fig.height=6}
-# extract_fit_parsnip(): extrae el modelo ajustado del workflow
-# (devuelve un objeto parsnip, no el objeto nativo del motor)
+```{r vip-gini, prompt=FALSE, echo=TRUE, fig.width=8, fig.height=5}
 modelo_extraido <- extract_fit_parsnip(ajuste_rf)
 
-# vip(): gráfico de importancia de variables
-# num_features: cuántas variables mostrar (las más importantes)
 vip(modelo_extraido, num_features = 15) +
-  labs(title = "Importancia de variables (Gini)",
-       subtitle = "Random Forest para predicción de voto") +
+  labs(title = "Importancia de variables (Gini)") +
   theme_minimal()
 ```
 :::
 
-## Interpretación de la importancia
+:::{.column width=40%}
+**Lo que vemos**
 
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
-**¿Qué nos dice el gráfico?**
+- [Edad]{.alert} es el predictor más fuerte, seguida por educación e ingreso
+- [Interés en política]{.alert} es la actitud más predictiva
+- Confianza en justicia supera a confianza en el gobierno
+- [Género, zona, internet]{.alert}: baja importancia
 
-- Las variables [demográficas]{.alert} dominan el ranking:
-  - [Edad]{.alert} es el predictor más fuerte
-  - Educación y luego ingreso del hogar
-
-- [Interés en la política]{.alert} es la actitud más predictiva, seguida de confianza en la justicia
-
-- Confianza en la justicia supera a confianza en el gobierno
-
-- Género, zona y uso de internet tienen [baja importancia]{.alert} predictiva
-:::
-
-:::{.column width=45%}
 :::{.callout-warning}
-**Cuidado con la interpretación**
-
-La importancia de Gini mide [predictibilidad]{.alert}, no [efecto causal]{.alert}.
-
-Que la edad sea importante no significa que "envejecer causa votar más", solo que la edad ayuda a predecir quién votará.
+Gini mide [predictibilidad]{.alert}, no efecto causal: que la edad importe no significa que "envejecer causa votar"
 :::
 :::
 :::
@@ -473,63 +441,35 @@ Que la edad sea importante no significa que "envejecer causa votar más", solo q
 
 ## Partial Dependence Plots
 
-:::{style="margin-top: 30px; font-size: 18px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
-```{r pdp-combinado, prompt=FALSE, echo=TRUE, fig.width=12, fig.height=4.5}
-# extract_fit_engine(): extrae el objeto nativo del motor (ranger)
+```{r pdp-combinado, prompt=FALSE, echo=TRUE, fig.width=12, fig.height=3.5}
 modelo_ranger <- extract_fit_engine(ajuste_rf)
-
-# bake(): aplica la receta ya estimada a los datos de entrenamiento
 datos_prep <- bake(prep(receta), new_data = datos_train)
 
 # partial() calcula el efecto marginal sobre P(voto = "si")
-# which.class = 1: primera clase del factor, es decir, "si"
-pdp_edad <- partial(modelo_ranger, pred.var = "edad",
-                    train = datos_prep, prob = TRUE, which.class = 1)
-
+pdp_edad    <- partial(modelo_ranger, pred.var = "edad",
+                       train = datos_prep, prob = TRUE, which.class = 1)
 pdp_interes <- partial(modelo_ranger, pred.var = "interes_politica",
                        train = datos_prep, prob = TRUE, which.class = 1)
 
-# Graficar lado a lado con patchwork (o cowplot)
 library(patchwork)
-p1 <- autoplot(pdp_edad) +
-  labs(title = "PDP: Edad", x = "Edad (normalizada)",
-       y = "P(voto = sí)") + theme_minimal()
-
-p2 <- autoplot(pdp_interes) +
-  labs(title = "PDP: Interés en política", x = "Interés (normalizado)",
-       y = "P(voto = sí)") + theme_minimal()
-
-p1 + p2
+autoplot(pdp_edad)    + labs(title = "Edad", y = "P(voto = sí)") +
+autoplot(pdp_interes) + labs(title = "Interés en política", y = NULL) &
+  theme_minimal()
 ```
-:::
 
-## Interpretación de los PDPs
-
-:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
-:::{.column width=50%}
-**Edad:**
+:::{.column width=55%}
+**Interpretación**
 
-- La probabilidad de votar [aumenta con la edad]{.alert}
-- El efecto es más fuerte entre los más viejos
-
-**Interés en política:**
-
-- Relación [monotónica positiva]{.alert}
-- Mayor interés → mayor probabilidad de votar
-- El efecto es aproximadamente lineal
+- [Edad]{.alert}: la probabilidad de votar aumenta con la edad; el efecto se acelera entre los más viejos
+- [Interés en política]{.alert}: relación monotónica y aproximadamente lineal
 :::
 
-:::{.column width=50%}
+:::{.column width=45%}
 :::{.callout-tip}
-**PDPs vs. coeficientes**
-
-Los PDPs muestran relaciones [no lineales]{.alert} que la regresión logística no captura.
-
-Si el PDP es aproximadamente lineal, la regresión logística podría ser suficiente.
-
-Si el PDP tiene curvas o mesetas, Random Forest captura patrones que otros modelos pierden.
+**PDPs vs. coeficientes**: si el PDP es aproximadamente lineal → la regresión logística podría bastar. Si tiene curvas o mesetas → Random Forest captura patrones que otros modelos pierden
 :::
 :::
 :::
@@ -555,7 +495,7 @@ datos_uruguay <- datos |>
 # Comparar el VIP con el modelo general
 ```
 
-[Pista: con pocos datos, usen hiperparámetros fijos en vez de tuning.]{.alert}
+[Pista: con pocos datos, usen hiperparámetros fijos en vez de tuning]{.alert}
 
 [[Apéndice 2: Solución]{.button}](#sec:appendix02)
 :::
@@ -588,7 +528,7 @@ datos_uruguay <- datos |>
 
 <br>
 
-[En ciencias sociales, la interpretabilidad suele ser tan importante como el rendimiento.]{.alert}
+[En ciencias sociales, la interpretabilidad suele ser tan importante como el rendimiento]{.alert}
 
 [[Apéndice 4: XGBoost opcional]{.button}](#sec:appendix04)
 :::
@@ -621,7 +561,7 @@ datos_uruguay <- datos |>
 
 <br>
 
-[En el próximo laboratorio aplicaremos estos conceptos a regresión.]{.alert}
+[En el próximo laboratorio aplicaremos estos conceptos a regresión]{.alert}
 :::
 
 # Continuar con el laboratorio de regresión {background-color="#2d4563"}
@@ -632,38 +572,37 @@ datos_uruguay <- datos |>
 
 :::{style="margin-top: 20px; font-size: 20px;"}
 
-```{r ap1-sol, prompt=FALSE, echo=TRUE, eval=TRUE, fig.width=8, fig.height=4}
-# Probar thresholds de 0.3 a 0.7 y guardar los resultados
+**Respuestas:**
+
+1. El threshold cercano a [0.4-0.5]{.alert} suele dar el F1 más alto (varía según la muestra)
+2. Al subir el threshold el modelo predice "sí" con más cautela: la **precisión** sube (menos falsos positivos) pero el **recall** baja (perdemos casos reales). El F1 balancea ambos, así que crece hasta cierto punto y después baja
+
+**Versión extendida** — barrer thresholds finos (cada 0.05) y graficar la curva:
+
+```{r ap1-sol, prompt=FALSE, echo=TRUE, eval=TRUE, fig.width=8, fig.height=3.5}
 thresholds <- seq(0.3, 0.7, by = 0.05)
 resultados <- data.frame(threshold = numeric(), f1 = numeric())
 
 for (t in thresholds) {
   pred_nuevo <- pred_logit |>
     mutate(.pred_class_nuevo = factor(
-      ifelse(.pred_si > t, "si", "no"),
-      levels = c("si", "no")))
-
-  f1 <- f_meas(pred_nuevo, truth = voto,
-               estimate = .pred_class_nuevo)
+      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
+  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
   resultados <- rbind(resultados,
                       data.frame(threshold = t, f1 = f1$.estimate))
 }
 
-# Ver todos los resultados, ordenados de mejor a peor
 resultados |> arrange(desc(f1))
 
-# Visualizar
 ggplot(resultados, aes(x = threshold, y = f1)) +
   geom_line(linewidth = 1.2, color = "#2d4563") +
   geom_point(size = 3, color = "#2d4563") +
-  labs(title = "F1-score según el threshold de clasificación",
+  labs(title = "F1-score según el threshold",
        x = "Threshold", y = "F1-score") +
   theme_minimal()
 ```
 
-- Un threshold [más bajo]{.alert} (p. ej., 0.3) predice "sí" con más facilidad: aumenta el recall pero reduce la precisión
-- Un threshold [más alto]{.alert} (p. ej., 0.7) es más conservador: menos falsos positivos, pero pierde más votantes reales
-- El threshold óptimo depende del [costo relativo]{.alert} de cada tipo de error
+- El threshold óptimo depende del [costo relativo]{.alert} de cada tipo de error: si los falsos positivos son caros, subir; si los falsos negativos son caros, bajar
 
 [[Volver al ejercicio]{.button}](#sec:exercise01)
 :::
@@ -679,11 +618,8 @@ cat("Observaciones en Uruguay:", nrow(datos_uruguay), "\n")
 
 # Con pocos datos (~28 obs), no dividimos en train/test
 # Entrenamos con todo el subconjunto solo para comparar VIP
-receta_uy <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +
-                    genero + confianza_gobierno + confianza_justicia +
-                    satisfaccion_democracia + percepcion_economia +
-                    uso_internet + interes_politica,
-                    data = datos_uruguay) |>
+receta_uy <- recipe(voto ~ ., data = datos_uruguay) |>
+  step_rm(pais, satisfaccion_vida) |>
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())

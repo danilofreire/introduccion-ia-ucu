@@ -1,0 +1,774 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 2.3: Laboratorio - Clasificación avanzada"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 2.3](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-02/07-laboratorio-03.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 3: Clasificación avanzada {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Predecir participación electoral
+2. Baseline con regresión logística
+3. Ajustar un Random Forest con CV
+4. Interpretar con VIP y PDP
+5. Comparar modelos en el conjunto de test
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- [Random Forest]{.alert} para clasificación
+- [Tuning]{.alert} de hiperparámetros con grilla
+- [Interpretación]{.alert} de modelos complejos
+- [Cuándo vale la pena la complejidad extra]{.alert}
+
+<br>
+
+[Trabajen en sus computadoras y pregunten si tienen dudas!]{.alert}
+:::
+:::
+:::
+
+# Parte 1: Preparación y baseline {background-color="#2d4563"}
+
+## Cargar los paquetes necesarios
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r cargar-paquetes, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
+# Si algún paquete falta:
+# install.packages(c("ranger", "vip", "pdp", "xgboost"))
+library(tidyverse)   # readr, dplyr, ggplot2, etc
+library(tidymodels)  # rsample, parsnip, recipes, workflows, tune, yardstick
+library(ranger)      # motor rápido para Random Forest
+library(vip)         # Variable Importance Plots
+library(pdp)         # Partial Dependence Plots
+
+set.seed(2026)
+```
+:::
+
+## Cargar y explorar los datos
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r cargar-datos, prompt=FALSE, echo=TRUE}
+# Cargar el dataset (generado con datos/crear-datos.R)
+datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+
+# Convertir variables categóricas a factores
+# El primer nivel de voto es la clase positiva para yardstick
+datos <- datos |>
+  mutate(
+    pais = factor(pais),
+    zona = factor(zona),
+    genero = factor(genero),
+    uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
+    voto = factor(voto, levels = c("si", "no"))
+  )
+
+# Estructura y distribución del voto
+glimpse(datos)
+
+datos |> count(voto) |> mutate(proporcion = n / sum(n))
+```
+:::
+
+## Dividir los datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r dividir-datos, prompt=FALSE, echo=TRUE}
+# initial_split(): divide los datos aleatoriamente en train y test
+# prop = 0.75: 75% para entrenamiento, 25% para test
+# strata = voto: estratificar para mantener la proporción de clases
+division <- initial_split(datos, prop = 0.75, strata = voto)
+
+datos_train <- training(division)
+datos_test <- testing(division)
+
+# Verificar proporciones
+cat("Proporción en train:\n")
+prop.table(table(datos_train$voto))
+
+cat("\nProporción en test:\n")
+prop.table(table(datos_test$voto))
+```
+:::
+
+## Preprocesamiento con recipes
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r crear-receta, prompt=FALSE, echo=TRUE}
+# recipe(): define el preprocesamiento como una "receta de cocina"
+# voto ~ ...: la fórmula indica variable objetivo ~ predictores
+receta <- recipe(voto ~ ., data = datos_train) |>
+  # step_rm(): excluir pais (alta cardinalidad) y satisfaccion_vida (outcome del Lab 4)
+  step_rm(pais, satisfaccion_vida) |>
+  # step_dummy(): convierte categóricas a variables indicadoras (0/1)
+  step_dummy(all_nominal_predictors()) |>
+  # step_normalize(): centra (media = 0) y escala (sd = 1) las numéricas
+  step_normalize(all_numeric_predictors()) |>
+  # step_zv(): elimina variables con varianza cero (constantes)
+  step_zv(all_predictors())
+
+# prep(): estima los parámetros de la receta (ej: medias para normalizar)
+# juice(): aplica la receta y devuelve los datos transformados
+receta |> prep() |> juice() |> glimpse()
+```
+:::
+
+## Modelo baseline: Regresión logística
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r modelo-baseline, prompt=FALSE, echo=TRUE}
+# logistic_reg(): modelo de regresión logística
+# set_engine("glm"): usar el motor glm de R base
+# set_mode("classification"): tarea de clasificación (no regresión)
+modelo_logit <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+# workflow(): combina preprocesamiento (receta) + modelo en un solo objeto
+wf_logit <- workflow() |>
+  add_recipe(receta) |>    # agregar la receta de preprocesamiento
+  add_model(modelo_logit)  # agregar el modelo
+
+# fit(): ajustar el workflow completo a los datos de entrenamiento
+ajuste_logit <- fit(wf_logit, data = datos_train)
+
+# predict(): genera predicciones de clase ("si"/"no")
+# type = "prob": genera probabilidades para cada clase (.pred_no, .pred_si)
+# bind_cols(): une las columnas de predicciones con los datos reales
+pred_logit <- predict(ajuste_logit, datos_test) |>
+  bind_cols(predict(ajuste_logit, datos_test, type = "prob")) |>
+  bind_cols(datos_test |> select(voto))
+
+# metrics(): calcula múltiples métricas de evaluación
+# truth: variable real, estimate: predicción de clase, .pred_si: probabilidades
+metricas_logit <- pred_logit |>
+  metrics(truth = voto, estimate = .pred_class, .pred_si)
+
+metricas_logit
+```
+:::
+
+## Matriz de confusión del baseline
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r confusion-baseline, prompt=FALSE, echo=TRUE, fig.width=5, fig.height=4, out.width="50%"}
+# conf_mat(): construye la tabla de predicho vs. real
+# autoplot(type = "heatmap"): visualización como mapa de calor
+conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
+  autoplot(type = "heatmap") +
+  scale_fill_gradient(low = "white", high = "#2d4563") +
+  labs(title = "Matriz de confusión - Regresión logística")
+```
+:::
+
+## Ejercicio 1: Threshold óptimo {#sec:exercise01}
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+Por defecto, clasificamos como "sí" si P(sí) > 0.5. Pero este valor puede no ser óptimo
+
+**Tarea:** ejecuten el código abajo (compara F1-score con tres thresholds) y respondan:
+
+1. ¿Qué threshold da el F1-score más alto?
+2. ¿Cómo cambia el F1 cuando subimos el threshold? ¿Por qué?
+
+```{r ej1-codigo, eval=FALSE, prompt=FALSE, echo=TRUE}
+# Calcular F1 para tres thresholds distintos
+for (t in c(0.3, 0.5, 0.7)) {
+  pred_nuevo <- pred_logit |>
+    mutate(.pred_class_nuevo = factor(
+      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
+  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
+  cat("Threshold", t, "→ F1 =", round(f1$.estimate, 3), "\n")
+}
+```
+
+:::{.callout-note}
+**¿Por qué F1 y no precisión o recall?** F1 [combina ambas]{.alert} y obliga al modelo a encontrar un equilibrio. Si fuera un test de cáncer (falso negativo = paciente sin diagnosticar) usaríamos [recall]{.alert}. Si fuera un sistema de recomendación (falso positivo = recomendar algo malo) usaríamos [precisión]{.alert}. Aquí ambos errores son igual de problemáticos, así que F1 nos da el equilibrio.
+:::
+
+[Tómense 3-5 minutos!]{.alert}
+
+[[Apéndice 1: Solución]{.button}](#sec:appendix01)
+:::
+
+# Parte 2: Random Forest con tuning {background-color="#2d4563"}
+
+## Definir Random Forest con hiperparámetros a ajustar
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r rf-tune-spec, prompt=FALSE, echo=TRUE}
+# rand_forest(): modelo de Random Forest
+# tune(): marcador especial que indica "optimizar este valor automáticamente"
+modelo_rf_tune <- rand_forest(
+  mtry = tune(),       # Número de variables a considerar en cada split
+  trees = 500,         # Número de árboles (fijo, no se optimiza)
+  min_n = tune()       # Mínimo de observaciones en nodo terminal
+) |>
+  # importance = "impurity": calcular importancia con reducción de impureza (Gini)
+  set_engine("ranger", importance = "impurity") |>
+  set_mode("classification")
+
+# workflow(): combina receta + modelo
+wf_rf_tune <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_rf_tune)
+
+# extract_parameter_set_dials(): muestra los hiperparámetros marcados con tune()
+modelo_rf_tune |> extract_parameter_set_dials()
+```
+:::
+
+## Crear la grilla de búsqueda
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r crear-grilla, prompt=FALSE, echo=TRUE}
+# grid_regular(): crea una grilla con valores uniformemente espaciados
+# Cada parámetro tiene un rango definido; levels indica cuántos valores probar
+grilla_rf <- grid_regular(
+  mtry(range = c(2, 8)),    # De 2 a 8 variables por split
+  min_n(range = c(5, 30)),  # De 5 a 30 obs mínimas por nodo
+  levels = c(4, 4)          # 4 valores de cada uno = 4 x 4 = 16 combinaciones
+)
+
+# Ver la grilla
+grilla_rf
+
+# Alternativa: grilla aleatoria (más eficiente para muchos hiperparámetros)
+# grilla_rf <- grid_random(
+#   mtry(range = c(2, 8)),
+#   min_n(range = c(5, 30)),
+#   size = 20  # 20 combinaciones aleatorias
+# )
+```
+:::
+
+## Configurar validación cruzada
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r crear-folds, prompt=FALSE, echo=TRUE}
+# vfold_cv(): divide los datos en v grupos (folds) para validación cruzada
+# strata = voto: estratificar para que cada fold mantenga la proporción de clases
+folds <- vfold_cv(datos_train, v = 10, strata = voto)
+
+# Ver los folds
+folds
+
+# Cada fold tiene 9/10 de los datos en training y 1/10 en assessment
+```
+
+<br>
+
+:::{.callout-note}
+Con 10 folds las estimaciones son más estables que con 5, y para este tamaño de dataset corre en pocos segundos. Para datasets mucho más grandes (>10K observaciones), 5 folds es un compromiso razonable entre estabilidad y tiempo de cómputo.
+:::
+:::
+
+## Ejecutar el tuning
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r ejecutar-tuning, prompt=FALSE, echo=TRUE, cache=TRUE}
+# tune_grid(): evalúa cada combinación de hiperparámetros con CV
+# Para cada combinación de la grilla, entrena el modelo en cada fold
+# y calcula las métricas especificadas
+resultados_tune <- tune_grid(
+  wf_rf_tune,                # el workflow con tune() pendientes
+  resamples = folds,         # los folds de validación cruzada
+  grid = grilla_rf,          # la grilla de combinaciones a probar
+  # metric_set(): define qué métricas calcular en cada evaluación
+  metrics = metric_set(accuracy, roc_auc, f_meas),
+  control = control_grid(verbose = FALSE)  # no imprimir progreso
+)
+
+# collect_metrics(): extrae los resultados promediados de todos los folds
+resultados_tune |>
+  collect_metrics() |>
+  filter(.metric == "roc_auc") |>
+  arrange(desc(mean))
+```
+:::
+
+## Seleccionar y ajustar el modelo final
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r ajustar-final, prompt=FALSE, echo=TRUE}
+# select_best(): elige la combinación con el mejor valor de la métrica
+mejor_rf <- select_best(resultados_tune, metric = "roc_auc")
+mejor_rf
+
+# finalize_workflow(): reemplaza los tune() por los valores óptimos
+# Luego ajustamos con todos los datos de entrenamiento
+wf_rf_final <- finalize_workflow(wf_rf_tune, mejor_rf)
+ajuste_rf <- fit(wf_rf_final, data = datos_train)
+
+# Predicciones y métricas en test
+pred_rf <- predict(ajuste_rf, datos_test) |>
+  bind_cols(predict(ajuste_rf, datos_test, type = "prob")) |>
+  bind_cols(datos_test |> select(voto))
+
+metricas_rf <- pred_rf |>
+  metrics(truth = voto, estimate = .pred_class, .pred_si)
+
+cat("Regresión logística:\n"); print(metricas_logit)
+cat("\nRandom Forest:\n");     print(metricas_rf)
+```
+:::
+
+## Curva ROC comparativa
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r curva-roc, prompt=FALSE, echo=TRUE, fig.width=8, fig.height=6}
+# roc_curve(): calcula sensibilidad y especificidad para cada umbral
+# truth: la variable real, .pred_si: probabilidades predichas
+roc_logit <- pred_logit |>
+  roc_curve(truth = voto, .pred_si) |>
+  mutate(modelo = "Regresión logística")
+
+roc_rf <- pred_rf |>
+  roc_curve(truth = voto, .pred_si) |>
+  mutate(modelo = "Random Forest")
+
+# Combinar y graficar
+bind_rows(roc_logit, roc_rf) |>
+  ggplot(aes(x = 1 - specificity, y = sensitivity, color = modelo)) +
+  geom_path(linewidth = 1.2) +
+  geom_abline(linetype = "dashed", color = "gray50") +
+  coord_equal() +
+  labs(title = "Comparación de curvas ROC",
+       x = "1 - Especificidad (Tasa de falsos positivos)",
+       y = "Sensibilidad (Tasa de verdaderos positivos)",
+       color = "Modelo") +
+  theme_minimal()
+```
+:::
+
+# Parte 3: Interpretación {background-color="#2d4563"}
+
+## Importancia de variables (Gini)
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=60%}
+
+```{r vip-gini, prompt=FALSE, echo=TRUE, fig.width=8, fig.height=5}
+modelo_extraido <- extract_fit_parsnip(ajuste_rf)
+
+vip(modelo_extraido, num_features = 15) +
+  labs(title = "Importancia de variables (Gini)") +
+  theme_minimal()
+```
+:::
+
+:::{.column width=40%}
+**Lo que vemos**
+
+- [Edad]{.alert} es el predictor más fuerte, seguida por educación e ingreso
+- [Interés en política]{.alert} es la actitud más predictiva
+- Confianza en justicia supera a confianza en el gobierno
+- [Género, zona, internet]{.alert}: baja importancia
+
+:::{.callout-warning}
+Gini mide [predictibilidad]{.alert}, no efecto causal: que la edad importe no significa que "envejecer causa votar"
+:::
+:::
+:::
+:::
+
+## Partial Dependence Plots
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r pdp-combinado, prompt=FALSE, echo=TRUE, fig.width=12, fig.height=3.5}
+modelo_ranger <- extract_fit_engine(ajuste_rf)
+datos_prep <- bake(prep(receta), new_data = datos_train)
+
+# partial() calcula el efecto marginal sobre P(voto = "si")
+pdp_edad    <- partial(modelo_ranger, pred.var = "edad",
+                       train = datos_prep, prob = TRUE, which.class = 1)
+pdp_interes <- partial(modelo_ranger, pred.var = "interes_politica",
+                       train = datos_prep, prob = TRUE, which.class = 1)
+
+library(patchwork)
+autoplot(pdp_edad)    + labs(title = "Edad", y = "P(voto = sí)") +
+autoplot(pdp_interes) + labs(title = "Interés en política", y = NULL) &
+  theme_minimal()
+```
+
+:::{.columns}
+:::{.column width=55%}
+**Interpretación**
+
+- [Edad]{.alert}: la probabilidad de votar aumenta con la edad; el efecto se acelera entre los más viejos
+- [Interés en política]{.alert}: relación monotónica y aproximadamente lineal
+:::
+
+:::{.column width=45%}
+:::{.callout-tip}
+**PDPs vs. coeficientes**: si el PDP es aproximadamente lineal → la regresión logística podría bastar. Si tiene curvas o mesetas → Random Forest captura patrones que otros modelos pierden
+:::
+:::
+:::
+:::
+
+## Ejercicio 2: Análisis por país {#sec:exercise02}
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Filtrar los datos para Uruguay solamente
+2. Entrenar el mismo modelo de Random Forest (sin tuning, con hiperparámetros fijos)
+3. ¿Cambia la importancia de las variables?
+4. ¿La edad sigue siendo el predictor más importante?
+
+```{r ejercicio-2, eval=FALSE, prompt=FALSE, echo=TRUE}
+# Tu código aquí
+datos_uruguay <- datos |>
+  filter(pais == "Uruguay")
+
+# Crear receta y workflow, ajustar el modelo...
+# Comparar el VIP con el modelo general
+```
+
+[Pista: con pocos datos, usen hiperparámetros fijos en vez de tuning]{.alert}
+
+[[Apéndice 2: Solución]{.button}](#sec:appendix02)
+:::
+
+# Parte 4: Discusión y cierre {background-color="#2d4563"}
+
+## ¿Cuál modelo elegir?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Si el objetivo es [predicción pura]{.alert}:**
+
+- Elegir el modelo con mejor AUC
+- Random Forest suele superar a la regresión logística
+- La interpretabilidad es secundaria
+
+**Si el objetivo es [entender los factores]{.alert}:**
+
+- Regresión logística da coeficientes interpretables
+- Random Forest con VIP + PDP es un compromiso
+:::
+
+:::{.column width=50%}
+**Consideraciones prácticas:**
+
+- [Tiempo]{.alert}: RF es más lento que la regresión logística
+- [Explicabilidad]{.alert}: ¿Podemos justificar las predicciones?
+- [Mejora marginal]{.alert}: ¿Vale la pena 2% más de AUC?
+
+<br>
+
+[En ciencias sociales, la interpretabilidad suele ser tan importante como el rendimiento]{.alert}
+
+[[Apéndice 4: XGBoost opcional]{.button}](#sec:appendix04)
+:::
+:::
+:::
+
+## Resumen del laboratorio
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que practicamos:**
+
+- Flujo completo de clasificación
+- Tuning de hiperparámetros con CV
+- Interpretación con VIP y PDP
+- Comparación de modelos en test
+:::
+
+:::{.column width=50%}
+**Conceptos clave:**
+
+- [tune()]{.alert} marca hiperparámetros a ajustar
+- [grid_regular()]{.alert} crea combinaciones
+- [tune_grid()]{.alert} evalúa con CV
+- [select_best()]{.alert} elige la mejor combinación
+- [finalize_workflow()]{.alert} aplica los valores
+:::
+:::
+
+<br>
+
+[En el próximo laboratorio aplicaremos estos conceptos a regresión]{.alert}
+:::
+
+# Continuar con el laboratorio de regresión {background-color="#2d4563"}
+
+# Apéndice: Soluciones {background-color="#2d4563"}
+
+## Apéndice 1: Threshold óptimo {#sec:appendix01}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+**Respuestas:**
+
+1. El threshold cercano a [0.4-0.5]{.alert} suele dar el F1 más alto (varía según la muestra)
+2. Al subir el threshold el modelo predice "sí" con más cautela: la **precisión** sube (menos falsos positivos) pero el **recall** baja (perdemos casos reales). El F1 balancea ambos, así que crece hasta cierto punto y después baja
+
+**Versión extendida** — barrer thresholds finos (cada 0.05) y graficar la curva:
+
+```{r ap1-sol, prompt=FALSE, echo=TRUE, eval=TRUE, fig.width=8, fig.height=3.5}
+thresholds <- seq(0.3, 0.7, by = 0.05)
+resultados <- data.frame(threshold = numeric(), f1 = numeric())
+
+for (t in thresholds) {
+  pred_nuevo <- pred_logit |>
+    mutate(.pred_class_nuevo = factor(
+      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
+  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
+  resultados <- rbind(resultados,
+                      data.frame(threshold = t, f1 = f1$.estimate))
+}
+
+resultados |> arrange(desc(f1))
+
+ggplot(resultados, aes(x = threshold, y = f1)) +
+  geom_line(linewidth = 1.2, color = "#2d4563") +
+  geom_point(size = 3, color = "#2d4563") +
+  labs(title = "F1-score según el threshold",
+       x = "Threshold", y = "F1-score") +
+  theme_minimal()
+```
+
+- El threshold óptimo depende del [costo relativo]{.alert} de cada tipo de error: si los falsos positivos son caros, subir; si los falsos negativos son caros, bajar
+
+[[Volver al ejercicio]{.button}](#sec:exercise01)
+:::
+
+## Apéndice 2: Análisis por país {#sec:appendix02}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r ap2-sol, prompt=FALSE, echo=TRUE, eval=TRUE, fig.width=10, fig.height=5}
+# Filtrar datos de Uruguay
+datos_uruguay <- datos |> filter(pais == "Uruguay")
+cat("Observaciones en Uruguay:", nrow(datos_uruguay), "\n")
+
+# Con pocos datos (~28 obs), no dividimos en train/test
+# Entrenamos con todo el subconjunto solo para comparar VIP
+receta_uy <- recipe(voto ~ ., data = datos_uruguay) |>
+  step_rm(pais, satisfaccion_vida) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_zv(all_predictors())
+
+modelo_rf_uy <- rand_forest(trees = 500, mtry = 4, min_n = 3) |>
+  set_engine("ranger", importance = "impurity") |>
+  set_mode("classification")
+
+ajuste_rf_uy <- workflow() |>
+  add_recipe(receta_uy) |>
+  add_model(modelo_rf_uy) |>
+  fit(data = datos_uruguay)
+
+# Comparar importancia de variables
+vip(extract_fit_parsnip(ajuste_rf_uy), num_features = 10) +
+  labs(title = "Importancia de variables - solo Uruguay",
+       subtitle = paste0("n = ", nrow(datos_uruguay), " observaciones")) +
+  theme_minimal()
+```
+
+- Con tan pocos datos (~28 obs), los resultados son [inestables]{.alert}: cambian con la semilla
+- El ranking de importancia puede diferir del modelo general
+- Para conclusiones confiables a nivel país, necesitaríamos [muestras más grandes]{.alert}
+
+[[Volver al ejercicio]{.button}](#sec:exercise02)
+:::
+
+## Apéndice 3: Árbol de decisión {#sec:appendix03}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r ap3-sol, prompt=FALSE, echo=TRUE, eval=TRUE, cache=TRUE}
+# Modelo de árbol con costo de complejidad a ajustar
+modelo_arbol <- decision_tree(
+  cost_complexity = tune(),
+  tree_depth = 10,
+  min_n = 10
+) |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+# Workflow con la misma receta
+wf_arbol <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_arbol)
+
+# Grilla de búsqueda para cost_complexity
+# range en escala log10: 10^-4 = 0.0001 a 10^-1 = 0.1
+grilla_arbol <- grid_regular(
+  cost_complexity(range = c(-4, -1)),
+  levels = 10
+)
+
+# Tuning con validación cruzada (reutilizamos folds)
+resultados_arbol <- tune_grid(
+  wf_arbol,
+  resamples = folds,
+  grid = grilla_arbol,
+  metrics = metric_set(roc_auc),
+  control = control_grid(verbose = FALSE)
+)
+
+# Mejor modelo
+mejor_arbol <- select_best(resultados_arbol, metric = "roc_auc")
+cat("Mejor cost_complexity:", mejor_arbol$cost_complexity, "\n")
+```
+
+```{r ap3-eval, prompt=FALSE, echo=TRUE, eval=TRUE, fig.width=10, fig.height=5}
+# Ajustar y evaluar
+wf_arbol_final <- finalize_workflow(wf_arbol, mejor_arbol)
+ajuste_arbol <- fit(wf_arbol_final, data = datos_train)
+
+pred_arbol <- predict(ajuste_arbol, datos_test) |>
+  bind_cols(predict(ajuste_arbol, datos_test, type = "prob")) |>
+  bind_cols(datos_test |> select(voto))
+
+# Comparar métricas
+cat("Árbol de decisión:\n")
+print(pred_arbol |> metrics(truth = voto, estimate = .pred_class, .pred_si))
+cat("\nRandom Forest:\n")
+print(metricas_rf)
+
+# Visualizar el tuning
+autoplot(resultados_arbol) +
+  theme_minimal() +
+  labs(title = "Tuning del árbol de decisión")
+```
+
+- El árbol de decisión suele tener [menor AUC]{.alert} que Random Forest
+- A cambio, es mucho más [interpretable]{.alert}: se puede visualizar como un diagrama de flujo
+- `cost_complexity` controla la poda: valores más altos producen árboles más simples
+:::
+
+## Apéndice 4: XGBoost opcional {#sec:appendix04}
+
+:::{style="margin-top: 20px; font-size: 18px;"}
+
+```{r ap4-xgb, prompt=FALSE, echo=TRUE, eval=TRUE, cache=TRUE}
+# boost_tree(): Gradient Boosting (árboles secuenciales)
+# tree_depth y learn_rate a optimizar; min_n fijo
+modelo_xgb <- boost_tree(
+  trees = 500,
+  tree_depth = tune(),
+  learn_rate = tune(),
+  min_n = 10
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+
+wf_xgb <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_xgb)
+
+# learn_rate en escala log10: 10^-3 a 10^-1
+grilla_xgb <- grid_regular(
+  tree_depth(range = c(3, 8)),
+  learn_rate(range = c(-3, -1)),
+  levels = c(3, 3)
+)
+
+resultados_xgb <- tune_grid(
+  wf_xgb, resamples = folds, grid = grilla_xgb,
+  metrics = metric_set(roc_auc),
+  control = control_grid(verbose = FALSE)
+)
+
+mejor_xgb <- select_best(resultados_xgb, metric = "roc_auc")
+wf_xgb_final <- finalize_workflow(wf_xgb, mejor_xgb)
+ajuste_xgb <- fit(wf_xgb_final, data = datos_train)
+
+# Predicciones y comparación final
+pred_xgb <- predict(ajuste_xgb, datos_test) |>
+  bind_cols(predict(ajuste_xgb, datos_test, type = "prob")) |>
+  bind_cols(datos_test |> select(voto))
+
+bind_rows(
+  pred_logit |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "Regresión logística"),
+  pred_rf |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "Random Forest"),
+  pred_xgb |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+    mutate(modelo = "XGBoost")
+) |>
+  select(modelo, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  arrange(desc(roc_auc))
+```
+
+- XGBoost suele igualar o superar a Random Forest en datasets tabulares
+- Requiere más tuning (tree_depth, learn_rate, trees) y más tiempo de cómputo
+- En ciencias sociales, la mejora marginal rara vez justifica la pérdida de interpretabilidad
+:::

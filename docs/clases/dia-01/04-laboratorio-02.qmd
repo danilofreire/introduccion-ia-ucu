@@ -277,7 +277,7 @@ satisfaccion <- satisfaccion |>
   )
 ```
 
-[Tómense 5 minutos.]{.alert}
+[Tómense 3-5 minutos!]{.alert}
 
 [[Más ejemplos en el Apéndice 5]{.button}](#sec:appendix05)
 :::
@@ -342,7 +342,7 @@ formula_basica <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
                                participacion_politica + zona
 ```
 
-Más adelante añadiremos una variable derivada para ver si mejora el ajuste.
+Más adelante añadiremos una variable derivada para ver si mejora el ajuste
 :::
 
 ## Función para evaluar un modelo
@@ -355,7 +355,7 @@ Creemos una función que facilite la evaluación:
 evaluar_modelo <- function(modelo, formula, folds, nombre = "modelo") {
   # 1. fit_resamples ajusta el modelo en cada fold de la validación cruzada
   resultados <- fit_resamples(
-    modelo,
+    modelo, 
     formula,
     resamples = folds,
     metrics  = metric_set(accuracy, precision, recall, roc_auc),  # 2. métricas que queremos
@@ -374,7 +374,7 @@ eval_logistico
 ```
 :::
 
-## Evaluar todos los modelos
+## Evaluar todos los modelos {#sec:evaluar-todos}
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
@@ -398,7 +398,7 @@ resultados |>
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-**Tarea:** Agreguen [la variable derivada que crearon antes]{.alert} a la fórmula y re-evalúen.
+**Tarea:** Agreguen [la variable derivada que crearon antes]{.alert} a la fórmula y re-evalúen
 
 1. ¿Mejora la regresión logística? ¿Y el árbol?
 2. ¿Cuál de los dos modelos es más sensible al feature nuevo?
@@ -415,7 +415,7 @@ bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
   filter(.metric == "accuracy") |> select(modelo, mean, std_err)
 ```
 
-[Tómense 10 minutos.]{.alert}
+[Tómense 5 minutos!]{.alert}
 
 [[Ir al Apéndice 6]{.button}](#sec:appendix06)
 :::
@@ -449,15 +449,17 @@ pred_test |> roc_auc(truth = satisfecho, .pred_si, event_level = "second")
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-Hay una [tarea para esta sesión]{.alert} con preguntas prácticas que aplican todo lo que vimos hoy.
+Hay una [tarea para las dos sesiones]{.alert} con preguntas prácticas que aplican todo lo que vimos hoy.
 
 - Página de [Laboratorios](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html) del sitio del curso
+- [Tarea 1](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-01.html)
+- [Respuestas Tarea 1](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-01-respuestas.html)
 - [Tarea 2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-02.html)
 - [Respuestas Tarea 2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-02-respuestas.html)
 
 <br>
 
-[Hagan la tarea antes de la próxima clase. Las respuestas ya están disponibles para que verifiquen su trabajo.]{.alert}
+[Las respuestas ya están disponibles para que verifiquen su trabajo]{.alert} 😉
 :::
 
 # Cierre del Día 1 {background-color="#2d4563"}
@@ -799,4 +801,6 @@ resultados |>
 
 - Las barras muestran la media de cada métrica; las líneas verticales son el error estándar (variabilidad entre folds)
 - Si las barras de error se superponen, la diferencia entre modelos no es robusta: probablemente no podamos decir cuál es "mejor" con confianza
+
+[Volver a la comparación numérica]{.button}](#sec:evaluar-todos)
 :::

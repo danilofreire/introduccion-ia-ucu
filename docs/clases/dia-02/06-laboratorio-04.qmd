@@ -55,93 +55,65 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Objetivos del laboratorio
 
-:::{style="margin-top: 30px; font-size: 28px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=50%}
-**Lo que vamos a hacer:**
+**Lo que vamos a hacer (5 ejercicios):**
 
-1. Predecir satisfacción con la vida
-2. Baseline con OLS
-3. Ajustar LASSO con validación cruzada
-4. Interpretar coeficientes y selección
-5. Contrastar con Ridge en una slide
-6. Cerrar con una tabla comparativa final
+1. **Ejercicio 1**: ajustar OLS y evaluar en test
+2. **Ejercicio 2**: correr validación cruzada para LASSO
+3. **Ejercicio 3**: seleccionar el mejor λ y ajustar el modelo final
+4. **Ejercicio 4**: implementar Ridge por analogía con LASSO
+5. **Ejercicio 5**: construir la tabla comparativa final
 :::
 
 :::{.column width=50%}
 **Lo que vamos a aprender:**
 
-- Cuándo usar [regularización]{.alert}
-- Diferencias prácticas entre LASSO y Ridge
-- [Tuning]{.alert} de penalty con CV
-- Trade-off interpretabilidad vs. rendimiento
+- Cuándo y cómo usar [regularización]{.alert}
+- Diferencias prácticas entre [LASSO]{.alert} y [Ridge]{.alert}
+- Tuning de `penalty` con validación cruzada
+- Trade-off entre interpretabilidad y rendimiento
 
 <br>
 
-[Usaremos el mismo dataset de Latinobarómetro (datos simulados).]{.alert}
+[Cada ejercicio tiene una pista y su solución en el apéndice. Si quedan atascados, miren la pista primero!]{.alert} 🤓
 :::
 :::
 :::
 
-# Parte 1: Preparación y baseline {background-color="#2d4563"}
+# Parte 1: Preparación {background-color="#2d4563"}
 
-## Cargar los paquetes necesarios
+## Cargar paquetes y datos
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
 ```{r}
-#| label: cargar-paquetes
+#| label: setup-paquetes
 #| message: false
 #| warning: false
 #| eval: true
 
-# Paquetes necesarios
-paquetes <- c("tidyverse", "tidymodels", "glmnet", "ranger", "vip")
-
-for (pkg in paquetes) {
-  if (!require(pkg, character.only = TRUE)) {
-    install.packages(pkg, dependencies = TRUE)
-    library(pkg, character.only = TRUE)
-  }
-}
-
-library(tidymodels)
-library(glmnet)   # Motor para LASSO, Ridge, Elastic Net
+# Si algún paquete falta: install.packages(c("glmnet", "ranger", "vip"))
+library(tidymodels)  # rsample, parsnip, recipes, workflows, tune, yardstick
+library(tidyverse)   # incluye readr (read_csv), dplyr, ggplot2, etc.
+library(glmnet)      # motor para LASSO, Ridge, Elastic Net
 
 set.seed(2026)
 
 # Cargar el dataset
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
-glimpse(datos)
-```
-:::
 
-## Cargar y explorar los datos
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-```{r}
-#| label: cargar-datos
-#| eval: true
-
-# Convertir variables categóricas
+# Convertir categóricas a factor
 datos <- datos |>
   mutate(
-    pais = factor(pais),
-    zona = factor(zona),
-    genero = factor(genero),
+    pais         = factor(pais),
+    zona         = factor(zona),
+    genero       = factor(genero),
     uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario"))
   )
 
-# Nuestra variable objetivo
-summary(datos$satisfaccion_vida)
-
-# Histograma
-ggplot(datos, aes(x = satisfaccion_vida)) +
-  geom_histogram(binwidth = 1, fill = "#2d4563", color = "white") +
-  labs(title = "Distribución de satisfacción con la vida",
-       x = "Satisfacción (1-10)", y = "Frecuencia") +
-  theme_minimal()
+glimpse(datos)
 ```
 :::
 
@@ -150,22 +122,19 @@ ggplot(datos, aes(x = satisfaccion_vida)) +
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r}
-#| label: dividir-datos
+#| label: split-datos
 #| eval: true
 
-# División train/test
-division <- initial_split(datos, prop = 0.75)
-
+# División train/test (75/25)
+division   <- initial_split(datos, prop = 0.75)
 datos_train <- training(division)
-datos_test <- testing(division)
+datos_test  <- testing(division)
 
-cat("Observaciones en train:", nrow(datos_train), "\n")
-cat("Observaciones en test:", nrow(datos_test), "\n")
-
-# Media de la variable objetivo
-cat("\nMedia satisfacción (train):", mean(datos_train$satisfaccion_vida))
-cat("\nMedia satisfacción (test):", mean(datos_test$satisfaccion_vida))
+cat("Train:", nrow(datos_train), "obs | Test:", nrow(datos_test), "obs\n")
 ```
+
+- La variable objetivo es `satisfaccion_vida` (1-10, continua)
+- Train tendrá ~375 obs, test ~125
 :::
 
 ## Receta de preprocesamiento
@@ -173,122 +142,95 @@ cat("\nMedia satisfacción (test):", mean(datos_test$satisfaccion_vida))
 :::{style="margin-top: 30px; font-size: 20px;"}
 
 ```{r}
-#| label: crear-receta
+#| label: receta
 #| eval: true
 
-# Definir predictores (excluimos voto y pais)
-receta <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
-                 zona + genero + confianza_gobierno + confianza_justicia +
-                 satisfaccion_democracia + percepcion_economia +
-                 uso_internet + interes_politica,
-                 data = datos_train) |>
-  # Dummies para categóricas
-  step_dummy(all_nominal_predictors()) |>
-  # Normalizar (importante para regularización)
-  step_normalize(all_numeric_predictors()) |>
-  # Eliminar varianza cero
-  step_zv(all_predictors())
+# Predecir con todas las variables menos voto (outcome del Lab 3) y pais (alta cardinalidad)
+receta <- recipe(satisfaccion_vida ~ ., data = datos_train) |>
+  step_rm(pais, voto) |>
+  step_dummy(all_nominal_predictors()) |>      # categóricas → dummies
+  step_normalize(all_numeric_predictors()) |>  # normalizar (importante para regularización)
+  step_zv(all_predictors())                    # eliminar varianza cero
 
 # Verificar
 receta |> prep() |> juice() |> glimpse()
 ```
 :::
 
-## Modelo baseline: OLS
+# Parte 2: OLS baseline {background-color="#2d4563"}
 
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-```{r}
-#| label: modelo-ols
-#| eval: true
-
-# Regresión lineal simple
-modelo_ols <- linear_reg() |>
-  set_engine("lm") |>
-  set_mode("regression")
-
-# Workflow
-wf_ols <- workflow() |>
-  add_recipe(receta) |>
-  add_model(modelo_ols)
-
-# Ajustar
-ajuste_ols <- fit(wf_ols, data = datos_train)
-
-# Coeficientes
-tidy(ajuste_ols) |>
-  arrange(desc(abs(estimate)))
-```
-:::
-
-## Evaluar OLS en test
+## OLS: spec y ajuste
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r}
-#| label: evaluar-ols
+#| label: ols-ajuste
 #| eval: true
 
-# Predicciones en test
-pred_ols <- predict(ajuste_ols, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+# Regresión lineal con motor lm
+modelo_ols <- linear_reg() |>
+  set_engine("lm") |>
+  set_mode("regression")
 
-# Métricas
+# Workflow + ajuste
+wf_ols     <- workflow() |> add_recipe(receta) |> add_model(modelo_ols)
+ajuste_ols <- fit(wf_ols, data = datos_train)
+
+# Coeficientes ordenados por magnitud (top 5)
+tidy(ajuste_ols) |>
+  arrange(desc(abs(estimate))) |>
+  head(5)
+```
+
+- `ajuste_ols` ya tiene el modelo ajustado a `datos_train`
+- En el próximo slide ustedes lo evalúan en test
+:::
+
+## Ejercicio 1: Evaluar OLS {#sec:exercise01}
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+**Tarea (5 min):** completen los huecos para evaluar `ajuste_ols` en el conjunto de prueba.
+
+```{r}
+#| label: ej1-skeleton
+#| eval: false
+
+# Generar predicciones
+pred_ols <- predict(___, datos_test) |>            # TODO: ¿qué modelo?
+  bind_cols(datos_test |> select(___))             # TODO: variable objetivo
+
+# Calcular métricas
 metricas_ols <- pred_ols |>
-  metrics(truth = satisfaccion_vida, estimate = .pred)
+  metrics(truth = ___, estimate = ___)             # TODO: columna real y predicha
 
 metricas_ols
-
-# Visualizar predicciones vs. reales
-ggplot(pred_ols, aes(x = satisfaccion_vida, y = .pred)) +
-  geom_point(alpha = 0.5) +
-  geom_abline(color = "red", linetype = "dashed") +
-  labs(title = "Predicciones OLS vs. valores reales",
-       x = "Satisfacción real", y = "Satisfacción predicha") +
-  theme_minimal()
 ```
-:::
 
-# Parte 2: LASSO con tuning {background-color="#2d4563"}
+```{r}
+#| label: ej1-hidden
+#| include: false
 
-## ¿Por qué regularizar?
+pred_ols <- predict(ajuste_ols, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+metricas_ols <- pred_ols |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+```
 
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
-**Nuestro caso:**
-
-- 11 predictores, ~375 observaciones en train
-- La ratio n/p no es tan extrema
-- Pero algunas variables podrían ser irrelevantes
-
-**¿Cuándo regularizar?**
-
-- Muchos predictores relativos a las observaciones
-- Sospecha de multicolinealidad
-- Queremos [selección automática]{.alert} de variables
-- Prevenir sobreajuste
-:::
-
-:::{.column width=45%}
-:::{style="margin-top: 30px;"}
 :::{.callout-note}
-**En este ejemplo**
-
-Usamos regularización principalmente para:
-
-1. [Demostrar el método]{.alert}
-2. Identificar variables que no aportan
-3. Comparar con OLS
-
-En la práctica, con p = 11 y n = 375, OLS probablemente está bien.
-:::
-:::
-:::
-:::
+**Pista**: la variable objetivo es `satisfaccion_vida`. La predicción que crea tidymodels se llama `.pred` (con punto al inicio).
 :::
 
-## Definir LASSO con penalty a ajustar
+:::{.callout-tip}
+**Checkpoint**: deberían ver 3 filas (rmse, rsq, mae) con RMSE ≈ 1.8-2.0 y R² ≈ 0.15-0.25.
+:::
+
+[[Apéndice 1: Solución]{.button}](#sec:appendix01)
+:::
+
+# Parte 3: LASSO con tuning {background-color="#2d4563"}
+
+## Definir LASSO + grilla de búsqueda
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
@@ -296,56 +238,75 @@ En la práctica, con p = 11 y n = 375, OLS probablemente está bien.
 #| label: lasso-spec
 #| eval: true
 
-# LASSO: mixture = 1
-modelo_lasso <- linear_reg(
-  penalty = tune(),   # λ a ajustar
-  mixture = 1         # 1 = LASSO puro
-) |>
+# LASSO: linear_reg con mixture = 1 (L1 puro)
+# tune() = "este valor se busca con CV"
+modelo_lasso <- linear_reg(penalty = tune(), mixture = 1) |>
   set_engine("glmnet") |>
   set_mode("regression")
 
-# Workflow
-wf_lasso <- workflow() |>
-  add_recipe(receta) |>
-  add_model(modelo_lasso)
+wf_lasso <- workflow() |> add_recipe(receta) |> add_model(modelo_lasso)
 
-# Grilla de valores de penalty (escala logarítmica)
-grilla_lambda <- grid_regular(
-  penalty(range = c(-4, 0)),  # 10^-4 a 10^0 = 0.0001 a 1
-  levels = 30
-)
+# Grilla de 30 valores de λ en escala logarítmica (10^-4 a 10^0)
+grilla_lambda <- grid_regular(penalty(range = c(-4, 0)), levels = 30)
 
 head(grilla_lambda)
 ```
+
+- `mixture = 1` → LASSO puro. Si fuera `0`, sería Ridge
+- En el próximo ejercicio ustedes corren la validación cruzada
 :::
 
-## Validación cruzada para LASSO
+## Ejercicio 2: Correr CV para LASSO {#sec:exercise02}
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 19px;"}
+
+**Tarea (7 min):** completen el código para evaluar cada λ con 10-fold CV.
 
 ```{r}
-#| label: lasso-cv
-#| eval: true
-#| cache: true
+#| label: ej2-skeleton
+#| eval: false
 
-# 10-fold CV
+# Crear folds (ya quedan creados aquí, no modificar después)
 folds <- vfold_cv(datos_train, v = 10)
 
-# Ajustar todas las lambdas
+# Tuning: probar cada valor de la grilla con CV
 resultados_lasso <- tune_grid(
-  wf_lasso,
-  resamples = folds,
-  grid = grilla_lambda,
-  metrics = metric_set(rmse, rsq, mae)
+  ___,                            # TODO: ¿qué workflow?
+  resamples = ___,                # TODO: los folds
+  grid = ___,                     # TODO: la grilla de λ
+  metrics = metric_set(rmse, rsq) # ya definido
 )
 
-# Ver resultados
+# Top 10 mejores λ por RMSE
 resultados_lasso |>
   collect_metrics() |>
   filter(.metric == "rmse") |>
   arrange(mean) |>
   head(10)
 ```
+
+```{r}
+#| label: ej2-hidden
+#| include: false
+
+folds <- vfold_cv(datos_train, v = 10)
+resultados_lasso <- tune_grid(
+  wf_lasso,
+  resamples = folds,
+  grid = grilla_lambda,
+  metrics = metric_set(rmse, rsq)
+)
+```
+
+:::{.callout-note}
+**Pista**: `wf_lasso`, `folds` y `grilla_lambda` ya están definidos. Solo hay que pasarlos en el orden correcto a `tune_grid()`.
+:::
+
+:::{.callout-tip}
+**Checkpoint**: deberían ver ~10 filas con `mean` (RMSE) entre 1.7 y 2.0 según el λ.
+:::
+
+[[Apéndice 2: Solución]{.button}](#sec:appendix02)
 :::
 
 ## Visualizar el tuning de LASSO
@@ -355,146 +316,160 @@ resultados_lasso |>
 ```{r}
 #| label: lasso-viz
 #| eval: true
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: 9
+#| fig-height: 4
 
-# Gráfico de RMSE vs. penalty
 autoplot(resultados_lasso) +
   scale_x_log10() +
   theme_minimal() +
-  labs(title = "Tuning de LASSO: RMSE vs. penalty (λ)")
+  labs(title = "RMSE vs. λ (escala log)")
 ```
+
+- La curva suele tener forma de **U**: λ muy bajo → poca regularización (sobreajuste); λ muy alto → demasiada (subajuste)
+- El mínimo de la curva es el λ óptimo según CV
+- En el próximo ejercicio lo seleccionan y ajustan el modelo final
 :::
 
-## Ejercicio 1: Efecto del λ en la selección {#sec:exercise01}
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-**Instrucciones:**
-
-1. Ajustar LASSO con varios valores de λ: 0.001, 0.01, 0.1, 0.5 y 1
-2. Contar cuántas variables se eliminan en cada caso
-3. ¿Qué pasa con un λ muy grande? ¿Y con uno muy pequeño?
-
-*Pista:* usen `map_df()` con una función que ajuste el workflow para cada lambda y cuente los coeficientes iguales a cero con `tidy()`.
-
-[Tómense 5 minutos para experimentar.]{.alert}
-
-[[Apéndice 1: Solución]{.button}](#sec:appendix01)
-:::
-
-## Seleccionar λ y ajustar LASSO final
+## Ejercicio 3: Seleccionar λ y ajustar final {#sec:exercise03}
 
 :::{style="margin-top: 30px; font-size: 18px;"}
 
+**Tarea (7 min):** seleccionen el mejor λ, ajusten LASSO con todos los datos de train, y vean los coeficientes.
+
 ```{r}
-#| label: lasso-final
-#| eval: true
+#| label: ej3-skeleton
+#| eval: false
 
-# λ mínimo vs. λ 1SE (modelo más simple dentro de 1 error estándar)
-lambda_min <- select_best(resultados_lasso, metric = "rmse")
-lambda_1se <- select_by_one_std_err(resultados_lasso, metric = "rmse",
-                                    desc(penalty))
+# 1. Seleccionar el λ con menor RMSE
+lambda_min <- select_best(___, metric = ___)       # TODO: resultados y métrica
+lambda_min
 
-cat("Lambda mínimo:", lambda_min$penalty,
-    " | Lambda 1SE:", lambda_1se$penalty, "\n")
+# 2. Finalizar el workflow con ese λ y ajustar
+wf_lasso_final <- finalize_workflow(___, lambda_min)  # TODO: ¿qué workflow?
+ajuste_lasso   <- fit(___, data = datos_train)         # TODO: el workflow finalizado
 
-# Usamos lambda mínimo y ajustamos con todo el training
-wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
-ajuste_lasso <- fit(wf_lasso_final, data = datos_train)
-
-# Coeficientes y variables eliminadas
+# 3. Ver coeficientes y contar variables eliminadas
 coef_lasso <- tidy(ajuste_lasso) |>
   filter(term != "(Intercept)") |>
   arrange(desc(abs(estimate)))
 
-coef_lasso
-cat("\nVariables eliminadas:", sum(coef_lasso$estimate == 0),
-    "de", nrow(coef_lasso))
+cat("Variables eliminadas (coef = 0):",
+    sum(coef_lasso$estimate == 0), "de", nrow(coef_lasso), "\n")
+coef_lasso |> head(8)
 ```
+
+```{r}
+#| label: ej3-hidden
+#| include: false
+
+lambda_min     <- select_best(resultados_lasso, metric = "rmse")
+wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
+ajuste_lasso   <- fit(wf_lasso_final, data = datos_train)
+
+# Coeficientes (para mostrar en Apéndice 3)
+coef_lasso <- tidy(ajuste_lasso) |>
+  filter(term != "(Intercept)") |>
+  arrange(desc(abs(estimate)))
+
+# Predicciones en test (para usar en Ejercicio 5)
+pred_lasso     <- predict(ajuste_lasso, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+metricas_lasso <- pred_lasso |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+```
+
+:::{.callout-note}
+**Pista**: `select_best()` recibe el objeto `resultados_lasso` y el nombre de la métrica como string (entre comillas: `"rmse"`).
+:::
+
+:::{.callout-tip}
+**Checkpoint**: con λ entre 0.003 y 0.01, deberían ver 1-3 variables con coeficiente exactamente 0 (eliminadas por LASSO).
+:::
+
+[[Apéndice 3: Solución]{.button}](#sec:appendix03)
 :::
 
 ## Comparar coeficientes OLS vs. LASSO
 
-:::{style="margin-top: 30px; font-size: 18px;"}
+:::{style="margin-top: 30px; font-size: 19px;"}
 
 ```{r}
 #| label: comparar-coef
 #| eval: true
 #| fig-width: 10
-#| fig-height: 5
+#| fig-height: 4
 
-# Extraer coeficientes de ambos
-coef_ols <- tidy(ajuste_ols) |>
-  filter(term != "(Intercept)") |>
-  select(term, estimate_ols = estimate)
+coef_ols  <- tidy(ajuste_ols)   |> filter(term != "(Intercept)") |>
+             select(term, OLS   = estimate)
+coef_lasc <- tidy(ajuste_lasso) |> filter(term != "(Intercept)") |>
+             select(term, LASSO = estimate)
 
-coef_lasso_comp <- tidy(ajuste_lasso) |>
-  filter(term != "(Intercept)") |>
-  select(term, estimate_lasso = estimate)
-
-# Combinar
-comparacion <- left_join(coef_ols, coef_lasso_comp, by = "term") |>
-  pivot_longer(cols = starts_with("estimate"),
-               names_to = "modelo", values_to = "coef") |>
-  mutate(modelo = ifelse(modelo == "estimate_ols", "OLS", "LASSO"))
-
-# Visualizar
-ggplot(comparacion, aes(x = reorder(term, abs(coef)), y = coef, fill = modelo)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
+left_join(coef_ols, coef_lasc, by = "term") |>
+  pivot_longer(c(OLS, LASSO), names_to = "modelo", values_to = "coef") |>
+  ggplot(aes(x = reorder(term, abs(coef)), y = coef, fill = modelo)) +
+  geom_col(position = "dodge") + coord_flip() +
   scale_fill_manual(values = c("OLS" = "#3498DB", "LASSO" = "#E74C3C")) +
-  labs(title = "Comparación de coeficientes: OLS vs. LASSO",
-       x = "Variable", y = "Coeficiente (normalizado)") +
+  labs(title = "Coeficientes: OLS vs. LASSO",
+       x = NULL, y = "Coeficiente (normalizado)") +
   theme_minimal()
 ```
+
+- LASSO encoge coeficientes hacia cero (algunos exactamente cero)
+- OLS los deja todos sin restricción
 :::
 
-## Evaluar LASSO en test
+# Parte 4: Ridge por analogía {background-color="#2d4563"}
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+## Ejercicio 4: Implementar Ridge por analogía {#sec:exercise04}
+
+:::{style="margin-top: 30px; font-size: 17px;"}
+
+**Tarea (8 min):** repitan TODO el pipeline de LASSO pero con `mixture = 0` (Ridge).
 
 ```{r}
-#| label: evaluar-lasso
-#| eval: true
+#| label: ej4-skeleton
+#| eval: false
 
-# Predicciones
-pred_lasso <- predict(ajuste_lasso, datos_test) |>
+# 1. Modelo Ridge: igual que LASSO pero mixture = 0
+modelo_ridge <- linear_reg(penalty = tune(), mixture = ___) |>  # TODO: ¿qué valor?
+  set_engine("glmnet") |>
+  set_mode("regression")
+
+# 2. Workflow + tuning (reutilizamos folds y grilla)
+wf_ridge <- workflow() |> add_recipe(receta) |> add_model(modelo_ridge)
+
+resultados_ridge <- tune_grid(
+  ___, resamples = folds, grid = grilla_lambda,    # TODO: ¿qué workflow?
+  metrics = metric_set(rmse)
+)
+
+# 3. Seleccionar mejor λ, finalizar, ajustar
+lambda_ridge <- select_best(___, metric = "rmse")  # TODO: ¿qué resultados?
+ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
+  fit(data = datos_train)
+
+# 4. Evaluar en test
+pred_ridge     <- predict(ajuste_ridge, datos_test) |>
   bind_cols(datos_test |> select(satisfaccion_vida))
-
-# Métricas
-metricas_lasso <- pred_lasso |>
+metricas_ridge <- pred_ridge |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 
-# Comparar con OLS
-cat("OLS:\n")
-print(metricas_ols)
-cat("\nLASSO:\n")
-print(metricas_lasso)
+# 5. Contar variables eliminadas (debería ser 0!)
+cat("Variables eliminadas en Ridge:",
+    sum(tidy(ajuste_ridge)$estimate[-1] == 0), "\n")
+metricas_ridge
 ```
-:::
-
-# Parte 3: Ridge y cierre {background-color="#2d4563"}
-
-## Ridge regression
-
-:::{style="margin-top: 30px; font-size: 18px;"}
 
 ```{r}
-#| label: ridge
-#| eval: true
-#| cache: true
+#| label: ej4-hidden
+#| include: false
 
-# Ridge: mixture = 0 (LASSO usa mixture = 1)
 modelo_ridge <- linear_reg(penalty = tune(), mixture = 0) |>
   set_engine("glmnet") |>
   set_mode("regression")
 
-wf_ridge <- workflow() |>
-  add_recipe(receta) |>
-  add_model(modelo_ridge)
+wf_ridge <- workflow() |> add_recipe(receta) |> add_model(modelo_ridge)
 
-# Reutilizamos los folds y la grilla de lambda de LASSO
 resultados_ridge <- tune_grid(
   wf_ridge, resamples = folds, grid = grilla_lambda,
   metrics = metric_set(rmse)
@@ -504,36 +479,323 @@ lambda_ridge <- select_best(resultados_ridge, metric = "rmse")
 ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
   fit(data = datos_train)
 
-# Predicciones y métricas en test
-pred_ridge <- predict(ajuste_ridge, datos_test) |>
+pred_ridge     <- predict(ajuste_ridge, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
+metricas_ridge <- pred_ridge |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+```
+
+:::{.callout-note}
+**Pista**: el único cambio respecto a LASSO es `mixture = 0`. Todo el resto sigue exactamente el mismo patrón.
+:::
+
+:::{.callout-tip}
+**Checkpoint**: Ridge debería eliminar **0 variables** (puede mostrar valores como `1e-10`, que son prácticamente cero pero no exactos). RMSE similar a LASSO (~1.7-2.0).
+:::
+
+[[Apéndice 4: Solución]{.button}](#sec:appendix04)
+:::
+
+## LASSO selecciona, Ridge encoge
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**LASSO (L1)**
+
+- Penaliza la suma de [valores absolutos]{.alert}
+- Reduce algunos coeficientes a [exactamente cero]{.alert}
+- Hace [selección automática]{.alert} de variables
+- Útil cuando solo algunas variables importan
+:::
+
+:::{.column width=50%}
+**Ridge (L2)**
+
+- Penaliza la suma de [cuadrados]{.alert}
+- Reduce todos los coeficientes pero ninguno a cero exacto
+- [Mantiene todas las variables]{.alert}
+- Útil con variables correlacionadas (multicolinealidad)
+:::
+:::
+
+<br>
+
+[Geométricamente: la "bola" de L1 tiene esquinas que tocan los ejes (coeficiente = 0); la "bola" de L2 es lisa y nunca toca exactamente un eje.]{.alert}
+
+Para una versión intermedia (Elastic Net), ver [[Apéndice 7]{.button}](#sec:appendix07).
+:::
+
+# Parte 5: Comparación final {background-color="#2d4563"}
+
+## Ejercicio 5: Tabla comparativa {#sec:exercise05}
+
+:::{style="margin-top: 30px; font-size: 19px;"}
+
+**Tarea (5 min):** combinen las métricas de los 3 modelos en una tabla comparativa.
+
+```{r}
+#| label: ej5-skeleton
+#| eval: false
+
+# Combinar los 3 objetos de métricas (ya creados en los ejercicios anteriores)
+tabla_final <- bind_rows(
+  metricas_ols   |> mutate(modelo = ___),    # TODO: nombre del modelo
+  metricas_lasso |> mutate(modelo = ___),    # TODO
+  metricas_ridge |> mutate(modelo = ___)     # TODO
+) |>
+  select(modelo, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  arrange(___)                               # TODO: ordenar por rmse (menor = mejor)
+
+tabla_final
+```
+
+```{r}
+#| label: ej5-hidden
+#| include: false
+
+tabla_final <- bind_rows(
+  metricas_ols   |> mutate(modelo = "OLS"),
+  metricas_lasso |> mutate(modelo = "LASSO"),
+  metricas_ridge |> mutate(modelo = "Ridge")
+) |>
+  select(modelo, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  arrange(rmse)
+```
+
+:::{.callout-note}
+**Pista**: los nombres de modelos van entre comillas (strings: `"OLS"`, etc.). Para ordenar de menor a mayor RMSE, basta con `arrange(rmse)`.
+:::
+
+:::{.callout-tip}
+**Checkpoint**: deberían ver una tabla de 3 filas y 4 columnas (modelo, rmse, rsq, mae). Las diferencias entre los 3 modelos suelen ser pequeñas con este dataset.
+:::
+
+[[Apéndice 5: Solución]{.button}](#sec:appendix05)
+:::
+
+# Cierre {background-color="#2d4563"}
+
+## Discusión y resumen
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que practicaron hoy:**
+
+1. Evaluar OLS en test
+2. Tunear LASSO con CV
+3. Seleccionar y finalizar un modelo
+4. Implementar Ridge por analogía
+5. Construir tabla comparativa
+:::
+
+:::{.column width=50%}
+**Conceptos clave:**
+
+- `mixture = 1` → [LASSO]{.alert} (selecciona)
+- `mixture = 0` → [Ridge]{.alert} (encoge)
+- `tune()` + `tune_grid()` para CV
+- `select_best()` + `finalize_workflow()` para fijar λ
+- En este dataset las diferencias entre OLS/LASSO/Ridge son [marginales]{.alert}
+:::
+:::
+
+<br>
+
+[¿Por qué tan marginales? Porque las relaciones son aproximadamente lineales y el ratio n/p no es extremo. La regularización brilla cuando p ≫ n o hay colinealidad fuerte.]{.alert}
+
+Para llevarse a casa: en el [[Apéndice 6]{.button}](#sec:appendix06) apliquen todo el pipeline a un outcome diferente (`satisfaccion_democracia`).
+:::
+
+# Apéndice: Soluciones {background-color="#2d4563"}
+
+## Apéndice 1: Solución Ejercicio 1 {#sec:appendix01}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r}
+#| label: ap1-sol
+#| eval: false
+
+# Evaluar OLS en test
+pred_ols <- predict(ajuste_ols, datos_test) |>
   bind_cols(datos_test |> select(satisfaccion_vida))
 
+metricas_ols <- pred_ols |>
+  metrics(truth = satisfaccion_vida, estimate = .pred)
+
+metricas_ols
+```
+
+**Resultado:**
+
+```{r}
+#| label: ap1-display
+#| echo: false
+#| eval: true
+
+metricas_ols |> knitr::kable(digits = 3)
+```
+
+- RMSE ≈ 1.85 — en promedio la predicción se aleja de la realidad en menos de 2 puntos (escala 1-10)
+- R² ≈ 0.18 — el modelo explica ~18% de la varianza de la satisfacción
+
+[[Volver al ejercicio]{.button}](#sec:exercise01)
+:::
+
+## Apéndice 2: Solución Ejercicio 2 {#sec:appendix02}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r}
+#| label: ap2-sol
+#| eval: false
+
+# Crear folds (10-fold CV)
+folds <- vfold_cv(datos_train, v = 10)
+
+# Tuning de LASSO sobre la grilla
+resultados_lasso <- tune_grid(
+  wf_lasso,
+  resamples = folds,
+  grid = grilla_lambda,
+  metrics = metric_set(rmse, rsq)
+)
+
+# Top 5 mejores λ por RMSE
+resultados_lasso |>
+  collect_metrics() |>
+  filter(.metric == "rmse") |>
+  arrange(mean) |>
+  head(5)
+```
+
+**Resultado (top 5 mejores λ):**
+
+```{r}
+#| label: ap2-display
+#| echo: false
+#| eval: true
+
+resultados_lasso |>
+  collect_metrics() |>
+  filter(.metric == "rmse") |>
+  arrange(mean) |>
+  head(5) |>
+  knitr::kable(digits = 4)
+```
+
+- `mean` es el RMSE promedio sobre los 10 folds
+- `std_err` indica cuánto varía entre folds (menor = más estable)
+
+[[Volver al ejercicio]{.button}](#sec:exercise02)
+:::
+
+## Apéndice 3: Solución Ejercicio 3 {#sec:appendix03}
+
+:::{style="margin-top: 20px; font-size: 19px;"}
+
+```{r}
+#| label: ap3-sol
+#| eval: false
+
+# 1. Seleccionar mejor λ
+lambda_min <- select_best(resultados_lasso, metric = "rmse")
+
+# 2. Finalizar y ajustar
+wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
+ajuste_lasso   <- fit(wf_lasso_final, data = datos_train)
+
+# 3. Coeficientes
+coef_lasso <- tidy(ajuste_lasso) |>
+  filter(term != "(Intercept)") |>
+  arrange(desc(abs(estimate)))
+
+cat("Variables eliminadas:", sum(coef_lasso$estimate == 0),
+    "de", nrow(coef_lasso), "\n")
+coef_lasso
+```
+
+**Top coeficientes (no nulos):**
+
+```{r}
+#| label: ap3-display
+#| echo: false
+#| eval: true
+
+coef_lasso |> head(10) |> knitr::kable(digits = 3)
+```
+
+- Las variables con `estimate == 0` fueron eliminadas por LASSO
+- Una alternativa: usar `select_by_one_std_err()` para un modelo más parsimonioso (sacrifica un poco de rendimiento por simplicidad)
+
+[[Volver al ejercicio]{.button}](#sec:exercise03)
+:::
+
+## Apéndice 4: Solución Ejercicio 4 {#sec:appendix04}
+
+:::{style="margin-top: 20px; font-size: 18px;"}
+
+```{r}
+#| label: ap4-sol
+#| eval: false
+
+# Cambio único: mixture = 0 (Ridge en vez de LASSO)
+modelo_ridge <- linear_reg(penalty = tune(), mixture = 0) |>
+  set_engine("glmnet") |>
+  set_mode("regression")
+
+wf_ridge <- workflow() |> add_recipe(receta) |> add_model(modelo_ridge)
+
+resultados_ridge <- tune_grid(
+  wf_ridge, resamples = folds, grid = grilla_lambda,
+  metrics = metric_set(rmse)
+)
+
+lambda_ridge <- select_best(resultados_ridge, metric = "rmse")
+ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
+  fit(data = datos_train)
+
+pred_ridge     <- predict(ajuste_ridge, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida))
 metricas_ridge <- pred_ridge |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 
-# Ridge nunca elimina variables (coefs se achican, no se anulan)
-cat("Variables con coef = 0 en Ridge:",
-    sum(tidy(ajuste_ridge)$estimate[-1] == 0), "\n\n")
+cat("Variables eliminadas en Ridge:",
+    sum(tidy(ajuste_ridge)$estimate[-1] == 0), "\n")
 metricas_ridge
 ```
 
-- LASSO [selecciona]{.alert} (achica y anula); Ridge [encoge]{.alert} todos los coeficientes
-- Para una versión intermedia (Elastic Net), ver [Apéndice 4](#sec:appendix04)
-:::
-
-# Parte 4: Comparación final {background-color="#2d4563"}
-
-## Tabla comparativa en test
-
-:::{style="margin-top: 30px; font-size: 20px;"}
+**Métricas de Ridge en test:**
 
 ```{r}
-#| label: tabla-final
+#| label: ap4-display
+#| echo: false
 #| eval: true
 
-# Combinar métricas de los tres modelos lineales
-tabla_comparacion <- bind_rows(
-  metricas_ols |> mutate(modelo = "OLS"),
+metricas_ridge |> knitr::kable(digits = 3)
+```
+
+- Ridge nunca elimina variables — solo las encoge
+- Si ven valores como `1e-10`, son numéricamente "cero" pero no exactamente
+- RMSE similar al de LASSO en este dataset
+
+[[Volver al ejercicio]{.button}](#sec:exercise04)
+:::
+
+## Apéndice 5: Solución Ejercicio 5 {#sec:appendix05}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r}
+#| label: ap5-sol
+#| eval: false
+
+tabla_final <- bind_rows(
+  metricas_ols   |> mutate(modelo = "OLS"),
   metricas_lasso |> mutate(modelo = "LASSO"),
   metricas_ridge |> mutate(modelo = "Ridge")
 ) |>
@@ -541,238 +803,87 @@ tabla_comparacion <- bind_rows(
   pivot_wider(names_from = .metric, values_from = .estimate) |>
   arrange(rmse)
 
-tabla_comparacion
+tabla_final
 ```
 
-<br>
-
-:::{.callout-note}
-Random Forest y Elastic Net están en los apéndices con código listo para correr en casa. En nuestras pruebas, RF reduce el RMSE ~0.15 puntos; Elastic Net se parece mucho a LASSO.
-:::
-:::
-
-## Visualización de predicciones
-
-:::{style="margin-top: 30px; font-size: 18px;"}
+**Tabla comparativa final:**
 
 ```{r}
-#| label: viz-pred
+#| label: ap5-display
+#| echo: false
 #| eval: true
-#| fig-width: 12
-#| fig-height: 4.5
 
-# Combinar predicciones de los tres modelos lineales
-todas_pred <- bind_rows(
-  pred_ols |> mutate(modelo = "OLS"),
-  pred_lasso |> mutate(modelo = "LASSO"),
-  pred_ridge |> mutate(modelo = "Ridge")
-)
-
-ggplot(todas_pred, aes(x = satisfaccion_vida, y = .pred)) +
-  geom_point(alpha = 0.4, color = "#2d4563") +
-  geom_abline(color = "red", linetype = "dashed") +
-  facet_wrap(~modelo, nrow = 1) +
-  labs(title = "Predicciones vs. valores reales",
-       x = "Satisfacción real", y = "Satisfacción predicha") +
-  theme_minimal()
-```
-:::
-
-## Discusión: ¿Qué modelo elegir?
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=50%}
-**Observaciones:**
-
-- Los tres modelos lineales dan resultados muy similares
-- LASSO eliminó algunas variables sin perder RMSE
-- La mejora de regularización sobre OLS es [marginal]{.alert}
-
-**¿Por qué?**
-
-- El dataset tiene relaciones aproximadamente lineales
-- No hay muchas variables irrelevantes
-- n/p no es extremo
-:::
-
-:::{.column width=50%}
-**Recomendación:**
-
-- Si quiero [interpretabilidad]{.alert}: OLS o LASSO
-- Si quiero [selección de variables]{.alert}: LASSO
-- Si quiero [mejor predicción]{.alert}: ver Random Forest en el [Apéndice 5](#sec:appendix05)
-
-<br>
-
-[En este caso, OLS y LASSO dan casi el mismo error. La regularización brilla cuando p/n es grande o hay colinealidad fuerte.]{.alert}
-:::
-:::
-:::
-
-## Resumen del laboratorio
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=50%}
-**Lo que practicamos:**
-
-- Regularización con LASSO y Ridge
-- Tuning de λ con CV
-- Comparación con OLS en test
-- Interpretación de coeficientes
-:::
-
-:::{.column width=50%}
-**Conceptos clave:**
-
-- [mixture = 1]{.alert}: LASSO (selecciona)
-- [mixture = 0]{.alert}: Ridge (reduce)
-- [Validación cruzada]{.alert} para elegir λ
-- [λ 1SE]{.alert} para modelos más simples
-- Apéndices: Elastic Net, Random Forest, ejercicios extra
-:::
-:::
-
-<br>
-
-[En el próximo día veremos aprendizaje no supervisado y análisis de texto.]{.alert}
-:::
-
-# Apéndice: Soluciones {background-color="#2d4563"}
-
-## Apéndice 1: Efecto del λ {#sec:appendix01}
-
-:::{style="margin-top: 20px; font-size: 20px;"}
-
-```{r ap1-sol, prompt=FALSE, echo=TRUE, eval=TRUE}
-# Probar varios valores de lambda
-lambdas <- c(0.001, 0.01, 0.1, 0.5, 1)
-
-# Para cada lambda, ajustar y contar variables eliminadas
-resultados_lambda <- map_df(lambdas, function(l) {
-  modelo <- linear_reg(penalty = l, mixture = 1) |>
-    set_engine("glmnet") |>
-    set_mode("regression")
-
-  ajuste <- workflow() |>
-    add_recipe(receta) |>
-    add_model(modelo) |>
-    fit(data = datos_train)
-
-  coefs <- tidy(ajuste) |> filter(term != "(Intercept)")
-  n_eliminadas <- sum(coefs$estimate == 0)
-  tibble(lambda = l, vars_eliminadas = n_eliminadas, vars_total = nrow(coefs))
-})
-
-resultados_lambda
+tabla_final |> knitr::kable(digits = 3)
 ```
 
-- Con [λ muy pequeño]{.alert} (0.001), LASSO se comporta casi como OLS: no elimina variables
-- Con [λ muy grande]{.alert} (1), LASSO elimina la mayoría o todas las variables
-- El λ óptimo balancea entre sesgo (simplificación) y varianza (sobreajuste)
+- Los 3 modelos producen RMSE muy similares en este dataset
+- LASSO selecciona variables; Ridge las encoge; OLS no penaliza
+- La elección depende del objetivo: [interpretabilidad]{.alert} (OLS o LASSO) vs [mejor predicción]{.alert} (suele ser Ridge o Elastic Net)
 
-[[Volver al ejercicio]{.button}](#sec:exercise01)
+[[Volver al ejercicio]{.button}](#sec:exercise05)
 :::
 
-## Apéndice 2: Interacciones {#sec:appendix02}
+## Apéndice 6: Capstone — outcome diferente {#sec:appendix06}
 
-:::{style="margin-top: 20px; font-size: 20px;"}
+:::{style="margin-top: 20px; font-size: 17px;"}
 
-```{r ap2-sol, prompt=FALSE, echo=TRUE, eval=TRUE}
-# Receta con interacciones
-receta_interact <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
-                 zona + genero + confianza_gobierno + confianza_justicia +
-                 satisfaccion_democracia + percepcion_economia +
-                 uso_internet + interes_politica,
-                 data = datos_train) |>
-  step_dummy(all_nominal_predictors()) |>
-  step_interact(terms = ~ edad:educacion_anios) |>
-  step_normalize(all_numeric_predictors()) |>
-  step_zv(all_predictors())
+**Para llevarse a casa:** apliquen todo el pipeline a `satisfaccion_democracia` (escala 1-5). ¿Cómo cambian los resultados?
 
-# Ajustar LASSO con la receta de interacciones
-wf_lasso_interact <- workflow() |>
-  add_recipe(receta_interact) |>
-  add_model(modelo_lasso)
+```{r}
+#| label: ap6-sol
+#| eval: false
 
-resultados_interact <- tune_grid(
-  wf_lasso_interact, resamples = folds,
-  grid = grilla_lambda, metrics = metric_set(rmse)
-)
-
-# Mejor lambda y modelo final
-mejor_interact <- select_best(resultados_interact, metric = "rmse")
-ajuste_interact <- finalize_workflow(wf_lasso_interact, mejor_interact) |>
-  fit(data = datos_train)
-
-# ¿La interaccion sobrevive?
-tidy(ajuste_interact) |>
-  filter(term != "(Intercept)") |>
-  arrange(desc(abs(estimate)))
-```
-
-- Si la interacción tiene [coeficiente distinto de cero]{.alert}, LASSO la considera útil
-- La mejora en RMSE suele ser pequeña porque la relación edad-educación ya se captura parcialmente por separado
-- Agregar interacciones aumenta el número de predictores, lo que da más trabajo al regularizador
-:::
-
-## Apéndice 3: Países {#sec:appendix03}
-
-:::{style="margin-top: 20px; font-size: 20px;"}
-
-```{r ap3-sol, prompt=FALSE, echo=TRUE, eval=TRUE}
-# Receta que incluye pais
-receta_pais <- recipe(satisfaccion_vida ~ ., data = datos_train) |>
-  step_rm(voto) |>
+# 1. Nueva receta para predecir satisfaccion_democracia
+receta_dem <- recipe(satisfaccion_democracia ~ ., data = datos_train) |>
+  step_rm(pais, voto, satisfaccion_vida) |>      # excluir outcomes ajenos
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())
 
-# Ajustar LASSO
-wf_lasso_pais <- workflow() |>
-  add_recipe(receta_pais) |>
-  add_model(modelo_lasso)
+# 2. LASSO con la nueva receta (mismo patrón)
+wf_lasso_dem <- workflow() |> add_recipe(receta_dem) |> add_model(modelo_lasso)
 
-resultados_pais <- tune_grid(
-  wf_lasso_pais, resamples = folds,
-  grid = grilla_lambda, metrics = metric_set(rmse)
+resultados_dem <- tune_grid(
+  wf_lasso_dem, resamples = folds, grid = grilla_lambda,
+  metrics = metric_set(rmse, rsq)
 )
 
-mejor_pais <- select_best(resultados_pais, metric = "rmse")
-ajuste_pais <- finalize_workflow(wf_lasso_pais, mejor_pais) |>
+lambda_dem  <- select_best(resultados_dem, metric = "rmse")
+ajuste_dem  <- finalize_workflow(wf_lasso_dem, lambda_dem) |>
   fit(data = datos_train)
 
-# ¿Qué países sobreviven?
-coef_pais <- tidy(ajuste_pais) |>
-  filter(str_detect(term, "pais"), estimate != 0) |>
-  arrange(desc(abs(estimate)))
+# 3. Evaluación
+pred_dem <- predict(ajuste_dem, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_democracia))
 
-cat("Países con coeficiente distinto de cero:", nrow(coef_pais), "\n")
-coef_pais
+pred_dem |> metrics(truth = satisfaccion_democracia, estimate = .pred)
 ```
 
-- LASSO [selecciona automáticamente]{.alert} los países que aportan información predictiva
-- Con muchas dummies de país, la regularización es más útil que en el modelo base
-- Los países con coeficientes positivos tienen mayor satisfacción (controlando por las otras variables)
+Preguntas para reflexionar:
+
+- ¿Las mismas variables son predictivas, o cambian?
+- ¿El RMSE es mayor o menor que para `satisfaccion_vida`?
+- Pueden repetir con `percepcion_economia` como tercer outcome
 :::
 
-## Apéndice 4: Elastic Net {#sec:appendix04}
+## Apéndice 7: Elastic Net (opcional) {#sec:appendix07}
 
 :::{style="margin-top: 20px; font-size: 18px;"}
 
-```{r ap4-enet, prompt=FALSE, echo=TRUE, eval=TRUE, cache=TRUE}
-# Elastic Net: combina L1 (LASSO) y L2 (Ridge)
-# Ajustamos penalty y mixture simultáneamente
+Elastic Net combina LASSO y Ridge: `mixture` entre 0 y 1.
+
+```{r}
+#| label: ap7-enet
+#| eval: false
+
+# Ajustar AMBOS hiperparámetros: penalty (λ) y mixture (α)
 modelo_enet <- linear_reg(penalty = tune(), mixture = tune()) |>
   set_engine("glmnet") |>
   set_mode("regression")
 
-wf_enet <- workflow() |>
-  add_recipe(receta) |>
-  add_model(modelo_enet)
+wf_enet <- workflow() |> add_recipe(receta) |> add_model(modelo_enet)
 
-# Grilla 2D: 15 lambdas x 5 valores de mixture
+# Grilla 2D: 15 valores de λ × 5 de mixture
 grilla_enet <- grid_regular(
   penalty(range = c(-4, 0)),
   mixture(range = c(0, 1)),
@@ -784,69 +895,20 @@ resultados_enet <- tune_grid(
   metrics = metric_set(rmse)
 )
 
-mejor_enet <- select_best(resultados_enet, metric = "rmse")
-mejor_enet
+mejor_enet  <- select_best(resultados_enet, metric = "rmse")
+mejor_enet  # vean el mixture óptimo
 
-# Ajustar modelo final
 ajuste_enet <- finalize_workflow(wf_enet, mejor_enet) |>
   fit(data = datos_train)
 
-pred_enet <- predict(ajuste_enet, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
-
-pred_enet |> metrics(truth = satisfaccion_vida, estimate = .pred)
-```
-
-- Elastic Net se sitúa entre LASSO (mixture = 1) y Ridge (mixture = 0)
-- Útil cuando hay [grupos de predictores correlacionados]{.alert}: LASSO tiende a elegir solo uno, Ridge los encoge a todos, Elastic Net captura un balance
-- En este dataset el RMSE queda casi idéntico al de LASSO; el método brilla con dimensiones mucho más altas
-:::
-
-## Apéndice 5: Random Forest para regresión {#sec:appendix05}
-
-:::{style="margin-top: 20px; font-size: 18px;"}
-
-```{r ap5-rf, prompt=FALSE, echo=TRUE, eval=TRUE, cache=TRUE}
-# Random Forest para regresión (mode = "regression")
-modelo_rf <- rand_forest(
-  trees = 500,
-  mtry = tune(),
-  min_n = tune()
-) |>
-  set_engine("ranger") |>
-  set_mode("regression")
-
-wf_rf <- workflow() |>
-  add_recipe(receta) |>
-  add_model(modelo_rf)
-
-grilla_rf <- grid_regular(
-  mtry(range = c(2, 8)),
-  min_n(range = c(5, 20)),
-  levels = c(4, 4)
-)
-
-resultados_rf <- tune_grid(
-  wf_rf, resamples = folds, grid = grilla_rf,
-  metrics = metric_set(rmse)
-)
-
-mejor_rf <- select_best(resultados_rf, metric = "rmse")
-ajuste_rf <- finalize_workflow(wf_rf, mejor_rf) |>
-  fit(data = datos_train)
-
-pred_rf <- predict(ajuste_rf, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
-
-metricas_rf <- pred_rf |>
+predict(ajuste_enet, datos_test) |>
+  bind_cols(datos_test |> select(satisfaccion_vida)) |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
-
-metricas_rf
 ```
 
-- RF [reduce el RMSE]{.alert} unas décimas frente a los modelos lineales
-- El costo es interpretabilidad: sin coeficientes, hay que usar VIP y PDP
-- En ciencias sociales, pesa la pregunta: ¿importa entender los coeficientes o predecir lo mejor posible?
+- Si `mixture` óptimo está cerca de 1 → LASSO ganó
+- Si está cerca de 0 → Ridge ganó
+- Si intermedio → Elastic Net mejora sobre ambos
 :::
 
 # Fin del día 2! 🤓 {background-color="#2d4563"}

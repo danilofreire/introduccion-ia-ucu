@@ -106,5 +106,17 @@
   },
   "referencia-texto.qmd": {
     "referencia-texto.html": "b2ad6d8e"
+  },
+  "clases/dia-02/05-clasificacion.qmd": {
+    "05-clasificacion.html": "db8215ca"
+  },
+  "clases/dia-02/06-regresion-prediccion.qmd": {
+    "06-regresion-prediccion.html": "93121d0e"
+  },
+  "clases/dia-02/07-laboratorio-03.qmd": {
+    "07-laboratorio-03.html": "05ce2b86"
+  },
+  "clases/dia-02/08-laboratorio-04.qmd": {
+    "08-laboratorio-04.html": "24c98428"
   }
 }

@@ -33,10 +33,10 @@ Las diapositivas de cada día se publicarán aquí a medida que avance el curso.
 [Sesión 2.2: Regresión y predicción. LASSO, Ridge, Elastic Net.]{.day-topics}
 
 ::: {.resource-links}
-[Sesión 2.1: Clasificación](clases/dia-02/03-clasificacion.html) |
-[Sesión 2.2: Regresión y predicción](clases/dia-02/04-regresion-prediccion.html) |
-[Lab 3: Clasificación avanzada](clases/dia-02/05-laboratorio-03.html) |
-[Lab 4: Regresión y regularización](clases/dia-02/06-laboratorio-04.html)
+[Sesión 2.1: Clasificación](clases/dia-02/05-clasificacion.html) |
+[Sesión 2.2: Regresión y predicción](clases/dia-02/06-regresion-prediccion.html) |
+[Lab 3: Clasificación avanzada](clases/dia-02/07-laboratorio-03.html) |
+[Lab 4: Regresión y regularización](clases/dia-02/08-laboratorio-04.html)
 :::
 :::
 

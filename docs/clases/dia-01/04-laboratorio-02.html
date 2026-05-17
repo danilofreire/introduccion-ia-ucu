@@ -1619,7 +1619,7 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <span id="cb14-4"><a></a>    <span class="at">educacion_alta =</span> <span class="fu">if_else</span>(educacion_anos <span class="sc">&gt;</span> <span class="dv">12</span>, <span class="st">&quot;alta&quot;</span>, <span class="st">&quot;baja&quot;</span>)</span>
 <span id="cb14-5"><a></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><span class="alert">Tómense 5 minutos.</span></p>
+<p><span class="alert">Tómense 3-5 minutos!</span></p>
 <p><a href="#/sec:appendix05"><span class="button">Más ejemplos en el Apéndice 5</span></a></p>
 </div>
 </section>
@@ -1683,7 +1683,7 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <span id="cb18-3"><a></a>                               confianza_gobierno <span class="sc">+</span> consumo_noticias <span class="sc">+</span></span>
 <span id="cb18-4"><a></a>                               participacion_politica <span class="sc">+</span> zona</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Más adelante añadiremos una variable derivada para ver si mejora el ajuste.</p>
+<p>Más adelante añadiremos una variable derivada para ver si mejora el ajuste</p>
 </div>
 </section>
 <section id="función-para-evaluar-un-modelo" class="slide level2">
@@ -1694,7 +1694,7 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>evaluar_modelo <span class="ot">&lt;-</span> <span class="cf">function</span>(modelo, formula, folds, <span class="at">nombre =</span> <span class="st">&quot;modelo&quot;</span>) {</span>
 <span id="cb19-2"><a></a>  <span class="co"># 1. fit_resamples ajusta el modelo en cada fold de la validación cruzada</span></span>
 <span id="cb19-3"><a></a>  resultados <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb19-4"><a></a>    modelo,</span>
+<span id="cb19-4"><a></a>    modelo, </span>
 <span id="cb19-5"><a></a>    formula,</span>
 <span id="cb19-6"><a></a>    <span class="at">resamples =</span> folds,</span>
 <span id="cb19-7"><a></a>    <span class="at">metrics  =</span> <span class="fu">metric_set</span>(accuracy, precision, recall, roc_auc),  <span class="co"># 2. métricas que queremos</span></span>
@@ -1721,7 +1721,7 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 </div>
 </div>
 </section>
-<section id="evaluar-todos-los-modelos" class="slide level2">
+<section id="sec:evaluar-todos" class="slide level2">
 <h2>Evaluar todos los modelos</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
@@ -1751,7 +1751,7 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <section id="sec:exercise04" class="slide level2 scrollable">
 <h2>Ejercicio 3: ¿Ayuda el feature engineering?</h2>
 <div style="margin-top: 30px; font-size: 24px;">
-<p><strong>Tarea:</strong> Agreguen <span class="alert">la variable derivada que crearon antes</span> a la fórmula y re-evalúen.</p>
+<p><strong>Tarea:</strong> Agreguen <span class="alert">la variable derivada que crearon antes</span> a la fórmula y re-evalúen</p>
 <ol type="1">
 <li>¿Mejora la regresión logística? ¿Y el árbol?</li>
 <li>¿Cuál de los dos modelos es más sensible al feature nuevo?</li>
@@ -1767,7 +1767,7 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <span id="cb24-8"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) <span class="sc">|&gt;</span></span>
 <span id="cb24-9"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;accuracy&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(modelo, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><span class="alert">Tómense 10 minutos.</span></p>
+<p><span class="alert">Tómense 5 minutos!</span></p>
 <p><a href="#/sec:appendix06"><span class="button">Ir al Apéndice 6</span></a></p>
 </div>
 </section>
@@ -1811,14 +1811,16 @@ $ satisfecho             &lt;fct&gt; si, si, no, si, si, no, si, si, si, no, si,
 <section id="tarea-para-casa" class="slide level2">
 <h2>Tarea para casa</h2>
 <div style="margin-top: 30px; font-size: 24px;">
-<p>Hay una <span class="alert">tarea para esta sesión</span> con preguntas prácticas que aplican todo lo que vimos hoy.</p>
+<p>Hay una <span class="alert">tarea para las dos sesiones</span> con preguntas prácticas que aplican todo lo que vimos hoy.</p>
 <ul>
 <li>Página de <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">Laboratorios</a> del sitio del curso</li>
+<li><a href="https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-01.html">Tarea 1</a></li>
+<li><a href="https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-01-respuestas.html">Respuestas Tarea 1</a></li>
 <li><a href="https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-02.html">Tarea 2</a></li>
 <li><a href="https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/tarea-02-respuestas.html">Respuestas Tarea 2</a></li>
 </ul>
 <p><br></p>
-<p><span class="alert">Hagan la tarea antes de la próxima clase. Las respuestas ya están disponibles para que verifiquen su trabajo.</span></p>
+<p><span class="alert">Las respuestas ya están disponibles para que verifiquen su trabajo</span> 😉</p>
 </div>
 </section></section>
 <section>
@@ -2296,6 +2298,7 @@ participacion_politica                   zona                 genero
 <li>Las barras muestran la media de cada métrica; las líneas verticales son el error estándar (variabilidad entre folds)</li>
 <li>Si las barras de error se superponen, la diferencia entre modelos no es robusta: probablemente no podamos decir cuál es “mejor” con confianza</li>
 </ul>
+<p><span class="button">Volver a la comparación numérica</span>](#sec:evaluar-todos)</p>
 </div>
 
 
