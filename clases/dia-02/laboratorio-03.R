@@ -64,11 +64,8 @@ prop.table(table(datos_test$voto))
 
 # --- Preprocesamiento con recipes ---------------------------
 
-receta <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +
-                 genero + confianza_gobierno + confianza_justicia +
-                 satisfaccion_democracia + percepcion_economia +
-                 uso_internet + interes_politica,
-                 data = datos_train) |>
+receta <- recipe(voto ~ ., data = datos_train) |>
+  step_rm(pais, satisfaccion_vida) |>          # excluir alta cardinalidad y outcome del Lab 4
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())
@@ -104,9 +101,18 @@ conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
   labs(title = "Matriz de confusión - Regresión logística")
 
 
-# --- Apéndice 1: Threshold óptimo (solución) ----------------
+# --- Ejercicio 1 + Apéndice 1: Threshold óptimo ------------
 
-# Probar thresholds de 0.3 a 0.7 y guardar los resultados
+# Versión simple (3 thresholds) — como aparece en la diapositiva del ejercicio
+for (t in c(0.3, 0.5, 0.7)) {
+  pred_nuevo <- pred_logit |>
+    mutate(.pred_class_nuevo = factor(
+      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
+  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
+  cat("Threshold", t, "→ F1 =", round(f1$.estimate, 3), "\n")
+}
+
+# Versión extendida (barrido fino) — del Apéndice 1
 thresholds <- seq(0.3, 0.7, by = 0.05)
 resultados <- data.frame(threshold = numeric(), f1 = numeric())
 
@@ -115,21 +121,18 @@ for (t in thresholds) {
     mutate(.pred_class_nuevo = factor(
       ifelse(.pred_si > t, "si", "no"),
       levels = c("si", "no")))
-
   f1 <- f_meas(pred_nuevo, truth = voto,
                estimate = .pred_class_nuevo)
   resultados <- rbind(resultados,
                       data.frame(threshold = t, f1 = f1$.estimate))
 }
 
-# Ver todos los resultados, ordenados de mejor a peor
 resultados |> arrange(desc(f1))
 
-# Visualizar
 ggplot(resultados, aes(x = threshold, y = f1)) +
   geom_line(linewidth = 1.2, color = "#2d4563") +
   geom_point(size = 3, color = "#2d4563") +
-  labs(title = "F1-score según el threshold de clasificación",
+  labs(title = "F1-score según el threshold",
        x = "Threshold", y = "F1-score") +
   theme_minimal()
 
@@ -158,8 +161,8 @@ grilla_rf <- grid_regular(
   levels = c(4, 4)
 )
 
-# 5-fold CV estratificada
-folds <- vfold_cv(datos_train, v = 5, strata = voto)
+# 10-fold CV estratificada
+folds <- vfold_cv(datos_train, v = 10, strata = voto)
 
 folds
 
@@ -259,11 +262,8 @@ datos_uruguay <- datos |> filter(pais == "Uruguay")
 cat("Observaciones en Uruguay:", nrow(datos_uruguay), "\n")
 
 # Con pocos datos, usamos hiperparámetros fijos en lugar de tuning
-receta_uy <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +
-                    genero + confianza_gobierno + confianza_justicia +
-                    satisfaccion_democracia + percepcion_economia +
-                    uso_internet + interes_politica,
-                    data = datos_uruguay) |>
+receta_uy <- recipe(voto ~ ., data = datos_uruguay) |>
+  step_rm(pais, satisfaccion_vida) |>
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())
