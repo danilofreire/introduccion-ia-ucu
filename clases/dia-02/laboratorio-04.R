@@ -76,8 +76,7 @@ tidy(ajuste_ols) |>
 # --- Ejercicio 1: Evaluar OLS (solución) -----------------------
 
 # Generar predicciones en test
-pred_ols <- predict(ajuste_ols, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ols <- augment(ajuste_ols, datos_test)
 
 # Métricas (rmse, rsq, mae)
 metricas_ols <- pred_ols |>
@@ -139,8 +138,9 @@ lambda_min <- select_best(resultados_lasso, metric = "rmse")
 lambda_min
 
 # 2. Finalizar workflow con ese λ y ajustar a todo el train
-wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
-ajuste_lasso   <- fit(wf_lasso_final, data = datos_train)
+ajuste_lasso <- wf_lasso |>
+  finalize_workflow(lambda_min) |>
+  fit(data = datos_train)
 
 # 3. Coeficientes y conteo de variables eliminadas
 coef_lasso <- tidy(ajuste_lasso) |>
@@ -152,8 +152,7 @@ cat("Variables eliminadas (coef = 0):",
 coef_lasso |> head(8)
 
 # Predicciones y métricas (para usar en Ejercicio 5)
-pred_lasso     <- predict(ajuste_lasso, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_lasso     <- augment(ajuste_lasso, datos_test)
 metricas_lasso <- pred_lasso |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 
@@ -195,8 +194,7 @@ lambda_ridge <- select_best(resultados_ridge, metric = "rmse")
 ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
   fit(data = datos_train)
 
-pred_ridge     <- predict(ajuste_ridge, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ridge     <- augment(ajuste_ridge, datos_test)
 metricas_ridge <- pred_ridge |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 
@@ -254,8 +252,7 @@ ajuste_dem <- finalize_workflow(wf_lasso_dem, lambda_dem) |>
   fit(data = datos_train)
 
 # 3. Evaluación
-pred_dem <- predict(ajuste_dem, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_democracia))
+pred_dem <- augment(ajuste_dem, datos_test)
 
 pred_dem |> metrics(truth = satisfaccion_democracia, estimate = .pred)
 
@@ -294,8 +291,7 @@ mejor_enet  # vean el mixture óptimo
 ajuste_enet <- finalize_workflow(wf_enet, mejor_enet) |>
   fit(data = datos_train)
 
-predict(ajuste_enet, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida)) |>
+augment(ajuste_enet, datos_test) |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 
 # Si mixture óptimo está cerca de 1 → LASSO ganó

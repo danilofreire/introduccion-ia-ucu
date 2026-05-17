@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -345,7 +345,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-8-más-folds-de-validación-cruzada" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-8-más-folds-de-validación-cruzada"><span class="header-section-number">4.3</span> Pregunta 8: Más folds de validación cruzada</h3>
-<p>Repitan el tuning de Random Forest del laboratorio pero con 10 folds en vez de 5. ¿El mejor modelo tiene los mismos hiperparámetros? ¿El error estándar (<code>std_err</code>) de las métricas es menor con más folds?</p>
+<p>Repitan el tuning de Random Forest del laboratorio pero con 20 folds en vez de 10. ¿El mejor modelo tiene los mismos hiperparámetros? ¿El error estándar (<code>std_err</code>) de las métricas es menor con más folds?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -377,6 +377,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-11-agregar-un-árbol-de-decisión" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-11-agregar-un-árbol-de-decisión"><span class="header-section-number">6.1</span> Pregunta 11: Agregar un árbol de decisión</h3>
 <p>Entrenen un modelo <code>decision_tree()</code> con <code>cost_complexity = 0.01</code>, <code>tree_depth = 10</code> y <code>min_n = 10</code>. Calculen sus métricas (accuracy, AUC) sobre el conjunto de prueba y compárenlas con la regresión logística y el Random Forest. ¿Cuánto se pierde en rendimiento respecto al Random Forest?</p>
+<p><em>Pista:</em> la sintaxis del árbol está en el <a href="07-laboratorio-03.html#sec:appendix03">Apéndice 3 del Laboratorio 3</a>: <code>decision_tree(cost_complexity, tree_depth, min_n) |&gt; set_engine("rpart") |&gt; set_mode("classification")</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -385,7 +386,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-12-tabla-comparativa-completa" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-12-tabla-comparativa-completa"><span class="header-section-number">6.2</span> Pregunta 12: Tabla comparativa completa</h3>
 <p>Creen una tabla que compare cuatro modelos (regresión logística, Random Forest, XGBoost y árbol de decisión) con las métricas: accuracy, AUC, precision, recall y F1-score. Usen <code>bind_rows()</code> para combinar y <code>pivot_wider()</code> para formatear.</p>
-<p><em>Pista:</em> para cada modelo, generen predicciones con <code>predict()</code> y <code>predict(type = "prob")</code>, luego calculen las métricas con <code>metrics()</code> y <code>f_meas()</code>.</p>
+<p><em>Pista (XGBoost):</em> la sintaxis está en el <a href="07-laboratorio-03.html#sec:appendix04">Apéndice 4 del Laboratorio 3</a>: <code>boost_tree(trees = 500, tree_depth = tune(), learn_rate = tune()) |&gt; set_engine("xgboost") |&gt; set_mode("classification")</code>.</p>
+<p><em>Pista (métricas):</em> para cada modelo, generen predicciones con <code>predict()</code> y <code>predict(type = "prob")</code>, luego calculen las métricas con <code>metrics()</code> y <code>f_meas()</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>

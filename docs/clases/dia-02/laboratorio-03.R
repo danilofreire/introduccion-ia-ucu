@@ -64,11 +64,8 @@ prop.table(table(datos_test$voto))
 
 # --- Preprocesamiento con recipes ---------------------------
 
-receta <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +
-                 genero + confianza_gobierno + confianza_justicia +
-                 satisfaccion_democracia + percepcion_economia +
-                 uso_internet + interes_politica,
-                 data = datos_train) |>
+receta <- recipe(voto ~ ., data = datos_train) |>
+  step_rm(pais, satisfaccion_vida) |>          # excluir alta cardinalidad y outcome del Lab 4
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())
@@ -88,9 +85,7 @@ wf_logit <- workflow() |>
 
 ajuste_logit <- fit(wf_logit, data = datos_train)
 
-pred_logit <- predict(ajuste_logit, datos_test) |>
-  bind_cols(predict(ajuste_logit, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_logit <- augment(ajuste_logit, datos_test)
 
 metricas_logit <- pred_logit |>
   metrics(truth = voto, estimate = .pred_class, .pred_si)
@@ -104,9 +99,18 @@ conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
   labs(title = "Matriz de confusión - Regresión logística")
 
 
-# --- Apéndice 1: Threshold óptimo (solución) ----------------
+# --- Ejercicio 1 + Apéndice 1: Threshold óptimo ------------
 
-# Probar thresholds de 0.3 a 0.7 y guardar los resultados
+# Versión simple (3 thresholds) — como aparece en la diapositiva del ejercicio
+for (t in c(0.3, 0.5, 0.7)) {
+  pred_nuevo <- pred_logit |>
+    mutate(.pred_class_nuevo = factor(
+      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
+  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
+  cat("Threshold", t, "→ F1 =", round(f1$.estimate, 3), "\n")
+}
+
+# Versión extendida (barrido fino) — del Apéndice 1
 thresholds <- seq(0.3, 0.7, by = 0.05)
 resultados <- data.frame(threshold = numeric(), f1 = numeric())
 
@@ -115,21 +119,18 @@ for (t in thresholds) {
     mutate(.pred_class_nuevo = factor(
       ifelse(.pred_si > t, "si", "no"),
       levels = c("si", "no")))
-
   f1 <- f_meas(pred_nuevo, truth = voto,
                estimate = .pred_class_nuevo)
   resultados <- rbind(resultados,
                       data.frame(threshold = t, f1 = f1$.estimate))
 }
 
-# Ver todos los resultados, ordenados de mejor a peor
 resultados |> arrange(desc(f1))
 
-# Visualizar
 ggplot(resultados, aes(x = threshold, y = f1)) +
   geom_line(linewidth = 1.2, color = "#2d4563") +
   geom_point(size = 3, color = "#2d4563") +
-  labs(title = "F1-score según el threshold de clasificación",
+  labs(title = "F1-score según el threshold",
        x = "Threshold", y = "F1-score") +
   theme_minimal()
 
@@ -158,8 +159,8 @@ grilla_rf <- grid_regular(
   levels = c(4, 4)
 )
 
-# 5-fold CV estratificada
-folds <- vfold_cv(datos_train, v = 5, strata = voto)
+# 10-fold CV estratificada
+folds <- vfold_cv(datos_train, v = 10, strata = voto)
 
 folds
 
@@ -167,7 +168,7 @@ resultados_tune <- tune_grid(
   wf_rf_tune,
   resamples = folds,
   grid = grilla_rf,
-  metrics = metric_set(accuracy, roc_auc, f_meas),
+  metrics = metric_set(accuracy, roc_auc),
   control = control_grid(verbose = FALSE)
 )
 
@@ -186,12 +187,11 @@ autoplot(resultados_tune) +
 mejor_rf <- select_best(resultados_tune, metric = "roc_auc")
 mejor_rf
 
-wf_rf_final <- finalize_workflow(wf_rf_tune, mejor_rf)
-ajuste_rf <- fit(wf_rf_final, data = datos_train)
+ajuste_rf <- wf_rf_tune |>
+  finalize_workflow(mejor_rf) |>
+  fit(data = datos_train)
 
-pred_rf <- predict(ajuste_rf, datos_test) |>
-  bind_cols(predict(ajuste_rf, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_rf <- augment(ajuste_rf, datos_test)
 
 metricas_rf <- pred_rf |>
   metrics(truth = voto, estimate = .pred_class, .pred_si)
@@ -224,21 +224,21 @@ bind_rows(roc_logit, roc_rf) |>
 
 # --- Parte 3: Interpretación --------------------------------
 
-modelo_extraido <- extract_fit_parsnip(ajuste_rf)
+rf_parsnip <- extract_fit_parsnip(ajuste_rf)
 
-vip(modelo_extraido, num_features = 15) +
+vip(rf_parsnip, num_features = 15) +
   labs(title = "Importancia de variables (Gini)",
        subtitle = "Random Forest para predicción de voto") +
   theme_minimal()
 
 # PDPs: edad e interés político (gráfico lado a lado)
-modelo_ranger <- extract_fit_engine(ajuste_rf)
+rf_engine <- extract_fit_engine(ajuste_rf)
 datos_prep <- bake(prep(receta), new_data = datos_train)
 
-pdp_edad <- partial(modelo_ranger, pred.var = "edad",
+pdp_edad <- partial(rf_engine, pred.var = "edad",
                     train = datos_prep, prob = TRUE, which.class = 1)
 
-pdp_interes <- partial(modelo_ranger, pred.var = "interes_politica",
+pdp_interes <- partial(rf_engine, pred.var = "interes_politica",
                        train = datos_prep, prob = TRUE, which.class = 1)
 
 p1 <- autoplot(pdp_edad) +
@@ -259,11 +259,8 @@ datos_uruguay <- datos |> filter(pais == "Uruguay")
 cat("Observaciones en Uruguay:", nrow(datos_uruguay), "\n")
 
 # Con pocos datos, usamos hiperparámetros fijos en lugar de tuning
-receta_uy <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +
-                    genero + confianza_gobierno + confianza_justicia +
-                    satisfaccion_democracia + percepcion_economia +
-                    uso_internet + interes_politica,
-                    data = datos_uruguay) |>
+receta_uy <- recipe(voto ~ ., data = datos_uruguay) |>
+  step_rm(pais, satisfaccion_vida) |>
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())
@@ -321,9 +318,7 @@ mejor_arbol <- select_best(resultados_arbol, metric = "roc_auc")
 ajuste_arbol <- finalize_workflow(wf_arbol, mejor_arbol) |>
   fit(data = datos_train)
 
-pred_arbol <- predict(ajuste_arbol, datos_test) |>
-  bind_cols(predict(ajuste_arbol, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_arbol <- augment(ajuste_arbol, datos_test)
 
 cat("Árbol de decisión:\n")
 print(pred_arbol |> metrics(truth = voto, estimate = .pred_class, .pred_si))
@@ -371,9 +366,7 @@ mejor_xgb <- select_best(resultados_xgb, metric = "roc_auc")
 ajuste_xgb <- finalize_workflow(wf_xgb, mejor_xgb) |>
   fit(data = datos_train)
 
-pred_xgb <- predict(ajuste_xgb, datos_test) |>
-  bind_cols(predict(ajuste_xgb, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_xgb <- augment(ajuste_xgb, datos_test)
 
 # Tabla comparativa con los tres modelos
 bind_rows(

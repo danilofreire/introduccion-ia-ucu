@@ -132,31 +132,37 @@ formula_basica <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
                                participacion_politica + zona
 
 
-# --- Función para evaluar un modelo --------------------------
+# --- Evaluar el modelo logístico -----------------------------
 
-evaluar_modelo <- function(modelo, formula, folds, nombre = "modelo") {
-  # 1. fit_resamples ajusta el modelo en cada fold de la validación cruzada
-  resultados <- fit_resamples(
-    modelo,
-    formula,
-    resamples = folds,
-    metrics  = metric_set(accuracy, precision, recall, roc_auc),  # 2. métricas
-    control  = control_resamples(event_level = "second")          # 3. "si" es la clase positiva
-  )
-  # 4. collect_metrics() devuelve la media y el error estándar de cada métrica
-  collect_metrics(resultados) |>
-    mutate(modelo = nombre)
-}
+# Validación cruzada en 5 folds. Usamos precision, recall y roc_auc en
+# lugar de accuracy: con clases desbalanceadas, accuracy puede engañar.
+eval_logistico <- fit_resamples(
+  modelo_logistico, formula_basica,
+  resamples = folds,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")   # "si" es la clase positiva
+) |>
+  collect_metrics() |>
+  mutate(modelo = "Logístico")
+
+eval_logistico
 
 
-# --- Evaluar ambos modelos -----------------------------------
+# --- Evaluar el árbol y comparar -----------------------------
 
-eval_logistico <- evaluar_modelo(modelo_logistico, formula_basica, folds, "Logístico")
-eval_arbol     <- evaluar_modelo(modelo_arbol,     formula_basica, folds, "Árbol")
+# El mismo bloque que antes, cambiando modelo_logistico → modelo_arbol
+eval_arbol <- fit_resamples(
+  modelo_arbol, formula_basica,
+  resamples = folds,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |>
+  mutate(modelo = "Árbol")
 
+# Combinar y mostrar la comparación
 resultados <- bind_rows(eval_logistico, eval_arbol)
 
-# Comparación en tabla
 resultados |>
   select(modelo, .metric, mean, std_err) |>
   pivot_wider(names_from = .metric, values_from = c(mean, std_err))
@@ -186,8 +192,9 @@ ajuste_final <- modelo_logistico |>
 # Añade las columnas .pred_class, .pred_no y .pred_si.
 pred_test <- ajuste_final |> augment(datos_test)
 
-# Métricas finales y AUC-ROC
-pred_test |> metrics(truth = satisfecho, estimate = .pred_class)
+# Métricas finales (las mismas que usamos en validación cruzada)
+pred_test |> precision(truth = satisfecho, estimate = .pred_class, event_level = "second")
+pred_test |> recall(truth = satisfecho, estimate = .pred_class, event_level = "second")
 pred_test |> roc_auc(truth = satisfecho, .pred_si, event_level = "second")
 
 
@@ -372,12 +379,24 @@ formula_ext <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
                             confianza_gobierno + consumo_noticias +
                             participacion_politica + zona + educacion_alta
 
-# Evaluar los dos modelos con el feature nuevo
-eval_log_ext <- evaluar_modelo(modelo_logistico, formula_ext, folds_ext, "Logístico (ext)")
-eval_arb_ext <- evaluar_modelo(modelo_arbol,     formula_ext, folds_ext, "Árbol (ext)")
+# Evaluar el logístico con folds_ext (mismo patrón que el cuerpo del lab)
+eval_log_ext <- fit_resamples(
+  modelo_logistico, formula_ext, resamples = folds_ext,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |> mutate(modelo = "Logístico (ext)")
+
+# Evaluar el árbol con folds_ext
+eval_arb_ext <- fit_resamples(
+  modelo_arbol, formula_ext, resamples = folds_ext,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |> mutate(modelo = "Árbol (ext)")
 
 bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
-  filter(.metric == "accuracy") |>
+  filter(.metric == "roc_auc") |>
   select(modelo, mean, std_err) |>
   arrange(desc(mean))
 

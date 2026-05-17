@@ -120,7 +120,7 @@ cat("\nPar con mayor correlación:",
 cat("Correlación:", round(mat_cor[max_idx[1], max_idx[2]], 3), "\n")
 ```
 
-**Respuesta:** Las variables con mayor correlación son probablemente `educacion_anios` e `ingreso_hogar` (r ~ 0.30-0.55), lo cual tiene sentido: personas con más educación tienden a tener mayores ingresos. También hay correlación entre `interes_politica` y `confianza_gobierno`, ya que personas más interesadas en política pueden tener opiniones más formadas sobre el gobierno. Las correlaciones entre actitudes políticas (confianza en gobierno, en justicia, satisfacción democrática) son moderadas, reflejando que estas actitudes están relacionadas entre si.
+**Respuesta:** Las variables con mayor correlación son probablemente `educacion_anios` e `ingreso_hogar` (r ~ 0.30-0.55), lo cual tiene sentido: personas con más educación tienden a tener mayores ingresos. También hay correlación entre `interes_politica` y `confianza_gobierno`, ya que personas más interesadas en política pueden tener opiniones más formadas sobre el gobierno. Las correlaciones entre actitudes políticas (confianza en gobierno, en justicia, satisfacción democrática) son moderadas, reflejando que estas actitudes están relacionadas entre sí.
 
 ### Pregunta 3: Distribución de edad por voto
 
@@ -156,15 +156,12 @@ modelo_logit <- logistic_reg() |>
   set_mode("classification")
 
 # Modelo reducido
-wf_reducido <- workflow() |>
+ajuste_reducido <- workflow() |>
   add_recipe(receta_reducida) |>
-  add_model(modelo_logit)
+  add_model(modelo_logit) |>
+  fit(data = datos_train)
 
-ajuste_reducido <- fit(wf_reducido, data = datos_train)
-
-pred_reducido <- predict(ajuste_reducido, datos_test) |>
-  bind_cols(predict(ajuste_reducido, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_reducido <- augment(ajuste_reducido, datos_test)
 
 metricas_reducido <- pred_reducido |>
   metrics(truth = voto, estimate = .pred_class, .pred_si)
@@ -173,15 +170,12 @@ cat("Modelo reducido (3 predictores):\n")
 metricas_reducido
 
 # Modelo completo para comparar
-wf_completo <- workflow() |>
+ajuste_completo <- workflow() |>
   add_recipe(receta) |>
-  add_model(modelo_logit)
+  add_model(modelo_logit) |>
+  fit(data = datos_train)
 
-ajuste_completo <- fit(wf_completo, data = datos_train)
-
-pred_completo <- predict(ajuste_completo, datos_test) |>
-  bind_cols(predict(ajuste_completo, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_completo <- augment(ajuste_completo, datos_test)
 
 metricas_completo <- pred_completo |>
   metrics(truth = voto, estimate = .pred_class, .pred_si)
@@ -205,7 +199,7 @@ coefs |>
   select(term, estimate, std.error, statistic, p.value, odds_ratio)
 ```
 
-**Respuesta:** Los coeficientes están en escala normalizada (ya que aplicamos `step_normalize()`), así que los odds ratios se interpretan como el cambio en las chances de votar por cada desviación estándar de aumento en el predictor. La variable con el efecto más fuerte es probablemente `interes_politica` o `edad` (odds ratio más alejado de 1). La variable `percepcion_economia` tiene un efecto negativo: cuando las personas perciben una economia peor, la probabilidad de votar aumenta (voto de protesta).
+**Respuesta:** Los coeficientes están en escala normalizada (ya que aplicamos `step_normalize()`), así que los odds ratios se interpretan como el cambio en las chances de votar por cada desviación estándar de aumento en el predictor. La variable con el efecto más fuerte es probablemente `interes_politica` o `edad` (odds ratio más alejado de 1). La variable `percepcion_economia` tiene un efecto negativo: cuando las personas perciben una economía peor, la probabilidad de votar aumenta (voto de protesta).
 
 ## Random Forest y tuning
 
@@ -217,21 +211,17 @@ Entrenen RF con 100, 500 y 1000 árboles. ¿Cuánto mejora el AUC?
 resultados_arboles <- data.frame(trees = numeric(), auc = numeric())
 
 for (n_trees in c(100, 500, 1000)) {
-  modelo_rf <- rand_forest(trees = n_trees, mtry = 4, min_n = 10) |>
+  modelo_temp <- rand_forest(trees = n_trees, mtry = 4, min_n = 10) |>
     set_engine("ranger") |>
     set_mode("classification")
 
-  wf_rf <- workflow() |>
+  ajuste_temp <- workflow() |>
     add_recipe(receta) |>
-    add_model(modelo_rf)
+    add_model(modelo_temp) |>
+    fit(data = datos_train)
 
-  ajuste_rf <- fit(wf_rf, data = datos_train)
-
-  pred_rf <- predict(ajuste_rf, datos_test) |>
-    bind_cols(predict(ajuste_rf, datos_test, type = "prob")) |>
-    bind_cols(datos_test |> select(voto))
-
-  auc_val <- pred_rf |>
+  auc_val <- ajuste_temp |>
+    augment(datos_test) |>
     roc_auc(truth = voto, .pred_si) |>
     pull(.estimate)
 
@@ -303,10 +293,12 @@ mejor_random |> select(mtry, min_n, mean, std_err)
 
 ### Pregunta 8: Más folds de validación cruzada
 
-Repitan el tuning con 10 folds. ¿Cambian los hiperparámetros? ¿Es menor el error estándar?
+Repitan el tuning con 20 folds (vs los 10 del laboratorio). ¿Cambian los hiperparámetros? ¿Es menor el error estándar?
 
 ```{r p8}
+# Comparar 10 folds (baseline del lab) vs 20 folds
 folds_10 <- vfold_cv(datos_train, v = 10, strata = voto)
+folds_20 <- vfold_cv(datos_train, v = 20, strata = voto)
 
 res_10folds <- tune_grid(
   wf_rf_tune, resamples = folds_10, grid = grilla_reg,
@@ -314,17 +306,23 @@ res_10folds <- tune_grid(
   control = control_grid(verbose = FALSE)
 )
 
-mejor_5f <- show_best(res_regular, metric = "roc_auc", n = 1)
+res_20folds <- tune_grid(
+  wf_rf_tune, resamples = folds_20, grid = grilla_reg,
+  metrics = metric_set(roc_auc),
+  control = control_grid(verbose = FALSE)
+)
+
 mejor_10f <- show_best(res_10folds, metric = "roc_auc", n = 1)
+mejor_20f <- show_best(res_20folds, metric = "roc_auc", n = 1)
 
-cat("Mejor modelo con 5 folds:\n")
-mejor_5f |> select(mtry, min_n, mean, std_err)
-
-cat("\nMejor modelo con 10 folds:\n")
+cat("Mejor modelo con 10 folds:\n")
 mejor_10f |> select(mtry, min_n, mean, std_err)
+
+cat("\nMejor modelo con 20 folds:\n")
+mejor_20f |> select(mtry, min_n, mean, std_err)
 ```
 
-**Respuesta:** Los hiperparámetros seleccionados pueden ser los mismos o ligeramente diferentes. El error estándar con 10 folds suele ser algo menor que con 5 folds, porque cada fold de validación es más grande y las estimaciones son más estables. Sin embargo, con un dataset de 500 observaciones, la diferencia práctica es pequeña. Usar 10 folds tarda más, pero da estimaciones algo más confiables.
+**Respuesta:** Los hiperparámetros seleccionados pueden ser los mismos o ligeramente diferentes. El error estándar con 20 folds suele ser algo menor que con 10, porque cada fold de validación es más pequeño y promediamos sobre más particiones, lo que reduce la varianza de la estimación. Con un dataset de ~375 observaciones de entrenamiento, la diferencia práctica es pequeña: pasar a 20 folds tarda el doble pero las conclusiones rara vez cambian. La regla general es usar 10 folds como compromiso entre estabilidad y tiempo de cómputo.
 
 ## Interpretación
 
@@ -333,22 +331,22 @@ mejor_10f |> select(mtry, min_n, mean, std_err)
 Creen PDPs para `confianza_gobierno` y `educacion_anios`.
 
 ```{r p9, fig.width=10, fig.height=5}
-# Ajustar RF final para PDPs
+# Random Forest principal con importancia (lo reusamos en VIP y comparación)
 modelo_rf_final <- rand_forest(trees = 500, mtry = 4, min_n = 10) |>
   set_engine("ranger", importance = "impurity") |>
   set_mode("classification")
 
-wf_rf_final <- workflow() |>
+ajuste_rf <- workflow() |>
   add_recipe(receta) |>
-  add_model(modelo_rf_final)
+  add_model(modelo_rf_final) |>
+  fit(data = datos_train)
 
-ajuste_rf_pdp <- fit(wf_rf_final, data = datos_train)
-modelo_ranger <- extract_fit_engine(ajuste_rf_pdp)
+rf_engine <- extract_fit_engine(ajuste_rf)
 datos_prep <- bake(prep(receta), new_data = datos_train)
 
 # PDP para confianza_gobierno
 pdp_gobierno <- partial(
-  modelo_ranger,
+  rf_engine,
   pred.var = "confianza_gobierno",
   train = datos_prep,
   prob = TRUE,
@@ -363,7 +361,7 @@ p1 <- autoplot(pdp_gobierno) +
 
 # PDP para educacion_anios
 pdp_educacion <- partial(
-  modelo_ranger,
+  rf_engine,
   pred.var = "educacion_anios",
   train = datos_prep,
   prob = TRUE,
@@ -390,7 +388,8 @@ Comparen el ranking del VIP con el ranking de los coeficientes logísticos.
 ```{r p10}
 # VIP del Random Forest (Gini)
 cat("Ranking VIP (Random Forest, Gini):\n")
-importancia_rf <- vip::vi(extract_fit_parsnip(ajuste_rf_pdp))
+rf_parsnip <- extract_fit_parsnip(ajuste_rf)
+importancia_rf <- vip::vi(rf_parsnip)
 importancia_rf |> arrange(desc(Importance))
 
 # Ranking de coeficientes logísticos (por |z|)
@@ -422,15 +421,12 @@ modelo_arbol <- decision_tree(
   set_engine("rpart") |>
   set_mode("classification")
 
-wf_arbol <- workflow() |>
+ajuste_arbol <- workflow() |>
   add_recipe(receta) |>
-  add_model(modelo_arbol)
+  add_model(modelo_arbol) |>
+  fit(data = datos_train)
 
-ajuste_arbol <- fit(wf_arbol, data = datos_train)
-
-pred_arbol <- predict(ajuste_arbol, datos_test) |>
-  bind_cols(predict(ajuste_arbol, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_arbol <- augment(ajuste_arbol, datos_test)
 
 metricas_arbol <- pred_arbol |>
   metrics(truth = voto, estimate = .pred_class, .pred_si)
@@ -438,18 +434,13 @@ metricas_arbol <- pred_arbol |>
 cat("Árbol de decisión:\n")
 metricas_arbol
 
-# Modelo RF para comparar
-ajuste_rf_comp <- fit(wf_rf_final, data = datos_train)
-
-pred_rf_comp <- predict(ajuste_rf_comp, datos_test) |>
-  bind_cols(predict(ajuste_rf_comp, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
-
-metricas_rf_comp <- pred_rf_comp |>
+# Random Forest: reusamos ajuste_rf de la pregunta 9
+pred_rf <- augment(ajuste_rf, datos_test)
+metricas_rf <- pred_rf |>
   metrics(truth = voto, estimate = .pred_class, .pred_si)
 
 cat("\nRandom Forest:\n")
-metricas_rf_comp
+metricas_rf
 
 cat("\nRegresión logística:\n")
 metricas_completo
@@ -490,20 +481,17 @@ modelo_xgb <- boost_tree(
   set_engine("xgboost") |>
   set_mode("classification")
 
-wf_xgb <- workflow() |>
+ajuste_xgb <- workflow() |>
   add_recipe(receta) |>
-  add_model(modelo_xgb)
+  add_model(modelo_xgb) |>
+  fit(data = datos_train)
 
-ajuste_xgb <- fit(wf_xgb, data = datos_train)
-
-pred_xgb <- predict(ajuste_xgb, datos_test) |>
-  bind_cols(predict(ajuste_xgb, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_xgb <- augment(ajuste_xgb, datos_test)
 
 # Calcular métricas para todos
 tabla <- bind_rows(
   calcular_metricas(pred_completo, "Reg. logística"),
-  calcular_metricas(pred_rf_comp, "Random Forest"),
+  calcular_metricas(pred_rf, "Random Forest"),
   calcular_metricas(pred_xgb, "XGBoost"),
   calcular_metricas(pred_arbol, "Árbol decisión")
 )

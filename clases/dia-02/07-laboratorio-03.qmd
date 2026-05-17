@@ -101,7 +101,7 @@ set.seed(2026)
 
 ## El dataset: Latinobarómetro (simulado)
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 Vamos a trabajar con datos simulados inspirados en el [Latinobarómetro](https://www.latinobarometro.org/), una encuesta de opinión pública en América Latina:
 
@@ -158,13 +158,14 @@ datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
 # Convertir variables categóricas a factores
 # El primer nivel de voto es la clase positiva para yardstick
+# El orden de niveles en uso_internet y voto es importante para interpretación
 datos <- datos |>
   mutate(
     pais = factor(pais),
     zona = factor(zona),
     genero = factor(genero),
     uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
-    voto = factor(voto, levels = c("si", "no"))
+    voto = factor(voto, levels = c("si", "no")) # Diferente del lab anterior
   )
 
 # Estructura y distribución del voto
@@ -231,20 +232,14 @@ modelo_logit <- logistic_reg() |>
   set_engine("glm") |>
   set_mode("classification")
 
-# workflow(): combina preprocesamiento (receta) + modelo en un solo objeto
-wf_logit <- workflow() |>
-  add_recipe(receta) |>    # agregar la receta de preprocesamiento
-  add_model(modelo_logit)  # agregar el modelo
+# workflow(): combina preprocesamiento (receta) + modelo + ajuste en una pipeline
+ajuste_logit <- workflow() |>
+  add_recipe(receta) |>       # agregar la receta de preprocesamiento
+  add_model(modelo_logit) |>  # agregar el modelo
+  fit(data = datos_train)     # ajustar a los datos de entrenamiento
 
-# fit(): ajustar el workflow completo a los datos de entrenamiento
-ajuste_logit <- fit(wf_logit, data = datos_train)
-
-# predict(): genera predicciones de clase ("si"/"no")
-# type = "prob": genera probabilidades para cada clase (.pred_no, .pred_si)
-# bind_cols(): une las columnas de predicciones con los datos reales
-pred_logit <- predict(ajuste_logit, datos_test) |>
-  bind_cols(predict(ajuste_logit, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+# augment(): genera predicciones y métricas para cada observación
+pred_logit <- augment(ajuste_logit, datos_test)
 
 # metrics(): calcula múltiples métricas de evaluación
 # truth: variable real, estimate: predicción de clase, .pred_si: probabilidades
@@ -264,7 +259,6 @@ metricas_logit
 # autoplot(type = "heatmap"): visualización como mapa de calor
 conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
   autoplot(type = "heatmap") +
-  scale_fill_gradient(low = "white", high = "#2d4563") +
   labs(title = "Matriz de confusión - Regresión logística")
 ```
 :::
@@ -314,8 +308,8 @@ modelo_rf_tune <- rand_forest(
   trees = 500,         # Número de árboles (fijo, no se optimiza)
   min_n = tune()       # Mínimo de observaciones en nodo terminal
 ) |>
-  # importance = "impurity": calcular importancia con reducción de impureza (Gini)
-  set_engine("ranger", importance = "impurity") |> # ranger es un motor rápido para Random Forest
+  # importance = "impurity": calcular importancia con permutación
+  set_engine("ranger", importance = "permutation") |> # ranger es un motor rápido para Random Forest
   set_mode("classification")
 
 # workflow(): combina receta + modelo
@@ -385,7 +379,7 @@ resultados_tune <- tune_grid(
   resamples = folds,         # los folds de validación cruzada
   grid = grilla_rf,          # la grilla de combinaciones a probar
   # metric_set(): define qué métricas calcular en cada evaluación
-  metrics = metric_set(accuracy, roc_auc, f_meas),
+  metrics = metric_set(accuracy, roc_auc),
   control = control_grid(verbose = FALSE)  # no imprimir progreso
 )
 
@@ -406,15 +400,14 @@ resultados_tune |>
 mejor_rf <- select_best(resultados_tune, metric = "roc_auc")
 mejor_rf
 
-# finalize_workflow(): reemplaza los tune() por los valores óptimos
-# Luego ajustamos con todos los datos de entrenamiento
-wf_rf_final <- finalize_workflow(wf_rf_tune, mejor_rf)
-ajuste_rf <- fit(wf_rf_final, data = datos_train)
+# finalize_workflow(): reemplaza los tune() por los valores óptimos;
+# luego fit() ajusta con todos los datos de entrenamiento, en una pipeline
+ajuste_rf <- wf_rf_tune |>
+  finalize_workflow(mejor_rf) |>
+  fit(data = datos_train)
 
 # Predicciones y métricas en test
-pred_rf <- predict(ajuste_rf, datos_test) |>
-  bind_cols(predict(ajuste_rf, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_rf <- augment(ajuste_rf, datos_test)
 
 metricas_rf <- pred_rf |>
   metrics(truth = voto, estimate = .pred_class, .pred_si)
@@ -455,17 +448,17 @@ bind_rows(roc_logit, roc_rf) |>
 
 # Parte 3: Interpretación {background-color="#2d4563"}
 
-## Importancia de variables (Gini)
+## Importancia de variables
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=60%}
 
 ```{r vip-gini, prompt=FALSE, echo=TRUE, fig.width=8, fig.height=5}
-modelo_extraido <- extract_fit_parsnip(ajuste_rf)
+rf_parsnip <- extract_fit_parsnip(ajuste_rf)
 
-vip(modelo_extraido, num_features = 15) +
-  labs(title = "Importancia de variables (Gini)") +
+vip(rf_parsnip, num_features = 15) +
+  labs(title = "Importancia de variables") +
   theme_minimal()
 ```
 :::
@@ -479,7 +472,7 @@ vip(modelo_extraido, num_features = 15) +
 - [Género, zona, internet]{.alert}: baja importancia
 
 :::{.callout-warning}
-Gini mide [predictibilidad]{.alert}, no efecto causal: que la edad importe no significa que "envejecer causa votar"
+Importancia mide [predictibilidad]{.alert}, no efecto causal: que la edad importe no significa que "envejecer causa votar"
 :::
 :::
 :::
@@ -490,13 +483,13 @@ Gini mide [predictibilidad]{.alert}, no efecto causal: que la edad importe no si
 :::{style="margin-top: 30px; font-size: 20px;"}
 
 ```{r pdp-combinado, prompt=FALSE, echo=TRUE, fig.width=12, fig.height=3.5}
-modelo_ranger <- extract_fit_engine(ajuste_rf)
+rf_engine <- extract_fit_engine(ajuste_rf)
 datos_prep <- bake(prep(receta), new_data = datos_train)
 
 # partial() calcula el efecto marginal sobre P(voto = "si")
-pdp_edad    <- partial(modelo_ranger, pred.var = "edad",
+pdp_edad    <- partial(rf_engine, pred.var = "edad",
                        train = datos_prep, prob = TRUE, which.class = 1)
-pdp_interes <- partial(modelo_ranger, pred.var = "interes_politica",
+pdp_interes <- partial(rf_engine, pred.var = "interes_politica",
                        train = datos_prep, prob = TRUE, which.class = 1)
 
 library(patchwork)
@@ -734,13 +727,12 @@ cat("Mejor cost_complexity:", mejor_arbol$cost_complexity, "\n")
 ```
 
 ```{r ap3-eval, prompt=FALSE, echo=TRUE, eval=TRUE, fig.width=10, fig.height=5}
-# Ajustar y evaluar
-wf_arbol_final <- finalize_workflow(wf_arbol, mejor_arbol)
-ajuste_arbol <- fit(wf_arbol_final, data = datos_train)
+# Ajustar y evaluar (finalize_workflow + fit en una pipeline)
+ajuste_arbol <- wf_arbol |>
+  finalize_workflow(mejor_arbol) |>
+  fit(data = datos_train)
 
-pred_arbol <- predict(ajuste_arbol, datos_test) |>
-  bind_cols(predict(ajuste_arbol, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_arbol <- augment(ajuste_arbol, datos_test)
 
 # Comparar métricas
 cat("Árbol de decisión:\n")
@@ -793,13 +785,12 @@ resultados_xgb <- tune_grid(
 )
 
 mejor_xgb <- select_best(resultados_xgb, metric = "roc_auc")
-wf_xgb_final <- finalize_workflow(wf_xgb, mejor_xgb)
-ajuste_xgb <- fit(wf_xgb_final, data = datos_train)
+ajuste_xgb <- wf_xgb |>
+  finalize_workflow(mejor_xgb) |>
+  fit(data = datos_train)
 
 # Predicciones y comparación final
-pred_xgb <- predict(ajuste_xgb, datos_test) |>
-  bind_cols(predict(ajuste_xgb, datos_test, type = "prob")) |>
-  bind_cols(datos_test |> select(voto))
+pred_xgb <- augment(ajuste_xgb, datos_test)
 
 bind_rows(
   pred_logit |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>

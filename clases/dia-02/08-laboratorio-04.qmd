@@ -153,6 +153,7 @@ receta <- recipe(satisfaccion_vida ~ ., data = datos_train) |>
   step_zv(all_predictors())                    # eliminar varianza cero
 
 # Verificar
+# prep() = preparar la receta con los datos de train; juice() = extraer el dataset preprocesado
 receta |> prep() |> juice() |> glimpse()
 ```
 :::
@@ -172,9 +173,11 @@ modelo_ols <- linear_reg() |>
   set_engine("lm") |>
   set_mode("regression")
 
-# Workflow + ajuste
-wf_ols     <- workflow() |> add_recipe(receta) |> add_model(modelo_ols)
-ajuste_ols <- fit(wf_ols, data = datos_train)
+# Workflow + ajuste (combinados en una pipeline)
+ajuste_ols <- workflow() |>
+  add_recipe(receta) |>
+  add_model(modelo_ols) |>
+  fit(data = datos_train)
 
 # Coeficientes ordenados por magnitud (top 5)
 tidy(ajuste_ols) |>
@@ -196,9 +199,8 @@ tidy(ajuste_ols) |>
 #| label: ej1-skeleton
 #| eval: false
 
-# Generar predicciones
-pred_ols <- predict(___, datos_test) |>            # TODO: ¿qué modelo?
-  bind_cols(datos_test |> select(___))             # TODO: variable objetivo
+# Generar predicciones (augment() añade .pred al test set)
+pred_ols <- augment(___, datos_test)               # TODO: ¿qué modelo?
 
 # Calcular métricas
 metricas_ols <- pred_ols |>
@@ -211,8 +213,7 @@ metricas_ols
 #| label: ej1-hidden
 #| include: false
 
-pred_ols <- predict(ajuste_ols, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ols <- augment(ajuste_ols, datos_test)
 metricas_ols <- pred_ols |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 ```
@@ -362,9 +363,10 @@ coef_lasso |> head(8)
 #| label: ej3-hidden
 #| include: false
 
-lambda_min     <- select_best(resultados_lasso, metric = "rmse")
-wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
-ajuste_lasso   <- fit(wf_lasso_final, data = datos_train)
+lambda_min   <- select_best(resultados_lasso, metric = "rmse")
+ajuste_lasso <- wf_lasso |>
+  finalize_workflow(lambda_min) |>
+  fit(data = datos_train)
 
 # Coeficientes (para mostrar en Apéndice 3)
 coef_lasso <- tidy(ajuste_lasso) |>
@@ -372,8 +374,7 @@ coef_lasso <- tidy(ajuste_lasso) |>
   arrange(desc(abs(estimate)))
 
 # Predicciones en test (para usar en Ejercicio 5)
-pred_lasso     <- predict(ajuste_lasso, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_lasso     <- augment(ajuste_lasso, datos_test)
 metricas_lasso <- pred_lasso |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 ```
@@ -449,8 +450,7 @@ ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
   fit(data = datos_train)
 
 # 4. Evaluar en test
-pred_ridge     <- predict(ajuste_ridge, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ridge     <- augment(ajuste_ridge, datos_test)
 metricas_ridge <- pred_ridge |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 
@@ -479,8 +479,7 @@ lambda_ridge <- select_best(resultados_ridge, metric = "rmse")
 ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
   fit(data = datos_train)
 
-pred_ridge     <- predict(ajuste_ridge, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ridge     <- augment(ajuste_ridge, datos_test)
 metricas_ridge <- pred_ridge |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 ```
@@ -496,7 +495,7 @@ metricas_ridge <- pred_ridge |>
 [[Apéndice 4: Solución]{.button}](#sec:appendix04)
 :::
 
-## LASSO selecciona, Ridge encoge
+## LASSO selecciona, Ridge encoge {#sec:lasso-vs-ridge}
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
@@ -578,7 +577,7 @@ tabla_final <- bind_rows(
 
 # Cierre {background-color="#2d4563"}
 
-## Discusión y resumen
+## Discusión y resumen {#sec:discussion}
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
@@ -621,8 +620,7 @@ Para llevarse a casa: en el [[Apéndice 6]{.button}](#sec:appendix06) apliquen t
 #| eval: false
 
 # Evaluar OLS en test
-pred_ols <- predict(ajuste_ols, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ols <- augment(ajuste_ols, datos_test)
 
 metricas_ols <- pred_ols |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
@@ -705,9 +703,10 @@ resultados_lasso |>
 # 1. Seleccionar mejor λ
 lambda_min <- select_best(resultados_lasso, metric = "rmse")
 
-# 2. Finalizar y ajustar
-wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
-ajuste_lasso   <- fit(wf_lasso_final, data = datos_train)
+# 2. Finalizar y ajustar (en una pipeline)
+ajuste_lasso <- wf_lasso |>
+  finalize_workflow(lambda_min) |>
+  fit(data = datos_train)
 
 # 3. Coeficientes
 coef_lasso <- tidy(ajuste_lasso) |>
@@ -759,8 +758,7 @@ lambda_ridge <- select_best(resultados_ridge, metric = "rmse")
 ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
   fit(data = datos_train)
 
-pred_ridge     <- predict(ajuste_ridge, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ridge     <- augment(ajuste_ridge, datos_test)
 metricas_ridge <- pred_ridge |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
 
@@ -853,8 +851,7 @@ ajuste_dem  <- finalize_workflow(wf_lasso_dem, lambda_dem) |>
   fit(data = datos_train)
 
 # 3. Evaluación
-pred_dem <- predict(ajuste_dem, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_democracia))
+pred_dem <- augment(ajuste_dem, datos_test)
 
 pred_dem |> metrics(truth = satisfaccion_democracia, estimate = .pred)
 ```
@@ -864,6 +861,8 @@ Preguntas para reflexionar:
 - ¿Las mismas variables son predictivas, o cambian?
 - ¿El RMSE es mayor o menor que para `satisfaccion_vida`?
 - Pueden repetir con `percepcion_economia` como tercer outcome
+
+[[Volver a la sección de discusión]{.button}](#sec:discussion)
 :::
 
 ## Apéndice 7: Elastic Net (opcional) {#sec:appendix07}
@@ -909,6 +908,8 @@ predict(ajuste_enet, datos_test) |>
 - Si `mixture` óptimo está cerca de 1 → LASSO ganó
 - Si está cerca de 0 → Ridge ganó
 - Si intermedio → Elastic Net mejora sobre ambos
+
+[[Volver a la sección de LASSO vs. Ridge]{.button}](#sec:lasso-vs-ridge)
 :::
 
 # Fin del día 2! 🤓 {background-color="#2d4563"}

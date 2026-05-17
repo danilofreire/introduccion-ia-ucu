@@ -137,7 +137,7 @@ En el laboratorio usamos `grid_regular()` para crear la grilla de búsqueda. Aho
 
 ### Pregunta 8: Más folds de validación cruzada
 
-Repitan el tuning de Random Forest del laboratorio pero con 10 folds en vez de 5. ¿El mejor modelo tiene los mismos hiperparámetros? ¿El error estándar (`std_err`) de las métricas es menor con más folds?
+Repitan el tuning de Random Forest del laboratorio pero con 20 folds en vez de 10. ¿El mejor modelo tiene los mismos hiperparámetros? ¿El error estándar (`std_err`) de las métricas es menor con más folds?
 
 ```{r p8}
 # Escriban su código aquí
@@ -178,6 +178,8 @@ Comparen el ranking de importancia del VIP (Random Forest, Gini) con el ranking 
 
 Entrenen un modelo `decision_tree()` con `cost_complexity = 0.01`, `tree_depth = 10` y `min_n = 10`. Calculen sus métricas (accuracy, AUC) sobre el conjunto de prueba y compárenlas con la regresión logística y el Random Forest. ¿Cuánto se pierde en rendimiento respecto al Random Forest?
 
+*Pista:* la sintaxis del árbol está en el [Apéndice 3 del Laboratorio 3](07-laboratorio-03.html#sec:appendix03): `decision_tree(cost_complexity, tree_depth, min_n) |> set_engine("rpart") |> set_mode("classification")`.
+
 ```{r p11}
 # Escriban su código aquí
 
@@ -189,7 +191,9 @@ Entrenen un modelo `decision_tree()` con `cost_complexity = 0.01`, `tree_depth =
 
 Creen una tabla que compare cuatro modelos (regresión logística, Random Forest, XGBoost y árbol de decisión) con las métricas: accuracy, AUC, precision, recall y F1-score. Usen `bind_rows()` para combinar y `pivot_wider()` para formatear.
 
-*Pista:* para cada modelo, generen predicciones con `predict()` y `predict(type = "prob")`, luego calculen las métricas con `metrics()` y `f_meas()`.
+*Pista (XGBoost):* la sintaxis está en el [Apéndice 4 del Laboratorio 3](07-laboratorio-03.html#sec:appendix04): `boost_tree(trees = 500, tree_depth = tune(), learn_rate = tune()) |> set_engine("xgboost") |> set_mode("classification")`.
+
+*Pista (métricas):* para cada modelo, generen predicciones con `predict()` y `predict(type = "prob")`, luego calculen las métricas con `metrics()` y `f_meas()`.
 
 ```{r p12}
 # Escriban su código aquí

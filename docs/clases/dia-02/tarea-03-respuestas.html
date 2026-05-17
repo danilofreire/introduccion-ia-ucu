@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -415,7 +415,7 @@ Par con mayor correlación: ingreso_hogar y educacion_anios </code></pre>
 <pre><code>Correlación: 0.539 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Las variables con mayor correlación son probablemente <code>educacion_anios</code> e <code>ingreso_hogar</code> (r ~ 0.30-0.55), lo cual tiene sentido: personas con más educación tienden a tener mayores ingresos. También hay correlación entre <code>interes_politica</code> y <code>confianza_gobierno</code>, ya que personas más interesadas en política pueden tener opiniones más formadas sobre el gobierno. Las correlaciones entre actitudes políticas (confianza en gobierno, en justicia, satisfacción democrática) son moderadas, reflejando que estas actitudes están relacionadas entre si.</p>
+<p><strong>Respuesta:</strong> Las variables con mayor correlación son probablemente <code>educacion_anios</code> e <code>ingreso_hogar</code> (r ~ 0.30-0.55), lo cual tiene sentido: personas con más educación tienden a tener mayores ingresos. También hay correlación entre <code>interes_politica</code> y <code>confianza_gobierno</code>, ya que personas más interesadas en política pueden tener opiniones más formadas sobre el gobierno. Las correlaciones entre actitudes políticas (confianza en gobierno, en justicia, satisfacción democrática) son moderadas, reflejando que estas actitudes están relacionadas entre sí.</p>
 </section>
 <section id="pregunta-3-distribución-de-edad-por-voto" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-distribución-de-edad-por-voto"><span class="header-section-number">2.3</span> Pregunta 3: Distribución de edad por voto</h3>
@@ -456,20 +456,17 @@ Par con mayor correlación: ingreso_hogar y educacion_anios </code></pre>
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo reducido</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>wf_reducido <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>ajuste_reducido <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(receta_reducida) <span class="sc">|&gt;</span></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_logit)</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>ajuste_reducido <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_reducido, <span class="at">data =</span> datos_train)</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>pred_reducido <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_reducido, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(ajuste_reducido, datos_test, <span class="at">type =</span> <span class="st">"prob"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(voto))</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_logit) <span class="sc">|&gt;</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>pred_reducido <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_reducido, datos_test)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>metricas_reducido <span class="ot">&lt;-</span> pred_reducido <span class="sc">|&gt;</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> voto, <span class="at">estimate =</span> .pred_class, .pred_si)</span>
 <span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>metricas_reducido <span class="ot">&lt;-</span> pred_reducido <span class="sc">|&gt;</span></span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> voto, <span class="at">estimate =</span> .pred_class, .pred_si)</span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Modelo reducido (3 predictores):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Modelo reducido (3 predictores):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Modelo reducido (3 predictores):</code></pre>
 </div>
@@ -484,20 +481,17 @@ Par con mayor correlación: ingreso_hogar y educacion_anios </code></pre>
 4 roc_auc     binary         0.637</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo completo para comparar</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>wf_completo <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>ajuste_completo <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_logit)</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>ajuste_completo <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_completo, <span class="at">data =</span> datos_train)</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>pred_completo <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_completo, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(ajuste_completo, datos_test, <span class="at">type =</span> <span class="st">"prob"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(voto))</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_logit) <span class="sc">|&gt;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>pred_completo <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_completo, datos_test)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>metricas_completo <span class="ot">&lt;-</span> pred_completo <span class="sc">|&gt;</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> voto, <span class="at">estimate =</span> .pred_class, .pred_si)</span>
 <span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>metricas_completo <span class="ot">&lt;-</span> pred_completo <span class="sc">|&gt;</span></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> voto, <span class="at">estimate =</span> .pred_class, .pred_si)</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Modelo completo (11 predictores):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Modelo completo (11 predictores):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Modelo completo (11 predictores):</code></pre>
@@ -544,7 +538,7 @@ Modelo completo (11 predictores):</code></pre>
 13 genero_mujer             0.00273     0.111    0.0246 0.980        1.00 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los coeficientes están en escala normalizada (ya que aplicamos <code>step_normalize()</code>), así que los odds ratios se interpretan como el cambio en las chances de votar por cada desviación estándar de aumento en el predictor. La variable con el efecto más fuerte es probablemente <code>interes_politica</code> o <code>edad</code> (odds ratio más alejado de 1). La variable <code>percepcion_economia</code> tiene un efecto negativo: cuando las personas perciben una economia peor, la probabilidad de votar aumenta (voto de protesta).</p>
+<p><strong>Respuesta:</strong> Los coeficientes están en escala normalizada (ya que aplicamos <code>step_normalize()</code>), así que los odds ratios se interpretan como el cambio en las chances de votar por cada desviación estándar de aumento en el predictor. La variable con el efecto más fuerte es probablemente <code>interes_politica</code> o <code>edad</code> (odds ratio más alejado de 1). La variable <code>percepcion_economia</code> tiene un efecto negativo: cuando las personas perciben una economía peor, la probabilidad de votar aumenta (voto de protesta).</p>
 </section>
 </section>
 <section id="random-forest-y-tuning" class="level2" data-number="4">
@@ -556,29 +550,25 @@ Modelo completo (11 predictores):</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>resultados_arboles <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">trees =</span> <span class="fu">numeric</span>(), <span class="at">auc =</span> <span class="fu">numeric</span>())</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (n_trees <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">500</span>, <span class="dv">1000</span>)) {</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  modelo_rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> n_trees, <span class="at">mtry =</span> <span class="dv">4</span>, <span class="at">min_n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  modelo_temp <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> n_trees, <span class="at">mtry =</span> <span class="dv">4</span>, <span class="at">min_n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_engine</span>(<span class="st">"ranger"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
 <span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  wf_rf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  ajuste_temp <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span></span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo_rf)</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  ajuste_rf <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_rf, <span class="at">data =</span> datos_train)</span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  pred_rf <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_rf, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_cols</span>(<span class="fu">predict</span>(ajuste_rf, datos_test, <span class="at">type =</span> <span class="st">"prob"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(voto))</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">add_model</span>(modelo_temp) <span class="sc">|&gt;</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  auc_val <span class="ot">&lt;-</span> ajuste_temp <span class="sc">|&gt;</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">augment</span>(datos_test) <span class="sc">|&gt;</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">roc_auc</span>(<span class="at">truth =</span> voto, .pred_si) <span class="sc">|&gt;</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(.estimate)</span>
 <span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>  auc_val <span class="ot">&lt;-</span> pred_rf <span class="sc">|&gt;</span></span>
-<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">roc_auc</span>(<span class="at">truth =</span> voto, .pred_si) <span class="sc">|&gt;</span></span>
-<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(.estimate)</span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>  resultados_arboles <span class="ot">&lt;-</span> <span class="fu">rbind</span>(resultados_arboles,</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">data.frame</span>(<span class="at">trees =</span> n_trees, <span class="at">auc =</span> <span class="fu">round</span>(auc_val, <span class="dv">4</span>)))</span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb31-21"><a href="#cb31-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>  resultados_arboles <span class="ot">&lt;-</span> <span class="fu">rbind</span>(resultados_arboles,</span>
-<span id="cb31-23"><a href="#cb31-23" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">data.frame</span>(<span class="at">trees =</span> n_trees, <span class="at">auc =</span> <span class="fu">round</span>(auc_val, <span class="dv">4</span>)))</span>
-<span id="cb31-24"><a href="#cb31-24" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb31-25"><a href="#cb31-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-26"><a href="#cb31-26" aria-hidden="true" tabindex="-1"></a>resultados_arboles</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb31-22"><a href="#cb31-22" aria-hidden="true" tabindex="-1"></a>resultados_arboles</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  trees    auc
 1   100 0.5477
@@ -663,44 +653,52 @@ Mejor AUC con grilla aleatoria:</code></pre>
 </section>
 <section id="pregunta-8-más-folds-de-validación-cruzada" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-8-más-folds-de-validación-cruzada"><span class="header-section-number">4.3</span> Pregunta 8: Más folds de validación cruzada</h3>
-<p>Repitan el tuning con 10 folds. ¿Cambian los hiperparámetros? ¿Es menor el error estándar?</p>
+<p>Repitan el tuning con 20 folds (vs los 10 del laboratorio). ¿Cambian los hiperparámetros? ¿Es menor el error estándar?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>folds_10 <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">10</span>, <span class="at">strata =</span> voto)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>res_10folds <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  wf_rf_tune, <span class="at">resamples =</span> folds_10, <span class="at">grid =</span> grilla_reg,</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc),</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_grid</span>(<span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>mejor_5f <span class="ot">&lt;-</span> <span class="fu">show_best</span>(res_regular, <span class="at">metric =</span> <span class="st">"roc_auc"</span>, <span class="at">n =</span> <span class="dv">1</span>)</span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>mejor_10f <span class="ot">&lt;-</span> <span class="fu">show_best</span>(res_10folds, <span class="at">metric =</span> <span class="st">"roc_auc"</span>, <span class="at">n =</span> <span class="dv">1</span>)</span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mejor modelo con 5 folds:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparar 10 folds (baseline del lab) vs 20 folds</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>folds_10 <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">10</span>, <span class="at">strata =</span> voto)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>folds_20 <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">20</span>, <span class="at">strata =</span> voto)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>res_10folds <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  wf_rf_tune, <span class="at">resamples =</span> folds_10, <span class="at">grid =</span> grilla_reg,</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc),</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_grid</span>(<span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>res_20folds <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  wf_rf_tune, <span class="at">resamples =</span> folds_20, <span class="at">grid =</span> grilla_reg,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(roc_auc),</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_grid</span>(<span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>mejor_10f <span class="ot">&lt;-</span> <span class="fu">show_best</span>(res_10folds, <span class="at">metric =</span> <span class="st">"roc_auc"</span>, <span class="at">n =</span> <span class="dv">1</span>)</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>mejor_20f <span class="ot">&lt;-</span> <span class="fu">show_best</span>(res_20folds, <span class="at">metric =</span> <span class="st">"roc_auc"</span>, <span class="at">n =</span> <span class="dv">1</span>)</span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mejor modelo con 10 folds:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mejor modelo con 5 folds:</code></pre>
+<pre><code>Mejor modelo con 10 folds:</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>mejor_5f <span class="sc">|&gt;</span> <span class="fu">select</span>(mtry, min_n, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>mejor_10f <span class="sc">|&gt;</span> <span class="fu">select</span>(mtry, min_n, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 4
    mtry min_n  mean std_err
   &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;
-1     2    21 0.624  0.0252</code></pre>
+1     4    13 0.615  0.0196</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Mejor modelo con 10 folds:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Mejor modelo con 20 folds:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Mejor modelo con 10 folds:</code></pre>
+Mejor modelo con 20 folds:</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>mejor_10f <span class="sc">|&gt;</span> <span class="fu">select</span>(mtry, min_n, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>mejor_20f <span class="sc">|&gt;</span> <span class="fu">select</span>(mtry, min_n, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 4
    mtry min_n  mean std_err
   &lt;int&gt; &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;
-1     4     5 0.616  0.0167</code></pre>
+1     4    21 0.638  0.0284</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los hiperparámetros seleccionados pueden ser los mismos o ligeramente diferentes. El error estándar con 10 folds suele ser algo menor que con 5 folds, porque cada fold de validación es más grande y las estimaciones son más estables. Sin embargo, con un dataset de 500 observaciones, la diferencia práctica es pequeña. Usar 10 folds tarda más, pero da estimaciones algo más confiables.</p>
+<p><strong>Respuesta:</strong> Los hiperparámetros seleccionados pueden ser los mismos o ligeramente diferentes. El error estándar con 20 folds suele ser algo menor que con 10, porque cada fold de validación es más pequeño y promediamos sobre más particiones, lo que reduce la varianza de la estimación. Con un dataset de ~375 observaciones de entrenamiento, la diferencia práctica es pequeña: pasar a 20 folds tarda el doble pero las conclusiones rara vez cambian. La regla general es usar 10 folds como compromiso entre estabilidad y tiempo de cómputo.</p>
 </section>
 </section>
 <section id="interpretación" class="level2" data-number="5">
@@ -709,22 +707,22 @@ Mejor modelo con 10 folds:</code></pre>
 <h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-9-pdps-adicionales"><span class="header-section-number">5.1</span> Pregunta 9: PDPs adicionales</h3>
 <p>Creen PDPs para <code>confianza_gobierno</code> y <code>educacion_anios</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajustar RF final para PDPs</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest principal con importancia (lo reusamos en VIP y comparación)</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>modelo_rf_final <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">500</span>, <span class="at">mtry =</span> <span class="dv">4</span>, <span class="at">min_n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>, <span class="at">importance =</span> <span class="st">"impurity"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
 <span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>wf_rf_final <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>ajuste_rf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span></span>
-<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_rf_final)</span>
-<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>ajuste_rf_pdp <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_rf_final, <span class="at">data =</span> datos_train)</span>
-<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>modelo_ranger <span class="ot">&lt;-</span> <span class="fu">extract_fit_engine</span>(ajuste_rf_pdp)</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_rf_final) <span class="sc">|&gt;</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>rf_engine <span class="ot">&lt;-</span> <span class="fu">extract_fit_engine</span>(ajuste_rf)</span>
 <span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>datos_prep <span class="ot">&lt;-</span> <span class="fu">bake</span>(<span class="fu">prep</span>(receta), <span class="at">new_data =</span> datos_train)</span>
 <span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a><span class="co"># PDP para confianza_gobierno</span></span>
 <span id="cb49-15"><a href="#cb49-15" aria-hidden="true" tabindex="-1"></a>pdp_gobierno <span class="ot">&lt;-</span> <span class="fu">partial</span>(</span>
-<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>  modelo_ranger,</span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true" tabindex="-1"></a>  rf_engine,</span>
 <span id="cb49-17"><a href="#cb49-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred.var =</span> <span class="st">"confianza_gobierno"</span>,</span>
 <span id="cb49-18"><a href="#cb49-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">train =</span> datos_prep,</span>
 <span id="cb49-19"><a href="#cb49-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">prob =</span> <span class="cn">TRUE</span>,</span>
@@ -739,7 +737,7 @@ Mejor modelo con 10 folds:</code></pre>
 <span id="cb49-28"><a href="#cb49-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb49-29"><a href="#cb49-29" aria-hidden="true" tabindex="-1"></a><span class="co"># PDP para educacion_anios</span></span>
 <span id="cb49-30"><a href="#cb49-30" aria-hidden="true" tabindex="-1"></a>pdp_educacion <span class="ot">&lt;-</span> <span class="fu">partial</span>(</span>
-<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>  modelo_ranger,</span>
+<span id="cb49-31"><a href="#cb49-31" aria-hidden="true" tabindex="-1"></a>  rf_engine,</span>
 <span id="cb49-32"><a href="#cb49-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">pred.var =</span> <span class="st">"educacion_anios"</span>,</span>
 <span id="cb49-33"><a href="#cb49-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">train =</span> datos_prep,</span>
 <span id="cb49-34"><a href="#cb49-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">prob =</span> <span class="cn">TRUE</span>,</span>
@@ -774,24 +772,25 @@ Mejor modelo con 10 folds:</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Ranking VIP (Random Forest, Gini):</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>importancia_rf <span class="ot">&lt;-</span> vip<span class="sc">::</span><span class="fu">vi</span>(<span class="fu">extract_fit_parsnip</span>(ajuste_rf_pdp))</span>
-<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>importancia_rf <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(Importance))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>rf_parsnip <span class="ot">&lt;-</span> <span class="fu">extract_fit_parsnip</span>(ajuste_rf)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>importancia_rf <span class="ot">&lt;-</span> vip<span class="sc">::</span><span class="fu">vi</span>(rf_parsnip)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>importancia_rf <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(Importance))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 12 × 2
    Variable                Importance
    &lt;chr&gt;                        &lt;dbl&gt;
- 1 edad                         26.4 
- 2 educacion_anios              23.2 
- 3 ingreso_hogar                15.3 
+ 1 edad                         27.2 
+ 2 educacion_anios              23.6 
+ 3 ingreso_hogar                15.1 
  4 interes_politica             10.7 
- 5 confianza_justicia            9.73
- 6 confianza_gobierno            9.32
- 7 percepcion_economia           9.21
- 8 satisfaccion_democracia       7.94
- 9 uso_internet_semanal          3.74
-10 uso_internet_diario           3.70
-11 zona_urbana                   3.41
-12 genero_mujer                  3.35</code></pre>
+ 5 confianza_justicia            9.56
+ 6 confianza_gobierno            9.08
+ 7 percepcion_economia           9.07
+ 8 satisfaccion_democracia       7.95
+ 9 uso_internet_diario           3.65
+10 uso_internet_semanal          3.60
+11 zona_urbana                   3.56
+12 genero_mujer                  3.40</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ranking de coeficientes logísticos (por |z|)</span></span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Ranking de coeficientes (regresión logística, |z|):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -842,20 +841,17 @@ Ranking de coeficientes (regresión logística, |z|):</code></pre>
 <span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"rpart"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
 <span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>wf_arbol <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>ajuste_arbol <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span></span>
-<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_arbol)</span>
-<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a>ajuste_arbol <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_arbol, <span class="at">data =</span> datos_train)</span>
-<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a>pred_arbol <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_arbol, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(ajuste_arbol, datos_test, <span class="at">type =</span> <span class="st">"prob"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(voto))</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_arbol) <span class="sc">|&gt;</span></span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-15"><a href="#cb58-15" aria-hidden="true" tabindex="-1"></a>pred_arbol <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_arbol, datos_test)</span>
+<span id="cb58-16"><a href="#cb58-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-17"><a href="#cb58-17" aria-hidden="true" tabindex="-1"></a>metricas_arbol <span class="ot">&lt;-</span> pred_arbol <span class="sc">|&gt;</span></span>
+<span id="cb58-18"><a href="#cb58-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> voto, <span class="at">estimate =</span> .pred_class, .pred_si)</span>
 <span id="cb58-19"><a href="#cb58-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a>metricas_arbol <span class="ot">&lt;-</span> pred_arbol <span class="sc">|&gt;</span></span>
-<span id="cb58-21"><a href="#cb58-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> voto, <span class="at">estimate =</span> .pred_class, .pred_si)</span>
-<span id="cb58-22"><a href="#cb58-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb58-23"><a href="#cb58-23" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Árbol de decisión:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb58-20"><a href="#cb58-20" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Árbol de decisión:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Árbol de decisión:</code></pre>
 </div>
@@ -869,30 +865,25 @@ Ranking de coeficientes (regresión logística, |z|):</code></pre>
 3 mn_log_loss binary         2.99 
 4 roc_auc     binary         0.604</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo RF para comparar</span></span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>ajuste_rf_comp <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_rf_final, <span class="at">data =</span> datos_train)</span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>pred_rf_comp <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_rf_comp, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(ajuste_rf_comp, datos_test, <span class="at">type =</span> <span class="st">"prob"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(voto))</span>
-<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>metricas_rf_comp <span class="ot">&lt;-</span> pred_rf_comp <span class="sc">|&gt;</span></span>
-<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> voto, <span class="at">estimate =</span> .pred_class, .pred_si)</span>
-<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Random Forest:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Random Forest: reusamos ajuste_rf de la pregunta 9</span></span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>pred_rf <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_rf, datos_test)</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>metricas_rf <span class="ot">&lt;-</span> pred_rf <span class="sc">|&gt;</span></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> voto, <span class="at">estimate =</span> .pred_class, .pred_si)</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Random Forest:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Random Forest:</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>metricas_rf_comp</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>metricas_rf</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 3
   .metric     .estimator .estimate
   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
-1 accuracy    binary         0.563
-2 kap         binary         0.114
-3 mn_log_loss binary         0.703
-4 roc_auc     binary         0.558</code></pre>
+1 accuracy    binary        0.548 
+2 kap         binary        0.0837
+3 mn_log_loss binary        0.700 
+4 roc_auc     binary        0.565 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Regresión logística:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -944,31 +935,28 @@ Regresión logística:</code></pre>
 <span id="cb70-26"><a href="#cb70-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"xgboost"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb70-27"><a href="#cb70-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
 <span id="cb70-28"><a href="#cb70-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-29"><a href="#cb70-29" aria-hidden="true" tabindex="-1"></a>wf_xgb <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb70-29"><a href="#cb70-29" aria-hidden="true" tabindex="-1"></a>ajuste_xgb <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb70-30"><a href="#cb70-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span></span>
-<span id="cb70-31"><a href="#cb70-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_xgb)</span>
-<span id="cb70-32"><a href="#cb70-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-33"><a href="#cb70-33" aria-hidden="true" tabindex="-1"></a>ajuste_xgb <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_xgb, <span class="at">data =</span> datos_train)</span>
-<span id="cb70-34"><a href="#cb70-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-35"><a href="#cb70-35" aria-hidden="true" tabindex="-1"></a>pred_xgb <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_xgb, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb70-36"><a href="#cb70-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(ajuste_xgb, datos_test, <span class="at">type =</span> <span class="st">"prob"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb70-37"><a href="#cb70-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(voto))</span>
-<span id="cb70-38"><a href="#cb70-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-39"><a href="#cb70-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular métricas para todos</span></span>
-<span id="cb70-40"><a href="#cb70-40" aria-hidden="true" tabindex="-1"></a>tabla <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb70-41"><a href="#cb70-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calcular_metricas</span>(pred_completo, <span class="st">"Reg. logística"</span>),</span>
-<span id="cb70-42"><a href="#cb70-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calcular_metricas</span>(pred_rf_comp, <span class="st">"Random Forest"</span>),</span>
-<span id="cb70-43"><a href="#cb70-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calcular_metricas</span>(pred_xgb, <span class="st">"XGBoost"</span>),</span>
-<span id="cb70-44"><a href="#cb70-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calcular_metricas</span>(pred_arbol, <span class="st">"Árbol decisión"</span>)</span>
-<span id="cb70-45"><a href="#cb70-45" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb70-46"><a href="#cb70-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb70-47"><a href="#cb70-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabla resumen</span></span>
-<span id="cb70-48"><a href="#cb70-48" aria-hidden="true" tabindex="-1"></a>tabla <span class="sc">|&gt;</span></span>
-<span id="cb70-49"><a href="#cb70-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb70-50"><a href="#cb70-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">|&gt;</span></span>
-<span id="cb70-51"><a href="#cb70-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb70-52"><a href="#cb70-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb70-53"><a href="#cb70-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(roc_auc))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb70-31"><a href="#cb70-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_xgb) <span class="sc">|&gt;</span></span>
+<span id="cb70-32"><a href="#cb70-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
+<span id="cb70-33"><a href="#cb70-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-34"><a href="#cb70-34" aria-hidden="true" tabindex="-1"></a>pred_xgb <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_xgb, datos_test)</span>
+<span id="cb70-35"><a href="#cb70-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-36"><a href="#cb70-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular métricas para todos</span></span>
+<span id="cb70-37"><a href="#cb70-37" aria-hidden="true" tabindex="-1"></a>tabla <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb70-38"><a href="#cb70-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calcular_metricas</span>(pred_completo, <span class="st">"Reg. logística"</span>),</span>
+<span id="cb70-39"><a href="#cb70-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calcular_metricas</span>(pred_rf, <span class="st">"Random Forest"</span>),</span>
+<span id="cb70-40"><a href="#cb70-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calcular_metricas</span>(pred_xgb, <span class="st">"XGBoost"</span>),</span>
+<span id="cb70-41"><a href="#cb70-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calcular_metricas</span>(pred_arbol, <span class="st">"Árbol decisión"</span>)</span>
+<span id="cb70-42"><a href="#cb70-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb70-43"><a href="#cb70-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-44"><a href="#cb70-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabla resumen</span></span>
+<span id="cb70-45"><a href="#cb70-45" aria-hidden="true" tabindex="-1"></a>tabla <span class="sc">|&gt;</span></span>
+<span id="cb70-46"><a href="#cb70-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb70-47"><a href="#cb70-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">|&gt;</span></span>
+<span id="cb70-48"><a href="#cb70-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb70-49"><a href="#cb70-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb70-50"><a href="#cb70-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(roc_auc))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 8
   modelo         accuracy   kap mn_log_loss roc_auc f_meas precision recall
@@ -976,7 +964,7 @@ Regresión logística:</code></pre>
 1 Reg. logística    0.611 0.214       0.67    0.626  0.647     0.634  0.662
 2 XGBoost           0.587 0.169       0.684   0.61   0.618     0.618  0.618
 3 Árbol decisión    0.571 0.133       2.99    0.604  0.614     0.597  0.632
-4 Random Forest     0.563 0.114       0.703   0.558  0.615     0.587  0.647</code></pre>
+4 Random Forest     0.548 0.084       0.7     0.565  0.596     0.575  0.618</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> La tabla permite comparar los modelos en varias dimensiones. Random Forest y XGBoost suelen tener el mejor AUC, seguidos por la regresión logística y el árbol de decisión. Las diferencias en accuracy pueden ser pequeñas (2-5 puntos porcentuales), lo que plantea la pregunta de si la complejidad adicional de RF o XGBoost se justifica. La precisión y el recall pueden variar: algunos modelos son más conservadores (alta precisión, bajo recall) y otros más agresivos.</p>

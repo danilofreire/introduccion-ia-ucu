@@ -255,7 +255,8 @@ ajuste_log <- logistic_reg() |>
 :::{style="text-align: center; font-size: 22px;"}
 **Resultados (datos simulados, n = `r nrow(datos_train)`):**
 
-```{r resultados-log, echo=FALSE, message=FALSE}
+```{r resultados-log, echo=TRUE, message=FALSE}
+#| code-fold: true
 broom::tidy(ajuste_log) |>
   dplyr::mutate(
     odds_ratio = exp(estimate),
@@ -437,24 +438,23 @@ Con tidymodels, solo necesitamos cambiar la especificación del modelo:
 
 :::{style="font-size: 22px;"}
 ```{r arbol-fit, echo=TRUE, message=FALSE}
-# Especificar un árbol de decisión
-modelo_arbol <- decision_tree(
-  tree_depth = 5, min_n = 10) |>
+# Ajustar un árbol de decisión (spec + fit en una sola pipeline)
+ajuste_arbol <- decision_tree(tree_depth = 5, min_n = 10) |>
   set_engine("rpart") |>
-  set_mode("classification")
+  set_mode("classification") |>
+  fit(apoya_democracia ~ ., data = datos_train)
 
-# Ajustar (exactamente igual que antes)
-ajuste_arbol <- modelo_arbol |> fit(apoya_democracia ~ ., data = datos_train)
-
-# Predecir y calcular accuracy
-pred_arbol <- predict(ajuste_arbol, datos_test)$.pred_class
-accuracy_vec(datos_test$apoya_democracia, pred_arbol)
+# Evaluar: accuracy y ROC-AUC en test
+pred_arbol <- augment(ajuste_arbol, datos_test)
+pred_arbol |> accuracy(truth = apoya_democracia, estimate = .pred_class)
+pred_arbol |> roc_auc(truth = apoya_democracia, .pred_si, event_level = "second")
 ```
 :::
 
 - Noten que la [interfaz es idéntica]{.alert}: solo cambiamos `logistic_reg()` por `decision_tree()`
+- Esta es la gran ventaja de tidymodels: [misma sintaxis para todos los modelos!]{.alert}
 - `tree_depth` y `min_n` son [hiperparámetros]{.alert}: controlan la complejidad del modelo
-- Esta es la gran ventaja de tidymodels: [misma sintaxis para todos los modelos]{.alert}
+- [`augment()`]{.alert} agrega las predicciones (`.pred_class`, `.pred_no`, `.pred_si`) al test set, así una sola llamada nos da todo lo necesario para calcular cualquier métrica de yardstick
 :::
 
 ## Visualizar un árbol de decisión
@@ -646,21 +646,16 @@ De nuevo, con tidymodels solo cambiamos la especificación:
 
 :::{style="font-size: 22px;"}
 ```{r rf-fit, echo=TRUE, message=FALSE}
-# Especificar Random Forest
-modelo_rf <- rand_forest(
-  trees = 500, mtry  = 3, min_n = 5) |>
-  set_engine("ranger", seed = 1) |>
-  set_mode("classification")
-
-# Ajustar
-ajuste_rf <- modelo_rf |>
+# Ajustar Random Forest (importance = "permutation" lo usamos después en VIP)
+ajuste_rf <- rand_forest(trees = 500, mtry = 3, min_n = 5) |>
+  set_engine("ranger", seed = 1, importance = "permutation") |>
+  set_mode("classification") |>
   fit(apoya_democracia ~ ., data = datos_train)
 
-# Predecir y evaluar
-predict(ajuste_rf, datos_test) |>
-  dplyr::bind_cols(datos_test) |>
-  yardstick::metrics(truth    = apoya_democracia,
-                     estimate = .pred_class)
+# Evaluar: accuracy y ROC-AUC en test
+pred_rf <- augment(ajuste_rf, datos_test)
+pred_rf |> accuracy(truth = apoya_democracia, estimate = .pred_class)
+pred_rf |> roc_auc(truth = apoya_democracia, .pred_si, event_level = "second")
 ```
 :::
 
@@ -685,16 +680,9 @@ predict(ajuste_rf, datos_test) |>
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 21px; margin-top: 20px;"}
 ```{r vip-rf, echo=TRUE, message=FALSE, warning=FALSE, fig.height=3.5, fig.width=5, fig.align="center", out.width="100%"}
-rf_spec <- rand_forest(trees = 500) |>
-  set_engine("ranger",
-             importance = "permutation") |>
-  set_mode("classification")
-
-rf_fit <- rf_spec |>
-  fit(apoya_democracia ~ .,
-      data = datos_train)
-
-vip(rf_fit, num_features = 7)
+# Reusamos ajuste_rf,
+# que ya tiene importance = "permutation"
+vip(ajuste_rf, num_features = 7)
 ```
 :::
 :::
@@ -740,7 +728,7 @@ vip(rf_fit, num_features = 7)
 ```{r pdp-code, echo=TRUE, eval=TRUE, fig.show='hide', message=FALSE, warning=FALSE}
 library(pdp)
 
-rf_fit |>
+ajuste_rf |>
   partial(pred.var    = "confianza_gobierno",
           which.class = "si",
           prob        = TRUE,
@@ -754,7 +742,7 @@ rf_fit |>
 **PDP: confianza en el gobierno → P(apoya democracia)**
 
 ```{r pdp-confianza, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3.5, fig.width=5, fig.align="center", out.width="90%"}
-rf_fit |>
+ajuste_rf |>
   pdp::partial(pred.var = "confianza_gobierno",
                which.class = "si",
                prob = TRUE,
@@ -825,9 +813,7 @@ El [tuning]{.alert} busca la mejor combinación de hiperparámetros usando valid
 
 ```{r tuning-full, echo=TRUE, message=FALSE, warning=FALSE}
 # 1. Modelo con parámetros tune()
-modelo_rf_tune <- rand_forest(
-  trees = 500, mtry = tune(), min_n = tune()
-) |>
+modelo_rf_tune <- rand_forest(trees = 500, mtry = tune(), min_n = tune()) |>
   set_engine("ranger", seed = 1) |>
   set_mode("classification")
 
@@ -851,15 +837,14 @@ ajuste_final <- finalize_model(modelo_rf_tune, mejor) |>
   fit(apoya_democracia ~ ., data = datos_train)
 
 # 5. Evaluar en datos de test
-predict(ajuste_final, datos_test) |>
-  dplyr::bind_cols(datos_test) |>
-  yardstick::metrics(truth = apoya_democracia,
-                     estimate = .pred_class)
+pred_test <- augment(ajuste_final, datos_test)
+pred_test |> accuracy(truth = apoya_democracia, estimate = .pred_class)
+pred_test |> roc_auc(truth = apoya_democracia, .pred_si, event_level = "second")
 ```
 
 - `tune()` marca los hiperparámetros a ajustar; `tune_grid()` evalúa cada combinación con validación cruzada
 - `select_best()` elige la mejor según la métrica indicada; `finalize_model()` fija los hiperparámetros para el entrenamiento final
-- [El tuning mejora el rendimiento pero toma tiempo]{.alert} — empiecen con valores por defecto y ajusten si es necesario
+- [El tuning mejora el rendimiento pero toma tiempo]{.alert}. Empiecen con valores por defecto y ajusten si es necesario
 :::
 
 # Comparación de modelos {background-color="#2d4563"}
@@ -872,29 +857,23 @@ La gran ventaja de tidymodels es que [cambiar de modelo es trivial]{.alert}:
 
 :::{style="font-size: 20px;"}
 ```{r comparacion-modelos, echo=TRUE, message=FALSE, warning=FALSE}
-# Modelos:
-modelo_1 <- logistic_reg() |> set_engine("glm") |> set_mode("classification")
-modelo_2 <- decision_tree(tree_depth = 5) |> set_engine("rpart") |> set_mode("classification")
-modelo_3 <- rand_forest(trees = 500) |> set_engine("ranger", seed = 1) |> set_mode("classification")
+# Recap: las tres ajustes que vimos en este capítulo (misma estructura, distinta spec)
+ajuste_log <- logistic_reg() |> set_engine("glm") |> set_mode("classification") |>
+  fit(apoya_democracia ~ ., data = datos_train)
+ajuste_arbol <- decision_tree(tree_depth = 5, min_n = 10) |> set_engine("rpart") |> set_mode("classification") |>
+  fit(apoya_democracia ~ ., data = datos_train)
+ajuste_rf <- rand_forest(trees = 500, mtry = 3, min_n = 5) |> set_engine("ranger", seed = 1, importance = "permutation") |> set_mode("classification") |>
+  fit(apoya_democracia ~ ., data = datos_train)
 
-# Todos se ajustan con la misma sintaxis
-ajuste_1 <- modelo_1 |> fit(apoya_democracia ~ ., data = datos_train)
-ajuste_2 <- modelo_2 |> fit(apoya_democracia ~ ., data = datos_train)
-ajuste_3 <- modelo_3 |> fit(apoya_democracia ~ ., data = datos_train)
-
-# Predecir las clases en el conjunto de prueba
-pred_1 <- predict(ajuste_1, datos_test)$.pred_class
-pred_2 <- predict(ajuste_2, datos_test)$.pred_class
-pred_3 <- predict(ajuste_3, datos_test)$.pred_class
-
-# Comparar con las clases verdaderas usando yardstick::accuracy_vec()
-verdad <- datos_test$apoya_democracia
-
+# Métrica: accuracy en test usando augment() + accuracy() para cada modelo
 tibble(
-  modelo   = c("Logística", "Árbol", "Random Forest"),
-  accuracy = c(accuracy_vec(verdad, pred_1), accuracy_vec(verdad, pred_2), accuracy_vec(verdad, pred_3))
-) |>
-  knitr::kable(digits = 3)
+  modelo = c("Logística", "Árbol", "Random Forest"),
+  accuracy = c(
+    augment(ajuste_log,   datos_test) |> accuracy(apoya_democracia, .pred_class) |> pull(.estimate),
+    augment(ajuste_arbol, datos_test) |> accuracy(apoya_democracia, .pred_class) |> pull(.estimate),
+    augment(ajuste_rf,    datos_test) |> accuracy(apoya_democracia, .pred_class) |> pull(.estimate)
+  )
+) |> knitr::kable(digits = 3)
 ```
 :::
 

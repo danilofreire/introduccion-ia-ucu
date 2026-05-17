@@ -298,6 +298,7 @@ ajuste <- fit(modelo_lasso, satisfaccion_vida ~ ., data = datos_train)
 - [Transformaciones]{.alert}: `log(ingreso)`, `edad^2` para no linealidades
 - [Discretización]{.alert}: edad → grupos etarios
 - [Imputación]{.alert}: reemplazar valores faltantes (mediana, KNN)
+- <https://recipes.tidymodels.org/reference/index.html>
 
 **Con recipes de tidymodels:**
 
@@ -311,7 +312,7 @@ receta <- recipe(voto ~ ., data = datos_train) |>
   step_other(religion, threshold = 0.05) |>         # agrupar raras
   step_corr(all_numeric_predictors(),
             threshold = 0.9) |>                     # quitar r > 0.9 (multicolinealidad)
-  step_log(ingreso, offset = 1) |>
+  step_log(ingreso, offset = 1) |>                  # log(ingreso + 1)  
   step_poly(edad, degree = 2)                       # edad + edad²
 ```
 :::
@@ -326,13 +327,15 @@ receta <- recipe(voto ~ ., data = datos_train) |>
 - Ventaja: se aplica automáticamente a datos nuevos, sin repetir pasos manualmente
 
 ```r
-# Combinar receta + modelo
-flujo <- workflow() |>
+# Combinar receta + modelo en un workflow
+# (en los labs lo verán como wf_<modelo>: 
+# wf_lasso, wf_rf, etc.)
+wf_lasso <- workflow() |>
   add_recipe(receta) |>
   add_model(modelo_lasso)
 
 # Ajustar todo junto
-ajuste <- fit(flujo, data = datos_train)
+ajuste <- fit(wf_lasso, data = datos_train)
 
 # Predecir con datos nuevos
 predicciones <- predict(ajuste,
@@ -346,7 +349,7 @@ predicciones <- predict(ajuste,
 
 ```r
 # Evaluar en el test set (una sola vez)
-resultado <- last_fit(flujo,
+resultado <- last_fit(wf_lasso,
                       split = datos_split)
 
 # Métricas finales
@@ -461,25 +464,33 @@ collect_metrics(resultados)
 ```r
 # 1. Modelo con penalty a ajustar (tune() = "búscalo con CV")
 # mixture = 1 → LASSO. Para Elastic Net: mixture = tune() también
-modelo_lasso_tune <- linear_reg(penalty = tune(), mixture = 1) |> set_engine("glmnet")
+modelo_lasso_tune <- linear_reg(penalty = tune(), mixture = 1) |> set_engine("glmnet") |> set_mode("regression")
 
-# 2. Grilla de valores candidatos de penalty (λ) en escala log10
+# 2. Workflow (mismo patrón que antes, ahora con penalty pendiente)
+wf_lasso <- workflow() |> add_recipe(receta) |> add_model(modelo_lasso_tune)
+
+# 3. Grilla de valores candidatos de penalty (λ) en escala log10
 grilla_lambda <- grid_regular(penalty(range = c(-4, 0)), levels = 30)
 
-# 3. Validación cruzada con 5 folds
+# 4. Validación cruzada con 5 folds
 folds <- vfold_cv(datos_train, v = 5)
 
-# 4. Probar cada λ con CV
-resultados <- tune_grid(modelo_lasso_tune,
-  satisfaccion_vida ~ .,
+# 5. Probar cada λ con CV (ahora le pasamos el workflow)
+resultados <- tune_grid(wf_lasso,
   resamples = folds,
   grid = grilla_lambda,
   metrics = metric_set(rmse, rsq))
 
-# 5. Visualizar y seleccionar el mejor
-autoplot(resultados)
+# 6. Seleccionar el mejor λ
 mejor_lambda <- select_best(resultados, metric = "rmse")
-modelo_final <- finalize_model(modelo_lasso_tune, mejor_lambda)
+
+# 7. Finalizar y evaluar en test (last_fit = fit en train + métricas en test)
+resultado_final <- wf_lasso |>
+  finalize_workflow(mejor_lambda) |>
+  last_fit(split = datos_split,
+           metrics = metric_set(rmse, rsq))
+
+collect_metrics(resultado_final)
 ```
 
 - `select_best()` da el λ con menor RMSE. Veremos una alternativa más parsimoniosa en la próxima slide

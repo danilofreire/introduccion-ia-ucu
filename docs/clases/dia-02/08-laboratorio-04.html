@@ -1402,7 +1402,8 @@ $ voto                    &lt;chr&gt; &quot;no&quot;, &quot;si&quot;, &quot;si&q
 <span id="cb5-6"><a></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>())                    <span class="co"># eliminar varianza cero</span></span>
 <span id="cb5-7"><a></a></span>
 <span id="cb5-8"><a></a><span class="co"># Verificar</span></span>
-<span id="cb5-9"><a></a>receta <span class="sc">|&gt;</span> <span class="fu">prep</span>() <span class="sc">|&gt;</span> <span class="fu">juice</span>() <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-9"><a></a><span class="co"># prep() = preparar la receta con los datos de train; juice() = extraer el dataset preprocesado</span></span>
+<span id="cb5-10"><a></a>receta <span class="sc">|&gt;</span> <span class="fu">prep</span>() <span class="sc">|&gt;</span> <span class="fu">juice</span>() <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 375
 Columns: 13
@@ -1437,14 +1438,16 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <span id="cb7-3"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;lm&quot;</span>) <span class="sc">|&gt;</span></span>
 <span id="cb7-4"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;regression&quot;</span>)</span>
 <span id="cb7-5"><a></a></span>
-<span id="cb7-6"><a></a><span class="co"># Workflow + ajuste</span></span>
-<span id="cb7-7"><a></a>wf_ols     <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span> <span class="fu">add_model</span>(modelo_ols)</span>
-<span id="cb7-8"><a></a>ajuste_ols <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_ols, <span class="at">data =</span> datos_train)</span>
-<span id="cb7-9"><a></a></span>
-<span id="cb7-10"><a></a><span class="co"># Coeficientes ordenados por magnitud (top 5)</span></span>
-<span id="cb7-11"><a></a><span class="fu">tidy</span>(ajuste_ols) <span class="sc">|&gt;</span></span>
-<span id="cb7-12"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate))) <span class="sc">|&gt;</span></span>
-<span id="cb7-13"><a></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-6"><a></a><span class="co"># Workflow + ajuste (combinados en una pipeline)</span></span>
+<span id="cb7-7"><a></a>ajuste_ols <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-8"><a></a>  <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span></span>
+<span id="cb7-9"><a></a>  <span class="fu">add_model</span>(modelo_ols) <span class="sc">|&gt;</span></span>
+<span id="cb7-10"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
+<span id="cb7-11"><a></a></span>
+<span id="cb7-12"><a></a><span class="co"># Coeficientes ordenados por magnitud (top 5)</span></span>
+<span id="cb7-13"><a></a><span class="fu">tidy</span>(ajuste_ols) <span class="sc">|&gt;</span></span>
+<span id="cb7-14"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate))) <span class="sc">|&gt;</span></span>
+<span id="cb7-15"><a></a>  <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 5
   term                    estimate std.error statistic   p.value
@@ -1467,15 +1470,14 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <div style="margin-top: 30px; font-size: 20px;">
 <p><strong>Tarea (5 min):</strong> completen los huecos para evaluar <code>ajuste_ols</code> en el conjunto de prueba</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co"># Generar predicciones</span></span>
-<span id="cb9-2"><a></a>pred_ols <span class="ot">&lt;-</span> <span class="fu">predict</span>(___, datos_test) <span class="sc">|&gt;</span>            <span class="co"># </span><span class="al">TODO</span><span class="co">: ¿qué modelo?</span></span>
-<span id="cb9-3"><a></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(___))             <span class="co"># </span><span class="al">TODO</span><span class="co">: variable objetivo</span></span>
-<span id="cb9-4"><a></a></span>
-<span id="cb9-5"><a></a><span class="co"># Calcular métricas</span></span>
-<span id="cb9-6"><a></a>metricas_ols <span class="ot">&lt;-</span> pred_ols <span class="sc">|&gt;</span></span>
-<span id="cb9-7"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> ___, <span class="at">estimate =</span> ___)             <span class="co"># </span><span class="al">TODO</span><span class="co">: columna real y predicha</span></span>
-<span id="cb9-8"><a></a></span>
-<span id="cb9-9"><a></a>metricas_ols</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co"># Generar predicciones (augment() añade .pred al test set)</span></span>
+<span id="cb9-2"><a></a>pred_ols <span class="ot">&lt;-</span> <span class="fu">augment</span>(___, datos_test)               <span class="co"># </span><span class="al">TODO</span><span class="co">: ¿qué modelo?</span></span>
+<span id="cb9-3"><a></a></span>
+<span id="cb9-4"><a></a><span class="co"># Calcular métricas</span></span>
+<span id="cb9-5"><a></a>metricas_ols <span class="ot">&lt;-</span> pred_ols <span class="sc">|&gt;</span></span>
+<span id="cb9-6"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> ___, <span class="at">estimate =</span> ___)             <span class="co"># </span><span class="al">TODO</span><span class="co">: columna real y predicha</span></span>
+<span id="cb9-7"><a></a></span>
+<span id="cb9-8"><a></a>metricas_ols</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
@@ -1731,15 +1733,14 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <span id="cb16-17"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
 <span id="cb16-18"><a></a></span>
 <span id="cb16-19"><a></a><span class="co"># 4. Evaluar en test</span></span>
-<span id="cb16-20"><a></a>pred_ridge     <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_ridge, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb16-21"><a></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(satisfaccion_vida))</span>
-<span id="cb16-22"><a></a>metricas_ridge <span class="ot">&lt;-</span> pred_ridge <span class="sc">|&gt;</span></span>
-<span id="cb16-23"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
-<span id="cb16-24"><a></a></span>
-<span id="cb16-25"><a></a><span class="co"># 5. Contar variables eliminadas (debería ser 0!)</span></span>
-<span id="cb16-26"><a></a><span class="fu">cat</span>(<span class="st">&quot;Variables eliminadas en Ridge:&quot;</span>,</span>
-<span id="cb16-27"><a></a>    <span class="fu">sum</span>(<span class="fu">tidy</span>(ajuste_ridge)<span class="sc">$</span>estimate[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">==</span> <span class="dv">0</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb16-28"><a></a>metricas_ridge</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb16-20"><a></a>pred_ridge     <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_ridge, datos_test)</span>
+<span id="cb16-21"><a></a>metricas_ridge <span class="ot">&lt;-</span> pred_ridge <span class="sc">|&gt;</span></span>
+<span id="cb16-22"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
+<span id="cb16-23"><a></a></span>
+<span id="cb16-24"><a></a><span class="co"># 5. Contar variables eliminadas (debería ser 0!)</span></span>
+<span id="cb16-25"><a></a><span class="fu">cat</span>(<span class="st">&quot;Variables eliminadas en Ridge:&quot;</span>,</span>
+<span id="cb16-26"><a></a>    <span class="fu">sum</span>(<span class="fu">tidy</span>(ajuste_ridge)<span class="sc">$</span>estimate[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">==</span> <span class="dv">0</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb16-27"><a></a>metricas_ridge</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-note callout-titled callout-style-default">
 <div class="callout-body">
@@ -1770,7 +1771,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><a href="#/sec:appendix04"><span class="button">Apéndice 4: Solución</span></a></p>
 </div>
 </section>
-<section id="lasso-selecciona-ridge-encoge" class="slide level2">
+<section id="sec:lasso-vs-ridge" class="slide level2">
 <h2>LASSO selecciona, Ridge encoge</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="columns">
@@ -1852,7 +1853,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <h1>Cierre</h1>
 
 </section>
-<section id="discusión-y-resumen" class="slide level2 scrollable">
+<section id="sec:discussion" class="slide level2 scrollable">
 <h2>Discusión y resumen</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="columns">
@@ -1890,13 +1891,12 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <div style="margin-top: 20px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a><span class="co"># Evaluar OLS en test</span></span>
-<span id="cb18-2"><a></a>pred_ols <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_ols, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(satisfaccion_vida))</span>
-<span id="cb18-4"><a></a></span>
-<span id="cb18-5"><a></a>metricas_ols <span class="ot">&lt;-</span> pred_ols <span class="sc">|&gt;</span></span>
-<span id="cb18-6"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
-<span id="cb18-7"><a></a></span>
-<span id="cb18-8"><a></a>metricas_ols</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb18-2"><a></a>pred_ols <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_ols, datos_test)</span>
+<span id="cb18-3"><a></a></span>
+<span id="cb18-4"><a></a>metricas_ols <span class="ot">&lt;-</span> pred_ols <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
+<span id="cb18-6"><a></a></span>
+<span id="cb18-7"><a></a>metricas_ols</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Resultado:</strong></p>
 <div class="cell" data-layout-align="center">
@@ -2037,18 +2037,19 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a><span class="co"># 1. Seleccionar mejor λ</span></span>
 <span id="cb20-2"><a></a>lambda_min <span class="ot">&lt;-</span> <span class="fu">select_best</span>(resultados_lasso, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span>
 <span id="cb20-3"><a></a></span>
-<span id="cb20-4"><a></a><span class="co"># 2. Finalizar y ajustar</span></span>
-<span id="cb20-5"><a></a>wf_lasso_final <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(wf_lasso, lambda_min)</span>
-<span id="cb20-6"><a></a>ajuste_lasso   <span class="ot">&lt;-</span> <span class="fu">fit</span>(wf_lasso_final, <span class="at">data =</span> datos_train)</span>
-<span id="cb20-7"><a></a></span>
-<span id="cb20-8"><a></a><span class="co"># 3. Coeficientes</span></span>
-<span id="cb20-9"><a></a>coef_lasso <span class="ot">&lt;-</span> <span class="fu">tidy</span>(ajuste_lasso) <span class="sc">|&gt;</span></span>
-<span id="cb20-10"><a></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-11"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate)))</span>
-<span id="cb20-12"><a></a></span>
-<span id="cb20-13"><a></a><span class="fu">cat</span>(<span class="st">&quot;Variables eliminadas:&quot;</span>, <span class="fu">sum</span>(coef_lasso<span class="sc">$</span>estimate <span class="sc">==</span> <span class="dv">0</span>),</span>
-<span id="cb20-14"><a></a>    <span class="st">&quot;de&quot;</span>, <span class="fu">nrow</span>(coef_lasso), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb20-15"><a></a>coef_lasso</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-4"><a></a><span class="co"># 2. Finalizar y ajustar (en una pipeline)</span></span>
+<span id="cb20-5"><a></a>ajuste_lasso <span class="ot">&lt;-</span> wf_lasso <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a></a>  <span class="fu">finalize_workflow</span>(lambda_min) <span class="sc">|&gt;</span></span>
+<span id="cb20-7"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
+<span id="cb20-8"><a></a></span>
+<span id="cb20-9"><a></a><span class="co"># 3. Coeficientes</span></span>
+<span id="cb20-10"><a></a>coef_lasso <span class="ot">&lt;-</span> <span class="fu">tidy</span>(ajuste_lasso) <span class="sc">|&gt;</span></span>
+<span id="cb20-11"><a></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-12"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate)))</span>
+<span id="cb20-13"><a></a></span>
+<span id="cb20-14"><a></a><span class="fu">cat</span>(<span class="st">&quot;Variables eliminadas:&quot;</span>, <span class="fu">sum</span>(coef_lasso<span class="sc">$</span>estimate <span class="sc">==</span> <span class="dv">0</span>),</span>
+<span id="cb20-15"><a></a>    <span class="st">&quot;de&quot;</span>, <span class="fu">nrow</span>(coef_lasso), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb20-16"><a></a>coef_lasso</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Top coeficientes (no nulos):</strong></p>
 <div class="cell" data-layout-align="center">
@@ -2143,14 +2144,13 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <span id="cb21-14"><a></a>ajuste_ridge <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(wf_ridge, lambda_ridge) <span class="sc">|&gt;</span></span>
 <span id="cb21-15"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
 <span id="cb21-16"><a></a></span>
-<span id="cb21-17"><a></a>pred_ridge     <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_ridge, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb21-18"><a></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(satisfaccion_vida))</span>
-<span id="cb21-19"><a></a>metricas_ridge <span class="ot">&lt;-</span> pred_ridge <span class="sc">|&gt;</span></span>
-<span id="cb21-20"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
-<span id="cb21-21"><a></a></span>
-<span id="cb21-22"><a></a><span class="fu">cat</span>(<span class="st">&quot;Variables eliminadas en Ridge:&quot;</span>,</span>
-<span id="cb21-23"><a></a>    <span class="fu">sum</span>(<span class="fu">tidy</span>(ajuste_ridge)<span class="sc">$</span>estimate[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">==</span> <span class="dv">0</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb21-24"><a></a>metricas_ridge</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb21-17"><a></a>pred_ridge     <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_ridge, datos_test)</span>
+<span id="cb21-18"><a></a>metricas_ridge <span class="ot">&lt;-</span> pred_ridge <span class="sc">|&gt;</span></span>
+<span id="cb21-19"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_vida, <span class="at">estimate =</span> .pred)</span>
+<span id="cb21-20"><a></a></span>
+<span id="cb21-21"><a></a><span class="fu">cat</span>(<span class="st">&quot;Variables eliminadas en Ridge:&quot;</span>,</span>
+<span id="cb21-22"><a></a>    <span class="fu">sum</span>(<span class="fu">tidy</span>(ajuste_ridge)<span class="sc">$</span>estimate[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">==</span> <span class="dv">0</span>), <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb21-23"><a></a>metricas_ridge</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Métricas de Ridge en test:</strong></p>
 <div class="cell" data-layout-align="center">
@@ -2274,10 +2274,9 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <span id="cb23-18"><a></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
 <span id="cb23-19"><a></a></span>
 <span id="cb23-20"><a></a><span class="co"># 3. Evaluación</span></span>
-<span id="cb23-21"><a></a>pred_dem <span class="ot">&lt;-</span> <span class="fu">predict</span>(ajuste_dem, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb23-22"><a></a>  <span class="fu">bind_cols</span>(datos_test <span class="sc">|&gt;</span> <span class="fu">select</span>(satisfaccion_democracia))</span>
-<span id="cb23-23"><a></a></span>
-<span id="cb23-24"><a></a>pred_dem <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_democracia, <span class="at">estimate =</span> .pred)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb23-21"><a></a>pred_dem <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_dem, datos_test)</span>
+<span id="cb23-22"><a></a></span>
+<span id="cb23-23"><a></a>pred_dem <span class="sc">|&gt;</span> <span class="fu">metrics</span>(<span class="at">truth =</span> satisfaccion_democracia, <span class="at">estimate =</span> .pred)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Preguntas para reflexionar:</p>
 <ul>
@@ -2285,6 +2284,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <li>¿El RMSE es mayor o menor que para <code>satisfaccion_vida</code>?</li>
 <li>Pueden repetir con <code>percepcion_economia</code> como tercer outcome</li>
 </ul>
+<p><a href="#/sec:discussion"><span class="button">Volver a la sección de discusión</span></a></p>
 </div>
 </section>
 <section id="sec:appendix07" class="slide level2">
@@ -2326,6 +2326,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <li>Si está cerca de 0 → Ridge ganó</li>
 <li>Si intermedio → Elastic Net mejora sobre ambos</li>
 </ul>
+<p><a href="#/sec:lasso-vs-ridge"><span class="button">Volver a la sección de LASSO vs. Ridge</span></a></p>
 </div>
 </section></section>
 <section id="fin-del-día-2" class="title-slide slide level1 center" data-background-color="#2d4563">

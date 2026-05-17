@@ -130,11 +130,10 @@ modelo_ols <- linear_reg() |>
   set_engine("lm") |>
   set_mode("regression")
 
-wf_ols <- workflow() |>
+ajuste_ols <- workflow() |>
   add_recipe(receta) |>
-  add_model(modelo_ols)
-
-ajuste_ols <- fit(wf_ols, data = datos_train)
+  add_model(modelo_ols) |>
+  fit(data = datos_train)
 
 coef_ols <- tidy(ajuste_ols) |>
   filter(term != "(Intercept)") |>
@@ -148,8 +147,7 @@ coef_ols
 ### Pregunta 6: Evaluar OLS
 
 ```{r p6}
-pred_ols <- predict(ajuste_ols, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_ols <- augment(ajuste_ols, datos_test)
 
 metricas_ols <- pred_ols |>
   metrics(truth = satisfaccion_vida, estimate = .pred)
@@ -222,8 +220,9 @@ cat("\nDiferencia:", round(lambda_1se$penalty / lambda_min$penalty, 1), "veces m
 ### Pregunta 9: Variables eliminadas por LASSO
 
 ```{r p9}
-wf_lasso_final <- finalize_workflow(wf_lasso, lambda_min)
-ajuste_lasso <- fit(wf_lasso_final, data = datos_train)
+ajuste_lasso <- wf_lasso |>
+  finalize_workflow(lambda_min) |>
+  fit(data = datos_train)
 
 coef_lasso <- tidy(ajuste_lasso) |>
   filter(term != "(Intercept)") |>
@@ -239,7 +238,7 @@ if (nrow(eliminadas) > 0) {
 }
 ```
 
-**Respuesta:** LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Las variables eliminadas probablemente son las que tienen correlación débil con la satisfacción o cuya información ya está capturada por otros predictores. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basandose en los datos.
+**Respuesta:** LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Las variables eliminadas probablemente son las que tienen correlación débil con la satisfacción o cuya información ya está capturada por otros predictores. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basándose en los datos.
 
 ## Ridge y Elastic Net
 
@@ -355,14 +354,10 @@ ajuste_rf <- finalize_workflow(wf_rf, mejor_rf) |>
   fit(data = datos_train)
 
 # Predicciones para todos los modelos
-pred_lasso <- predict(ajuste_lasso, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
-pred_ridge <- predict(ajuste_ridge, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
-pred_enet <- predict(ajuste_enet, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
-pred_rf <- predict(ajuste_rf, datos_test) |>
-  bind_cols(datos_test |> select(satisfaccion_vida))
+pred_lasso <- augment(ajuste_lasso, datos_test)
+pred_ridge <- augment(ajuste_ridge, datos_test)
+pred_enet  <- augment(ajuste_enet,  datos_test)
+pred_rf    <- augment(ajuste_rf,    datos_test)
 
 metricas_lasso <- pred_lasso |> metrics(truth = satisfaccion_vida, estimate = .pred)
 metricas_ridge <- pred_ridge |> metrics(truth = satisfaccion_vida, estimate = .pred)
