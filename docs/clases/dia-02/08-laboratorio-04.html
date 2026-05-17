@@ -1396,7 +1396,7 @@ $ voto                    &lt;chr&gt; &quot;no&quot;, &quot;si&quot;, &quot;si&q
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="co"># Predecir con todas las variables menos voto (outcome del Lab 3) y pais (alta cardinalidad)</span></span>
 <span id="cb5-2"><a></a>receta <span class="ot">&lt;-</span> <span class="fu">recipe</span>(satisfaccion_vida <span class="sc">~</span> ., <span class="at">data =</span> datos_train) <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a></a>  <span class="fu">step_rm</span>(pais, voto) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a></a>  <span class="fu">step_rm</span>(pais, voto) <span class="sc">|&gt;</span>                       <span class="co"># eliminar variables no predictivas o con demasiados niveles</span></span>
 <span id="cb5-4"><a></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span>      <span class="co"># categóricas → dummies</span></span>
 <span id="cb5-5"><a></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span>  <span class="co"># normalizar (importante para regularización)</span></span>
 <span id="cb5-6"><a></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>())                    <span class="co"># eliminar varianza cero</span></span>
@@ -1465,7 +1465,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <section id="sec:exercise01" class="slide level2">
 <h2>Ejercicio 1: Evaluar OLS</h2>
 <div style="margin-top: 30px; font-size: 20px;">
-<p><strong>Tarea (5 min):</strong> completen los huecos para evaluar <code>ajuste_ols</code> en el conjunto de prueba.</p>
+<p><strong>Tarea (5 min):</strong> completen los huecos para evaluar <code>ajuste_ols</code> en el conjunto de prueba</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co"># Generar predicciones</span></span>
 <span id="cb9-2"><a></a>pred_ols <span class="ot">&lt;-</span> <span class="fu">predict</span>(___, datos_test) <span class="sc">|&gt;</span>            <span class="co"># </span><span class="al">TODO</span><span class="co">: ¿qué modelo?</span></span>
@@ -1486,7 +1486,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Nota</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Pista</strong>: la variable objetivo es <code>satisfaccion_vida</code>. La predicción que crea tidymodels se llama <code>.pred</code> (con punto al inicio).</p>
+<p><strong>Pista</strong>: la variable objetivo es <code>satisfaccion_vida</code>. La predicción que crea tidymodels se llama <code>.pred</code> (con punto al inicio)</p>
 </div>
 </div>
 </div>
@@ -1499,7 +1499,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Tip</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Checkpoint</strong>: deberían ver 3 filas (rmse, rsq, mae) con RMSE ≈ 1.8-2.0 y R² ≈ 0.15-0.25.</p>
+<p><strong>Checkpoint</strong>: deberían ver 3 filas (rmse, rsq, mae) con RMSE ≈ 1.8-2.0 y R² ≈ 0.15-0.30</p>
 </div>
 </div>
 </div>
@@ -1523,7 +1523,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <span id="cb10-6"><a></a></span>
 <span id="cb10-7"><a></a>wf_lasso <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span> <span class="fu">add_model</span>(modelo_lasso)</span>
 <span id="cb10-8"><a></a></span>
-<span id="cb10-9"><a></a><span class="co"># Grilla de 30 valores de λ en escala logarítmica (10^-4 a 10^0)</span></span>
+<span id="cb10-9"><a></a><span class="co"># Grilla de 30 valores de λ en escala logarítmica (10^-4 = 0.0001 a 10^0 = 1)</span></span>
 <span id="cb10-10"><a></a>grilla_lambda <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">30</span>)</span>
 <span id="cb10-11"><a></a></span>
 <span id="cb10-12"><a></a><span class="fu">head</span>(grilla_lambda)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1548,7 +1548,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <section id="sec:exercise02" class="slide level2">
 <h2>Ejercicio 2: Correr CV para LASSO</h2>
 <div style="margin-top: 30px; font-size: 19px;">
-<p><strong>Tarea (7 min):</strong> completen el código para evaluar cada λ con 10-fold CV.</p>
+<p><strong>Tarea (5 min):</strong> completen el código para evaluar cada λ con 10-fold CV</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="co"># Crear folds (ya quedan creados aquí, no modificar después)</span></span>
 <span id="cb12-2"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">10</span>)</span>
@@ -1577,7 +1577,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Nota</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Pista</strong>: <code>wf_lasso</code>, <code>folds</code> y <code>grilla_lambda</code> ya están definidos. Solo hay que pasarlos en el orden correcto a <code>tune_grid()</code>.</p>
+<p><strong>Pista</strong>: <code>wf_lasso</code>, <code>folds</code> y <code>grilla_lambda</code> ya están definidos. Solo hay que pasarlos en el orden correcto a <code>tune_grid()</code></p>
 </div>
 </div>
 </div>
@@ -1590,7 +1590,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Tip</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Checkpoint</strong>: deberían ver ~10 filas con <code>mean</code> (RMSE) entre 1.7 y 2.0 según el λ.</p>
+<p><strong>Checkpoint</strong>: deberían ver ~10 filas con <code>mean</code> (RMSE) entre 1.0 y 2.0 según el λ</p>
 </div>
 </div>
 </div>
@@ -1623,7 +1623,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <section id="sec:exercise03" class="slide level2">
 <h2>Ejercicio 3: Seleccionar λ y ajustar final</h2>
 <div style="margin-top: 30px; font-size: 18px;">
-<p><strong>Tarea (7 min):</strong> seleccionen el mejor λ, ajusten LASSO con todos los datos de train, y vean los coeficientes.</p>
+<p><strong>Tarea (7 min):</strong> seleccionen el mejor λ, ajusten LASSO con todos los datos de train, y vean los coeficientes</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a><span class="co"># 1. Seleccionar el λ con menor RMSE</span></span>
 <span id="cb14-2"><a></a>lambda_min <span class="ot">&lt;-</span> <span class="fu">select_best</span>(___, <span class="at">metric =</span> ___)       <span class="co"># </span><span class="al">TODO</span><span class="co">: resultados y métrica</span></span>
@@ -1651,7 +1651,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Nota</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Pista</strong>: <code>select_best()</code> recibe el objeto <code>resultados_lasso</code> y el nombre de la métrica como string (entre comillas: <code>&quot;rmse&quot;</code>).</p>
+<p><strong>Pista</strong>: <code>select_best()</code> recibe el objeto <code>resultados_lasso</code> y el nombre de la métrica como string (entre comillas: <code>&quot;rmse&quot;</code>)</p>
 </div>
 </div>
 </div>
@@ -1664,7 +1664,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Tip</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Checkpoint</strong>: con λ entre 0.003 y 0.01, deberían ver 1-3 variables con coeficiente exactamente 0 (eliminadas por LASSO).</p>
+<p><strong>Checkpoint</strong>: con λ entre 0.003 y 0.01, deberían ver 1-3 variables con coeficiente exactamente 0 (eliminadas por LASSO)</p>
 </div>
 </div>
 </div>
@@ -1710,7 +1710,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <section id="sec:exercise04" class="slide level2">
 <h2>Ejercicio 4: Implementar Ridge por analogía</h2>
 <div style="margin-top: 30px; font-size: 17px;">
-<p><strong>Tarea (8 min):</strong> repitan TODO el pipeline de LASSO pero con <code>mixture = 0</code> (Ridge).</p>
+<p><strong>Tarea (8 min):</strong> repitan TODO el pipeline de LASSO pero con <code>mixture = 0</code> (Ridge)</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a><span class="co"># 1. Modelo Ridge: igual que LASSO pero mixture = 0</span></span>
 <span id="cb16-2"><a></a>modelo_ridge <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> ___) <span class="sc">|&gt;</span>  <span class="co"># </span><span class="al">TODO</span><span class="co">: ¿qué valor?</span></span>
@@ -1750,7 +1750,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Nota</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Pista</strong>: el único cambio respecto a LASSO es <code>mixture = 0</code>. Todo el resto sigue exactamente el mismo patrón.</p>
+<p><strong>Pista</strong>: el único cambio respecto a LASSO es <code>mixture = 0</code>. Todo el resto sigue exactamente el mismo patrón</p>
 </div>
 </div>
 </div>
@@ -1763,7 +1763,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Tip</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Checkpoint</strong>: Ridge debería eliminar <strong>0 variables</strong> (puede mostrar valores como <code>1e-10</code>, que son prácticamente cero pero no exactos). RMSE similar a LASSO (~1.7-2.0).</p>
+<p><strong>Checkpoint</strong>: Ridge debería eliminar <strong>0 variables</strong> (puede mostrar valores como <code>1e-10</code>, que son prácticamente cero pero no exactos). RMSE similar a LASSO (~1.7-2.0)</p>
 </div>
 </div>
 </div>
@@ -1793,7 +1793,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 </div></div>
 <p><br></p>
 <p><span class="alert">Geométricamente: la “bola” de L1 tiene esquinas que tocan los ejes (coeficiente = 0); la “bola” de L2 es lisa y nunca toca exactamente un eje.</span></p>
-<p>Para una versión intermedia (Elastic Net), ver <a href="#/sec:appendix07"><span class="button">Apéndice 7</span></a>.</p>
+<p>Para una versión intermedia (Elastic Net), ver <a href="#/sec:appendix07"><span class="button">Apéndice 7</span></a></p>
 </div>
 </section></section>
 <section>
@@ -1804,7 +1804,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <section id="sec:exercise05" class="slide level2">
 <h2>Ejercicio 5: Tabla comparativa</h2>
 <div style="margin-top: 30px; font-size: 19px;">
-<p><strong>Tarea (5 min):</strong> combinen las métricas de los 3 modelos en una tabla comparativa.</p>
+<p><strong>Tarea (5 min):</strong> combinen las métricas de los 3 modelos en una tabla comparativa</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="co"># Combinar los 3 objetos de métricas (ya creados en los ejercicios anteriores)</span></span>
 <span id="cb17-2"><a></a>tabla_final <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
@@ -1827,7 +1827,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Nota</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Pista</strong>: los nombres de modelos van entre comillas (strings: <code>&quot;OLS&quot;</code>, etc.). Para ordenar de menor a mayor RMSE, basta con <code>arrange(rmse)</code>.</p>
+<p><strong>Pista</strong>: los nombres de modelos van entre comillas (strings: <code>&quot;OLS&quot;</code>, etc.). Para ordenar de menor a mayor RMSE, basta con <code>arrange(rmse)</code></p>
 </div>
 </div>
 </div>
@@ -1840,7 +1840,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <p><strong>Tip</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Checkpoint</strong>: deberían ver una tabla de 3 filas y 4 columnas (modelo, rmse, rsq, mae). Las diferencias entre los 3 modelos suelen ser pequeñas con este dataset.</p>
+<p><strong>Checkpoint</strong>: deberían ver una tabla de 3 filas y 4 columnas (modelo, rmse, rsq, mae). Las diferencias entre los 3 modelos suelen ser pequeñas con este dataset</p>
 </div>
 </div>
 </div>
@@ -1877,7 +1877,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 </div></div>
 <p><br></p>
 <p><span class="alert">¿Por qué tan marginales? Porque las relaciones son aproximadamente lineales y el ratio n/p no es extremo. La regularización brilla cuando p ≫ n o hay colinealidad fuerte.</span></p>
-<p>Para llevarse a casa: en el <a href="#/sec:appendix06"><span class="button">Apéndice 6</span></a> apliquen todo el pipeline a un outcome diferente (<code>satisfaccion_democracia</code>).</p>
+<p>Para llevarse a casa: en el <a href="#/sec:appendix06"><span class="button">Apéndice 6</span></a> apliquen todo el pipeline a un outcome diferente (<code>satisfaccion_democracia</code>)</p>
 </div>
 </section></section>
 <section>
@@ -2184,7 +2184,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 </div>
 </div>
 <ul>
-<li>Ridge nunca elimina variables — solo las encoge</li>
+<li>Ridge nunca elimina variables, solo las encoge</li>
 <li>Si ven valores como <code>1e-10</code>, son numéricamente “cero” pero no exactamente</li>
 <li>RMSE similar al de LASSO en este dataset</li>
 </ul>
@@ -2250,7 +2250,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 </div>
 </section>
 <section id="sec:appendix06" class="slide level2">
-<h2>Apéndice 6: Capstone — outcome diferente</h2>
+<h2>Apéndice 6: Capstone: outcome diferente</h2>
 <div style="margin-top: 20px; font-size: 17px;">
 <p><strong>Para llevarse a casa:</strong> apliquen todo el pipeline a <code>satisfaccion_democracia</code> (escala 1-5). ¿Cómo cambian los resultados?</p>
 <div class="cell" data-layout-align="center">
@@ -2290,7 +2290,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <section id="sec:appendix07" class="slide level2">
 <h2>Apéndice 7: Elastic Net (opcional)</h2>
 <div style="margin-top: 20px; font-size: 18px;">
-<p>Elastic Net combina LASSO y Ridge: <code>mixture</code> entre 0 y 1.</p>
+<p>Elastic Net combina LASSO y Ridge: <code>mixture</code> entre 0 y 1</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a><span class="co"># Ajustar AMBOS hiperparámetros: penalty (λ) y mixture (α)</span></span>
 <span id="cb24-2"><a></a>modelo_enet <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>

@@ -1341,6 +1341,109 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </div>
 </div>
 </section>
+<section id="el-dataset-latinobarómetro-simulado" class="slide level2">
+<h2>El dataset: Latinobarómetro (simulado)</h2>
+<div style="margin-top: 30px; font-size: 22px;">
+<p>Vamos a trabajar con datos simulados inspirados en el <a href="https://www.latinobarometro.org/">Latinobarómetro</a>, una encuesta de opinión pública en América Latina:</p>
+<ul>
+<li>~500 encuestados distribuidos en varios países de la región</li>
+<li>Combina variables <span class="alert">demográficas</span> (edad, educación, ingreso, zona, género) con <span class="alert">actitudes políticas</span> (confianza en instituciones, satisfacción, interés)</li>
+<li>Dos posibles variables objetivo en el mismo dataset:
+<ul>
+<li><strong><code>voto</code></strong> (sí/no): ¿el encuestado votó en la última elección? → <span class="alert">Lab 3 (clasificación)</span></li>
+<li><strong><code>satisfaccion_vida</code></strong> (1-10): satisfacción general con la vida → <span class="alert">Lab 4 (regresión)</span></li>
+</ul></li>
+</ul>
+<p><strong>En este laboratorio</strong>, nuestro objetivo es predecir <span class="alert"><code>voto</code></span> usando los demás predictores</p>
+</div>
+</section>
+<section id="descripción-de-las-variables" class="slide level2">
+<h2>Descripción de las variables</h2>
+<div style="margin-top: 30px; font-size: 22px;">
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><strong>Variables numéricas</strong></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>edad</code></td>
+<td>Edad del encuestado</td>
+</tr>
+<tr class="even">
+<td><code>educacion_anios</code></td>
+<td>Años de educación formal</td>
+</tr>
+<tr class="odd">
+<td><code>ingreso_hogar</code></td>
+<td>Ingreso mensual del hogar (USD)</td>
+</tr>
+<tr class="even">
+<td><code>confianza_gobierno</code></td>
+<td>Confianza en el gobierno (1-10)</td>
+</tr>
+<tr class="odd">
+<td><code>confianza_justicia</code></td>
+<td>Confianza en el poder judicial (1-10)</td>
+</tr>
+<tr class="even">
+<td><code>satisfaccion_democracia</code></td>
+<td>Satisfacción con la democracia (1-5)</td>
+</tr>
+<tr class="odd">
+<td><code>percepcion_economia</code></td>
+<td>Percepción de la economía (1-5)</td>
+</tr>
+<tr class="even">
+<td><code>interes_politica</code></td>
+<td>Interés en política (0-10)</td>
+</tr>
+<tr class="odd">
+<td><code>satisfaccion_vida</code></td>
+<td>Satisfacción con la vida (Lab 4)</td>
+</tr>
+</tbody>
+</table>
+</div><div class="column" style="width:45%;">
+<p><strong>Variables categóricas</strong></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Valores</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong><code>voto</code></strong></td>
+<td>sí / no (outcome)</td>
+</tr>
+<tr class="even">
+<td><code>uso_internet</code></td>
+<td>nunca / semanal / diario</td>
+</tr>
+<tr class="odd">
+<td><code>zona</code></td>
+<td>urbano / rural</td>
+</tr>
+<tr class="even">
+<td><code>genero</code></td>
+<td>masculino / femenino</td>
+</tr>
+<tr class="odd">
+<td><code>pais</code></td>
+<td>varios países</td>
+</tr>
+</tbody>
+</table>
+</div></div>
+</div>
+</section>
 <section id="cargar-y-explorar-los-datos" class="slide level2">
 <h2>Cargar y explorar los datos</h2>
 <div style="margin-top: 30px; font-size: 20px;">
@@ -1583,16 +1686,13 @@ $ uso_internet_diario     &lt;dbl&gt; -1.1805505, 0.8447976, -1.1805505, 0.84479
 <span id="cb20-6"><a></a>  <span class="at">min_n =</span> <span class="fu">tune</span>()       <span class="co"># Mínimo de observaciones en nodo terminal</span></span>
 <span id="cb20-7"><a></a>) <span class="sc">|&gt;</span></span>
 <span id="cb20-8"><a></a>  <span class="co"># importance = &quot;impurity&quot;: calcular importancia con reducción de impureza (Gini)</span></span>
-<span id="cb20-9"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>, <span class="at">importance =</span> <span class="st">&quot;impurity&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-9"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>, <span class="at">importance =</span> <span class="st">&quot;impurity&quot;</span>) <span class="sc">|&gt;</span> <span class="co"># ranger es un motor rápido para Random Forest</span></span>
 <span id="cb20-10"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span>
 <span id="cb20-11"><a></a></span>
 <span id="cb20-12"><a></a><span class="co"># workflow(): combina receta + modelo</span></span>
 <span id="cb20-13"><a></a>wf_rf_tune <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
 <span id="cb20-14"><a></a>  <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span></span>
-<span id="cb20-15"><a></a>  <span class="fu">add_model</span>(modelo_rf_tune)</span>
-<span id="cb20-16"><a></a></span>
-<span id="cb20-17"><a></a><span class="co"># extract_parameter_set_dials(): muestra los hiperparámetros marcados con tune()</span></span>
-<span id="cb20-18"><a></a>modelo_rf_tune <span class="sc">|&gt;</span> <span class="fu">extract_parameter_set_dials</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-15"><a></a>  <span class="fu">add_model</span>(modelo_rf_tune)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>

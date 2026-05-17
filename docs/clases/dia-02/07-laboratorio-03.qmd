@@ -99,6 +99,55 @@ set.seed(2026)
 ```
 :::
 
+## El dataset: Latinobarómetro (simulado)
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+Vamos a trabajar con datos simulados inspirados en el [Latinobarómetro](https://www.latinobarometro.org/), una encuesta de opinión pública en América Latina:
+
+- ~500 encuestados distribuidos en varios países de la región
+- Combina variables [demográficas]{.alert} (edad, educación, ingreso, zona, género) con [actitudes políticas]{.alert} (confianza en instituciones, satisfacción, interés)
+- Dos posibles variables objetivo en el mismo dataset:
+    - **`voto`** (sí/no): ¿el encuestado votó en la última elección? → [Lab 3 (clasificación)]{.alert}
+    - **`satisfaccion_vida`** (1-10): satisfacción general con la vida → [Lab 4 (regresión)]{.alert}
+
+**En este laboratorio**, nuestro objetivo es predecir [`voto`]{.alert} usando los demás predictores
+:::
+
+## Descripción de las variables
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+**Variables numéricas**
+
+| Variable | Descripción |
+|----------|-------------|
+| `edad` | Edad del encuestado |
+| `educacion_anios` | Años de educación formal |
+| `ingreso_hogar` | Ingreso mensual del hogar (USD) |
+| `confianza_gobierno` | Confianza en el gobierno (1-10) |
+| `confianza_justicia` | Confianza en el poder judicial (1-10) |
+| `satisfaccion_democracia` | Satisfacción con la democracia (1-5) |
+| `percepcion_economia` | Percepción de la economía (1-5) |
+| `interes_politica` | Interés en política (0-10) |
+| `satisfaccion_vida` | Satisfacción con la vida (Lab 4) |
+:::
+
+:::{.column width=45%}
+**Variables categóricas**
+
+| Variable | Valores |
+|----------|---------|
+| **`voto`** | sí / no (outcome) |
+| `uso_internet` | nunca / semanal / diario |
+| `zona` | urbano / rural |
+| `genero` | masculino / femenino |
+| `pais` | varios países |
+:::
+:::
+:::
+
 ## Cargar y explorar los datos
 
 :::{style="margin-top: 30px; font-size: 20px;"}
@@ -266,16 +315,13 @@ modelo_rf_tune <- rand_forest(
   min_n = tune()       # Mínimo de observaciones en nodo terminal
 ) |>
   # importance = "impurity": calcular importancia con reducción de impureza (Gini)
-  set_engine("ranger", importance = "impurity") |>
+  set_engine("ranger", importance = "impurity") |> # ranger es un motor rápido para Random Forest
   set_mode("classification")
 
 # workflow(): combina receta + modelo
 wf_rf_tune <- workflow() |>
   add_recipe(receta) |>
   add_model(modelo_rf_tune)
-
-# extract_parameter_set_dials(): muestra los hiperparámetros marcados con tune()
-modelo_rf_tune |> extract_parameter_set_dials()
 ```
 :::
 
