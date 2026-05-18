@@ -97,8 +97,9 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 **[Laboratorio 6: Análisis de texto](clases/dia-03/12-laboratorio-06.html)**
 
 - Tokenización y limpieza de discursos políticos con `tidytext`
-- TF-IDF para identificar vocabulario distintivo
-- Topic Modeling (LDA) con `topicmodels`
+- TF-IDF para identificar vocabulario distintivo por tema y país
+- Análisis de sentimiento con diccionarios de valencia
+- Síntesis: combinar las dos lentes (de qué habla vs. cómo lo dice)
 
 ### Día 4: Modelos de lenguaje extensos (LLMs) y aplicaciones
 
@@ -123,7 +124,7 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 - Métricas de equidad
 - Regulación: EU AI Act, legislación latinoamericana, Ley 18.331 (Uruguay)
 
-**[Sesión 5.2: Mini-propuestas de investigación](clases/dia-05/10-propuestas-cierre.html)**
+**[Sesión 5.2: Mini-propuestas de investigación](clases/dia-05/12-propuestas-cierre.html)**
 
 - Integración de IA en el flujo de investigación
 - Taller: cada estudiante diseña una mini-propuesta aplicando una técnica del curso a una pregunta de ciencias sociales relevante para América Latina
