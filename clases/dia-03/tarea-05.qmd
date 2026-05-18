@@ -1,0 +1,194 @@
+---
+title: "Tarea 5: Clustering y PCA"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-22"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta tarea usa el mismo dataset del Laboratorio 5 (`indicadores_paises.csv`): 18 países latinoamericanos con 8 indicadores socioeconómicos. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
+
+**Para trabajar en esta tarea:**
+
+1. Descarguen este archivo `.qmd` y el dataset `indicadores_paises.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto
+3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)
+4. Cuando terminen, pueden renderizar el documento completo con el botón "Render" en RStudio
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(corrplot)
+
+set.seed(2026)
+
+paises <- read_csv("datos/indicadores_paises.csv", show_col_types = FALSE)
+```
+
+## Exploración
+
+### Pregunta 1: Resumen del dataset
+
+Muestren el rango (mínimo y máximo) y la mediana de cada variable numérica del dataset. ¿Cuál variable tiene la mayor dispersión relativa (rango dividido por mediana)?
+
+```{r p1}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 2: Países con valores extremos
+
+Identifiquen los países con el [PIB per cápita más alto y más bajo]{.alert}, la [esperanza de vida más alta y más baja]{.alert}, y la [desigualdad (Gini) más alta y más baja]{.alert}. Muestren los resultados en una tabla. ¿Algún país aparece varias veces?
+
+```{r p2}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 3: Correlaciones
+
+Calculen la matriz de correlaciones de las variables numéricas. ¿Cuál par de variables tiene la correlación positiva más fuerte? ¿Cuál tiene la correlación negativa más fuerte? ¿Tiene sentido teóricamente?
+
+```{r p3}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## K-means
+
+### Pregunta 4: K-means con K=4
+
+Escalen las variables numéricas (usando `column_to_rownames("pais") |> scale()`) y ajusten K-means con K=4 y `nstart = 25`. ¿Qué países quedan en cada cluster?
+
+```{r p4}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 5: Comparar K=2, 3, 4 con silueta
+
+Para K=2, 3 y 4, calculen la silueta promedio de cada solución. ¿Qué K maximiza la silueta? ¿Es la solución que más sentido tiene políticamente?
+
+*Pista:* `silhouette(km$cluster, dist(datos_scaled))` devuelve una matriz; la columna `"sil_width"` (tercera) tiene los valores que se promedian.
+
+```{r p5}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 6: Perfil de los clusters
+
+Para la solución K=4 de la pregunta 4, calculen la media de PIB, esperanza de vida, índice de democracia y Gini dentro de cada cluster. Asignen una etiqueta sustantiva a cada cluster (p. ej. "alto desarrollo", "ingreso medio").
+
+```{r p6}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Clustering jerárquico
+
+### Pregunta 7: Dendrograma con método "complete"
+
+Ajusten un clustering jerárquico con `method = "complete"` (en lugar del Ward del laboratorio). Visualicen el dendrograma con los cortes para K=3 resaltados.
+
+*Pista:* `hclust(dist(datos_scaled), method = "complete")` y luego `rect.hclust(hc, k = 3, border = ...)`.
+
+```{r p7}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 8: Ward vs complete
+
+Comparen las soluciones K=3 obtenidas con Ward y con complete usando `table()`. ¿Coinciden? ¿Cuál parece más balanceada?
+
+```{r p8}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## PCA
+
+### Pregunta 9: Primeros 3 componentes
+
+Ajusten `prcomp()` sobre los datos escalados. ¿Qué porcentaje de la varianza acumulada explican los primeros 3 componentes? ¿Es suficiente para resumir el dataset?
+
+```{r p9}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 10: Interpretar PC3
+
+Vean los loadings del tercer componente (`pca$rotation[, 3]`). ¿Qué variables pesan más? ¿Qué dimensión sustantiva captura PC3?
+
+```{r p10}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 11: Países extremos en PC2
+
+Ordenen los países por su valor en PC2. ¿Cuáles están en los extremos? ¿Tiene sentido dado el significado de PC2 (vimos en el laboratorio que captura "desigualdad alta vs. urbanización/educación alta")?
+
+```{r p11}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Síntesis
+
+### Pregunta 12: Excluir un país extremo
+
+Excluyan a Uruguay (el país más "desarrollado" según PC1) y re-corran PCA con los 17 países restantes. ¿Cambian los loadings de PC1 y PC2? ¿Aparece algún país nuevo en los extremos?
+
+```{r p12}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 13: Reflexión
+
+Basándose en los resultados de esta tarea, respondan:
+
+1. ¿Cuántos clusters cree que describen mejor a los 18 países? Justifique con evidencia (silueta + interpretación sustantiva)
+2. ¿Las técnicas de clustering y PCA llegan a la misma conclusión sobre quiénes son los países "similares"?
+3. Si tuvieran que presentar estos resultados a un ministro de planificación, ¿qué visualización elegirían y por qué?
+
+**Respuesta:**

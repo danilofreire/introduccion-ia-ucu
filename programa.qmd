@@ -74,27 +74,27 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 
 ### Día 3: Aprendizaje no supervisado y análisis de texto
 
-**[Sesión 3.1: Clustering y reducción de dimensionalidad](clases/dia-03/05-clustering-pca.html)**
+**[Sesión 3.1: Clustering y reducción de dimensionalidad](clases/dia-03/09-clustering-pca.html)**
 
 - K-means y clustering jerárquico
 - Evaluación de clusters: método del codo y coeficiente de silueta
 - PCA: componentes principales, loadings y biplot
 - Aplicaciones: tipologías de países y actores políticos
 
-**[Sesión 3.2: Análisis computacional de texto](clases/dia-03/06-analisis-texto.html)**
+**[Sesión 3.2: Análisis computacional de texto](clases/dia-03/10-analisis-texto.html)**
 
 - Tokenización y preprocesamiento de texto
 - Bag-of-words y TF-IDF
 - Análisis de sentimiento con diccionarios
 - Topic Modeling (LDA)
 
-**[Laboratorio 5: Clustering y PCA](clases/dia-03/07-laboratorio-05.html)**
+**[Laboratorio 5: Clustering y PCA](clases/dia-03/11-laboratorio-05.html)**
 
 - Segmentación de países latinoamericanos con indicadores del Banco Mundial
 - K-means y clustering jerárquico con evaluación (codo, silueta)
 - PCA e interpretación de componentes con biplot
 
-**[Laboratorio 6: Análisis de texto](clases/dia-03/08-laboratorio-06.html)**
+**[Laboratorio 6: Análisis de texto](clases/dia-03/12-laboratorio-06.html)**
 
 - Tokenización y limpieza de discursos políticos con `tidytext`
 - TF-IDF para identificar vocabulario distintivo

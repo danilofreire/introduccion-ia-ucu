@@ -1,0 +1,689 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 3.4: Laboratorio - Análisis de texto"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 3.4](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-03/12-laboratorio-06.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# Laboratorio 6: Análisis de texto {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer:**
+
+1. Cargar y explorar un corpus
+2. Tokenizar y limpiar texto
+3. Identificar [palabras distintivas]{.alert} con TF-IDF
+4. Medir el [tono]{.alert} con un diccionario de sentimiento
+5. Conectar las dos lentes para contar una historia
+:::
+
+:::{.column width=50%}
+**Lo que vamos a aprender:**
+
+- Flujo de trabajo con [tidytext]{.alert}
+- Preprocesamiento de texto en español
+- [TF-IDF]{.alert} responde *de qué* habla un texto
+- [Sentimiento]{.alert} responde *cómo* lo dice
+
+<br>
+
+[El corpus contiene 60 textos políticos simulados sobre 5 temas y 18 países]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 28px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Tokenización y limpieza | ~15 min |
+| 2 | TF-IDF + ejercicio | ~17 min |
+| 3 | Sentimiento + ejercicio | ~22 min |
+| 4 | Síntesis y resumen | ~6 min |
+
+<br>
+
+[Los textos están etiquetados por tema y país. Vamos a usar dos herramientas complementarias para caracterizarlos. Material extra en los apéndices]{.alert}
+:::
+
+# Parte 1: Tokenización y limpieza {background-color="#2d4563"}
+
+## Cargar paquetes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cargar-paquetes
+#| echo: true
+#| eval: true
+#| message: false
+#| warning: false
+
+# Si algún paquete falta:
+# install.packages(c("tidyverse", "tidytext", "topicmodels", "tm", "ggwordcloud"))
+
+library(tidyverse)
+library(tidytext)      # Análisis de texto tidy
+library(topicmodels)   # LDA
+library(tm)            # Stopwords en español
+library(ggwordcloud)   # Nubes de palabras
+
+set.seed(2026)
+```
+:::
+
+## Cargar el corpus
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: cargar-corpus
+#| echo: true
+#| eval: true
+
+# Cargar textos políticos
+textos <- read_csv("datos/textos_politicos.csv")
+
+# Explorar estructura
+glimpse(textos)
+
+# Textos por tema
+textos |>
+  count(tema)
+```
+:::
+
+## Ver un texto de ejemplo
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: ejemplo-texto
+#| echo: true
+#| eval: true
+
+# Un texto de cada tema
+textos |>
+  group_by(tema) |>
+  slice(1) |>
+  select(tema, texto) |>
+  ungroup()
+```
+:::
+
+## Tokenizar
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: tokenizar
+#| echo: true
+#| eval: true
+
+# Tokenizar: una fila por palabra
+tokens <- textos |>
+  unnest_tokens(palabra, texto)
+
+# Ver resultado
+tokens |>
+  head(20)
+```
+
+`unnest_tokens()` automáticamente convierte a minúsculas y elimina puntuación
+
+[Para bigramas:]{.alert} `unnest_tokens(palabra, texto, token = "ngrams", n = 2)`
+:::
+
+## Stopwords en español
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: stopwords
+#| echo: true
+#| eval: true
+
+# Obtener stopwords en español
+stopwords_es <- tibble(palabra = tm::stopwords("spanish"))
+
+# Ver algunas
+head(stopwords_es, 20)
+
+# ¿Cuántas hay?
+nrow(stopwords_es)
+```
+:::
+
+## Eliminar stopwords
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: eliminar-stopwords
+#| echo: true
+#| eval: true
+
+# Eliminar stopwords y números
+tokens_limpios <- tokens |>
+  anti_join(stopwords_es, by = "palabra") |>
+  filter(!str_detect(palabra, "^[0-9]+$"),    # no números
+         nchar(palabra) > 2)                  # ≥ 3 letras
+
+# Comparar
+cat("Tokens antes:", nrow(tokens), "\n")
+cat("Tokens después:", nrow(tokens_limpios), "\n")
+cat("Reducción:", round((1 - nrow(tokens_limpios)/nrow(tokens)) * 100, 1), "%\n")
+```
+:::
+
+## Palabras más frecuentes
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: frecuencias
+#| echo: true
+#| eval: true
+#| fig-width: 10
+#| fig-height: 5
+
+# Top 20 palabras
+tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  head(20) |>
+  mutate(palabra = reorder(palabra, n)) |>
+  ggplot(aes(x = n, y = palabra)) +
+  geom_col(fill = "#2d4563") +
+  labs(title = "20 palabras más frecuentes (sin stopwords)",
+       x = "Frecuencia", y = NULL) +
+  theme_minimal()
+```
+:::
+
+# Parte 2: TF-IDF {background-color="#2d4563"}
+
+## ¿Qué es TF-IDF?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+- [TF]{.alert} (Term Frequency): frecuencia del término en el documento
+- [IDF]{.alert} (Inverse Document Frequency): penaliza palabras muy comunes
+
+$$\text{TF-IDF} = \text{TF} \times \log\left(\frac{\text{Total documentos}}{\text{Documentos con el término}}\right)$$
+
+- Palabras [distintivas]{.alert}: frecuentes en pocos documentos → TF-IDF alto
+- Palabras [comunes]{.alert}: frecuentes en muchos documentos → TF-IDF bajo
+
+[TF-IDF identifica qué palabras caracterizan a cada documento o grupo]{.alert}
+:::
+
+## Calcular TF-IDF por tema
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: tfidf-calc
+#| echo: true
+#| eval: true
+
+# Contar palabras por tema
+palabras_tema <- tokens_limpios |>
+  count(tema, palabra, sort = TRUE)
+
+# Calcular TF-IDF
+tfidf <- palabras_tema |>
+  bind_tf_idf(palabra, tema, n)
+
+# Ver resultado
+tfidf |>
+  arrange(desc(tf_idf)) |>
+  head(15)
+```
+:::
+
+## Visualizar TF-IDF por tema
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: tfidf-viz
+#| echo: true
+#| eval: true
+#| fig-width: 12
+#| fig-height: 7
+
+# Top 6 palabras por tema
+tfidf |>
+  group_by(tema) |>
+  slice_max(tf_idf, n = 6) |>
+  ungroup() |>
+  mutate(palabra = reorder_within(palabra, tf_idf, tema)) |>
+  ggplot(aes(x = tf_idf, y = palabra, fill = tema)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~tema, scales = "free_y", ncol = 3) +
+  scale_y_reordered() +
+  labs(title = "Palabras más distintivas por tema (TF-IDF)",
+       x = "TF-IDF", y = NULL) +
+  theme_minimal()
+```
+:::
+
+## Interpretación del TF-IDF
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**¿Las palabras tienen sentido?**
+
+- Economía: crecimiento, inflación, empleo
+- Educación: estudiantes, docentes, escuelas
+- Salud: hospitales, vacunación, pandemia
+- Seguridad: violencia, crimen, policía
+- Medioambiente: deforestación, biodiversidad, bosque
+:::
+
+:::{.column width=50%}
+**Limitaciones:**
+
+- Depende de la [limpieza]{.alert} del texto
+- No captura [sinónimos]{.alert}
+- No captura [contexto]{.alert}
+
+<br>
+
+[TF-IDF es simple pero efectivo para identificar palabras clave]{.alert}
+:::
+:::
+:::
+
+## Ejercicio rápido: TF-IDF por país {#sec:ejercicio-tfidf-pais}
+
+:::{style="margin-top: 20px; font-size: 22px;"}
+
+**Tarea (5 min):** calculen TF-IDF agrupando por `pais` en lugar de `tema`. ¿Qué palabras distinguen a cada país?
+
+```{r}
+#| label: ej-tfidf-pais
+#| echo: true
+#| eval: false
+#| prompt: false
+
+# Mismo patrón que antes, cambiando tema → pais
+tfidf_pais <- tokens_limpios |>
+  count(___, palabra) |>          # TODO: agrupar por
+  bind_tf_idf(palabra, ___, n)    # TODO: columna de agrupamiento
+
+# Top 5 palabras distintivas por país
+tfidf_pais |>
+  group_by(___) |>                # TODO
+  slice_max(tf_idf, n = 5) |>
+  arrange(pais, desc(tf_idf))
+```
+
+:::{.callout-note}
+**Pista**: cambien las dos referencias a `tema` por `pais`. La función `bind_tf_idf()` toma `(palabra, grupo, n)`, así que el segundo argumento es el grupo
+:::
+
+[[Apéndice 1: Solución]{.button}](#sec:sol-tfidf-pais)
+:::
+
+# Parte 3: Análisis de sentimiento {background-color="#2d4563"}
+
+## ¿Qué es el análisis de sentimiento?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+- [Análisis de sentimiento]{.alert}: clasificar un texto por su tono — positivo, negativo o neutro
+- Método más simple: **diccionarios de valencia** — listas de palabras pre-clasificadas
+    - `crecimiento`, `mejora`, `éxito` → positivo
+    - `crisis`, `violencia`, `pobreza` → negativo
+- Cada documento recibe un **score** = (palabras positivas) − (palabras negativas)
+- [Limitaciones]{.alert}: no captura negaciones ("no es bueno" cuenta como positivo), ironía, ni contexto. Los diccionarios son [dependientes del dominio]{.alert} (un diccionario médico no sirve para política)
+- Aún así, [es transparente y fácil de validar]{.alert} a gran escala
+:::
+
+## Construir diccionarios pos/neg
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: dict-sentimiento
+#| echo: true
+#| eval: true
+
+# Diccionarios para texto político (versión inicial — ampliable)
+positivas <- c("crecimiento", "mejora", "mejorado", "oportunidad",
+               "fortalecido", "innovadores", "renovables", "sólido",
+               "beneficio", "avance", "estabilizar", "reducir")
+
+negativas <- c("crisis", "inflación", "pobreza", "violencia", "amenaza",
+               "problema", "deuda", "riesgo", "deficiencias", "grave",
+               "crimen", "narcotráfico", "deforestación", "informalidad",
+               "inseguridad", "contaminación", "desempleo", "vulnerables")
+
+cat("Positivas:", length(positivas), "  Negativas:", length(negativas), "\n")
+```
+
+- En la práctica usaríamos un diccionario validado (p. ej. [LIWC](https://www.liwc.app/), [NRC Spanish](https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm))
+- Para clases pequeñas, una lista construida a mano funciona si la revisamos con cuidado
+:::
+
+## Calcular el score de cada documento
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: score-sentimiento
+#| echo: true
+#| eval: true
+
+# Score por documento = #positivas − #negativas
+sentimiento_doc <- tokens_limpios |>
+  mutate(valencia = case_when(
+    palabra %in% positivas ~  1L,
+    palabra %in% negativas ~ -1L,
+    TRUE ~ 0L
+  )) |>
+  group_by(id, tema, pais) |>
+  summarise(score = sum(valencia), .groups = "drop")
+
+# Documentos más positivos y más negativos
+sentimiento_doc |>
+  arrange(desc(score)) |>
+  head(3)
+
+sentimiento_doc |>
+  arrange(score) |>
+  head(3)
+```
+
+- `case_when()` asigna +1 a positivas, -1 a negativas, 0 a las demás
+- El `score` es la suma de valencias por documento. Score positivo → tono optimista; negativo → tono crítico
+:::
+
+## Visualizar el tono por tema
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: viz-sentimiento
+#| echo: true
+#| eval: true
+#| fig-width: 9
+#| fig-height: 4.5
+
+sentimiento_doc |>
+  group_by(tema) |>
+  summarise(score_promedio = mean(score),
+            .groups = "drop") |>
+  mutate(tema = reorder(tema, score_promedio)) |>
+  ggplot(aes(x = score_promedio, y = tema, fill = score_promedio > 0)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_manual(values = c("TRUE" = "#27AE60", "FALSE" = "#E74C3C")) +
+  labs(title = "Tono promedio por tema",
+       x = "Score promedio (positivas − negativas)", y = NULL) +
+  theme_minimal()
+```
+
+- Los temas con palabras como *crisis*, *violencia*, *inseguridad* tienden a tener score negativo
+- Los temas con palabras como *crecimiento*, *mejora*, *innovación* tienden a positivo
+- El score absoluto depende del diccionario. Las comparaciones relativas (qué tema es más negativo que otro) son lo informativo
+:::
+
+## Ejercicio rápido: el documento más negativo {#sec:ejercicio-sentimiento}
+
+:::{style="margin-top: 20px; font-size: 22px;"}
+
+**Tarea (8 min):** identifiquen el documento con el score de sentimiento más negativo y léanlo. ¿El método captura bien su tono?
+
+```{r}
+#| label: ej-sentimiento
+#| echo: true
+#| eval: false
+#| prompt: false
+
+# Doc con score más negativo
+doc_mas_negativo <- sentimiento_doc |>
+  arrange(___) |>           # TODO: ordenar de menor a mayor
+  head(1)
+
+doc_mas_negativo
+
+# Recuperar el texto completo de ese documento
+textos |>
+  filter(id == doc_mas_negativo$___) |>   # TODO: ¿qué columna identifica al documento?
+  pull(texto)
+```
+
+:::{.callout-note}
+**Pista**: para ordenar de menor (más negativo) a mayor, `arrange()` sin `desc()` ya lo hace. La columna que identifica el documento es la misma en `textos` y `sentimiento_doc`
+:::
+
+:::{.callout-tip}
+**Checkpoint**: van a ver un texto sobre crisis, violencia, o emergencia. Pregunta de reflexión: ¿el método le da el "score" correcto, o exagera/subestima el tono real?
+:::
+
+[[Apéndice 1: Solución]{.button}](#sec:sol-sentimiento)
+:::
+
+# Parte 4: Síntesis {background-color="#2d4563"}
+
+## Dos lentes, dos preguntas
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**TF-IDF: ¿de qué habla el texto?**
+
+- Identifica las palabras que **caracterizan** a un documento o grupo
+- Útil para describir vocabularios, comparar grupos
+- No nos dice nada sobre el tono ni la emoción
+:::
+
+:::{.column width=50%}
+**Sentimiento: ¿cómo lo dice?**
+
+- Mide el [tono]{.alert} a partir de palabras valoradas
+- Útil para detectar crisis, polarización, optimismo
+- No nos dice de qué trata el texto
+:::
+:::
+
+<br>
+
+[Combinadas, las dos herramientas construyen una narrativa:]{.alert} "Los textos sobre **seguridad** (TF-IDF) tienen un tono marcadamente **negativo** (sentimiento)." Una herramienta sola rara vez alcanza.
+
+[Regla práctica:]{.alert} antes de creerle a un método automático, leé una muestra de textos y validá que el análisis cuadra con tu lectura
+:::
+
+## Resumen del laboratorio
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que practicamos:**
+
+- Tokenización con `unnest_tokens()`
+- Limpieza: stopwords, números, palabras cortas
+- TF-IDF con `bind_tf_idf()` (por tema y por país)
+- Sentimiento con diccionarios de valencia
+- Combinar ambas lentes para interpretar un corpus
+:::
+
+:::{.column width=50%}
+**Funciones clave:**
+
+- `unnest_tokens()`: tokenizar
+- `anti_join()`: eliminar stopwords
+- `bind_tf_idf()`: calcular TF-IDF
+- `case_when()`: asignar valencia
+- `summarise(.by = grupo)`: agregar por grupo
+
+:::{style="margin-top: 30px;"}
+:::
+
+[Diccionarios profesionales]{.alert}: [LIWC](https://www.liwc.app/), [NRC](https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm) (Spanish disponible)
+:::
+:::
+
+:::{style="margin-top: 30px;"}
+:::
+
+[Mañana veremos cómo los LLMs hacen estas dos tareas (caracterizar y medir tono) en una sola llamada. Material extra en los apéndices]{.alert}
+:::
+
+# Apéndice 1: Soluciones de ejercicios rápidos {background-color="#2d4563"}
+
+## Solución: TF-IDF por país {#sec:sol-tfidf-pais}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r}
+#| label: sol-tfidf-pais
+#| echo: true
+#| eval: true
+
+tfidf_pais <- tokens_limpios |>
+  count(pais, palabra) |>
+  bind_tf_idf(palabra, pais, n)
+
+# Top 5 palabras distintivas por país
+tfidf_pais |>
+  group_by(pais) |>
+  slice_max(tf_idf, n = 5) |>
+  arrange(pais, desc(tf_idf))
+```
+
+- Aparecen palabras locales (nombres de instituciones, ciudades) y términos políticos específicos
+- Los TF-IDF más altos suelen ser palabras que solo aparecen en un país
+
+[[Volver al ejercicio]{.button}](#sec:ejercicio-tfidf-pais)
+:::
+
+## Solución: el documento más negativo {#sec:sol-sentimiento}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+
+```{r}
+#| label: sol-sentimiento
+#| echo: true
+#| eval: true
+
+# Doc con score más negativo
+doc_mas_negativo <- sentimiento_doc |>
+  arrange(score) |>
+  head(1)
+
+doc_mas_negativo
+
+# Recuperar el texto completo de ese documento
+textos |>
+  filter(id == doc_mas_negativo$id) |>
+  pull(texto)
+```
+
+- El método captura bien temas donde las palabras negativas son explícitas (seguridad, crisis)
+- Cuando el tono está implícito (ironía, comparaciones, frases largas) el método lo pierde
+- Para análisis serio: combinar con lectura humana de una muestra, validar diccionarios contra el dominio
+
+[[Volver al ejercicio]{.button}](#sec:ejercicio-sentimiento)
+:::
+
+# Apéndice 2: Nube de palabras {background-color="#2d4563"}
+
+## Visualizar frecuencias como wordcloud
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: wordcloud
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 6
+
+# Contar frecuencias
+freq <- tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  head(100)
+
+# Nube de palabras
+ggplot(freq, aes(label = palabra, size = n, color = n)) +
+  geom_text_wordcloud(rm_outside = TRUE) +
+  scale_size_area(max_size = 15) +
+  scale_color_gradient(low = "#457b9d", high = "#e63946") +
+  theme_minimal() +
+  labs(title = "Nube de palabras del corpus")
+```
+:::
+
+## Resumen del Día 3
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+**Aprendizaje no supervisado:**
+
+- [K-means]{.alert} y [jerárquico]{.alert}: agrupar observaciones similares
+- [PCA]{.alert}: reducir dimensionalidad, visualizar, crear índices
+- [Silueta]{.alert}: evaluar calidad de clusters
+
+**Análisis de texto:**
+
+- [Tokenización]{.alert}: dividir texto en palabras
+- [TF-IDF]{.alert}: identificar palabras distintivas
+- [LDA]{.alert}: descubrir temas latentes
+
+[Estos métodos son exploratorios. Los LLMs (Día 4) los superan en precisión y flexibilidad]{.alert}
+:::
+
+# Fin del Día 3 {background-color="#2d4563"}

@@ -1,0 +1,259 @@
+---
+title: "Tarea 5: Clustering y PCA — Respuestas"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-22"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta es la clave de respuestas de la Tarea 5. Cada pregunta incluye el código R completo y una respuesta escrita.
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(corrplot)
+
+set.seed(2026)
+
+paises <- read_csv("datos/indicadores_paises.csv", show_col_types = FALSE)
+
+# Escalado reutilizado a lo largo de la tarea
+datos_scaled <- paises |>
+  column_to_rownames("pais") |>
+  scale()
+```
+
+## Exploración
+
+### Pregunta 1: Resumen del dataset
+
+```{r p1}
+resumen <- paises |>
+  select(-pais) |>
+  summarise(across(everything(),
+                   list(min = min, mediana = median, max = max),
+                   .names = "{.col}__{.fn}")) |>
+  pivot_longer(everything(),
+               names_to = c("variable", "stat"),
+               names_sep = "__") |>
+  pivot_wider(names_from = stat, values_from = value) |>
+  mutate(rango_rel = round((max - min) / mediana, 2)) |>
+  arrange(desc(rango_rel))
+
+resumen
+```
+
+**Respuesta:** La variable con mayor dispersión relativa suele ser el [PIB per cápita]{.alert} (Uruguay ~17,000 vs. Honduras ~2,500, con mediana intermedia → rango_rel > 1). El gasto en salud y la desigualdad tienen rangos relativos más bajos. Esto justifica usar `scale()` antes de aplicar K-means o PCA: si no escalamos, el PIB dominaría las distancias.
+
+### Pregunta 2: Países con valores extremos
+
+```{r p2}
+extremos <- bind_rows(
+  paises |> slice_max(pib_per_capita, n = 1)   |> mutate(var = "PIB max"),
+  paises |> slice_min(pib_per_capita, n = 1)   |> mutate(var = "PIB min"),
+  paises |> slice_max(esperanza_vida, n = 1)   |> mutate(var = "Vida max"),
+  paises |> slice_min(esperanza_vida, n = 1)   |> mutate(var = "Vida min"),
+  paises |> slice_max(indice_gini, n = 1)      |> mutate(var = "Gini max"),
+  paises |> slice_min(indice_gini, n = 1)      |> mutate(var = "Gini min")
+) |>
+  select(var, pais, pib_per_capita, esperanza_vida, indice_gini)
+
+extremos
+```
+
+**Respuesta:** **Uruguay** suele aparecer en los extremos altos (PIB, esperanza de vida). **Honduras** o **Nicaragua** aparecen en los extremos bajos. **Brasil** o **Colombia** suelen liderar en desigualdad. Que un país aparezca varias veces en extremos confirma que es un caso atípico — los métodos de clustering lo tratarán como tal.
+
+### Pregunta 3: Correlaciones
+
+```{r p3}
+cor_matrix <- paises |>
+  select(-pais) |>
+  cor()
+
+# Convertir a formato largo para encontrar los extremos
+cor_long <- cor_matrix |>
+  as.data.frame() |>
+  rownames_to_column("v1") |>
+  pivot_longer(-v1, names_to = "v2", values_to = "cor") |>
+  filter(v1 < v2)  # quitar duplicados y diagonal
+
+# Correlación positiva más fuerte
+cor_long |> arrange(desc(cor)) |> head(3)
+
+# Correlación negativa más fuerte
+cor_long |> arrange(cor) |> head(3)
+```
+
+**Respuesta:** La correlación positiva más fuerte suele ser entre **internet y urbanización** (~0.86), o entre PIB y esperanza de vida (~0.74). La correlación negativa más fuerte es entre **Gini y urbanización** (~-0.41). Tiene sentido teórico: la urbanización va de la mano con infraestructura digital y servicios; en zonas rurales la desigualdad puede ser más persistente.
+
+## K-means
+
+### Pregunta 4: K-means con K=4
+
+```{r p4}
+km4 <- kmeans(datos_scaled, centers = 4, nstart = 25)
+
+# Países por cluster
+data.frame(pais = rownames(datos_scaled), cluster = km4$cluster) |>
+  arrange(cluster, pais)
+```
+
+**Respuesta:** Los 4 clusters tienden a separar: (a) Uruguay/Chile/Argentina (más desarrollados), (b) Costa Rica/Panamá/México (ingreso medio-alto), (c) Bolivia/Ecuador/Perú/Paraguay/RepDom (ingreso medio), (d) Guatemala/Honduras/Nicaragua/Venezuela (menos desarrollados o con crisis institucional). Algunos países pueden moverse según la semilla.
+
+### Pregunta 5: Comparar K=2, 3, 4 con silueta
+
+```{r p5}
+siluetas <- sapply(2:4, function(k) {
+  km <- kmeans(datos_scaled, centers = k, nstart = 25)
+  sil <- silhouette(km$cluster, dist(datos_scaled))
+  mean(sil[, "sil_width"])
+})
+
+tibble(K = 2:4, silueta_promedio = round(siluetas, 3)) |>
+  arrange(desc(silueta_promedio))
+```
+
+**Respuesta:** **K=2 maximiza la silueta** (~0.29), seguido de K=3 (~0.27) y K=4 (~0.24 - 0.25). Sin embargo, K=2 colapsa toda la región en "desarrollados" vs. "menos desarrollados", lo cual es demasiado grueso para análisis políticos finos. **K=3 ofrece un buen compromiso entre estructura estadística y sentido sustantivo**: añade un grupo intermedio interpretable.
+
+### Pregunta 6: Perfil de los clusters
+
+```{r p6}
+paises$cluster_km4 <- factor(km4$cluster)
+
+paises |>
+  group_by(cluster_km4) |>
+  summarise(
+    n = n(),
+    pib_mean  = round(mean(pib_per_capita)),
+    vida_mean = round(mean(esperanza_vida), 1),
+    demo_mean = round(mean(indice_democracia), 1),
+    gini_mean = round(mean(indice_gini), 1),
+    .groups = "drop"
+  )
+```
+
+**Respuesta:** Etiquetas razonables (variarán según semilla):
+
+- Cluster con PIB más alto y democracia alta: **"alto desarrollo"** (Uruguay, Chile, etc.)
+- Cluster con PIB medio-alto: **"ingreso medio-alto"**
+- Cluster con PIB intermedio: **"ingreso medio"**
+- Cluster con PIB más bajo: **"bajo desarrollo"** o **"vulnerabilidad estructural"**
+
+## Clustering jerárquico
+
+### Pregunta 7: Dendrograma con "complete"
+
+```{r p7, fig.width=10, fig.height=5}
+d <- dist(datos_scaled, method = "euclidean")
+hc_complete <- hclust(d, method = "complete")
+
+plot(hc_complete, hang = -1, cex = 0.9,
+     main = "Dendrograma (método: complete)",
+     xlab = "País", ylab = "Altura")
+rect.hclust(hc_complete, k = 3, border = c("#2d4563", "#b85450", "#27AE60"))
+```
+
+**Respuesta:** El método complete tiende a generar clusters más compactos (porque define distancia entre clusters como la **máxima** distancia entre puntos). Eso lo hace sensible a outliers — un país muy extremo puede formar su propio cluster.
+
+### Pregunta 8: Ward vs complete
+
+```{r p8}
+hc_ward <- hclust(d, method = "ward.D2")
+
+ward_groups     <- cutree(hc_ward, k = 3)
+complete_groups <- cutree(hc_complete, k = 3)
+
+table(Ward = ward_groups, Complete = complete_groups)
+```
+
+**Respuesta:** Las dos soluciones tienden a coincidir en los extremos (los más desarrollados y los menos desarrollados) pero a diferir en el grupo intermedio. **Ward suele dar clusters más balanceados** (de tamaño similar), mientras que complete puede producir un cluster muy pequeño con outliers.
+
+## PCA
+
+### Pregunta 9: Primeros 3 componentes
+
+```{r p9}
+pca <- prcomp(datos_scaled)
+summary(pca)$importance[, 1:3]
+```
+
+**Respuesta:** Los primeros 3 componentes acumulan aproximadamente el **85-90%** de la varianza (PC1 ~52% + PC2 ~20% + PC3 ~10-15%). Para fines descriptivos y visualización, **2 componentes ya bastan** (más del 70%). PC3 agrega información complementaria solo si queremos una representación más fiel del dataset original.
+
+### Pregunta 10: Interpretar PC3
+
+```{r p10}
+pca$rotation[, 3] |> round(2) |> sort()
+```
+
+**Respuesta:** PC3 suele cargar fuertemente en variables que NO están en PC1 ni PC2 — por ejemplo, `gasto_salud_pib` o `acceso_internet` con signos opuestos a otras variables. Puede capturar una dimensión como **"calidad de servicios públicos vs. mercado privado"** o **"intensidad de inversión social"**. Su interpretación es más difícil porque captura varianza residual; conviene leerlo en conjunto con los datos.
+
+### Pregunta 11: Países extremos en PC2
+
+```{r p11}
+pca$x[, 1:2] |>
+  as.data.frame() |>
+  rownames_to_column("pais") |>
+  arrange(PC2) |>
+  mutate(PC1 = round(PC1, 2), PC2 = round(PC2, 2))
+```
+
+**Respuesta:** Los países más extremos en PC2 son aquellos con alta desigualdad pero baja urbanización/educación (en un extremo) y baja desigualdad pero alta urbanización (en el otro). Países como Brasil o Colombia (alta desigualdad) tienden a aparecer en un extremo; Uruguay o Costa Rica (baja desigualdad relativa) en el otro. PC2 captura la **dimensión de desigualdad relativa al desarrollo**.
+
+## Síntesis
+
+### Pregunta 12: Excluir Uruguay y re-correr PCA
+
+```{r p12}
+sin_uruguay <- paises |>
+  filter(pais != "Uruguay") |>
+  select(-cluster_km4)  # quitar la columna agregada antes
+
+datos_sin_uy <- sin_uruguay |>
+  column_to_rownames("pais") |>
+  scale()
+
+pca_sin_uy <- prcomp(datos_sin_uy)
+
+# Comparar varianza explicada
+summary(pca_sin_uy)$importance[, 1:2]
+
+# Loadings PC1
+pca_sin_uy$rotation[, 1] |> round(2) |> sort()
+
+# Países extremos
+pca_sin_uy$x[, 1:2] |>
+  as.data.frame() |>
+  rownames_to_column("pais") |>
+  arrange(PC1) |>
+  head(3)
+
+pca_sin_uy$x[, 1:2] |>
+  as.data.frame() |>
+  rownames_to_column("pais") |>
+  arrange(desc(PC1)) |>
+  head(3)
+```
+
+**Respuesta:** Los loadings de PC1 son muy similares (sigue siendo un "eje de desarrollo"). Lo que cambia es **quién está en el extremo "desarrollado"**: ahora Chile o Argentina lideran. Esto muestra que PCA no es muy sensible a quitar un solo caso — la estructura global del dataset persiste. **Si quitar un caso cambia drásticamente PC1, ese caso es un outlier que distorsiona los resultados**.
+
+### Pregunta 13: Reflexión
+
+**Respuesta:**
+
+1. **¿Cuántos clusters?** K=3 ofrece el mejor balance entre estabilidad estadística (silueta razonable) e interpretación política (alto, medio, bajo desarrollo). K=2 es demasiado grueso; K=4 fragmenta sin ganar mucho.
+
+2. **¿Clustering y PCA coinciden?** Sí, parcialmente. Ambos identifican el eje "desarrollado vs. menos desarrollado" como el más informativo. El biplot de PCA muestra cómo los clusters se separan principalmente a lo largo de PC1. Pero PCA agrega una dimensión adicional (PC2 = desigualdad) que el clustering K-means no captura explícitamente, porque K-means solo asigna etiquetas categóricas.
+
+3. **¿Qué visualización?** El **biplot** (PCA + clusters K-means superpuestos) combina lo mejor de ambos métodos: muestra las dimensiones latentes (loadings = ejes interpretables), los grupos sustantivos (clusters como color), y los países individuales (puntos etiquetados). Es la representación más rica y le da al funcionario tanto una visión panorámica como información sobre cada país.

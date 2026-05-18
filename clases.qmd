@@ -45,13 +45,15 @@ Las diapositivas de cada día se publicarán aquí a medida que avance el curso.
 
 [Texto y aprendizaje no supervisado]{.day-title}
 
-[Sesión 3.1: Clustering y PCA (versión express).]{.day-topics}
+[Sesión 3.1: Clustering y PCA. K-means, jerárquico, PCA.]{.day-topics}
 
-[Sesión 3.2: Análisis de texto. Tokenización, TF-IDF, sentimiento, LDA.]{.day-topics}
+[Sesión 3.2: Análisis de texto. Tokenización, TF-IDF, sentimiento.]{.day-topics}
 
 ::: {.resource-links}
-[Sesión 3.1: Clustering y PCA](clases/dia-03/05-clustering-pca.html) |
-[Sesión 3.2: Análisis de texto](clases/dia-03/06-analisis-texto.html)
+[Sesión 3.1: Clustering y PCA](clases/dia-03/09-clustering-pca.html) |
+[Sesión 3.2: Análisis de texto](clases/dia-03/10-analisis-texto.html) |
+[Lab 5: Clustering y PCA](clases/dia-03/11-laboratorio-05.html) |
+[Lab 6: Análisis de texto](clases/dia-03/12-laboratorio-06.html)
 :::
 :::
 

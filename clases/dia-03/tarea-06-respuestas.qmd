@@ -1,0 +1,326 @@
+---
+title: "Tarea 6: Análisis de texto — Respuestas"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-24"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta es la clave de respuestas de la Tarea 6. Cada pregunta incluye el código R completo y una respuesta escrita.
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(tidytext)
+library(tm)
+
+set.seed(2026)
+
+textos <- read_csv("datos/textos_politicos.csv", show_col_types = FALSE)
+
+stopwords_es <- tibble(palabra = tm::stopwords("spanish"))
+
+tokens <- textos |>
+  unnest_tokens(palabra, texto)
+
+tokens_limpios <- tokens |>
+  anti_join(stopwords_es, by = "palabra") |>
+  filter(!str_detect(palabra, "^[0-9]+$"),
+         nchar(palabra) > 2)
+```
+
+## Exploración
+
+### Pregunta 1: Distribución por año
+
+```{r p1, fig.width=8, fig.height=4}
+textos |>
+  count(anio) |>
+  ggplot(aes(x = factor(anio), y = n, fill = factor(anio))) +
+  geom_col() +
+  labs(title = "Textos por año",
+       x = "Año", y = "Cantidad") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+**Respuesta:** La distribución es desigual: **2018** y **2024** tienen ~12-13 textos cada uno (años más representados), mientras que **2020** tiene solo ~2 textos. Esto es relevante porque cualquier análisis comparativo entre años debe tener en cuenta que algunos años están subrepresentados — las conclusiones sobre 2020 serán menos robustas que sobre 2018 o 2024.
+
+### Pregunta 2: Longitud de los textos
+
+```{r p2}
+longitudes <- tokens |>
+  count(id, name = "n_tokens")
+
+# Texto más corto
+mas_corto <- longitudes |> slice_min(n_tokens, n = 1)
+mas_corto
+
+# Texto más largo
+mas_largo <- longitudes |> slice_max(n_tokens, n = 1)
+mas_largo
+
+# Contenido de ambos
+textos |> filter(id %in% c(mas_corto$id, mas_largo$id)) |> select(id, tema, texto)
+```
+
+**Respuesta:** El texto más corto tiene ~10-15 palabras; el más largo ~25-30. La variación es moderada. Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).
+
+### Pregunta 3: Bigramas más frecuentes
+
+```{r p3}
+bigramas <- textos |>
+  unnest_tokens(par, texto, token = "ngrams", n = 2) |>
+  separate(par, c("palabra1", "palabra2"), sep = " ") |>
+  filter(!palabra1 %in% stopwords_es$palabra,
+         !palabra2 %in% stopwords_es$palabra,
+         !str_detect(palabra1, "^[0-9]+$"),
+         !str_detect(palabra2, "^[0-9]+$")) |>
+  unite("bigrama", palabra1, palabra2, sep = " ") |>
+  count(bigrama, sort = TRUE) |>
+  head(10)
+
+bigramas
+```
+
+**Respuesta:** Los bigramas más frecuentes capturan expresiones compuestas que las palabras sueltas pierden: **"educación pública"**, **"crecimiento económico"**, **"medio ambiente"**, **"salud pública"**, etc. Esto muestra una ventaja real de los bigramas — recuperan colocaciones (palabras que aparecen juntas con significado conjunto) que enriquecen el análisis.
+
+## TF-IDF
+
+### Pregunta 4: TF-IDF por año
+
+```{r p4}
+tfidf_anio <- tokens_limpios |>
+  count(anio, palabra) |>
+  bind_tf_idf(palabra, anio, n)
+
+tfidf_anio |>
+  group_by(anio) |>
+  slice_max(tf_idf, n = 3) |>
+  arrange(anio, desc(tf_idf))
+```
+
+**Respuesta:** El año **2020-2021** suele tener "pandemia", "covid", "vacunación", "confinamiento" como palabras distintivas — el COVID-19 deja una huella léxica clara. Años posteriores (2022-2024) tienen palabras de "recuperación", "post-pandemia" o conflictos actuales. Esto demuestra que TF-IDF detecta automáticamente eventos sociales mayores sin necesidad de etiquetas manuales.
+
+### Pregunta 5: Vocabulario de la pandemia
+
+```{r p5}
+tfidf_pandemia <- textos |>
+  mutate(periodo = if_else(anio %in% c(2020, 2021), "pandemia", "otros")) |>
+  unnest_tokens(palabra, texto) |>
+  anti_join(stopwords_es, by = "palabra") |>
+  filter(!str_detect(palabra, "^[0-9]+$"), nchar(palabra) > 2) |>
+  count(periodo, palabra) |>
+  bind_tf_idf(palabra, periodo, n)
+
+tfidf_pandemia |>
+  filter(periodo == "pandemia") |>
+  slice_max(tf_idf, n = 10) |>
+  select(palabra, tf, idf, tf_idf)
+```
+
+**Respuesta:** Las palabras distintivas del período pandemia incluyen términos como **pandemia, vacunación, covid, confinamiento, sanitaria, emergencia**. Este es exactamente el caso donde TF-IDF brilla: un evento histórico introduce vocabulario nuevo que NO aparece (o aparece poco) en otros períodos, y TF-IDF lo identifica automáticamente.
+
+### Pregunta 6: TF-IDF por tema vs. por país
+
+```{r p6}
+# Top 5 salud (por tema)
+top_salud <- tokens_limpios |>
+  count(tema, palabra) |>
+  bind_tf_idf(palabra, tema, n) |>
+  filter(tema == "salud") |>
+  slice_max(tf_idf, n = 5) |>
+  pull(palabra)
+
+# Top 5 del país con más textos
+pais_top <- tokens_limpios |> count(pais, sort = TRUE) |> slice(1) |> pull(pais)
+
+top_pais <- tokens_limpios |>
+  count(pais, palabra) |>
+  bind_tf_idf(palabra, pais, n) |>
+  filter(pais == pais_top) |>
+  slice_max(tf_idf, n = 5) |>
+  pull(palabra)
+
+cat("Top 5 salud:", paste(top_salud, collapse = ", "), "\n")
+cat("Top 5", pais_top, ":", paste(top_pais, collapse = ", "), "\n")
+
+# Solapamiento
+intersect(top_salud, top_pais)
+```
+
+**Respuesta:** El solapamiento es **mínimo o nulo**. Las palabras distintivas por tema capturan vocabulario sustantivo (hospitales, vacunación), mientras que las distintivas por país capturan referencias geográficas (nombres de ciudades, instituciones locales). Esto confirma que TF-IDF responde a la pregunta que le hacemos: si agrupamos por tema, encontramos vocabulario temático; si agrupamos por país, encontramos vocabulario nacional.
+
+## Sentimiento
+
+### Pregunta 7: Ampliar diccionarios
+
+```{r p7}
+positivas <- c("crecimiento", "mejora", "mejorado", "oportunidad", "fortalecido",
+               "innovadores", "renovables", "sólido", "beneficio", "avance",
+               "estabilizar", "reducir", "éxito", "progreso", "esperanza",
+               "desarrollo", "inversión", "expansión", "estable", "positivo",
+               "consolidación", "fortalecimiento", "incremento", "modernización",
+               "inclusión", "sustentable", "eficiente", "transparencia",
+               "participación", "cooperación", "innovación", "competitividad")
+
+negativas <- c("crisis", "inflación", "pobreza", "violencia", "amenaza",
+               "problema", "deuda", "riesgo", "deficiencias", "grave",
+               "crimen", "narcotráfico", "deforestación", "informalidad",
+               "inseguridad", "contaminación", "desempleo", "vulnerables",
+               "corrupción", "recesión", "desigualdad", "exclusión",
+               "abandono", "fracaso", "estancamiento", "deterioro",
+               "marginación", "represión", "polarización", "fragmentación",
+               "atraso", "conflicto", "tensión", "deficiente", "precario")
+
+cat("Positivas:", length(positivas), "  Negativas:", length(negativas), "\n")
+```
+
+**Respuesta:** Los diccionarios deben adaptarse al dominio. Para texto político en español agregué palabras sobre [desarrollo institucional]{.alert} (transparencia, participación, modernización) en positivas y sobre [conflicto político]{.alert} (corrupción, polarización, fragmentación) en negativas. La calidad del análisis depende fuertemente de qué palabras incluyamos.
+
+### Pregunta 8: Sentimiento por país
+
+```{r p8}
+sentimiento_doc <- tokens_limpios |>
+  mutate(valencia = case_when(
+    palabra %in% positivas ~  1L,
+    palabra %in% negativas ~ -1L,
+    TRUE ~ 0L
+  )) |>
+  group_by(id, pais) |>
+  summarise(score = sum(valencia), .groups = "drop")
+
+sentimiento_pais <- sentimiento_doc |>
+  group_by(pais) |>
+  summarise(
+    n_textos = n(),
+    score_promedio = round(mean(score), 2),
+    .groups = "drop"
+  ) |>
+  arrange(score_promedio)
+
+sentimiento_pais
+```
+
+**Respuesta:** Los países con tono más negativo en promedio tienden a ser aquellos que el corpus simula con temas de crisis o seguridad: **Venezuela, El Salvador, Honduras**. Los más positivos suelen ser países con menos textos sobre temas problemáticos. Un caveat importante: con tan pocos textos por país (algunos solo 1-2), el promedio es muy sensible al azar — interpretar con cautela.
+
+### Pregunta 9: El documento más positivo
+
+```{r p9}
+doc_mas_positivo <- sentimiento_doc |>
+  arrange(desc(score)) |>
+  head(1)
+
+doc_mas_positivo
+
+textos |>
+  filter(id == doc_mas_positivo$id) |>
+  select(id, tema, pais, anio, texto)
+```
+
+**Respuesta:** El texto más positivo suele estar en los temas **economía** o **educación**, con palabras como crecimiento, mejora, sólido, oportunidad. El método capta bien el tono explícitamente positivo. Lo que NO capta: matices, condicionales ("podríamos crecer si..."), o palabras positivas específicas al dominio que no están en el diccionario (p. ej. "renacimiento", "auge").
+
+### Pregunta 10: Heatmap sentimiento por tema y año
+
+```{r p10, fig.width=8, fig.height=4}
+sentimiento_tema_anio <- tokens_limpios |>
+  mutate(valencia = case_when(
+    palabra %in% positivas ~  1L,
+    palabra %in% negativas ~ -1L,
+    TRUE ~ 0L
+  )) |>
+  group_by(id, tema, anio) |>
+  summarise(score = sum(valencia), .groups = "drop") |>
+  group_by(tema, anio) |>
+  summarise(score_promedio = mean(score), .groups = "drop")
+
+ggplot(sentimiento_tema_anio,
+       aes(x = factor(anio), y = tema, fill = score_promedio)) +
+  geom_tile() +
+  geom_text(aes(label = round(score_promedio, 1)), color = "white", size = 3) +
+  scale_fill_gradient2(low = "#E74C3C", mid = "white", high = "#27AE60",
+                      midpoint = 0) +
+  labs(title = "Tono promedio por tema × año",
+       x = "Año", y = "Tema", fill = "Score") +
+  theme_minimal()
+```
+
+**Respuesta:** El heatmap revela patrones: el tema **seguridad** mantiene tono negativo en todos los años; **salud** se vuelve más negativo en 2020-2021 (pandemia); **economía** alterna entre tonos. Los años con pocos textos (2020) son menos confiables. El gradiente bicolor (rojo-blanco-verde) hace evidente que la mayoría de los temas se mueven entre -1 y +2 — el rango de variación es moderado.
+
+## Síntesis
+
+### Pregunta 11: Clasificador por palabras clave
+
+```{r p11}
+ancla <- list(
+  economia      = c("crecimiento", "inflación", "empleo", "pib", "mercado",
+                    "inversión", "fiscal", "monetaria", "desempleo"),
+  educacion     = c("estudiantes", "docentes", "escuelas", "universidad",
+                    "educativa", "alumnos", "aprendizaje", "escolar"),
+  salud         = c("hospitales", "vacunación", "pandemia", "médicos",
+                    "sanitaria", "enfermedades", "covid"),
+  seguridad     = c("violencia", "crimen", "policía", "delincuencia",
+                    "narcotráfico", "robos", "inseguridad"),
+  medioambiente = c("deforestación", "biodiversidad", "bosque", "clima",
+                    "renovables", "contaminación", "sustentable")
+)
+
+# Para cada documento, contar palabras de cada ancla
+clasificacion <- tokens_limpios |>
+  mutate(tema_predicho = case_when(
+    palabra %in% ancla$economia      ~ "economia",
+    palabra %in% ancla$educacion     ~ "educacion",
+    palabra %in% ancla$salud         ~ "salud",
+    palabra %in% ancla$seguridad     ~ "seguridad",
+    palabra %in% ancla$medioambiente ~ "medioambiente",
+    TRUE ~ NA_character_
+  )) |>
+  filter(!is.na(tema_predicho)) |>
+  count(id, tema_predicho) |>
+  group_by(id) |>
+  slice_max(n, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  left_join(textos |> select(id, tema_real = tema), by = "id")
+
+# Matriz de confusión
+conf_mat <- table(Real = clasificacion$tema_real, Predicho = clasificacion$tema_predicho)
+conf_mat
+
+# Accuracy
+accuracy <- sum(diag(conf_mat)) / sum(conf_mat)
+cat("Accuracy:", round(accuracy, 3), "\n")
+```
+
+**Respuesta:** El clasificador por keywords obtiene accuracy de ~70-85% según la calidad de las palabras-ancla. Es **transparente** (sabemos exactamente por qué clasifica cada texto), **rápido** y **fácil de mejorar** (agregar más palabras-ancla). Sus errores tienden a ocurrir cuando un texto cruza dos temas (p. ej. "pandemia y economía") o cuando el tema se discute sin las palabras clásicas. Para un corpus pequeño como este, este enfoque puede igualar a LDA en accuracy con mucha más claridad.
+
+### Pregunta 12: TF-IDF + sentimiento
+
+**Respuesta:** Hay una relación parcial pero no determinista. Los **temas** con vocabulario marcadamente negativo según TF-IDF (seguridad, con palabras como "violencia", "crimen") también tienen los scores de sentimiento más negativos — lo cual valida que las dos herramientas capturan la misma señal de fondo. Sin embargo, los **países** con tono más negativo no siempre son los más representados en temas problemáticos: a veces un país tiene un solo texto que, por azar, es muy negativo, y eso sesga su promedio. La combinación de TF-IDF (qué palabras) + sentimiento (cómo se sienten) y validación humana (¿son representativas las palabras-ancla?) construye un análisis más completo que cualquier método solo.
+
+### Pregunta 13: Reflexión
+
+**Respuesta:**
+
+1. **TF-IDF vs. sentimiento — cuándo usar cuál:**
+   - **TF-IDF** responde preguntas como: "¿Qué vocabulario distingue a [grupo A] de [grupo B]?" Ejemplo: "¿Qué palabras eran más comunes en los discursos del partido X frente al partido Y en 2023?"
+   - **Sentimiento** responde preguntas como: "¿Cuál es el tono dominante de este corpus? ¿Cómo varía entre grupos?" Ejemplo: "¿Los medios de derecha cubren la migración con tono más negativo que los de izquierda?"
+
+2. **Dos limitaciones serias del sentimiento por diccionario:**
+   - **Negaciones e ironía**: "no es un buen presidente" cuenta como positivo. Mitigación: usar bigramas como contexto, o un modelo entrenado con anotaciones humanas.
+   - **Dependencia del dominio**: "viral" es positivo en marketing, negativo en epidemiología. Mitigación: validar diccionarios contra una muestra anotada manualmente para el dominio específico.
+
+3. **Cuándo preferir un LLM:**
+   - Textos largos con tono mixto, donde un score promedio pierde matiz
+   - Tareas que requieren entender contexto: detectar ironía, sarcasmo, alusiones culturales
+   - Necesidad de extraer información estructurada (eventos, actores, fechas) sin reglas pre-definidas
+   - Sin embargo, los métodos clásicos siguen siendo preferibles cuando se necesita **transparencia y replicabilidad** (un revisor puede inspeccionar exactamente qué palabra activó qué decisión, lo que un LLM no permite).

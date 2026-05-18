@@ -73,20 +73,32 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 ::: {.resource-card}
 [Lab 5: Clustering y PCA]{.resource-title}
 
-[Día 3, sesión 1. Segmentación de países latinoamericanos por indicadores socioeconómicos del Banco Mundial usando K-means, clustering jerárquico y PCA.]{.resource-meta}
+[Día 3, sesión 1. Segmentación de países latinoamericanos por indicadores socioeconómicos usando K-means, clustering jerárquico y PCA. Visualización con biplot.]{.resource-meta}
 
 ::: {.resource-links}
-Código (próximamente)
+[Diapositivas (.html)](clases/dia-03/11-laboratorio-05.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/11-laboratorio-05.qmd) |
+[Código (.R)](clases/dia-03/laboratorio-05.R) |
+[Tarea 5 (.html)](clases/dia-03/tarea-05.html) |
+[Tarea 5 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-05.qmd) |
+[Respuestas Tarea 5 (.html)](clases/dia-03/tarea-05-respuestas.html) |
+[Respuestas Tarea 5 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-05-respuestas.qmd)
 :::
 :::
 
 ::: {.resource-card}
 [Lab 6: Análisis de texto]{.resource-title}
 
-[Día 3, sesión 2. Tokenización, TF-IDF, nube de palabras y extracción de tópicos (LDA) en discursos políticos latinoamericanos con `tidytext` y `topicmodels`.]{.resource-meta}
+[Día 3, sesión 2. Tokenización, TF-IDF y análisis de sentimiento con diccionarios sobre discursos políticos latinoamericanos. Uso de `tidytext` para identificar palabras distintivas y medir el tono de los textos.]{.resource-meta}
 
 ::: {.resource-links}
-Código (próximamente)
+[Diapositivas (.html)](clases/dia-03/12-laboratorio-06.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/12-laboratorio-06.qmd) |
+[Código (.R)](clases/dia-03/laboratorio-06.R) |
+[Tarea 6 (.html)](clases/dia-03/tarea-06.html) |
+[Tarea 6 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-06.qmd) |
+[Respuestas Tarea 6 (.html)](clases/dia-03/tarea-06-respuestas.html) |
+[Respuestas Tarea 6 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-06-respuestas.qmd)
 :::
 :::
 

@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Danilo Freire">
 
-<title>Laboratorios – IA para Científicos Sociales</title>
+<title>Tarea 5: Clustering y PCA – IA para Científicos Sociales</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -61,22 +62,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -118,7 +119,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">IA para Científicos Sociales</span>
     </a>
   </div>
@@ -129,19 +130,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Inicio</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./programa.html"> 
+    <a class="nav-link" href="../../programa.html"> 
 <span class="menu-text">Programa</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./laboratorios.html" aria-current="page"> 
+    <a class="nav-link" href="../../laboratorios.html"> 
 <span class="menu-text">Laboratorios</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./lecturas.html"> 
+    <a class="nav-link" href="../../lecturas.html"> 
 <span class="menu-text">Lecturas</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -150,15 +151,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
         <li>
-    <a class="dropdown-item" href="./referencia-tidymodels.html">
+    <a class="dropdown-item" href="../../referencia-tidymodels.html">
  <span class="dropdown-text">Supervisado (tidymodels)</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./referencia-no-supervisado.html">
+    <a class="dropdown-item" href="../../referencia-no-supervisado.html">
  <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./referencia-texto.html">
+    <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
   </li>  
     </ul>
@@ -195,25 +196,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">En esta página</h2>
    
-  <ul>
-  <li><a href="#ejercicios-prácticos" id="toc-ejercicios-prácticos" class="nav-link active" data-scroll-target="#ejercicios-prácticos">Ejercicios prácticos</a></li>
-  <li><a href="#requisitos-de-software" id="toc-requisitos-de-software" class="nav-link" data-scroll-target="#requisitos-de-software">Requisitos de software</a></li>
+  <ul class="collapse">
+  <li><a href="#instrucciones" id="toc-instrucciones" class="nav-link active" data-scroll-target="#instrucciones"><span class="header-section-number">1</span> Instrucciones</a></li>
+  <li><a href="#exploración" id="toc-exploración" class="nav-link" data-scroll-target="#exploración"><span class="header-section-number">2</span> Exploración</a></li>
+  <li><a href="#k-means" id="toc-k-means" class="nav-link" data-scroll-target="#k-means"><span class="header-section-number">3</span> K-means</a></li>
+  <li><a href="#clustering-jerárquico" id="toc-clustering-jerárquico" class="nav-link" data-scroll-target="#clustering-jerárquico"><span class="header-section-number">4</span> Clustering jerárquico</a></li>
+  <li><a href="#pca" id="toc-pca" class="nav-link" data-scroll-target="#pca"><span class="header-section-number">5</span> PCA</a></li>
+  <li><a href="#síntesis" id="toc-síntesis" class="nav-link" data-scroll-target="#síntesis"><span class="header-section-number">6</span> Síntesis</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/laboratorios.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
+<div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-03/tarea-05.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Laboratorios</h1>
+<h1 class="title">Tarea 5: Clustering y PCA</h1>
+<p class="subtitle lead">IA para Científicos Sociales - UCU</p>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Autor/a</div>
+    <div class="quarto-title-meta-contents">
+             <p>Danilo Freire </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">22 de abril de 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -223,93 +241,154 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="ejercicios-prácticos" class="level2">
-<h2 class="anchored" data-anchor-id="ejercicios-prácticos">Ejercicios prácticos</h2>
-<p>Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en clase a datos reales. Los laboratorios se realizan en R usando RStudio.</p>
-<div class="resource-card">
-<p><span class="resource-title">Lab 1: Primer flujo de trabajo con tidymodels</span></p>
-<p><span class="resource-meta">Día 1. Configuración del entorno, carga de datos, división train/test, ajuste de un modelo simple y evaluación de métricas básicas.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-01/03-laboratorio-01.html">Diapositivas (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/03-laboratorio-01.qmd">Diapositivas (.qmd)</a> | <a href="clases/dia-01/laboratorio-01.R">Código (.R)</a> | <a href="clases/dia-01/tarea-01.html">Tarea 1 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/tarea-01.qmd">Tarea 1 (.qmd)</a> | <a href="clases/dia-01/tarea-01-respuestas.html">Respuestas Tarea 1 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/tarea-01-respuestas.qmd">Respuestas Tarea 1 (.qmd)</a></p>
-</div>
-</div>
-<div class="resource-card">
-<p><span class="resource-title">Lab 2: Exploración avanzada y comparación de modelos</span></p>
-<p><span class="resource-meta">Día 1. Exploración de datos de satisfacción democrática en América Latina. Feature engineering, comparación de regresión logística, árboles de decisión y KNN con <code>tidymodels</code>.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-01/04-laboratorio-02.html">Diapositivas (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/04-laboratorio-02.qmd">Diapositivas (.qmd)</a> | <a href="clases/dia-01/laboratorio-02.R">Código (.R)</a> | <a href="clases/dia-01/tarea-02.html">Tarea 2 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/tarea-02.qmd">Tarea 2 (.qmd)</a> | <a href="clases/dia-01/tarea-02-respuestas.html">Respuestas Tarea 2 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/tarea-02-respuestas.qmd">Respuestas Tarea 2 (.qmd)</a></p>
-</div>
-</div>
-<div class="resource-card">
-<p><span class="resource-title">Lab 3: Clasificación avanzada con Latinobarómetro</span></p>
-<p><span class="resource-meta">Día 2. Clasificación avanzada con datos simulados de Latinobarómetro. Random Forest con tuning de hiperparámetros, XGBoost, interpretación con VIP y Partial Dependence Plots.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-02/07-laboratorio-03.html">Diapositivas (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/07-laboratorio-03.qmd">Diapositivas (.qmd)</a> | <a href="clases/dia-02/laboratorio-03.R">Código (.R)</a> | <a href="clases/dia-02/tarea-03.html">Tarea 3 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-03.qmd">Tarea 3 (.qmd)</a> | <a href="clases/dia-02/tarea-03-respuestas.html">Respuestas Tarea 3 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-03-respuestas.qmd">Respuestas Tarea 3 (.qmd)</a></p>
-</div>
-</div>
-<div class="resource-card">
-<p><span class="resource-title">Lab 4: Regresión y regularización</span></p>
-<p><span class="resource-meta">Día 2. Regresión lineal, LASSO, Ridge y Elastic Net con <code>glmnet</code>. Selección de variables, comparación de modelos de regresión y predicción con datos de Latinobarómetro.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-02/08-laboratorio-04.html">Diapositivas (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/08-laboratorio-04.qmd">Diapositivas (.qmd)</a> | <a href="clases/dia-02/laboratorio-04.R">Código (.R)</a> | <a href="clases/dia-02/tarea-04.html">Tarea 4 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-04.qmd">Tarea 4 (.qmd)</a> | <a href="clases/dia-02/tarea-04-respuestas.html">Respuestas Tarea 4 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-04-respuestas.qmd">Respuestas Tarea 4 (.qmd)</a></p>
-</div>
-</div>
-<div class="resource-card">
-<p><span class="resource-title">Lab 5: Clustering y PCA</span></p>
-<p><span class="resource-meta">Día 3, sesión 1. Segmentación de países latinoamericanos por indicadores socioeconómicos usando K-means, clustering jerárquico y PCA. Visualización con biplot.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-03/11-laboratorio-05.html">Diapositivas (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/11-laboratorio-05.qmd">Diapositivas (.qmd)</a> | <a href="clases/dia-03/laboratorio-05.R">Código (.R)</a> | <a href="clases/dia-03/tarea-05.html">Tarea 5 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-05.qmd">Tarea 5 (.qmd)</a> | <a href="clases/dia-03/tarea-05-respuestas.html">Respuestas Tarea 5 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-05-respuestas.qmd">Respuestas Tarea 5 (.qmd)</a></p>
-</div>
-</div>
-<div class="resource-card">
-<p><span class="resource-title">Lab 6: Análisis de texto</span></p>
-<p><span class="resource-meta">Día 3, sesión 2. Tokenización, TF-IDF y análisis de sentimiento con diccionarios sobre discursos políticos latinoamericanos. Uso de <code>tidytext</code> para identificar palabras distintivas y medir el tono de los textos.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-03/12-laboratorio-06.html">Diapositivas (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/12-laboratorio-06.qmd">Diapositivas (.qmd)</a> | <a href="clases/dia-03/laboratorio-06.R">Código (.R)</a> | <a href="clases/dia-03/tarea-06.html">Tarea 6 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-06.qmd">Tarea 6 (.qmd)</a> | <a href="clases/dia-03/tarea-06-respuestas.html">Respuestas Tarea 6 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-06-respuestas.qmd">Respuestas Tarea 6 (.qmd)</a></p>
-</div>
-</div>
-<div class="resource-card">
-<p><span class="resource-title">Lab 7: Primeros pasos con ellmer</span></p>
-<p><span class="resource-meta">Día 4, sesión 1. Uso de <code>ellmer</code> para interactuar con modelos de lenguaje desde R. Clasificación automática de textos y extracción de datos estructurados.</span></p>
-<div class="resource-links">
-<p>Código (próximamente)</p>
-</div>
-</div>
-<div class="resource-card">
-<p><span class="resource-title">Lab 8: Aplicaciones avanzadas de LLMs</span></p>
-<p><span class="resource-meta">Día 4, sesión 2. Análisis de sentimiento con LLMs, generación de datos sintéticos y auditoría de sesgos algorítmicos.</span></p>
-<div class="resource-links">
-<p>Código (próximamente)</p>
-</div>
-</div>
-<div class="resource-card">
-<p><span class="resource-title">Lab 9: Auditoría de sesgo algorítmico</span></p>
-<p><span class="resource-meta">Día 5. Métricas de equidad, detección de sesgo en modelos de ML y propuestas de investigación.</span></p>
-<div class="resource-links">
-<p>Código (próximamente)</p>
-</div>
+<section id="instrucciones" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="instrucciones"><span class="header-section-number">1</span> Instrucciones</h2>
+<p>Esta tarea usa el mismo dataset del Laboratorio 5 (<code>indicadores_paises.csv</code>): 18 países latinoamericanos con 8 indicadores socioeconómicos. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
+<p><strong>Para trabajar en esta tarea:</strong></p>
+<ol type="1">
+<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>indicadores_paises.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code></li>
+<li>Necesitan <a href="https://quarto.org/docs/get-started/">Quarto</a> instalado junto con RStudio. Las versiones recientes de RStudio (&gt;= 2022.07) ya incluyen Quarto</li>
+<li>Abran este archivo <code>.qmd</code> en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)</li>
+<li>Cuando terminen, pueden renderizar el documento completo con el botón “Render” en RStudio</li>
+</ol>
+<section id="configuración" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="configuración"><span class="header-section-number">1.1</span> Configuración</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>paises <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/indicadores_paises.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="requisitos-de-software" class="level2">
-<h2 class="anchored" data-anchor-id="requisitos-de-software">Requisitos de software</h2>
-<p>Antes del primer día, asegurarse de tener instalado:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Núcleo</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidyverse"</span>, <span class="st">"tidymodels"</span>,</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 2: clasificación, regresión y regularización</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ranger"</span>, <span class="st">"xgboost"</span>, <span class="st">"glmnet"</span>, <span class="st">"kknn"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"rpart"</span>, <span class="st">"rpart.plot"</span>, <span class="st">"broom"</span>, <span class="st">"vip"</span>, <span class="st">"pdp"</span>, <span class="st">"patchwork"</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 3: clustering, PCA y análisis de texto</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"cluster"</span>, <span class="st">"factoextra"</span>, <span class="st">"dendextend"</span>, <span class="st">"corrplot"</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidytext"</span>, <span class="st">"topicmodels"</span>, <span class="st">"tm"</span>, <span class="st">"ggwordcloud"</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 4: modelos de lenguaje (LLMs)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ellmer"</span>, <span class="st">"jsonlite"</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 5: auditoría de sesgo algorítmico</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fairmodels"</span>, <span class="st">"DALEX"</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Se enviarán instrucciones detalladas de instalación por correo electrónico antes del inicio del curso.</p>
+</section>
+<section id="exploración" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="exploración"><span class="header-section-number">2</span> Exploración</h2>
+<section id="pregunta-1-resumen-del-dataset" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-del-dataset"><span class="header-section-number">2.1</span> Pregunta 1: Resumen del dataset</h3>
+<p>Muestren el rango (mínimo y máximo) y la mediana de cada variable numérica del dataset. ¿Cuál variable tiene la mayor dispersión relativa (rango dividido por mediana)?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-2-países-con-valores-extremos" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-países-con-valores-extremos"><span class="header-section-number">2.2</span> Pregunta 2: Países con valores extremos</h3>
+<p>Identifiquen los países con el <span class="alert">PIB per cápita más alto y más bajo</span>, la <span class="alert">esperanza de vida más alta y más baja</span>, y la <span class="alert">desigualdad (Gini) más alta y más baja</span>. Muestren los resultados en una tabla. ¿Algún país aparece varias veces?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-3-correlaciones" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
+<p>Calculen la matriz de correlaciones de las variables numéricas. ¿Cuál par de variables tiene la correlación positiva más fuerte? ¿Cuál tiene la correlación negativa más fuerte? ¿Tiene sentido teóricamente?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+</section>
+<section id="k-means" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="k-means"><span class="header-section-number">3</span> K-means</h2>
+<section id="pregunta-4-k-means-con-k4" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-k-means-con-k4"><span class="header-section-number">3.1</span> Pregunta 4: K-means con K=4</h3>
+<p>Escalen las variables numéricas (usando <code>column_to_rownames("pais") |&gt; scale()</code>) y ajusten K-means con K=4 y <code>nstart = 25</code>. ¿Qué países quedan en cada cluster?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-5-comparar-k2-3-4-con-silueta" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-comparar-k2-3-4-con-silueta"><span class="header-section-number">3.2</span> Pregunta 5: Comparar K=2, 3, 4 con silueta</h3>
+<p>Para K=2, 3 y 4, calculen la silueta promedio de cada solución. ¿Qué K maximiza la silueta? ¿Es la solución que más sentido tiene políticamente?</p>
+<p><em>Pista:</em> <code>silhouette(km$cluster, dist(datos_scaled))</code> devuelve una matriz; la columna <code>"sil_width"</code> (tercera) tiene los valores que se promedian.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-6-perfil-de-los-clusters" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-perfil-de-los-clusters"><span class="header-section-number">3.3</span> Pregunta 6: Perfil de los clusters</h3>
+<p>Para la solución K=4 de la pregunta 4, calculen la media de PIB, esperanza de vida, índice de democracia y Gini dentro de cada cluster. Asignen una etiqueta sustantiva a cada cluster (p.&nbsp;ej. “alto desarrollo”, “ingreso medio”).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+</section>
+<section id="clustering-jerárquico" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="clustering-jerárquico"><span class="header-section-number">4</span> Clustering jerárquico</h2>
+<section id="pregunta-7-dendrograma-con-método-complete" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-dendrograma-con-método-complete"><span class="header-section-number">4.1</span> Pregunta 7: Dendrograma con método “complete”</h3>
+<p>Ajusten un clustering jerárquico con <code>method = "complete"</code> (en lugar del Ward del laboratorio). Visualicen el dendrograma con los cortes para K=3 resaltados.</p>
+<p><em>Pista:</em> <code>hclust(dist(datos_scaled), method = "complete")</code> y luego <code>rect.hclust(hc, k = 3, border = ...)</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-8-ward-vs-complete" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-ward-vs-complete"><span class="header-section-number">4.2</span> Pregunta 8: Ward vs complete</h3>
+<p>Comparen las soluciones K=3 obtenidas con Ward y con complete usando <code>table()</code>. ¿Coinciden? ¿Cuál parece más balanceada?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+</section>
+<section id="pca" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="pca"><span class="header-section-number">5</span> PCA</h2>
+<section id="pregunta-9-primeros-3-componentes" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-9-primeros-3-componentes"><span class="header-section-number">5.1</span> Pregunta 9: Primeros 3 componentes</h3>
+<p>Ajusten <code>prcomp()</code> sobre los datos escalados. ¿Qué porcentaje de la varianza acumulada explican los primeros 3 componentes? ¿Es suficiente para resumir el dataset?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-10-interpretar-pc3" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-interpretar-pc3"><span class="header-section-number">5.2</span> Pregunta 10: Interpretar PC3</h3>
+<p>Vean los loadings del tercer componente (<code>pca$rotation[, 3]</code>). ¿Qué variables pesan más? ¿Qué dimensión sustantiva captura PC3?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-11-países-extremos-en-pc2" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-países-extremos-en-pc2"><span class="header-section-number">5.3</span> Pregunta 11: Países extremos en PC2</h3>
+<p>Ordenen los países por su valor en PC2. ¿Cuáles están en los extremos? ¿Tiene sentido dado el significado de PC2 (vimos en el laboratorio que captura “desigualdad alta vs.&nbsp;urbanización/educación alta”)?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+</section>
+<section id="síntesis" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="síntesis"><span class="header-section-number">6</span> Síntesis</h2>
+<section id="pregunta-12-excluir-un-país-extremo" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-excluir-un-país-extremo"><span class="header-section-number">6.1</span> Pregunta 12: Excluir un país extremo</h3>
+<p>Excluyan a Uruguay (el país más “desarrollado” según PC1) y re-corran PCA con los 17 países restantes. ¿Cambian los loadings de PC1 y PC2? ¿Aparece algún país nuevo en los extremos?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-13-reflexión" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-13-reflexión"><span class="header-section-number">6.2</span> Pregunta 13: Reflexión</h3>
+<p>Basándose en los resultados de esta tarea, respondan:</p>
+<ol type="1">
+<li>¿Cuántos clusters cree que describen mejor a los 18 países? Justifique con evidencia (silueta + interpretación sustantiva)</li>
+<li>¿Las técnicas de clustering y PCA llegan a la misma conclusión sobre quiénes son los países “similares”?</li>
+<li>Si tuvieran que presentar estos resultados a un ministro de planificación, ¿qué visualización elegirían y por qué?</li>
+</ol>
+<p><strong>Respuesta:</strong></p>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
@@ -721,7 +800,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/laboratorios.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-03/tarea-05.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Hecho con <a href="https://quarto.org">Quarto</a></p>
 </div>
