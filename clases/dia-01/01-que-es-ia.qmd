@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -49,7 +49,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 }
 ```
 
-# Bienvenidos! 🥳 {background-color="#2d4563"}
+# ¡Bienvenidos! 🥳 {background-color="#2d4563"}
 
 ## Agenda de la sesión
 ### ¿Qué veremos hoy?
@@ -67,11 +67,11 @@ if (!require("fontawesome", character.only = TRUE)) {
 4. [Tipos de aprendizaje automático]{.alert}
     - Supervisado, no supervisado, por refuerzo
 5. [Ética y regulación]{.alert}
-    - Sesgos, alucinaciones, legislación actual
+    - Sesgos, alucinaciones
 :::
 
 :::{.column width=50%}
-:::{style="text-align: center; margin-top: -50px;"}
+:::{style="text-align: center; margin-top: -30px;"}
 [![](figures/cute-robot.png){width="65%"}](#){data-modal-type="image" data-modal-url="figures/cute-robot.png"}
 :::
 :::
@@ -91,7 +91,7 @@ Todos los materiales del curso (diapositivas, código, laboratorios y lecturas) 
 Las diapositivas se publicarán antes de cada sesión y se actualizarán a lo largo de la semana si surgen nuevas ideas o preguntas 😉
 
 ::: {.callout-note}
-Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevos materiales!
+¡Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevos materiales!
 :::
 :::
 
@@ -113,7 +113,7 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 
 :::{.column}
 :::{style="font-size: 28px;"}
-`r fa('chalkboard-user')` Professor Assistente en el [Department of Data and Decision Sciences](https://datascience.emory.edu/), [Emory University](https://www.emory.edu/)
+`r fa('chalkboard-user')` Profesor asistente visitante en el [Department of Data and Decision Sciences](https://datascience.emory.edu/), [Emory University](https://www.emory.edu/)
 
 `r fa('graduation-cap')` MA del Graduate Institute Geneva, PhD de King's College London, Postdoc en Brown University, Senior Lecturer en la University of Lincoln, UK
 
@@ -126,11 +126,13 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 
 :::{style="margin-top: 60px; font-size: 40px;"}
 
-- Ahora les toca a ustedes! 😊
+- ¡Ahora les toca a ustedes! 😊
 
-- Por favor, preséntense brevemente
+- Por favor, preséntense
 
-- Cuéntennos su nombre, su área de trabajo y qué les gustaría aprender en este curso
+- Cuéntennos su nombre, su área de trabajo y qué les gustaría aprender en este curso 
+
+- Por favor, *sean breves*: unos 30 segundos por persona para que nos dé tiempo de escuchar a todos 😉
 :::
 
 ## Estructura del curso
@@ -140,18 +142,18 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 
 | Día | Tema | Sesiones | Laboratorios |
 |-----|------|----------|--------------|
-| 1 | Fundamentos de IA y ML | ¿Qué es la IA? + Flujo de ML | tidymodels + comparación de modelos |
-| 2 | Aprendizaje supervisado | Clasificación + Predicción | clasificación + regresión |
-| 3 | Texto y no supervisado | Clustering/PCA + Texto | clustering + análisis de texto |
-| 4 | LLMs y aplicaciones | Transformers + APIs | ellmer + aplicaciones avanzadas |
-| 5 | Ética y cierre | Sesgo/regulación + Propuestas | auditoría de sesgo |
+| 1 | [Fundamentos de IA y ML]{.alert} | ¿Qué es la IA? + Flujo de ML | tidymodels + comparación de modelos |
+| 2 | [Aprendizaje supervisado]{.alert} | Clasificación + Predicción | clasificación + regresión |
+| 3 | [Texto y no supervisado]{.alert} | Clustering/PCA + Texto | clustering + análisis de texto |
+| 4 | [LLMs y aplicaciones]{.alert} | Transformers + APIs | ellmer + aplicaciones avanzadas |
+| 5 | [Ética y cierre]{.alert} | Sesgo/regulación + Propuestas | auditoría de sesgo |
 
 :::
 
 ## Objetivos de aprendizaje
 ### Al finalizar este curso, serán capaces de:
 
-:::{style="margin-top: 40px; font-size: 30px;"}
+:::{style="margin-top: 40px; font-size: 34px;"}
 
 :::{.incremental}
 - [Explicar]{.alert} cómo funcionan los sistemas de IA actuales
@@ -162,13 +164,13 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 :::
 :::
 
-# ¿Qué es la Inteligencia Artificial? {background-color="#2d4563"}
+# ¿Qué es la Inteligencia Artificial? 🤖 {background-color="#2d4563"}
 
 ## Definición de IA
 
 :::{style="margin-top: 20px; font-size: 25px;"}
 - Una definición sencilla: [la Inteligencia Artificial (IA) es una rama de la informática centrada en crear sistemas capaces de realizar tareas que normalmente requieren inteligencia humana]{.alert}
-- Estas tareas incluyen aprender, razonar, resolver problemas, percibir y entender el lenguaje
+- Estas tareas incluyen aprender, razonar, resolver problemas, entender el lenguaje, etc
 
 :::{.columns style="margin-top: 20px;"}
 :::{.column width=50%}
@@ -183,7 +185,7 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 **Técnicas comunes**
 
 - [Aprendizaje automático]{.alert} (ML)
-- [Aprendizaje profundo]{.alert} (DP), un subconjunto de ML basado en redes neuronales
+- [Aprendizaje profundo]{.alert} (DL), un subconjunto de ML basado en redes neuronales
 - [Procesamiento del lenguaje natural]{.alert} (NLP), un área de aplicación
 :::
 :::
@@ -192,9 +194,8 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 ## ¿Qué NO es la IA?
 ### Mitos y concepciones erróneas
 
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=50%}
+:::{style="margin-top: 30px; font-size: 30px;"}
+:::{.incremental}
 **Mitos comunes:**
 
 - [La IA "piensa" como los humanos]{.alert}
@@ -206,20 +207,23 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 - [La IA es infalible]{.alert}
     - No. Comete errores, a veces con mucha confianza
 :::
-
-:::{.column width=50%}
-**Lo que la IA realmente es:**
-
-- Una [herramienta poderosa]{.alert} para tareas específicas
-- Un sistema que [encuentra patrones]{.alert} en grandes cantidades de datos
-- Una tecnología que [requiere supervisión humana]{.alert}
-- Un campo en [rápida evolución]{.alert} con limitaciones reales
-
-<br>
-
-[Entender qué NO es la IA es tan importante como entender qué es!]{.alert}
 :::
-:::
+
+## Fortalezas y limitaciones de la IA
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+**Lo que la IA hace bien:**
+
+- Procesar [grandes cantidades de datos rápidamente]{.alert}
+- Identificar [patrones complejos]{.alert} que los humanos podrían pasar por alto
+- Realizar [tareas repetitivas o peligrosas sin fatiga]{.alert}
+- [Generar contenido creativo]{.alert} (texto, imágenes, música) a partir de ejemplos
+
+**Lo que la IA no hace bien:**
+
+- [Razonamiento causal]{.alert}: no entiende relaciones causa-efecto, solo correlaciones
+- [Contexto amplio]{.alert}: no puede entender situaciones complejas que requieren conocimiento del mundo o sentido común
+- [Adaptación a situaciones nuevas]{.alert}: no generaliza bien fuera de los datos con los que fue entrenada
 :::
 
 ## Taxonomía de la IA
@@ -230,37 +234,6 @@ Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevo
 Fuente: [McKinsey & Company (2024)](https://www.mckinsey.com/featured-insights/mckinsey-explainers/what-is-ai)
 :::
 
-## IA en América Latina
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-- La región [produce y adapta]{.alert} IA, no solo la consume
-
-:::{.columns style="margin-top: 20px;"}
-:::{.column width=50%}
-**Aplicaciones**
-
-- [Agricultura]{.alert}: predicción de cosechas y monitoreo de deforestación
-- Detección de fraude en [fintech]{.alert} (MercadoLibre, Nubank)
-- En [salud]{.alert}, triaje automático en hospitales públicos
-- [Justicia]{.alert}: clasificación de procesos (Uruguay, Brasil)
-- Rutas optimizadas en [logística]{.alert} (Rappi)
-:::
-
-:::{.column width=50%}
-**Desafíos**
-
-- Pocos datos en español y portugués
-- Brecha digital urbano-rural
-- Infraestructura desigual
-- Dependencia de cloud extranjero
-
-<br>
-
-[¿Quién diseñará la IA para la región?]{.alert}
-:::
-:::
-:::
-
 ## Benchmarks de IA y desempeño humano
 
 :::{style="margin-top: 40px; font-size: 28px; text-align: center;"}
@@ -269,46 +242,11 @@ Fuente: [McKinsey & Company (2024)](https://www.mckinsey.com/featured-insights/m
 Fuente: [Artificial Intelligence Index Report (2025)](https://hai.stanford.edu/ai-index/2025-ai-index-report)
 :::
 
-## El estado actual de la IA (2025)
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
-**Lo que ya hace bien**
-
-- [Generación de texto]{.alert}: resúmenes, traducción y código
-- [Análisis de imágenes]{.alert} para diagnóstico médico y reconocimiento facial
-- [Predicción]{.alert} de demanda o riesgo crediticio
-- [Automatización]{.alert} en atención al cliente y clasificación de documentos
-
-**Lo que todavía le cuesta**
-
-- El [razonamiento causal]{.alert}: entender el porqué, no solo las correlaciones
-- El [sentido común]{.alert}, eso que para nosotros es obvio
-- La [explicabilidad]{.alert} de sus propias decisiones
-:::
-
-:::{.column width=45%}
-**Tendencias actuales**
-
-- Modelos cada vez más [grandes]{.alert}, con rendimientos decrecientes
-- Énfasis en la [eficiencia]{.alert}: modelos pequeños y rápidos
-- [Multimodalidad]{.alert} (texto, imagen, audio y video)
-- [Agentes]{.alert} autónomos para tareas complejas
-- Debate sobre [IA abierta y cerrada]{.alert} y el acceso a los modelos
-
-<br>
-
-[Momento de experimentación activa: nadie sabe exactamente a dónde va esto]{.alert}
-:::
-:::
-:::
-
 # Breve historia de la IA {background-color="#2d4563"}
 
 ## Mitos antiguos y calculadoras mecánicas
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - Los seres humanos [siempre han soñado con crear vida artificial]{.alert}
@@ -422,7 +360,7 @@ Fuente: [IEEE Spectrum](https://spectrum.ieee.org/dartmouth-ai-workshop)
 
 **Segundo invierno (1987-1993)**
 
-- [Mantenimiento costoso]{.alert}, [cuello de botella del conocimiento]{.alert}, [no aprendían]{.alert}
+- [Mantenimiento costoso]{.alert}, [no aprendían]{.alert}, [poca escalabilidad]{.alert}
 - Las PCs hicieron obsoleto el hardware especializado
 - "IA" se convirtió en una mala palabra
 :::
@@ -521,66 +459,10 @@ Fuente: [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762)
 
 :::{.column width=45%}
 :::{style="text-align: center;"}
-[![El crecimiento explosivo de ChatGPT](figures/chatgpt-growth.webp){width="80%"}](#){data-modal-type="image" data-modal-url="figures/chatgpt-growth.webp"}
+[![El crecimiento explosivo de ChatGPT](figures/chatgpt-growth.webp){width="100%"}](#){data-modal-type="image" data-modal-url="figures/chatgpt-growth.webp"}
 
-Fuente: [Voronoi](https://www.voronoiapp.com/technology/OpenAIs-ChatGPT-Hits-Record-5846-Billion-Monthly-Website-Visits-in-August-2025-6532)
+Fuente: [Backlinko](https://api.backlinko.com/app/uploads/2024/06/chatgpt-weekly-active-users-worldwide-1440x1094.webp)
 :::
-:::
-:::
-:::
-
-## IA multimodal
-
-:::{style="margin-top: 30px; font-size: 26px;"}
-:::{.columns}
-:::{.column width=55%}
-- La IA moderna no se limita solo al texto
-- Los [modelos multimodales]{.alert} pueden procesar:
-    - Texto e imágenes (DALL-E, Midjourney)
-    - Texto y audio (Whisper, ElevenLabs)
-    - Texto y video (Sora, Runway)
-    - Texto y código (Codex, Copilot)
-- [Misma arquitectura de transformers]{.alert}, diferentes entradas y salidas
-- Las fronteras entre modalidades se están [difuminando]{.alert}
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center;"}
-[![IA multimodal: entendiendo múltiples tipos de datos](figures/multimodal.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/multimodal.png"}
-
-Fuente: [Tarun Sharma](https://www.linkedin.com/pulse/multimodal-generative-ai-tarun-sharma-zzf9c)
-:::
-:::
-:::
-:::
-
-## Capacidades emergentes
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
-- A medida que los modelos crecen, aparecen [capacidades que no fueron entrenadas explícitamente]{.alert}
-
-**Ejemplos**
-
-- [Razonamiento matemático]{.alert}: resolver problemas paso a paso
-- [Traducción zero-shot]{.alert} entre idiomas que nunca vio juntos
-- Escribir [código]{.alert} en múltiples lenguajes
-- [Seguir instrucciones complejas]{.alert}
-
-- Nadie las diseñó: [emergieron del entrenamiento a escala]{.alert}
-:::
-
-:::{.column width=45%}
-**Implicancia**
-
-- No podemos predecir qué hará un modelo nuevo
-- La evaluación post-hoc es necesaria
-- Las capacidades pueden aparecer (o desaparecer) con la escala
-
-<br>
-
-[¿Cómo predecir y controlar capacidades emergentes? Es un área de investigación activa]{.alert}
 :::
 :::
 :::
@@ -668,7 +550,7 @@ Grupo A: compras frecuentes, bajo valor
 Grupo B: compras ocasionales, alto valor
 Grupo C: nuevos clientes, sin patrón claro
 
-Nadie le dijo que estos grupos existían; el algoritmo los encontró solo!
+Nadie le dijo que estos grupos existían; ¡el algoritmo los encontró solo!
 ```
 :::
 :::
@@ -688,7 +570,7 @@ Nadie le dijo que estos grupos existían; el algoritmo los encontró solo!
     - [Robots]{.alert} que aprenden a caminar cayéndose miles de veces
     - [RLHF]{.alert} en ChatGPT: humanos califican respuestas, el modelo aprende qué es "útil"
 - [No necesita ejemplos etiquetados]{.alert}: aprende de la experiencia
-- Seramos más específicos sobre RLHF en el [Día 4]{.alert}
+- Seremos más específicos sobre RLHF en el [Día 4]{.alert}
 :::
 
 :::{.column width=45%}
@@ -760,7 +642,7 @@ $$P(\text{siguiente palabra} | \text{contexto}) \neq P(\text{afirmación verdade
 
 <br>
 
-[La IA es una herramienta, no un oráculo!]{.alert} 😅
+[¡La IA es una herramienta, no un oráculo!]{.alert} 😅
 
 Siempre mantengan el pensamiento crítico 😉
 :::
@@ -772,73 +654,38 @@ Siempre mantengan el pensamiento crítico 😉
 
 ## Verdadero o falso
 
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=50%}
+:::{style="margin-top: 30px; font-size: 28px;"}
 :::{.incremental}
+- [Un modelo de contratación puede seguir discriminando por raza aunque eliminemos la variable "raza" de los datos]{.alert}
+    - [Verdadero.]{.alert} Otras variables se correlacionan con la raza y actúan como proxy, así que el sesgo persiste
+
+- [Un modelo muy sofisticado con pocos datos suele superar a un modelo simple con muchos datos]{.alert}
+    - [Falso.]{.alert} Es al revés, según "The Unreasonable Effectiveness of Data"
+
+- [Una IA puede inventar una cita que no existe aunque haya sido entrenada solo con textos verídicos]{.alert}
+    - [Verdadero.]{.alert} No copia hechos, predice la palabra más probable. Datos verídicos no garantizan afirmaciones verídicas
+
 - [Un modelo con 99% de accuracy siempre es mejor que uno con 80%]{.alert}
     - [Falso.]{.alert} Con clases desbalanceadas, predecir siempre la clase mayoritaria da 99% sin aprender nada
-
-- [Los LLMs "entienden" el significado de las palabras como los humanos]{.alert}
-    - [Falso.]{.alert} Procesan patrones estadísticos de co-ocurrencia, sin comprensión real
-
-- [Si un modelo funciona bien en el conjunto de entrenamiento, funcionará bien en datos nuevos]{.alert}
-    - [Falso.]{.alert} Eso es sobreajuste: memoriza sin generalizar
-:::
-:::
-
-:::{.column width=50%}
-:::{.incremental}
-- [El código postal puede ser una variable discriminatoria aunque no incluya raza]{.alert}
-    - [Verdadero.]{.alert} El código postal es proxy de raza por la segregación residencial histórica
-
-- [BERT y GPT usan la misma arquitectura transformer pero para tareas diferentes]{.alert}
-    - [Verdadero.]{.alert} BERT es encoder (comprensión), GPT es decoder (generación)
-
-- [La validación cruzada sirve para elegir hiperparámetros sin "contaminar" el test set]{.alert}
-    - [Verdadero.]{.alert} Evalúa configuraciones solo con datos de entrenamiento, reservando el test set
-:::
-:::
-:::
-:::
-
-## Recurso interactivo
-### Exploren los transformers ustedes mismos
-
-:::{style="margin-top: 30px; font-size: 26px;"}
-:::{.columns}
-:::{.column width=55%}
-- [Transformer Explainer](https://poloclub.github.io/transformer-explainer/) de Georgia Tech
-- Visualización interactiva de cómo funcionan los transformers
-- Vean los patrones de atención en tiempo real
-- Experimenten con la temperatura y el muestreo
-- Ejecuta GPT-2 directamente en su navegador
-
-[https://poloclub.github.io/transformer-explainer](https://poloclub.github.io/transformer-explainer/)
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center;"}
-[![](figures/transformer-explainer.png){width="95%"}](#){data-modal-type="image" data-modal-url="figures/transformer-explainer.png"}
-:::
-:::
 :::
 :::
 
 ## Resumen de la sesión
 
-:::{style="margin-top: 30px; font-size: 28px;"}
+:::{style="margin-top: 30px; font-size: 32px;"}
 
 - [IA:]{.alert} sistemas que realizan tareas que requieren inteligencia humana
+- [Tipos de IA:]{.alert} estrecha, general, superinteligente
+- [Fortalezas:]{.alert} procesar grandes datos, identificar patrones, tareas repetitivas, generar contenido
+- [Limitaciones:]{.alert} razonamiento causal, contexto amplio, adaptación a situaciones
 - [Historia:]{.alert} ciclos de entusiasmo y decepción, cada uno con avances reales
 - [Tres tipos de ML:]{.alert} supervisado, no supervisado y por refuerzo
 - [Problemas reales:]{.alert} sesgo, alucinaciones, regulación incompleta
-- [América Latina:]{.alert} desafíos de datos e infraestructura, pero aplicaciones concretas en fintech, salud y agricultura
 :::
 
 ## Próximo: Fundamentos de Machine Learning
 
-:::{style="margin-top: 40px; font-size: 28px;"}
+:::{style="margin-top: 40px; font-size: 30px;"}
 
 - En la [próxima sesión]{.alert}, vamos a profundizar en los fundamentos del aprendizaje automático
 - Veremos:
@@ -847,7 +694,6 @@ Siempre mantengan el pensamiento crítico 😉
     - Sobreajuste y el compromiso sesgo-varianza
     - Métricas de evaluación (precisión, recall, matrices de confusión)
 - Y cerraremos con un [laboratorio práctico]{.alert} en R con tidymodels
-- Nos vemos después del descanso
 :::
 
-# Nos vemos en la próxima sesión! 🤓 {background-color="#2d4563"}
+# ¡Nos vemos en la próxima sesión! 🤓 {background-color="#2d4563"}

@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -94,7 +94,8 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 [![Flujo de trabajo de ML](figures/ml-workflow.png){width="60%"}](#){data-modal-type="image" data-modal-url="figures/ml-workflow.png"}
 :::
 
-<br>
+:::{style="margin-top: 30px;"}
+:::
 
 :::{.columns}
 :::{.column width=50%}
@@ -119,14 +120,14 @@ En la práctica, [el proceso es iterativo]{.alert}: volvemos a pasos anteriores 
 :::{.column width=55%}
 **Recolección de datos**
 
-- Encuestas, registros administrativos, sensores, APIs, [web scraping](https://es.wikipedia.org/wiki/Web_scraping)
+- Encuestas, registros administrativos, sensores, APIs, web scraping, etc
 - La [calidad]{.alert} de los datos determina la calidad del modelo
 - "Basura entra, basura sale" (garbage in, garbage out)
 
 **Preprocesamiento**
 
 - [Valores faltantes]{.alert}: imputar, eliminar o marcar
-- Convertir [variables categóricas]{.alert} a numéricas con [one-hot encoding](https://en.wikipedia.org/wiki/One-hot) o [label encoding](https://en.wikipedia.org/wiki/Feature_engineering#Categorical_data)
+- Convertir [variables categóricas]{.alert} a numéricas con [one-hot encoding](https://www.geeksforgeeks.org/r-language/encoding-categorical-data-in-r/) o [label encoding](https://www.geeksforgeeks.org/r-language/label-encoding-in-r-programming/)
 - [Escalar]{.alert} variables numéricas ([normalizar](https://es.wikipedia.org/wiki/Normalización_(estadística)))
 - Detectar [outliers]{.alert} y decidir qué hacer con ellos
 - [[Feature engineering](https://en.wikipedia.org/wiki/Feature_engineering)]{.alert}, crear nuevas variables a partir de las existentes
@@ -177,7 +178,7 @@ El preprocesamiento es [la mayor parte del trabajo]{.alert} en un proyecto real 
 :::{style="text-align: center; font-size: 23px;"}
 **Ejemplo de data leakage:**
 
-Quieren predecir si un paciente será hospitalizado.
+Quieren predecir si un paciente será hospitalizado
 
 ```
 Variable: "días_en_hospital"
@@ -310,58 +311,6 @@ tendencia_reciente       ← ¿aumenta o baja?
 :::
 :::
 
-## Estratificación y otras estrategias
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-**Estratificación**
-
-- Cada fold mantiene la [misma proporción de clases]{.alert} que el dataset
-- Útil cuando las clases están [desbalanceadas]{.alert}
-- En tidymodels: `initial_split(datos, strata = variable_respuesta)`
-
-**Validación temporal**
-
-- Para datos con [estructura temporal]{.alert} ([series de tiempo](https://es.wikipedia.org/wiki/Serie_temporal))
-- [Nunca entrenar con el futuro]{.alert} para predecir el pasado
-
-**[Leave-One-Out](https://en.wikipedia.org/wiki/Cross-validation_(statistics)#Leave-one-out_cross-validation) (LOO)**
-
-- K = N, una observación por fold
-- Útil con [muy pocos datos]{.alert}, pero costoso
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**Validación temporal**
-
-```
-Datos: ene feb mar abr may jun jul ago
-
-Fold 1:
-  Train: ene feb mar
-  Test:  abr
-
-Fold 2:
-  Train: ene feb mar abr
-  Test:  may
-
-Fold 3:
-  Train: ene feb mar abr may
-  Test:  jun
-
-... y así sucesivamente
-```
-
-<br>
-
-[La validación temporal es necesaria para datos con dependencia temporal]{.alert}
-:::
-:::
-:::
-:::
-
 ## ¿Cuántos datos necesito?
 
 :::{style="margin-top: 30px; font-size: 22px;"}
@@ -472,7 +421,7 @@ Fuente: [X.com](https://x.com/MaartenvSmeden/status/1522230905468862464)
 - En la práctica:
     - Los modelos simples ([regresión lineal](https://es.wikipedia.org/wiki/Regresión_lineal)) tienden a alto sesgo y baja varianza
     - Los modelos complejos ([redes neuronales profundas](https://es.wikipedia.org/wiki/Aprendizaje_profundo)) muestran bajo sesgo y alta varianza
-    - La [regularización]{.alert} controla la varianza sin aumentar mucho el sesgo
+    - La [regularización]{.alert} controla la varianza sin aumentar mucho el sesgo (la veremos en detalle en el [Día 2]{.alert}, con regresión)
 :::
 
 :::{.column width=45%}
@@ -482,88 +431,7 @@ Fuente: [X.com](https://x.com/MaartenvSmeden/status/1522230905468862464)
 A medida que el modelo se vuelve
 más complejo, el sesgo disminuye
 (la curva baja) pero la varianza
-aumenta (la curva sube).
-:::
-:::
-:::
-:::
-
-## Regularización: controlando la complejidad
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-- [[Regularización:](https://en.wikipedia.org/wiki/Regularization_(mathematics))]{.alert} técnica para penalizar la complejidad del modelo
-- Agrega un término de penalización a la [función de pérdida](https://en.wikipedia.org/wiki/Loss_function)
-- Obliga al modelo a [mantener coeficientes pequeños]{.alert}
-- Reduce la varianza a costa de un pequeño aumento en el sesgo
-
-**Tipos principales:**
-
-- [[L1 (LASSO)](https://en.wikipedia.org/wiki/Lasso_(statistics))]{.alert} puede llevar coeficientes a exactamente cero (selección de variables)
-- [[L2 (Ridge)](https://en.wikipedia.org/wiki/Ridge_regression)]{.alert} reduce los coeficientes, pero no los elimina
-- [[Elastic Net](https://en.wikipedia.org/wiki/Elastic_net_regularization)]{.alert}, combinación de L1 y L2
-
-Lo veremos en detalle en el [Día 2]{.alert} cuando trabajemos con regresión
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**Intuición de la regularización**
-
-Sin regularización:
-```
-Modelo: y = 15.3x₁ - 42.7x₂ + 89.1x₃
-
-Coeficientes grandes = modelo sensible
-a pequeños cambios en los datos
-```
-
-Con regularización:
-```
-Modelo: y = 2.1x₁ - 1.8x₂ + 0.5x₃
-
-Coeficientes pequeños = modelo más
-estable y generalizable
-```
-
-<br>
-
-[La regularización es como pedirle al modelo que sea "parsimonioso"]{.alert}
-:::
-:::
-:::
-:::
-
-## Cómo detectar sobreajuste en la práctica
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
-**Señales de alarma:**
-
-1. [Gran brecha]{.alert} entre rendimiento en train y test
-2. El modelo mejora en train pero [empeora en validación]{.alert}
-3. Coeficientes o pesos [muy grandes]{.alert}
-4. El modelo es [muy sensible]{.alert} a pequeños cambios en los datos
-
-**Estrategias para combatirlo:**
-
-- [Más datos]{.alert} (si es posible)
-- [Regularización]{.alert} (L1, L2, Elastic Net)
-- [Reducir complejidad]{.alert} del modelo
-- [Validación cruzada]{.alert} para evaluar de forma más robusta
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**Curvas de entrenamiento**
-
-[![](figures/learning-curve-overfit.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/learning-curve-overfit.png"}
-
-Cuando las curvas se separan, [el modelo está sobreajustando]{.alert}
-
-El punto donde se cruzan es donde deberíamos detenernos.
+aumenta (la curva sube)
 :::
 :::
 :::
@@ -615,7 +483,7 @@ Piénsenlo 30 segundos...
 
 ## Precisión y recall
 
-:::{style="margin-top: 20px; font-size: 22px;"}
+:::{style="margin-top: 20px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=50%}
 **[Precision](https://es.wikipedia.org/wiki/Precisi%C3%B3n_y_exhaustividad)** = VP / (VP + FP)
@@ -630,7 +498,6 @@ Piénsenlo 30 segundos...
 - Alto recall = [no se nos escapan positivos]{.alert}
 - Importa cuando los **falsos negativos** son costosos (enfermedades, seguridad)
 
-Los clasificadores devuelven una [puntuación de probabilidad]{.alert}. Mover el umbral cambia el equilibrio entre precisión y recall, y [no se pueden maximizar ambos]{.alert}
 :::
 
 :::{.column width=50%}
@@ -639,88 +506,8 @@ Los clasificadores devuelven una [puntuación de probabilidad]{.alert}. Mover el
 
 Fuente: [Analytics Vidhya](https://www.analyticsvidhya.com/blog/2020/10/how-to-choose-evaluation-metrics-for-classification-model/)
 :::
-:::
-:::
-:::
 
-## AUC-ROC
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=50%}
-**[AUC-ROC](https://es.wikipedia.org/wiki/Curva_ROC)**
-
-- La [curva ROC](https://es.wikipedia.org/wiki/Curva_ROC){.alert} grafica tasa de verdaderos positivos vs. falsos positivos
-- El [AUC](https://en.wikipedia.org/wiki/Receiver_operating_characteristic#AUC){.alert} es el área bajo esa curva (0.5 = azar, 1.0 = perfecto)
-- Mide qué tan bien el modelo [separa las clases]{.alert}
-- [Independiente del umbral]{.alert}, ya que evalúa todas las probabilidades
-- Muy usado para comparar clasificadores
-
-:::{style="text-align: center;"}
-| AUC | Interpretación |
-|-----|----------------|
-| 0.5 | No mejor que azar |
-| 0.7-0.8 | Aceptable |
-| 0.8-0.9 | Bueno |
-| >0.9 | Excelente |
-:::
-:::
-
-:::{.column width=50%}
-:::{style="text-align: center; font-size: 30px;"}
-[![Área bajo la curva ROC (AUC). El modelo perfecto (verde, AUC = 1) llega directamente a la esquina superior izquierda sin falsos positivos; el modelo aleatorio sigue la diagonal (rojo, AUC = 0,5). Cuanto más se aleja la curva azul de la diagonal, mejor distingue el modelo entre positivos y negativos.](figures/auc.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/auc.png"}
-:::
-:::
-:::
-:::
-
-## Métricas de regresión
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-- Para regresión (predecir números), necesitamos métricas diferentes:
-
-| Métrica | Fórmula | Intuición |
-|---------|---------|-----------|
-| **[MAE](https://es.wikipedia.org/wiki/Error_absoluto_medio)** | Media de |real - predicho| | Error promedio (en unidades originales) |
-| **[MSE](https://es.wikipedia.org/wiki/Error_cuadrático_medio)** | Media de (real - predicho)² | Error cuadrado promedio (penaliza errores grandes) |
-| **[RMSE](https://en.wikipedia.org/wiki/Root_mean_square_deviation)** | $\sqrt{\text{MSE}}$ | Lo mismo que MSE, pero en unidades originales |
-| **[R²](https://es.wikipedia.org/wiki/Coeficiente_de_determinación)** | 1 - (SS_res / SS_tot) | Proporción de varianza explicada |
-
-:::{.fragment}
-[Ejemplos sencillos:]{.alert}
-
-- **MAE**: predigo 10 pizzas, llegan 12, error de 2. Predigo 10, llegan 8, error de 2. [MAE = 2 pizzas]{.alert}
-- **RMSE**: un día me equivoco por 2, otro día por 10. RMSE [penaliza mucho más]{.alert} el error de 10 que el de 2
-- **R²**: R² = 0,8 significa que el modelo [explica el 80%]{.alert} de la variación; [el 20% queda sin explicar]{.alert}
-:::
-:::
-
-## ¿Qué métrica elegir?
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-- No existe una métrica "mejor" en general: [depende del contexto]{.alert}
-- Preguntas para orientarse:
-    - ¿Cuál es el costo de un [falso positivo]{.alert}? (decir "sí" cuando es "no")
-    - ¿Cuál es el costo de un [falso negativo]{.alert}? (decir "no" cuando es "sí")
-    - ¿Las clases están [balanceadas]{.alert} o desbalanceadas?
-    - ¿Qué [acción]{.alert} se tomará con base en la predicción?
-
-| Escenario | Métrica prioritaria |
-|-----------|-------------------|
-| Diagnóstico médico | [Recall]{.alert} (no perder enfermos) |
-| Filtro de spam | [Precision]{.alert} (no perder correos legítimos) |
-| Predicción de ventas | [MAE o RMSE]{.alert} |
-| Comparar modelos | [R²]{.alert} (varianza explicada) |
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center;"}
-[![Diferentes métricas para diferentes objetivos](figures/metrics-tradeoffs.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/metrics-tradeoffs.png"}
-
-Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-understanding-machine-learning-evaluation-metrics-30f199ac6a23)
-:::
+Los clasificadores devuelven una [puntuación de probabilidad]{.alert}. Mover el umbral cambia el equilibrio entre precisión y recall, y [no se pueden maximizar ambos]{.alert}
 :::
 :::
 :::
@@ -825,8 +612,8 @@ Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-unde
 
 - [[renv](https://rstudio.github.io/renv/)]{.alert} para gestionar dependencias y versiones de paquetes
 - [[targets](https://docs.ropensci.org/targets/)]{.alert}: pipelines reproducibles
-- [Quarto/RMarkdown]{.alert}, código y documentación juntos
-- [Git]{.alert} para control de versiones
+- [Quarto](https://quarto.org/), código y documentación juntos
+- [Git](https://git-scm.com/) para control de versiones
 
 **En general:**
 
@@ -866,7 +653,7 @@ mi_proyecto/
 
 ## El ecosistema tidymodels
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - [tidymodels](https://www.tidymodels.org/) es un conjunto de paquetes de R para modelado de datos
@@ -936,7 +723,7 @@ predicciones <- predict(ajuste,
 
 - El [sobreajuste]{.alert} ocurre cuando el modelo memoriza en lugar de aprender
 - La [regularización]{.alert} controla la complejidad del modelo
-- La [accuracy no es suficiente]{.alert}: necesitamos precisión, recall, AUC-ROC
+- La [accuracy no es suficiente]{.alert}: necesitamos precisión y recall
 - Los [hiperparámetros]{.alert} se ajustan con validación, no con test
 - La [reproducibilidad]{.alert} es necesaria para verificar y colaborar
 :::
@@ -958,4 +745,4 @@ predicciones <- predict(ajuste,
 - Vamos a aplicar todo lo que vimos hoy con [modelos más sofisticados]{.alert}
 :::
 
-# Nos vemos en el laboratorio! 🤓 {background-color="#2d4563"}
+# ¡Nos vemos en el laboratorio! 🤓 {background-color="#2d4563"}

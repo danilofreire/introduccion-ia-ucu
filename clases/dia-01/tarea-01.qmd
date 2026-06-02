@@ -84,11 +84,11 @@ Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `c
 
 **Respuesta:**
 
-### Pregunta 5: Modelo con un solo predictor
+### Pregunta 5: La línea base
 
-Ajusten una regresión logística que use **solo** `indice_gobierno_digital` como predictor. Reporten el coeficiente estimado, su p-valor y el odds ratio. ¿Cómo se interpreta el odds ratio en este caso?
+Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba de la pregunta anterior, calculen la accuracy de un "modelo" que siempre predice la clase mayoritaria de `crecimiento_alto` (sin usar ningún predictor). ¿Cuál es esa accuracy?
 
-*Pista:* usen `fit(crecimiento_alto ~ indice_gobierno_digital, data = ...)`.
+*Pista:* la respuesta sale de las proporciones de `crecimiento_alto` en el conjunto de prueba.
 
 ```{r p5}
 # Escriban su código aquí
@@ -97,9 +97,9 @@ Ajusten una regresión logística que use **solo** `indice_gobierno_digital` com
 
 **Respuesta:**
 
-### Pregunta 6: Modelo completo
+### Pregunta 6: ¿Cuánto mejora el modelo completo?
 
-Ahora ajusten el modelo completo con los 8 predictores (como en el laboratorio). Comparen la accuracy del modelo con un solo predictor vs. el modelo completo sobre el conjunto de prueba. ¿Cuánto mejora?
+Ajusten el modelo logístico completo con los 8 predictores (como en el laboratorio). Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente "adivinar" la clase mayoritaria?
 
 ```{r p6}
 # Escriban su código aquí
@@ -112,7 +112,7 @@ Ahora ajusten el modelo completo con los 8 predictores (como en el laboratorio).
 
 ### Pregunta 7: Matriz de confusión
 
-Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. ¿Cuántos falsos positivos y falsos negativos hay? ¿Cuál tipo de error es más frecuente?
+Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. ¿Cuántos falsos positivos y falsos negativos hay? ¿Qué tipo de error es más frecuente?
 
 ```{r p7}
 # Escriban su código aquí

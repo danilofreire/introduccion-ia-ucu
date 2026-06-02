@@ -33,7 +33,7 @@ datos <- datos |>
 
 ### Pregunta 1: Resumen por continente
 
-Calculen la media de `acceso_internet` e `inflacion` por continente. Qué continente tiene el mayor acceso promedio a internet? Cuál tiene la inflación más alta?
+Calculen la media de `acceso_internet` e `inflacion` por continente. ¿Qué continente tiene el mayor acceso promedio a internet? ¿Cuál tiene la inflación más alta?
 
 ```{r p1}
 resumen_continente <- datos |>
@@ -48,11 +48,11 @@ resumen_continente <- datos |>
 resumen_continente
 ```
 
-**Respuesta:** Europa tiene el mayor acceso promedio a internet, seguida de América y Oceanía. África tiene la inflación más alta, consistente con la idea de que países con menor nivel de desarrollo económico tienden a tener mayor inestabilidad de precios. Los resultados reflejan diferencias estructurales entre regiones: Europa combina alta conectividad con inflación relativamente baja, mientras África presenta el patrón inverso.
+**Respuesta:** Europa tiene el mayor acceso promedio a internet (≈65%) y, a la vez, la inflación más baja (≈10%). África tiene el menor acceso (≈50%). La inflación más alta se reparte entre Oceanía, África y América, todas alrededor del 14%. El patrón general es coherente: las regiones con mayor conectividad tienden a tener menor inflación, con Europa en un extremo y África y América en el otro.
 
 ### Pregunta 2: Visualización de distribuciones
 
-Creen un histograma de `indice_gobierno_digital` usando `ggplot2`. Agreguen una línea vertical en la mediana con `geom_vline()`. La distribución es simétrica o sesgada?
+Creen un histograma de `indice_gobierno_digital` usando `ggplot2`. Agreguen una línea vertical en la mediana con `geom_vline()`. ¿La distribución es simétrica o sesgada?
 
 ```{r p2}
 mediana_igd <- median(datos$indice_gobierno_digital)
@@ -74,7 +74,7 @@ ggplot(datos, aes(x = indice_gobierno_digital)) +
 
 ### Pregunta 3: Correlaciones
 
-Calculen la matriz de correlaciones entre las 8 variables numéricas. Cuáles dos variables tienen la correlación más alta (en valor absoluto)? Tiene sentido teórico?
+Calculen la matriz de correlaciones entre las 8 variables numéricas. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)? ¿Tiene sentido teórico?
 
 ```{r p3}
 vars_numericas <- datos |>
@@ -95,13 +95,13 @@ cat("Par con mayor correlacion:",
 cat("Correlacion:", round(mat_cor[max_idx[1], max_idx[2]], 3), "\n")
 ```
 
-**Respuesta:** Las dos variables con la correlación más alta son probablemente `acceso_internet` y `urbanizacion` (o `acceso_internet` e `indice_gobierno_digital`). Esto tiene sentido teórico: países más urbanizados tienden a tener mejor infraestructura de telecomunicaciones, y países con mayor acceso a internet tienden a desarrollar más servicios de gobierno digital. Todas las correlaciones son moderadas (típicamente entre 0.15 y 0.35), lo cual es realista para datos de desarrollo a nivel de países.
+**Respuesta:** El par con la correlación más alta es `indice_gobierno_digital` e `inversion_extranjera` (≈0.39). Tiene sentido teórico: los países con mejor gobierno digital suelen atraer más inversión extranjera. Aun así, todas las correlaciones son débiles o moderadas (la mayoría con valor absoluto por debajo de 0.3), lo cual es realista para datos de desarrollo a nivel de países: ningún par de predictores es redundante.
 
 ## División y entrenamiento
 
 ### Pregunta 4: División estratificada
 
-Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `crecimiento_alto`. Usen `set.seed(42)`. Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de `"si"` y `"no"` son similares en ambos.
+Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `crecimiento_alto`. Usen `set.seed(42)`. ¿Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de `"si"` y `"no"` son similares en ambos.
 
 ```{r p4}
 datos_modelo <- datos |>
@@ -131,45 +131,42 @@ test |>
 
 **Respuesta:** El conjunto de entrenamiento tiene aproximadamente 143 observaciones y el de prueba 36 (los números exactos dependen de la semilla y el redondeo). Las proporciones de `"si"` y `"no"` son similares en ambos conjuntos gracias a la estratificación, lo que asegura que el modelo se entrene y se evalúa con una representación equilibrada del outcome.
 
-### Pregunta 5: Modelo con un solo predictor
+### Pregunta 5: La línea base
 
-Ajusten una regresión logística que use **solo** `indice_gobierno_digital` como predictor. Reporten el coeficiente estimado, su p-valor y el odds ratio. Cómo se interpreta el odds ratio en este caso?
+Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba, calculen la accuracy de un "modelo" que siempre predice la clase mayoritaria de `crecimiento_alto`. ¿Cuál es esa accuracy?
 
 ```{r p5}
+# Proporción de cada clase en el conjunto de prueba
+test |>
+  count(crecimiento_alto) |>
+  mutate(prop = round(n / sum(n), 3))
+
+# La línea base: accuracy de predecir siempre la clase mayoritaria
+baseline_acc <- test |>
+  count(crecimiento_alto) |>
+  mutate(prop = n / sum(n)) |>
+  summarise(baseline = max(prop)) |>
+  pull(baseline)
+
+cat("Accuracy de la línea base (clase mayoritaria):", round(baseline_acc, 3), "\n")
+```
+
+**Respuesta:** La línea base es la proporción de la clase mayoritaria de `crecimiento_alto`: si esa clase representa, por ejemplo, el 51% de las observaciones de prueba, entonces predecir siempre esa clase acierta el 51% de las veces sin usar ningún predictor. Esa es la "tasa de no-información", el piso que cualquier modelo útil debe superar. Es la misma idea de "La paradoja de la precisión" de la clase teórica: una accuracy alta no dice nada por sí sola, solo importa en relación con esta referencia.
+
+### Pregunta 6: ¿Cuánto mejora el modelo completo?
+
+Ajusten el modelo logístico completo con los 8 predictores. Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente "adivinar" la clase mayoritaria?
+
+```{r p6}
+# Especificar y ajustar el modelo completo
 modelo_log <- logistic_reg() |>
   set_engine("glm") |>
   set_mode("classification")
 
-ajuste_simple <- modelo_log |>
-  fit(crecimiento_alto ~ indice_gobierno_digital, data = train)
-
-resultados_simple <- tidy(ajuste_simple) |>
-  mutate(odds_ratio = exp(estimate))
-
-resultados_simple |>
-  select(term, estimate, std.error, p.value, odds_ratio)
-```
-
-**Respuesta:** El coeficiente de `indice_gobierno_digital` es positivo y estadísticamente significativo (p < 0.05). El odds ratio indica que por cada unidad de aumento en el índice de gobierno digital, las chances de que un país tenga crecimiento alto del PIB se multiplican por el valor del odds ratio. Como el índice va de 0 a 1, un aumento de una unidad representa ir del mínimo al máximo, así que en la práctica conviene interpretar el efecto para cambios más pequenos (por ejemplo, un aumento de 0.10 multiplica el odds por $e^{0.10 \times \beta}$).
-
-### Pregunta 6: Modelo completo
-
-Ahora ajusten el modelo completo con los 8 predictores. Comparen la accuracy del modelo con un solo predictor vs. el modelo completo sobre el conjunto de prueba. Cuánto mejora?
-
-```{r p6}
-# Modelo completo
 ajuste_completo <- modelo_log |>
   fit(crecimiento_alto ~ ., data = train)
 
-# Predicciones del modelo simple
-pred_simple <- ajuste_simple |>
-  predict(test) |>
-  bind_cols(test)
-
-acc_simple <- pred_simple |>
-  accuracy(truth = crecimiento_alto, estimate = .pred_class)
-
-# Predicciones del modelo completo
+# Accuracy del modelo completo en el conjunto de prueba
 pred_completo <- ajuste_completo |>
   predict(test) |>
   bind_cols(test)
@@ -177,18 +174,18 @@ pred_completo <- ajuste_completo |>
 acc_completo <- pred_completo |>
   accuracy(truth = crecimiento_alto, estimate = .pred_class)
 
-cat("Accuracy modelo simple:", round(acc_simple$.estimate, 3), "\n")
+cat("Línea base (clase mayoritaria):", round(baseline_acc, 3), "\n")
 cat("Accuracy modelo completo:", round(acc_completo$.estimate, 3), "\n")
-cat("Mejora:", round(acc_completo$.estimate - acc_simple$.estimate, 3), "\n")
+cat("Mejora sobre la línea base:", round(acc_completo$.estimate - baseline_acc, 3), "\n")
 ```
 
-**Respuesta:** El modelo completo tiene una accuracy superior al modelo con un solo predictor. La mejora depende de la muestra, pero típicamente agregar predictores informativos (gasto en educación, inflación, desempleo, inversión extranjera) permite al modelo capturar mejor los patrones en los datos. La magnitud de la mejora puede ser moderada (5-15 puntos porcentuales), lo cual tiene sentido dado que `indice_gobierno_digital` ya es un predictor fuerte por si solo.
+**Respuesta:** El modelo completo supera a la línea base, lo que confirma que los predictores aportan información real sobre el crecimiento del PIB. La magnitud de la mejora depende de la muestra, pero lo importante es el razonamiento: una accuracy solo es buena en relación con la línea base. Si el modelo apenas superara la proporción de la clase mayoritaria, no estaría aprendiendo nada útil, por más alto que pareciera el número.
 
 ## Evaluación
 
 ### Pregunta 7: Matriz de confusión
 
-Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. Cuántos falsos positivos y falsos negativos hay? Cuál tipo de error es más frecuente?
+Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. ¿Cuántos falsos positivos y falsos negativos hay? ¿Cuál tipo de error es más frecuente?
 
 ```{r p7}
 mc <- conf_mat(pred_completo, truth = crecimiento_alto, estimate = .pred_class)
@@ -210,7 +207,7 @@ cat("Falsos negativos (predicho no, real si):", fn, "\n")
 
 ### Pregunta 8: Precisión vs. recall
 
-Calculen precisión y recall (con `event_level = "second"`) para el modelo completo. Si este modelo se usara para decidir en que países invertir (donde un falso positivo significa invertir en un país que no crece), que métrica priorizarian?
+Calculen precisión y recall (con `event_level = "second"`) para el modelo completo. Si este modelo se usara para decidir en qué países invertir (donde un falso positivo significa invertir en un país que no crece), ¿qué métrica priorizarían?
 
 ```{r p8}
 prec <- pred_completo |>
@@ -229,7 +226,7 @@ cat("Recall:", round(rec$.estimate, 3), "\n")
 
 ### Pregunta 9: Efecto del umbral
 
-Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. Qué umbral elegirían para el escenario de inversión de la pregunta anterior?
+Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de inversión de la pregunta anterior?
 
 ```{r p9}
 # Obtener probabilidades
@@ -262,7 +259,7 @@ tabla_umbrales
 
 ### Pregunta 10: Curva ROC y AUC
 
-Grafiquen la curva ROC y calculen el AUC del modelo completo. Recuerden usar `event_level = "second"`. Consideran que el AUC indica un buen modelo?
+Grafiquen la curva ROC y calculen el AUC del modelo completo. Recuerden usar `event_level = "second"`. ¿Consideran que el AUC indica un buen modelo?
 
 ```{r p10}
 # Curva ROC
@@ -279,21 +276,20 @@ auc_valor <- pred_probs |>
 cat("AUC:", round(auc_valor$.estimate, 3), "\n")
 ```
 
-**Respuesta:** Un AUC superior a 0.80 se considera bueno, y superior a 0.90 excelente. Según la tabla de referencia del laboratorio:
+**Respuesta:** Según la tabla de referencia del laboratorio:
 
-- 0.50-0.60: no mejor que el azar
-- 0.60-0.70: pobre
-- 0.70-0.80: aceptable
-- 0.80-0.90: bueno
-- 0.90-1.00: excelente
+- 0.5: no mejor que el azar
+- 0.7-0.8: aceptable
+- 0.8-0.9: bueno
+- > 0.9: excelente (conviene verificar que no haya data leakage)
 
-El AUC obtenido indica que el modelo tiene una capacidad discriminativa buena/excelente para distinguir entre países con crecimiento alto y bajo del PIB. La curva ROC se aleja de la diagonal (que representaria clasificación aleatoria), confirmando que el modelo captura patrones reales en los datos.
+El AUC obtenido indica que el modelo tiene una capacidad discriminativa buena para distinguir entre países con crecimiento alto y bajo del PIB. La curva ROC se aleja de la diagonal (que representaría clasificación aleatoria), confirmando que el modelo captura patrones reales en los datos.
 
 ## Validación cruzada
 
 ### Pregunta 11: Validación cruzada con 10 folds
 
-Realicen validación cruzada con **10 folds** sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. Cómo se compara con los resultados de 5 folds del laboratorio?
+Realicen validación cruzada con **10 folds** sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. ¿Cómo se compara con los resultados de 5 folds del laboratorio?
 
 ```{r p11}
 set.seed(42)
@@ -314,7 +310,7 @@ collect_metrics(cv_10)
 
 ### Pregunta 12: Modelo reducido
 
-Ajusten un modelo que use solo los 4 predictores con p-valor más bajo en el modelo completo. Comparen su accuracy (validación cruzada, 5 folds) con la del modelo completo. Vale la pena usar los 8 predictores o el modelo reducido es suficiente?
+Ajusten un modelo que use solo los 4 predictores con p-valor más bajo en el modelo completo. Comparen su accuracy (validación cruzada, 5 folds) con la del modelo completo. ¿Vale la pena usar los 8 predictores o el modelo reducido es suficiente?
 
 ```{r p12}
 # Ver p-valores del modelo completo
@@ -362,11 +358,11 @@ cat("\nAccuracy modelo reducido (4 predictores):\n")
 collect_metrics(cv_reducido)
 ```
 
-**Respuesta:** El modelo reducido con 4 predictores tiene una accuracy similar a la del modelo completo con 8. Esto sugiere que los 4 predictores más significativos capturan la mayor parte de la información relevante para predecir el crecimiento del PIB. En la práctica, un modelo más simple tiene ventajas: es más facil de interpretar, menos propenso a sobreajuste, y requiere menos datos para estimar. Si la diferencia de accuracy es menor a 2-3 puntos porcentuales, el modelo reducido es preferible por parsimonia.
+**Respuesta:** El modelo reducido con 4 predictores tiene una accuracy similar a la del modelo completo con 8. Esto sugiere que los 4 predictores más significativos capturan la mayor parte de la información relevante para predecir el crecimiento del PIB. En la práctica, un modelo más simple tiene ventajas: es más fácil de interpretar, menos propenso a sobreajuste, y requiere menos datos para estimar. Si la diferencia de accuracy es menor a 2-3 puntos porcentuales, el modelo reducido es preferible por parsimonia.
 
 **Nota técnica:** seleccionar variables por p-valor del mismo modelo es una técnica introductoria con limitaciones conocidas (sesgo de inferencia post-selección, p-valores inflados). En el Día 2 veremos métodos más principiados como [LASSO](https://es.wikipedia.org/wiki/LASSO_(estad%C3%ADstica)) y [Ridge](https://en.wikipedia.org/wiki/Ridge_regression), que realizan selección y regularización de forma más rigurosa.
 
-## Reflexion
+## Reflexión
 
 ### Pregunta 13: Variables sin efecto
 

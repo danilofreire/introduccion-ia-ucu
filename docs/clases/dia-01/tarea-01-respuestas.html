@@ -109,35 +109,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -231,7 +202,7 @@ window.Quarto = {
   <li><a href="#división-y-entrenamiento" id="toc-división-y-entrenamiento" class="nav-link" data-scroll-target="#división-y-entrenamiento"><span class="header-section-number">3</span> División y entrenamiento</a></li>
   <li><a href="#evaluación" id="toc-evaluación" class="nav-link" data-scroll-target="#evaluación"><span class="header-section-number">4</span> Evaluación</a></li>
   <li><a href="#validación-cruzada" id="toc-validación-cruzada" class="nav-link" data-scroll-target="#validación-cruzada"><span class="header-section-number">5</span> Validación cruzada</a></li>
-  <li><a href="#reflexion" id="toc-reflexion" class="nav-link" data-scroll-target="#reflexion"><span class="header-section-number">6</span> Reflexion</a></li>
+  <li><a href="#reflexión" id="toc-reflexión" class="nav-link" data-scroll-target="#reflexión"><span class="header-section-number">6</span> Reflexión</a></li>
   </ul>
 <div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-01/tarea-01-respuestas.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
     </div>
@@ -290,7 +261,7 @@ window.Quarto = {
 <h2 data-number="2" class="anchored" data-anchor-id="exploración-y-preprocesamiento"><span class="header-section-number">2</span> Exploración y preprocesamiento</h2>
 <section id="pregunta-1-resumen-por-continente" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-por-continente"><span class="header-section-number">2.1</span> Pregunta 1: Resumen por continente</h3>
-<p>Calculen la media de <code>acceso_internet</code> e <code>inflacion</code> por continente. Qué continente tiene el mayor acceso promedio a internet? Cuál tiene la inflación más alta?</p>
+<p>Calculen la media de <code>acceso_internet</code> e <code>inflacion</code> por continente. ¿Qué continente tiene el mayor acceso promedio a internet? ¿Cuál tiene la inflación más alta?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>resumen_continente <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(continente) <span class="sc">|&gt;</span></span>
@@ -313,11 +284,11 @@ window.Quarto = {
 5 África               50.1            14      52</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Europa tiene el mayor acceso promedio a internet, seguida de América y Oceanía. África tiene la inflación más alta, consistente con la idea de que países con menor nivel de desarrollo económico tienden a tener mayor inestabilidad de precios. Los resultados reflejan diferencias estructurales entre regiones: Europa combina alta conectividad con inflación relativamente baja, mientras África presenta el patrón inverso.</p>
+<p><strong>Respuesta:</strong> Europa tiene el mayor acceso promedio a internet (≈65%) y, a la vez, la inflación más baja (≈10%). África tiene el menor acceso (≈50%). La inflación más alta se reparte entre Oceanía, África y América, todas alrededor del 14%. El patrón general es coherente: las regiones con mayor conectividad tienden a tener menor inflación, con Europa en un extremo y África y América en el otro.</p>
 </section>
 <section id="pregunta-2-visualización-de-distribuciones" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-visualización-de-distribuciones"><span class="header-section-number">2.2</span> Pregunta 2: Visualización de distribuciones</h3>
-<p>Creen un histograma de <code>indice_gobierno_digital</code> usando <code>ggplot2</code>. Agreguen una línea vertical en la mediana con <code>geom_vline()</code>. La distribución es simétrica o sesgada?</p>
+<p>Creen un histograma de <code>indice_gobierno_digital</code> usando <code>ggplot2</code>. Agreguen una línea vertical en la mediana con <code>geom_vline()</code>. ¿La distribución es simétrica o sesgada?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mediana_igd <span class="ot">&lt;-</span> <span class="fu">median</span>(datos<span class="sc">$</span>indice_gobierno_digital)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -344,7 +315,7 @@ window.Quarto = {
 </section>
 <section id="pregunta-3-correlaciones" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
-<p>Calculen la matriz de correlaciones entre las 8 variables numéricas. Cuáles dos variables tienen la correlación más alta (en valor absoluto)? Tiene sentido teórico?</p>
+<p>Calculen la matriz de correlaciones entre las 8 variables numéricas. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)? ¿Tiene sentido teórico?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>vars_numericas <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(gasto_educacion, acceso_internet, urbanizacion,</span>
@@ -397,14 +368,14 @@ indice_gobierno_digital                    1.00</code></pre>
 <pre><code>Correlacion: 0.385 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Las dos variables con la correlación más alta son probablemente <code>acceso_internet</code> y <code>urbanizacion</code> (o <code>acceso_internet</code> e <code>indice_gobierno_digital</code>). Esto tiene sentido teórico: países más urbanizados tienden a tener mejor infraestructura de telecomunicaciones, y países con mayor acceso a internet tienden a desarrollar más servicios de gobierno digital. Todas las correlaciones son moderadas (típicamente entre 0.15 y 0.35), lo cual es realista para datos de desarrollo a nivel de países.</p>
+<p><strong>Respuesta:</strong> El par con la correlación más alta es <code>indice_gobierno_digital</code> e <code>inversion_extranjera</code> (≈0.39). Tiene sentido teórico: los países con mejor gobierno digital suelen atraer más inversión extranjera. Aun así, todas las correlaciones son débiles o moderadas (la mayoría con valor absoluto por debajo de 0.3), lo cual es realista para datos de desarrollo a nivel de países: ningún par de predictores es redundante.</p>
 </section>
 </section>
 <section id="división-y-entrenamiento" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="división-y-entrenamiento"><span class="header-section-number">3</span> División y entrenamiento</h2>
 <section id="pregunta-4-división-estratificada" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-división-estratificada"><span class="header-section-number">3.1</span> Pregunta 4: División estratificada</h3>
-<p>Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por <code>crecimiento_alto</code>. Usen <code>set.seed(42)</code>. Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de <code>"si"</code> y <code>"no"</code> son similares en ambos.</p>
+<p>Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por <code>crecimiento_alto</code>. Usen <code>set.seed(42)</code>. ¿Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de <code>"si"</code> y <code>"no"</code> son similares en ambos.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>datos_modelo <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>pais, <span class="sc">-</span>continente)</span>
@@ -458,89 +429,88 @@ Proporciones en prueba:</code></pre>
 </div>
 <p><strong>Respuesta:</strong> El conjunto de entrenamiento tiene aproximadamente 143 observaciones y el de prueba 36 (los números exactos dependen de la semilla y el redondeo). Las proporciones de <code>"si"</code> y <code>"no"</code> son similares en ambos conjuntos gracias a la estratificación, lo que asegura que el modelo se entrene y se evalúa con una representación equilibrada del outcome.</p>
 </section>
-<section id="pregunta-5-modelo-con-un-solo-predictor" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-modelo-con-un-solo-predictor"><span class="header-section-number">3.2</span> Pregunta 5: Modelo con un solo predictor</h3>
-<p>Ajusten una regresión logística que use <strong>solo</strong> <code>indice_gobierno_digital</code> como predictor. Reporten el coeficiente estimado, su p-valor y el odds ratio. Cómo se interpreta el odds ratio en este caso?</p>
+<section id="pregunta-5-la-línea-base" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-la-línea-base"><span class="header-section-number">3.2</span> Pregunta 5: La línea base</h3>
+<p>Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba, calculen la accuracy de un “modelo” que siempre predice la clase mayoritaria de <code>crecimiento_alto</code>. ¿Cuál es esa accuracy?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>modelo_log <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glm"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>ajuste_simple <span class="ot">&lt;-</span> modelo_log <span class="sc">|&gt;</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(crecimiento_alto <span class="sc">~</span> indice_gobierno_digital, <span class="at">data =</span> train)</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>resultados_simple <span class="ot">&lt;-</span> <span class="fu">tidy</span>(ajuste_simple) <span class="sc">|&gt;</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">odds_ratio =</span> <span class="fu">exp</span>(estimate))</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>resultados_simple <span class="sc">|&gt;</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(term, estimate, std.error, p.value, odds_ratio)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Proporción de cada clase en el conjunto de prueba</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>test <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n), <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 5
-  term                    estimate std.error     p.value odds_ratio
-  &lt;chr&gt;                      &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
-1 (Intercept)                -4.54     0.874 0.000000208     0.0107
-2 indice_gobierno_digital     8.49     1.61  0.000000148  4844.    </code></pre>
+<pre><code># A tibble: 2 × 3
+  crecimiento_alto     n  prop
+  &lt;fct&gt;            &lt;int&gt; &lt;dbl&gt;
+1 no                  19 0.514
+2 si                  18 0.486</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># La línea base: accuracy de predecir siempre la clase mayoritaria</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>baseline_acc <span class="ot">&lt;-</span> test <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(crecimiento_alto) <span class="sc">|&gt;</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n)) <span class="sc">|&gt;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">baseline =</span> <span class="fu">max</span>(prop)) <span class="sc">|&gt;</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(baseline)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy de la línea base (clase mayoritaria):"</span>, <span class="fu">round</span>(baseline_acc, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Accuracy de la línea base (clase mayoritaria): 0.514 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El coeficiente de <code>indice_gobierno_digital</code> es positivo y estadísticamente significativo (p &lt; 0.05). El odds ratio indica que por cada unidad de aumento en el índice de gobierno digital, las chances de que un país tenga crecimiento alto del PIB se multiplican por el valor del odds ratio. Como el índice va de 0 a 1, un aumento de una unidad representa ir del mínimo al máximo, así que en la práctica conviene interpretar el efecto para cambios más pequenos (por ejemplo, un aumento de 0.10 multiplica el odds por <span class="math inline">\(e^{0.10 \times \beta}\)</span>).</p>
+<p><strong>Respuesta:</strong> La línea base es la proporción de la clase mayoritaria de <code>crecimiento_alto</code>: si esa clase representa, por ejemplo, el 51% de las observaciones de prueba, entonces predecir siempre esa clase acierta el 51% de las veces sin usar ningún predictor. Esa es la “tasa de no-información”, el piso que cualquier modelo útil debe superar. Es la misma idea de “La paradoja de la precisión” de la clase teórica: una accuracy alta no dice nada por sí sola, solo importa en relación con esta referencia.</p>
 </section>
-<section id="pregunta-6-modelo-completo" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-modelo-completo"><span class="header-section-number">3.3</span> Pregunta 6: Modelo completo</h3>
-<p>Ahora ajusten el modelo completo con los 8 predictores. Comparen la accuracy del modelo con un solo predictor vs.&nbsp;el modelo completo sobre el conjunto de prueba. Cuánto mejora?</p>
+<section id="pregunta-6-cuánto-mejora-el-modelo-completo" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-cuánto-mejora-el-modelo-completo"><span class="header-section-number">3.3</span> Pregunta 6: ¿Cuánto mejora el modelo completo?</h3>
+<p>Ajusten el modelo logístico completo con los 8 predictores. Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente “adivinar” la clase mayoritaria?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo completo</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>ajuste_completo <span class="ot">&lt;-</span> modelo_log <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(crecimiento_alto <span class="sc">~</span> ., <span class="at">data =</span> train)</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicciones del modelo simple</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>pred_simple <span class="ot">&lt;-</span> ajuste_simple <span class="sc">|&gt;</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(test) <span class="sc">|&gt;</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test)</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>acc_simple <span class="ot">&lt;-</span> pred_simple <span class="sc">|&gt;</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicciones del modelo completo</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>pred_completo <span class="ot">&lt;-</span> ajuste_completo <span class="sc">|&gt;</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(test) <span class="sc">|&gt;</span></span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test)</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>acc_completo <span class="ot">&lt;-</span> pred_completo <span class="sc">|&gt;</span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy modelo simple:"</span>, <span class="fu">round</span>(acc_simple<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Especificar y ajustar el modelo completo</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>modelo_log <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glm"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>ajuste_completo <span class="ot">&lt;-</span> modelo_log <span class="sc">|&gt;</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(crecimiento_alto <span class="sc">~</span> ., <span class="at">data =</span> train)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Accuracy del modelo completo en el conjunto de prueba</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>pred_completo <span class="ot">&lt;-</span> ajuste_completo <span class="sc">|&gt;</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(test) <span class="sc">|&gt;</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>acc_completo <span class="ot">&lt;-</span> pred_completo <span class="sc">|&gt;</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Línea base (clase mayoritaria):"</span>, <span class="fu">round</span>(baseline_acc, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Accuracy modelo simple: 0.568 </code></pre>
+<pre><code>Línea base (clase mayoritaria): 0.514 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy modelo completo:"</span>, <span class="fu">round</span>(acc_completo<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy modelo completo:"</span>, <span class="fu">round</span>(acc_completo<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Accuracy modelo completo: 0.757 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mejora:"</span>, <span class="fu">round</span>(acc_completo<span class="sc">$</span>.estimate <span class="sc">-</span> acc_simple<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mejora sobre la línea base:"</span>, <span class="fu">round</span>(acc_completo<span class="sc">$</span>.estimate <span class="sc">-</span> baseline_acc, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mejora: 0.189 </code></pre>
+<pre><code>Mejora sobre la línea base: 0.243 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El modelo completo tiene una accuracy superior al modelo con un solo predictor. La mejora depende de la muestra, pero típicamente agregar predictores informativos (gasto en educación, inflación, desempleo, inversión extranjera) permite al modelo capturar mejor los patrones en los datos. La magnitud de la mejora puede ser moderada (5-15 puntos porcentuales), lo cual tiene sentido dado que <code>indice_gobierno_digital</code> ya es un predictor fuerte por si solo.</p>
+<p><strong>Respuesta:</strong> El modelo completo supera a la línea base, lo que confirma que los predictores aportan información real sobre el crecimiento del PIB. La magnitud de la mejora depende de la muestra, pero lo importante es el razonamiento: una accuracy solo es buena en relación con la línea base. Si el modelo apenas superara la proporción de la clase mayoritaria, no estaría aprendiendo nada útil, por más alto que pareciera el número.</p>
 </section>
 </section>
 <section id="evaluación" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="evaluación"><span class="header-section-number">4</span> Evaluación</h2>
 <section id="pregunta-7-matriz-de-confusión" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-matriz-de-confusión"><span class="header-section-number">4.1</span> Pregunta 7: Matriz de confusión</h3>
-<p>Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. Cuántos falsos positivos y falsos negativos hay? Cuál tipo de error es más frecuente?</p>
+<p>Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. ¿Cuántos falsos positivos y falsos negativos hay? ¿Cuál tipo de error es más frecuente?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>mc <span class="ot">&lt;-</span> <span class="fu">conf_mat</span>(pred_completo, <span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>mc</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mc <span class="ot">&lt;-</span> <span class="fu">conf_mat</span>(pred_completo, <span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>mc</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          Truth
 Prediction no si
         no 15  5
         si  4 13</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(mc, <span class="at">type =</span> <span class="st">"heatmap"</span>) <span class="sc">+</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Matriz de confusion - modelo completo"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(mc, <span class="at">type =</span> <span class="st">"heatmap"</span>) <span class="sc">+</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Matriz de confusion - modelo completo"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -548,15 +518,15 @@ Prediction no si
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraer valores</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>tabla <span class="ot">&lt;-</span> mc<span class="sc">$</span>table</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>fp <span class="ot">&lt;-</span> tabla[<span class="st">"si"</span>, <span class="st">"no"</span>]  <span class="co"># predicho si, real no</span></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>fn <span class="ot">&lt;-</span> tabla[<span class="st">"no"</span>, <span class="st">"si"</span>]  <span class="co"># predicho no, real si</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Falsos positivos (predicho si, real no):"</span>, fp, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraer valores</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>tabla <span class="ot">&lt;-</span> mc<span class="sc">$</span>table</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>fp <span class="ot">&lt;-</span> tabla[<span class="st">"si"</span>, <span class="st">"no"</span>]  <span class="co"># predicho si, real no</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>fn <span class="ot">&lt;-</span> tabla[<span class="st">"no"</span>, <span class="st">"si"</span>]  <span class="co"># predicho no, real si</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Falsos positivos (predicho si, real no):"</span>, fp, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Falsos positivos (predicho si, real no): 4 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Falsos negativos (predicho no, real si):"</span>, fn, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Falsos negativos (predicho no, real si):"</span>, fn, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Falsos negativos (predicho no, real si): 5 </code></pre>
 </div>
@@ -565,21 +535,21 @@ Prediction no si
 </section>
 <section id="pregunta-8-precisión-vs.-recall" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-precisión-vs.-recall"><span class="header-section-number">4.2</span> Pregunta 8: Precisión vs.&nbsp;recall</h3>
-<p>Calculen precisión y recall (con <code>event_level = "second"</code>) para el modelo completo. Si este modelo se usara para decidir en que países invertir (donde un falso positivo significa invertir en un país que no crece), que métrica priorizarian?</p>
+<p>Calculen precisión y recall (con <code>event_level = "second"</code>) para el modelo completo. Si este modelo se usara para decidir en qué países invertir (donde un falso positivo significa invertir en un país que no crece), ¿qué métrica priorizarían?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>prec <span class="ot">&lt;-</span> pred_completo <span class="sc">|&gt;</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class,</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span> pred_completo <span class="sc">|&gt;</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class,</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Precision:"</span>, <span class="fu">round</span>(prec<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>prec <span class="ot">&lt;-</span> pred_completo <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class,</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span> pred_completo <span class="sc">|&gt;</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class,</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Precision:"</span>, <span class="fu">round</span>(prec<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Precision: 0.765 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Recall:"</span>, <span class="fu">round</span>(rec<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Recall:"</span>, <span class="fu">round</span>(rec<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Recall: 0.722 </code></pre>
 </div>
@@ -588,32 +558,32 @@ Prediction no si
 </section>
 <section id="pregunta-9-efecto-del-umbral" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-9-efecto-del-umbral"><span class="header-section-number">4.3</span> Pregunta 9: Efecto del umbral</h3>
-<p>Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. Qué umbral elegirían para el escenario de inversión de la pregunta anterior?</p>
+<p>Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de inversión de la pregunta anterior?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtener probabilidades</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>pred_probs <span class="ot">&lt;-</span> ajuste_completo <span class="sc">|&gt;</span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(test, <span class="at">type =</span> <span class="st">"prob"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test)</span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular metricas para cada umbral</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>umbrales <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.35</span>, <span class="fl">0.5</span>, <span class="fl">0.65</span>, <span class="fl">0.8</span>)</span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>tabla_umbrales <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_df</span>(umbrales, <span class="cf">function</span>(u) {</span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">.pred_u =</span> <span class="fu">factor</span>(</span>
-<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(.pred_si <span class="sc">&gt;=</span> u, <span class="st">"si"</span>, <span class="st">"no"</span>),</span>
-<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>)</span>
-<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">|&gt;</span></span>
-<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
-<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">umbral    =</span> u,</span>
-<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">precision =</span> <span class="fu">precision_vec</span>(crecimiento_alto, .pred_u,</span>
-<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>                                <span class="at">event_level =</span> <span class="st">"second"</span>),</span>
-<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">recall    =</span> <span class="fu">recall_vec</span>(crecimiento_alto, .pred_u,</span>
-<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>                             <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb42-22"><a href="#cb42-22" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb42-23"><a href="#cb42-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-24"><a href="#cb42-24" aria-hidden="true" tabindex="-1"></a>tabla_umbrales</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtener probabilidades</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>pred_probs <span class="ot">&lt;-</span> ajuste_completo <span class="sc">|&gt;</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">predict</span>(test, <span class="at">type =</span> <span class="st">"prob"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(test)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular metricas para cada umbral</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>umbrales <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.35</span>, <span class="fl">0.5</span>, <span class="fl">0.65</span>, <span class="fl">0.8</span>)</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>tabla_umbrales <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map_df</span>(umbrales, <span class="cf">function</span>(u) {</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>  pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">.pred_u =</span> <span class="fu">factor</span>(</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(.pred_si <span class="sc">&gt;=</span> u, <span class="st">"si"</span>, <span class="st">"no"</span>),</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>)</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">|&gt;</span></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">umbral    =</span> u,</span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">precision =</span> <span class="fu">precision_vec</span>(crecimiento_alto, .pred_u,</span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>                                <span class="at">event_level =</span> <span class="st">"second"</span>),</span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">recall    =</span> <span class="fu">recall_vec</span>(crecimiento_alto, .pred_u,</span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>                             <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>tabla_umbrales</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 3
   umbral precision recall
@@ -629,14 +599,14 @@ Prediction no si
 </section>
 <section id="pregunta-10-curva-roc-y-auc" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="pregunta-10-curva-roc-y-auc"><span class="header-section-number">4.4</span> Pregunta 10: Curva ROC y AUC</h3>
-<p>Grafiquen la curva ROC y calculen el AUC del modelo completo. Recuerden usar <code>event_level = "second"</code>. Consideran que el AUC indica un buen modelo?</p>
+<p>Grafiquen la curva ROC y calculen el AUC del modelo completo. Recuerden usar <code>event_level = "second"</code>. ¿Consideran que el AUC indica un buen modelo?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Curva ROC</span></span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>roc_data <span class="ot">&lt;-</span> pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(roc_data) <span class="sc">+</span></span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Curva ROC - modelo completo"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Curva ROC</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>roc_data <span class="ot">&lt;-</span> pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(roc_data) <span class="sc">+</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Curva ROC - modelo completo"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -644,44 +614,45 @@ Prediction no si
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AUC</span></span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>auc_valor <span class="ot">&lt;-</span> pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"AUC:"</span>, <span class="fu">round</span>(auc_valor<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># AUC</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>auc_valor <span class="ot">&lt;-</span> pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"AUC:"</span>, <span class="fu">round</span>(auc_valor<span class="sc">$</span>.estimate, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>AUC: 0.86 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Un AUC superior a 0.80 se considera bueno, y superior a 0.90 excelente. Según la tabla de referencia del laboratorio:</p>
+<p><strong>Respuesta:</strong> Según la tabla de referencia del laboratorio:</p>
 <ul>
-<li>0.50-0.60: no mejor que el azar</li>
-<li>0.60-0.70: pobre</li>
-<li>0.70-0.80: aceptable</li>
-<li>0.80-0.90: bueno</li>
-<li>0.90-1.00: excelente</li>
+<li>0.5: no mejor que el azar</li>
+<li>0.7-0.8: aceptable</li>
+<li>0.8-0.9: bueno</li>
+<li><blockquote class="blockquote">
+<p>0.9: excelente (conviene verificar que no haya data leakage)</p>
+</blockquote></li>
 </ul>
-<p>El AUC obtenido indica que el modelo tiene una capacidad discriminativa buena/excelente para distinguir entre países con crecimiento alto y bajo del PIB. La curva ROC se aleja de la diagonal (que representaria clasificación aleatoria), confirmando que el modelo captura patrones reales en los datos.</p>
+<p>El AUC obtenido indica que el modelo tiene una capacidad discriminativa buena para distinguir entre países con crecimiento alto y bajo del PIB. La curva ROC se aleja de la diagonal (que representaría clasificación aleatoria), confirmando que el modelo captura patrones reales en los datos.</p>
 </section>
 </section>
 <section id="validación-cruzada" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="validación-cruzada"><span class="header-section-number">5</span> Validación cruzada</h2>
 <section id="pregunta-11-validación-cruzada-con-10-folds" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-11-validación-cruzada-con-10-folds"><span class="header-section-number">5.1</span> Pregunta 11: Validación cruzada con 10 folds</h3>
-<p>Realicen validación cruzada con <strong>10 folds</strong> sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. Cómo se compara con los resultados de 5 folds del laboratorio?</p>
+<p>Realicen validación cruzada con <strong>10 folds</strong> sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. ¿Cómo se compara con los resultados de 5 folds del laboratorio?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>folds_10 <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train, <span class="at">v =</span> <span class="dv">10</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>cv_10 <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>  modelo_log,</span>
-<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>  crecimiento_alto <span class="sc">~</span> .,</span>
-<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds_10,</span>
-<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(accuracy, precision, recall, roc_auc),</span>
-<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(cv_10)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>folds_10 <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train, <span class="at">v =</span> <span class="dv">10</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>cv_10 <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  modelo_log,</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  crecimiento_alto <span class="sc">~</span> .,</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds_10,</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(accuracy, precision, recall, roc_auc),</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(cv_10)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 6
   .metric   .estimator  mean     n std_err .config        
@@ -696,18 +667,18 @@ Prediction no si
 </section>
 <section id="pregunta-12-modelo-reducido" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-12-modelo-reducido"><span class="header-section-number">5.2</span> Pregunta 12: Modelo reducido</h3>
-<p>Ajusten un modelo que use solo los 4 predictores con p-valor más bajo en el modelo completo. Comparen su accuracy (validación cruzada, 5 folds) con la del modelo completo. Vale la pena usar los 8 predictores o el modelo reducido es suficiente?</p>
+<p>Ajusten un modelo que use solo los 4 predictores con p-valor más bajo en el modelo completo. Comparen su accuracy (validación cruzada, 5 folds) con la del modelo completo. ¿Vale la pena usar los 8 predictores o el modelo reducido es suficiente?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ver p-valores del modelo completo</span></span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">tidy</span>(ajuste_completo) <span class="sc">|&gt;</span></span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">"(Intercept)"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(p.value)</span>
-<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Predictores ordenados por p-valor:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ver p-valores del modelo completo</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>coefs <span class="ot">&lt;-</span> <span class="fu">tidy</span>(ajuste_completo) <span class="sc">|&gt;</span></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(term <span class="sc">!=</span> <span class="st">"(Intercept)"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(p.value)</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Predictores ordenados por p-valor:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Predictores ordenados por p-valor:</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>coefs <span class="sc">|&gt;</span> <span class="fu">select</span>(term, estimate, p.value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>coefs <span class="sc">|&gt;</span> <span class="fu">select</span>(term, estimate, p.value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 3
   term                    estimate p.value
@@ -721,57 +692,57 @@ Prediction no si
 7 urbanizacion             0.00350 0.825  
 8 gasto_salud             -0.0115  0.960  </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Los 4 con menor p-valor</span></span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>top4 <span class="ot">&lt;-</span> coefs <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(term)</span>
-<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">4 mejores predictores:"</span>, <span class="fu">paste</span>(top4, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Los 4 con menor p-valor</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>top4 <span class="ot">&lt;-</span> coefs <span class="sc">|&gt;</span> <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(term)</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">4 mejores predictores:"</span>, <span class="fu">paste</span>(top4, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 4 mejores predictores: indice_gobierno_digital, acceso_internet, desempleo, inversion_extranjera </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo reducido con validacion cruzada</span></span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>formula_reducida <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">"crecimiento_alto ~"</span>, <span class="fu">paste</span>(top4, <span class="at">collapse =</span> <span class="st">" + "</span>))</span>
-<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>folds_5 <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a><span class="co"># CV del modelo completo</span></span>
-<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>cv_completo <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>  modelo_log,</span>
-<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>  crecimiento_alto <span class="sc">~</span> .,</span>
-<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds_5,</span>
-<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(accuracy),</span>
-<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a><span class="co"># CV del modelo reducido</span></span>
-<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a>cv_reducido <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb55-20"><a href="#cb55-20" aria-hidden="true" tabindex="-1"></a>  modelo_log,</span>
-<span id="cb55-21"><a href="#cb55-21" aria-hidden="true" tabindex="-1"></a>  formula_reducida,</span>
-<span id="cb55-22"><a href="#cb55-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds_5,</span>
-<span id="cb55-23"><a href="#cb55-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(accuracy),</span>
-<span id="cb55-24"><a href="#cb55-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb55-25"><a href="#cb55-25" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb55-26"><a href="#cb55-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb55-27"><a href="#cb55-27" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Accuracy modelo completo (8 predictores):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo reducido con validacion cruzada</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>formula_reducida <span class="ot">&lt;-</span> <span class="fu">as.formula</span>(</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste</span>(<span class="st">"crecimiento_alto ~"</span>, <span class="fu">paste</span>(top4, <span class="at">collapse =</span> <span class="st">" + "</span>))</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>folds_5 <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a><span class="co"># CV del modelo completo</span></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>cv_completo <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>  modelo_log,</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>  crecimiento_alto <span class="sc">~</span> .,</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds_5,</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(accuracy),</span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a><span class="co"># CV del modelo reducido</span></span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>cv_reducido <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a>  modelo_log,</span>
+<span id="cb57-21"><a href="#cb57-21" aria-hidden="true" tabindex="-1"></a>  formula_reducida,</span>
+<span id="cb57-22"><a href="#cb57-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds_5,</span>
+<span id="cb57-23"><a href="#cb57-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(accuracy),</span>
+<span id="cb57-24"><a href="#cb57-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">control   =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb57-25"><a href="#cb57-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb57-26"><a href="#cb57-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb57-27"><a href="#cb57-27" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Accuracy modelo completo (8 predictores):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Accuracy modelo completo (8 predictores):</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(cv_completo)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(cv_completo)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 6
   .metric  .estimator  mean     n std_err .config        
   &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          
 1 accuracy binary     0.788     5  0.0338 pre0_mod0_post0</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Accuracy modelo reducido (4 predictores):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Accuracy modelo reducido (4 predictores):</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Accuracy modelo reducido (4 predictores):</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(cv_reducido)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(cv_reducido)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 6
   .metric  .estimator  mean     n std_err .config        
@@ -779,12 +750,12 @@ Accuracy modelo reducido (4 predictores):</code></pre>
 1 accuracy binary     0.796     5  0.0132 pre0_mod0_post0</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El modelo reducido con 4 predictores tiene una accuracy similar a la del modelo completo con 8. Esto sugiere que los 4 predictores más significativos capturan la mayor parte de la información relevante para predecir el crecimiento del PIB. En la práctica, un modelo más simple tiene ventajas: es más facil de interpretar, menos propenso a sobreajuste, y requiere menos datos para estimar. Si la diferencia de accuracy es menor a 2-3 puntos porcentuales, el modelo reducido es preferible por parsimonia.</p>
+<p><strong>Respuesta:</strong> El modelo reducido con 4 predictores tiene una accuracy similar a la del modelo completo con 8. Esto sugiere que los 4 predictores más significativos capturan la mayor parte de la información relevante para predecir el crecimiento del PIB. En la práctica, un modelo más simple tiene ventajas: es más fácil de interpretar, menos propenso a sobreajuste, y requiere menos datos para estimar. Si la diferencia de accuracy es menor a 2-3 puntos porcentuales, el modelo reducido es preferible por parsimonia.</p>
 <p><strong>Nota técnica:</strong> seleccionar variables por p-valor del mismo modelo es una técnica introductoria con limitaciones conocidas (sesgo de inferencia post-selección, p-valores inflados). En el Día 2 veremos métodos más principiados como <a href="https://es.wikipedia.org/wiki/LASSO_(estad%C3%ADstica)">LASSO</a> y <a href="https://en.wikipedia.org/wiki/Ridge_regression">Ridge</a>, que realizan selección y regularización de forma más rigurosa.</p>
 </section>
 </section>
-<section id="reflexion" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="reflexion"><span class="header-section-number">6</span> Reflexion</h2>
+<section id="reflexión" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="reflexión"><span class="header-section-number">6</span> Reflexión</h2>
 <section id="pregunta-13-variables-sin-efecto" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-13-variables-sin-efecto"><span class="header-section-number">6.1</span> Pregunta 13: Variables sin efecto</h3>
 <p>En el modelo completo, <code>urbanizacion</code> y <code>gasto_salud</code> no son significativas (p &gt; 0.05). Sin embargo, ambas se correlacionan positivamente con <code>crecimiento_alto</code> en un análisis bivariado simple. Expliquen por qué una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotético de la vida real.</p>

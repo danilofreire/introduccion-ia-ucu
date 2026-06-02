@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -187,7 +187,7 @@ datos |>
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-**Instrucciones:** Antes de continuar, exploren los datos ustedes mismos.
+**Instrucciones:** Antes de continuar, exploren los datos ustedes mismos
 
 1. ¿Cuántas observaciones y variables tiene el dataset?
 2. ¿Hay valores faltantes (NA)?
@@ -201,7 +201,7 @@ sum(is.na(datos))             # Total de NAs
 cor(datos |> select(where(is.numeric)))  # Correlaciones
 ```
 
-[Tómense unos minutos para explorar!]{.alert}
+[¡Tómense unos minutos para explorar!]{.alert}
 
 [[Apéndice 1: Solución]{.button}](#sec:appendix01)
 :::
@@ -320,7 +320,7 @@ modelo_log
 - Otros modelos disponibles en parsnip: [lista completa](https://www.tidymodels.org/find/parsnip/)
 :::
 
-## Ajustar el modelo
+## Ajustar el modelo {#sec:ajustar}
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
@@ -338,36 +338,8 @@ tidy(ajuste)
 - `crecimiento_alto ~ .` significa: predecir `crecimiento_alto` usando [todas las demás variables]{.alert}
 - `fit()` entrena el modelo con los datos de entrenamiento
 - `tidy()` nos da una tabla limpia con coeficientes, errores estándar y p-valores
-:::
 
-## Interpretar los coeficientes
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=45%}
-**Recordatorio: regresión logística**
-
-- Los coeficientes están en escala de [log-odds]{.alert}
-- Un coeficiente positivo aumenta la probabilidad de "sí"
-- Un coeficiente negativo la disminuye
-- Para convertir a odds ratio: `exp(coeficiente)`
-
-**Pregunta para discutir:**
-
-- ¿Los signos tienen sentido teórico? Por ejemplo, ¿la inflación alta se asocia con menor crecimiento?
-:::
-
-:::{.column width=55%}
-:::{style="margin-top: 30px; font-size: 24px;"}
-```{r coef-interpretacion, prompt=FALSE, echo=TRUE}
-# Ver los odds ratios
-tidy(ajuste) |>
-  mutate(odds_ratio = exp(estimate)) |>
-  select(term, estimate, odds_ratio, p.value)
-```
-:::
-:::
-:::
+[[Apéndice 7: interpretar los coeficientes (odds ratios)]{.button}](#sec:appendix07)
 :::
 
 ## Generar predicciones
@@ -427,14 +399,14 @@ predicciones |>
   summary()
 ```
 
-[Observen las diferentes métricas y piensen cuál es más relevante para este problema!]{.alert} 🤓
+[¡Observen las diferentes métricas y piensen cuál es más relevante para este problema!]{.alert} 🤓
 :::
 
 ## Ejercicio 3: Interpretación {#sec:exercise03}
 
 :::{style="margin-top: 30px; font-size: 26px;"}
 
-**Instrucciones:** Reflexionen sobre los resultados.
+**Instrucciones:** Reflexionen sobre los resultados
 
 1. ¿El modelo tiene mejor precisión o mejor recall?
 2. ¿Qué significa eso en términos prácticos?
@@ -453,7 +425,7 @@ predicciones |>
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-El modelo no solo predice clases: también devuelve [probabilidades]{.alert}. Por defecto, `predict()` usa un umbral de 0.5, pero podemos cambiarlo.
+El modelo no solo predice clases: también devuelve [probabilidades]{.alert}. Por defecto, `predict()` usa un umbral de 0.5, pero podemos cambiarlo
 
 ```{r probs-umbral, prompt=FALSE, echo=TRUE}
 pred_probs <- ajuste |>
@@ -499,7 +471,7 @@ Dos temas que no tocaremos hoy pero aparecen en los apéndices:
 - **Comparación de umbrales en detalle**: tabla completa y discusión en [[Apéndice 4]{.button}](#sec:appendix04)
 - **Validación cruzada** (`vfold_cv` + `fit_resamples`): en lugar de una sola división train/test, el modelo se evalúa en varios folds y se promedian las métricas. Da estimaciones más estables. La veremos en [Laboratorio 2]{.alert}. Ejemplo en [[Apéndice 5]{.button}](#sec:appendix05)
 
-[Material opcional: carguen el script [`laboratorio-01.R`](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/laboratorio-01.R) para ejecutar todos los ejemplos.]{.alert}
+[Material opcional: carguen el script [`laboratorio-01.R`](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/laboratorio-01.R) para ejecutar todos los ejemplos]{.alert}
 :::
 
 # Resumen y cierre {background-color="#2d4563"}
@@ -538,14 +510,14 @@ Dos temas que no tocaremos hoy pero aparecen en los apéndices:
 
 En el [Laboratorio 2 (Sesión 1.4)]{.alert} vamos a:
 
-- Trabajar con un dataset diferente
+- Trabajar con modelos más complejos (árboldes de decisión)
 - Explorar más a fondo el preprocesamiento
 - Comparar múltiples modelos
 - Practicar la interpretación de resultados
 
 <br>
 
-[Guarden su trabajo y tómense un descanso!]{.alert} 😉
+[¡Guarden su trabajo y tómense un descanso!]{.alert} 😉
 :::
 
 # Apéndice: Soluciones {background-color="#2d4563"}
@@ -588,7 +560,7 @@ datos |>
 - `acceso_internet` y `urbanizacion` tienen distribuciones amplias: países con muy poco acceso vs. muy conectados
 - `indice_gobierno_digital` se correlaciona positivamente con `acceso_internet` y negativamente con `inflacion`
 
-[Pista:]{.alert} `ggplot2` permite visualizar distribuciones con `geom_histogram()` y correlaciones con el paquete `corrplot` o `ggcorrplot`.
+[Pista:]{.alert} `ggplot2` permite visualizar distribuciones con `geom_histogram()` y correlaciones con el paquete `corrplot` o `ggcorrplot`
 :::
 :::
 
@@ -633,7 +605,7 @@ predicciones |>
 - Si el [costo de una falsa alarma]{.alert} es alto (p. ej., asignar recursos mal): prioricen [precisión]{.alert}
 - Sin preferencia clara: usen [F1]{.alert}, el promedio armónico de ambas
 
-[No hay respuesta universal.]{.alert} El contexto define la métrica correcta.
+[No hay respuesta universal.]{.alert} El contexto define la métrica correcta
 :::
 :::
 
@@ -688,7 +660,7 @@ purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
 | [0.5]{.alert} | media | media | punto de equilibrio (por defecto) |
 | [0.7]{.alert} | alta | baja | predice "sí" con cautela, más falsos negativos |
 
-Este es el [compromiso precisión-recall]{.alert} en acción. El umbral óptimo depende del problema.
+Este es el [compromiso precisión-recall]{.alert} en acción. El umbral óptimo depende del problema
 
 [[Volver]{.button}](#sec:masalla)
 :::
@@ -745,4 +717,34 @@ predicciones |>
 - Es especialmente útil para [comparar modelos]{.alert} sin tener que elegir un umbral
 
 [[Volver al ejercicio]{.button}](#sec:exercise07)
+:::
+
+## Apéndice 7: Interpretar los coeficientes {#sec:appendix07}
+
+:::{style="margin-top: 20px; font-size: 20px;"}
+:::{.columns}
+:::{.column width=45%}
+**Recordatorio: regresión logística**
+
+- Los coeficientes están en escala de [log-odds]{.alert}
+- Un coeficiente positivo aumenta la probabilidad de "sí"
+- Un coeficiente negativo la disminuye
+- Para convertir a odds ratio: `exp(coeficiente)`
+
+**Pregunta para discutir:**
+
+- ¿Los signos tienen sentido teórico? Por ejemplo, ¿la inflación alta se asocia con menor crecimiento?
+:::
+
+:::{.column width=55%}
+```{r coef-interpretacion, prompt=FALSE, echo=TRUE}
+# Ver los odds ratios
+tidy(ajuste) |>
+  mutate(odds_ratio = exp(estimate)) |>
+  select(term, estimate, odds_ratio, p.value)
+```
+:::
+:::
+
+[[Volver]{.button}](#sec:ajustar)
 :::

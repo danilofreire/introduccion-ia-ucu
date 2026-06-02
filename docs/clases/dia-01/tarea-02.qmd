@@ -15,7 +15,7 @@ engine: knitr
 
 ## Instrucciones
 
-Esta tarea usa el dataset del Laboratorio 2 (`satisfaccion_democracia.csv`). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
+Esta tarea usa un dataset nuevo, `satisfaccion_democracia.csv`: una encuesta simulada de opinión pública (inspirada en el [Latinobarómetro](https://www.latinobarometro.org/)) sobre la satisfacción con la democracia. Es un primer contacto con el tipo de datos que trabajaremos en los laboratorios del Día 2. Las técnicas son las mismas del Laboratorio 2: validación cruzada y comparación de modelos. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
 
 **Para trabajar en esta tarea:**
 
@@ -29,7 +29,6 @@ Esta tarea usa el dataset del Laboratorio 2 (`satisfaccion_democracia.csv`). Res
 ```{r setup, message=FALSE, warning=FALSE}
 library(tidymodels)
 library(tidyverse)
-library(kknn)  # Para KNN en la Pregunta 7. Si no está instalado: install.packages("kknn")
 
 satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
 
@@ -46,7 +45,7 @@ satisfaccion <- satisfaccion |>
 
 ### Pregunta 1: Resumen del dataset
 
-Calculen la proporción de satisfechos (`"si"`) por país. Cuál país tiene la proporción más alta? Cuál tiene la más baja? Muestren los resultados en una tabla ordenada.
+Calculen la proporción de satisfechos (`"si"`) por país. ¿Cuál país tiene la proporción más alta? ¿Cuál tiene la más baja? Muestren los resultados en una tabla ordenada.
 
 ```{r p1}
 # Escriban su codigo aqui
@@ -57,7 +56,7 @@ Calculen la proporción de satisfechos (`"si"`) por país. Cuál país tiene la 
 
 ### Pregunta 2: Confianza y satisfacción
 
-Creen un boxplot que muestre la distribución de `confianza_gobierno` separada por `satisfecho`. Agreguen `labs()` con titulo y etiquetas claras. Qué observan?
+Creen un boxplot que muestre la distribución de `confianza_gobierno` separada por `satisfecho`. Agreguen `labs()` con título y etiquetas claras. ¿Qué observan?
 
 ```{r p2}
 # Escriban su codigo aqui
@@ -68,7 +67,7 @@ Creen un boxplot que muestre la distribución de `confianza_gobierno` separada p
 
 ### Pregunta 3: Correlaciones
 
-Calculen la matriz de correlaciones entre las 4 variables numéricas principales: `edad`, `educacion_anos`, `ingreso_hogar` y `confianza_gobierno`. Cuáles dos variables tienen la mayor correlación? Es fuerte o débil?
+Calculen la matriz de correlaciones entre las 4 variables numéricas principales: `edad`, `educacion_anos`, `ingreso_hogar` y `confianza_gobierno`. ¿Cuáles dos variables tienen la mayor correlación? ¿Es fuerte o débil?
 
 ```{r p3}
 # Escriban su codigo aqui
@@ -96,7 +95,7 @@ Muestren las primeras 10 filas de las nuevas variables junto con `satisfecho`.
 
 ### Pregunta 5: Explorar las nuevas variables
 
-Calculen la proporción de satisfechos entre personas con confianza baja vs. alta, y entre jovenes vs. no jovenes. Qué variable parece más útil para predecir la satisfacción?
+Calculen la proporción de satisfechos entre personas con confianza baja vs. alta, y entre jóvenes vs. no jóvenes. ¿Qué variable parece más útil para predecir la satisfacción?
 
 ```{r p5}
 # Escriban su codigo aqui
@@ -116,9 +115,9 @@ Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(42)` y estrati
 
 ```
 
-### Pregunta 7: Tres modelos con fórmula básica
+### Pregunta 7: Dos modelos con fórmula básica
 
-Definan tres modelos (regresión logística, árbol de decisión y KNN con k=5) y evaluenlos con validación cruzada (5 folds) usando la fórmula: `satisfecho ~ edad + educacion_anos + ingreso_hogar + confianza_gobierno + consumo_noticias + participacion_politica + zona`. Reporten accuracy para cada uno.
+Definan dos modelos (regresión logística y árbol de decisión) y evalúenlos con validación cruzada (5 folds) usando la fórmula: `satisfecho ~ edad + educacion_anos + ingreso_hogar + confianza_gobierno + consumo_noticias + participacion_politica + zona`. Reporten accuracy para cada uno.
 
 *Pista:* usen `control_resamples(event_level = "second")` dentro de `fit_resamples()`.
 
@@ -131,7 +130,7 @@ Definan tres modelos (regresión logística, árbol de decisión y KNN con k=5) 
 
 ### Pregunta 8: Mejor modelo con fórmula extendida
 
-Ahora evaluen el mejor modelo de la pregunta anterior con una fórmula que agregue `confianza_baja` y `ingreso_x_educacion`. Mejora la accuracy? Cuánto?
+Ahora evaluen el mejor modelo de la pregunta anterior con una fórmula que agregue `confianza_baja` y `ingreso_x_educacion`. ¿Mejora la accuracy? ¿Cuánto?
 
 ```{r p8}
 # Escriban su codigo aqui
@@ -144,7 +143,7 @@ Ahora evaluen el mejor modelo de la pregunta anterior con una fórmula que agreg
 
 ### Pregunta 9: Matriz de confusión
 
-Ajusten el modelo logístico con la fórmula básica en los datos de entrenamiento y generen predicciones sobre el conjunto de prueba. Construyan la matriz de confusión. Cuántos errores comete el modelo en total?
+Ajusten el modelo logístico con la fórmula básica en los datos de entrenamiento y generen predicciones sobre el conjunto de prueba. Construyan la matriz de confusión. ¿Cuántos errores comete el modelo en total?
 
 ```{r p9}
 # Escriban su codigo aqui
@@ -155,7 +154,7 @@ Ajusten el modelo logístico con la fórmula básica en los datos de entrenamien
 
 ### Pregunta 10: Precisión, recall y AUC
 
-Calculen precisión, recall y AUC del modelo logístico sobre el conjunto de prueba. Recuerden usar `event_level = "second"`. Es un buen modelo según el AUC?
+Calculen precisión, recall y AUC del modelo logístico sobre el conjunto de prueba. Recuerden usar `event_level = "second"`. ¿Es un buen modelo según el AUC?
 
 ```{r p10}
 # Escriban su codigo aqui
@@ -166,7 +165,7 @@ Calculen precisión, recall y AUC del modelo logístico sobre el conjunto de pru
 
 ### Pregunta 11: Curva ROC
 
-Grafiquen la curva ROC del modelo logístico. Agreguen un titulo al gráfico con `labs()`.
+Grafiquen la curva ROC del modelo logístico. Agreguen un título al gráfico con `labs()`.
 
 ```{r p11}
 # Escriban su codigo aqui
@@ -184,10 +183,10 @@ Usen el modelo logístico para esta pregunta (los coeficientes de un árbol no s
 
 **Respuesta:**
 
-## Reflexion
+## Reflexión
 
 ### Pregunta 13: Árbol vs. logística
 
-Los árboles de decisión y la regresión logística tienen ventajas y desventajas distintas. Basandose en los resultados del laboratorio, discutan en que situaciones preferirían un árbol de decisión sobre una regresión logística, y viceversa. Consideren al menos dos criterios (por ejemplo, interpretabilidad, rendimiento, tipo de datos).
+Los árboles de decisión y la regresión logística tienen ventajas y desventajas distintas. Basándose en los resultados del laboratorio, discutan en qué situaciones preferirían un árbol de decisión sobre una regresión logística, y viceversa. Consideren al menos dos criterios (por ejemplo, interpretabilidad, rendimiento, tipo de datos).
 
 **Respuesta:**

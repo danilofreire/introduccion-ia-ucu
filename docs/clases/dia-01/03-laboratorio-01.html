@@ -1283,7 +1283,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <a href="mailto:danilofreire@gmail.com">danilofreire@gmail.com</a>
 </div>
         <p class="quarto-title-affiliation">
-            Departament of Data and Decision Sciences <br> Emory University
+            Department of Data and Decision Sciences <br> Emory University
           </p>
     </div>
 </div>
@@ -1461,14 +1461,14 @@ $ crecimiento_alto        &lt;chr&gt; &quot;si&quot;, &quot;si&quot;, &quot;no&q
 <section id="sec:exercise01" class="slide level2 scrollable">
 <h2>Ejercicio 1: Exploración</h2>
 <div style="margin-top: 30px; font-size: 24px;">
-<p><strong>Instrucciones:</strong> Antes de continuar, exploren los datos ustedes mismos.</p>
+<p><strong>Instrucciones:</strong> Antes de continuar, exploren los datos ustedes mismos</p>
 <ol type="1">
 <li>¿Cuántas observaciones y variables tiene el dataset?</li>
 <li>¿Hay valores faltantes (NA)?</li>
 <li>¿Cómo se distribuye cada variable numérica?</li>
 <li>¿Hay correlaciones fuertes entre las variables?</li>
 </ol>
-<p><span class="alert">Tómense unos minutos para explorar!</span></p>
+<p><span class="alert">¡Tómense unos minutos para explorar!</span></p>
 <p><a href="#/sec:appendix01"><span class="button">Apéndice 1: Solución</span></a></p>
 </div>
 </section></section>
@@ -1626,7 +1626,7 @@ Computational engine: glm </code></pre>
 </ul>
 </div>
 </section>
-<section id="ajustar-el-modelo" class="slide level2">
+<section id="sec:ajustar" class="slide level2">
 <h2>Ajustar el modelo</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <p>Ahora ajustamos el modelo a los datos de entrenamiento:</p>
@@ -1657,48 +1657,7 @@ Computational engine: glm </code></pre>
 <li><code>fit()</code> entrena el modelo con los datos de entrenamiento</li>
 <li><code>tidy()</code> nos da una tabla limpia con coeficientes, errores estándar y p-valores</li>
 </ul>
-</div>
-</section>
-<section id="interpretar-los-coeficientes" class="slide level2">
-<h2>Interpretar los coeficientes</h2>
-<div style="margin-top: 30px; font-size: 22px;">
-<div class="columns">
-<div class="column" style="width:45%;">
-<p><strong>Recordatorio: regresión logística</strong></p>
-<ul>
-<li>Los coeficientes están en escala de <span class="alert">log-odds</span></li>
-<li>Un coeficiente positivo aumenta la probabilidad de “sí”</li>
-<li>Un coeficiente negativo la disminuye</li>
-<li>Para convertir a odds ratio: <code>exp(coeficiente)</code></li>
-</ul>
-<p><strong>Pregunta para discutir:</strong></p>
-<ul>
-<li>¿Los signos tienen sentido teórico? Por ejemplo, ¿la inflación alta se asocia con menor crecimiento?</li>
-</ul>
-</div><div class="column" style="width:55%;">
-<div style="margin-top: 30px; font-size: 24px;">
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="co"># Ver los odds ratios</span></span>
-<span id="cb25-2"><a></a><span class="fu">tidy</span>(ajuste) <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a></a>  <span class="fu">mutate</span>(<span class="at">odds_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
-<span id="cb25-4"><a></a>  <span class="fu">select</span>(term, estimate, odds_ratio, p.value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 4
-  term                    estimate odds_ratio  p.value
-  &lt;chr&gt;                      &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
-1 (Intercept)             -4.64       0.00963 0.0701  
-2 gasto_educacion          0.588      1.80    0.0299  
-3 acceso_internet          0.0634     1.07    0.000658
-4 urbanizacion            -0.00648    0.994   0.683   
-5 gasto_salud             -0.168      0.845   0.443   
-6 inflacion               -0.166      0.847   0.00938 
-7 desempleo               -0.318      0.727   0.00438 
-8 inversion_extranjera     0.355      1.43    0.0505  
-9 indice_gobierno_digital  5.35     211.      0.00848 </code></pre>
-</div>
-</div>
-</div>
-</div></div>
+<p><a href="#/sec:appendix07"><span class="button">Apéndice 7: interpretar los coeficientes (odds ratios)</span></a></p>
 </div>
 </section>
 <section id="generar-predicciones" class="slide level2">
@@ -1710,15 +1669,15 @@ Computational engine: glm </code></pre>
 <li>Comparamos con <code>crecimiento_alto</code> (la verdad)</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="co"># Predecir clases</span></span>
-<span id="cb27-2"><a></a>predicciones <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span></span>
-<span id="cb27-3"><a></a>  <span class="fu">predict</span>(datos_test) <span class="sc">|&gt;</span>  <span class="co"># predice clases por defecto</span></span>
-<span id="cb27-4"><a></a>  <span class="fu">bind_cols</span>(datos_test)   <span class="co"># combinar con datos originales para evaluación</span></span>
-<span id="cb27-5"><a></a></span>
-<span id="cb27-6"><a></a><span class="co"># Ver las primeras predicciones</span></span>
-<span id="cb27-7"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb27-8"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_class) <span class="sc">|&gt;</span></span>
-<span id="cb27-9"><a></a>  <span class="fu">head</span>(<span class="dv">8</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="co"># Predecir clases</span></span>
+<span id="cb25-2"><a></a>predicciones <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a></a>  <span class="fu">predict</span>(datos_test) <span class="sc">|&gt;</span>  <span class="co"># predice clases por defecto</span></span>
+<span id="cb25-4"><a></a>  <span class="fu">bind_cols</span>(datos_test)   <span class="co"># combinar con datos originales para evaluación</span></span>
+<span id="cb25-5"><a></a></span>
+<span id="cb25-6"><a></a><span class="co"># Ver las primeras predicciones</span></span>
+<span id="cb25-7"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb25-8"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb25-9"><a></a>  <span class="fu">head</span>(<span class="dv">8</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 2
   crecimiento_alto .pred_class
@@ -1743,8 +1702,8 @@ Computational engine: glm </code></pre>
 <li><code>truth</code> es la clase real, <code>estimate</code> la clase predicha</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a><span class="co"># Matriz de confusión (conf_mat = confusion matrix)</span></span>
-<span id="cb29-2"><a></a><span class="fu">conf_mat</span>(predicciones, <span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a></a><span class="co"># Matriz de confusión (conf_mat = confusion matrix)</span></span>
+<span id="cb27-2"><a></a><span class="fu">conf_mat</span>(predicciones, <span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          Truth
 Prediction no si
@@ -1770,10 +1729,10 @@ Prediction no si
 <h2>Métricas de evaluación</h2>
 <div style="margin-top: 30px; font-size: 24px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a><span class="co"># Conjunto completo de métricas</span></span>
-<span id="cb31-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb31-3"><a></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
-<span id="cb31-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a><span class="co"># Conjunto completo de métricas</span></span>
+<span id="cb29-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb29-3"><a></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb29-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 13 × 3
    .metric              .estimator .estimate
@@ -1793,13 +1752,13 @@ Prediction no si
 13 f_meas               binary         0.809</code></pre>
 </div>
 </div>
-<p><span class="alert">Observen las diferentes métricas y piensen cuál es más relevante para este problema!</span> 🤓</p>
+<p><span class="alert">¡Observen las diferentes métricas y piensen cuál es más relevante para este problema!</span> 🤓</p>
 </div>
 </section>
 <section id="sec:exercise03" class="slide level2 scrollable">
 <h2>Ejercicio 3: Interpretación</h2>
 <div style="margin-top: 30px; font-size: 26px;">
-<p><strong>Instrucciones:</strong> Reflexionen sobre los resultados.</p>
+<p><strong>Instrucciones:</strong> Reflexionen sobre los resultados</p>
 <ol type="1">
 <li>¿El modelo tiene mejor precisión o mejor recall?</li>
 <li>¿Qué significa eso en términos prácticos?
@@ -1821,13 +1780,13 @@ Prediction no si
 <section id="sec:exercise04" class="slide level2">
 <h2>Probabilidades y umbral (demo)</h2>
 <div style="margin-top: 30px; font-size: 24px;">
-<p>El modelo no solo predice clases: también devuelve <span class="alert">probabilidades</span>. Por defecto, <code>predict()</code> usa un umbral de 0.5, pero podemos cambiarlo.</p>
+<p>El modelo no solo predice clases: también devuelve <span class="alert">probabilidades</span>. Por defecto, <code>predict()</code> usa un umbral de 0.5, pero podemos cambiarlo</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a>pred_probs <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span></span>
-<span id="cb33-2"><a></a>  <span class="fu">predict</span>(datos_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb33-3"><a></a>  <span class="fu">bind_cols</span>(datos_test)</span>
-<span id="cb33-4"><a></a></span>
-<span id="cb33-5"><a></a>pred_probs <span class="sc">|&gt;</span> <span class="fu">select</span>(crecimiento_alto, .pred_no, .pred_si) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a>pred_probs <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a></a>  <span class="fu">predict</span>(datos_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb31-3"><a></a>  <span class="fu">bind_cols</span>(datos_test)</span>
+<span id="cb31-4"><a></a></span>
+<span id="cb31-5"><a></a>pred_probs <span class="sc">|&gt;</span> <span class="fu">select</span>(crecimiento_alto, .pred_no, .pred_si) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 3
   crecimiento_alto .pred_no .pred_si
@@ -1873,9 +1832,9 @@ Prediction no si
 <div style="margin-top: 30px; font-size: 24px;">
 <p>La curva ROC resume el rendimiento <span class="alert">en todos los umbrales a la vez</span>:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb35-2"><a></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb35-3"><a></a>  <span class="fu">autoplot</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a>pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb33-3"><a></a>  <span class="fu">autoplot</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1883,8 +1842,8 @@ Prediction no si
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a>pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb36-2"><a></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb34-2"><a></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> crecimiento_alto, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
@@ -1903,7 +1862,7 @@ Prediction no si
 <li><strong>Comparación de umbrales en detalle</strong>: tabla completa y discusión en <a href="#/sec:appendix04"><span class="button">Apéndice 4</span></a></li>
 <li><strong>Validación cruzada</strong> (<code>vfold_cv</code> + <code>fit_resamples</code>): en lugar de una sola división train/test, el modelo se evalúa en varios folds y se promedian las métricas. Da estimaciones más estables. La veremos en <span class="alert">Laboratorio 2</span>. Ejemplo en <a href="#/sec:appendix05"><span class="button">Apéndice 5</span></a></li>
 </ul>
-<p><span class="alert">Material opcional: carguen el script <a href="https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/laboratorio-01.R"><code>laboratorio-01.R</code></a> para ejecutar todos los ejemplos.</span></p>
+<p><span class="alert">Material opcional: carguen el script <a href="https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-01/laboratorio-01.R"><code>laboratorio-01.R</code></a> para ejecutar todos los ejemplos</span></p>
 </div>
 </section></section>
 <section>
@@ -1949,7 +1908,7 @@ Prediction no si
 <li>Practicar la interpretación de resultados</li>
 </ul>
 <p><br></p>
-<p><span class="alert">Guarden su trabajo y tómense un descanso!</span> 😉</p>
+<p><span class="alert">¡Guarden su trabajo y tómense un descanso!</span> 😉</p>
 </div>
 </section></section>
 <section>
@@ -1964,25 +1923,25 @@ Prediction no si
 <div class="column" style="width:50%;">
 <p><strong>Comandos para cada pregunta:</strong></p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="co"># 1. Dimensiones del dataset</span></span>
-<span id="cb38-2"><a></a><span class="fu">dim</span>(datos)            <span class="co"># filas y columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a><span class="co"># 1. Dimensiones del dataset</span></span>
+<span id="cb36-2"><a></a><span class="fu">dim</span>(datos)            <span class="co"># filas y columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 179  11</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a><span class="fu">nrow</span>(datos)           <span class="co"># solo filas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a><span class="fu">nrow</span>(datos)           <span class="co"># solo filas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 179</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a><span class="fu">ncol</span>(datos)           <span class="co"># solo columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a><span class="fu">ncol</span>(datos)           <span class="co"># solo columnas</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 11</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="co"># 2. Valores faltantes</span></span>
-<span id="cb44-2"><a></a><span class="fu">sum</span>(<span class="fu">is.na</span>(datos))         <span class="co"># total de NAs</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a><span class="co"># 2. Valores faltantes</span></span>
+<span id="cb42-2"><a></a><span class="fu">sum</span>(<span class="fu">is.na</span>(datos))         <span class="co"># total de NAs</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(datos))     <span class="co"># NAs por columna</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(datos))     <span class="co"># NAs por columna</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                   pais              continente         gasto_educacion 
                       0                       0                       0 
@@ -1993,10 +1952,10 @@ Prediction no si
 indice_gobierno_digital        crecimiento_alto 
                       0                       0 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a></a><span class="co"># 3. Distribución de variables numéricas</span></span>
-<span id="cb48-2"><a></a>datos <span class="sc">|&gt;</span></span>
-<span id="cb48-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
-<span id="cb48-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a><span class="co"># 3. Distribución de variables numéricas</span></span>
+<span id="cb46-2"><a></a>datos <span class="sc">|&gt;</span></span>
+<span id="cb46-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb46-4"><a></a>  <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> gasto_educacion acceso_internet  urbanizacion    gasto_salud   
  Min.   :2.100   Min.   : 5.00   Min.   :16.40   Min.   :3.200  
@@ -2013,11 +1972,11 @@ indice_gobierno_digital        crecimiento_alto
  3rd Qu.:14.70   3rd Qu.:10.100   3rd Qu.:5.100        3rd Qu.:0.6350         
  Max.   :37.40   Max.   :16.100   Max.   :7.400        Max.   :0.9600         </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a></a><span class="co"># 4. Correlaciones entre variables</span></span>
-<span id="cb50-2"><a></a>datos <span class="sc">|&gt;</span></span>
-<span id="cb50-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
-<span id="cb50-4"><a></a>  <span class="fu">cor</span>() <span class="sc">|&gt;</span></span>
-<span id="cb50-5"><a></a>  <span class="fu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a></a><span class="co"># 4. Correlaciones entre variables</span></span>
+<span id="cb48-2"><a></a>datos <span class="sc">|&gt;</span></span>
+<span id="cb48-3"><a></a>  <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
+<span id="cb48-4"><a></a>  <span class="fu">cor</span>() <span class="sc">|&gt;</span></span>
+<span id="cb48-5"><a></a>  <span class="fu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                        gasto_educacion acceso_internet urbanizacion
 gasto_educacion                    1.00            0.07         0.24
@@ -2056,7 +2015,7 @@ indice_gobierno_digital                    1.00</code></pre>
 <li><code>acceso_internet</code> y <code>urbanizacion</code> tienen distribuciones amplias: países con muy poco acceso vs. muy conectados</li>
 <li><code>indice_gobierno_digital</code> se correlaciona positivamente con <code>acceso_internet</code> y negativamente con <code>inflacion</code></li>
 </ul>
-<p><span class="alert">Pista:</span> <code>ggplot2</code> permite visualizar distribuciones con <code>geom_histogram()</code> y correlaciones con el paquete <code>corrplot</code> o <code>ggcorrplot</code>.</p>
+<p><span class="alert">Pista:</span> <code>ggplot2</code> permite visualizar distribuciones con <code>geom_histogram()</code> y correlaciones con el paquete <code>corrplot</code> o <code>ggcorrplot</code></p>
 </div></div>
 <p><a href="#/sec:exercise01"><span class="button">Volver al ejercicio</span></a></p>
 </div>
@@ -2068,31 +2027,31 @@ indice_gobierno_digital                    1.00</code></pre>
 <div class="column" style="width:50%;">
 <p><strong>Calcular las métricas:</strong></p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb52-2"><a></a>  <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto,</span>
-<span id="cb52-3"><a></a>            <span class="at">estimate =</span> .pred_class,</span>
-<span id="cb52-4"><a></a>            <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb50-2"><a></a>  <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto,</span>
+<span id="cb50-3"><a></a>            <span class="at">estimate =</span> .pred_class,</span>
+<span id="cb50-4"><a></a>            <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric   .estimator .estimate
   &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;
 1 precision binary         0.783</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb54-2"><a></a>  <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto,</span>
-<span id="cb54-3"><a></a>         <span class="at">estimate =</span> .pred_class,</span>
-<span id="cb54-4"><a></a>         <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb52-2"><a></a>  <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto,</span>
+<span id="cb52-3"><a></a>         <span class="at">estimate =</span> .pred_class,</span>
+<span id="cb52-4"><a></a>         <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
 1 recall  binary         0.818</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a></a><span class="co"># O ambas a la vez:</span></span>
-<span id="cb56-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb56-3"><a></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> crecimiento_alto,</span>
-<span id="cb56-4"><a></a>           <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
-<span id="cb56-5"><a></a>  <span class="fu">summary</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a></a><span class="co"># O ambas a la vez:</span></span>
+<span id="cb54-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb54-3"><a></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> crecimiento_alto,</span>
+<span id="cb54-4"><a></a>           <span class="at">estimate =</span> .pred_class) <span class="sc">|&gt;</span></span>
+<span id="cb54-5"><a></a>  <span class="fu">summary</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 13 × 3
    .metric              .estimator .estimate
@@ -2124,7 +2083,7 @@ indice_gobierno_digital                    1.00</code></pre>
 <li>Si el <span class="alert">costo de una falsa alarma</span> es alto (p. ej., asignar recursos mal): prioricen <span class="alert">precisión</span></li>
 <li>Sin preferencia clara: usen <span class="alert">F1</span>, el promedio armónico de ambas</li>
 </ul>
-<p><span class="alert">No hay respuesta universal.</span> El contexto define la métrica correcta.</p>
+<p><span class="alert">No hay respuesta universal.</span> El contexto define la métrica correcta</p>
 </div></div>
 <p><a href="#/sec:exercise03"><span class="button">Volver al ejercicio</span></a></p>
 </div>
@@ -2134,12 +2093,12 @@ indice_gobierno_digital                    1.00</code></pre>
 <div style="margin-top: 20px; font-size: 21px;">
 <p><strong>¿Cómo identificar predicciones inciertas?</strong></p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a></a><span class="co"># Observaciones con probabilidad cercana a 0.5</span></span>
-<span id="cb58-2"><a></a>pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb58-3"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_no, .pred_si) <span class="sc">|&gt;</span></span>
-<span id="cb58-4"><a></a>  <span class="fu">mutate</span>(<span class="at">incertidumbre =</span> <span class="fu">abs</span>(.pred_si <span class="sc">-</span> <span class="fl">0.5</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb58-5"><a></a>  <span class="fu">filter</span>(incertidumbre <span class="sc">&lt;</span> <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
-<span id="cb58-6"><a></a>  <span class="fu">arrange</span>(incertidumbre)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a></a><span class="co"># Observaciones con probabilidad cercana a 0.5</span></span>
+<span id="cb56-2"><a></a>pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb56-3"><a></a>  <span class="fu">select</span>(crecimiento_alto, .pred_no, .pred_si) <span class="sc">|&gt;</span></span>
+<span id="cb56-4"><a></a>  <span class="fu">mutate</span>(<span class="at">incertidumbre =</span> <span class="fu">abs</span>(.pred_si <span class="sc">-</span> <span class="fl">0.5</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb56-5"><a></a>  <span class="fu">filter</span>(incertidumbre <span class="sc">&lt;</span> <span class="fl">0.1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb56-6"><a></a>  <span class="fu">arrange</span>(incertidumbre)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 4
   crecimiento_alto .pred_no .pred_si incertidumbre
@@ -2163,19 +2122,19 @@ indice_gobierno_digital                    1.00</code></pre>
 <h2>Apéndice 4: Cambio de umbral</h2>
 <div style="margin-top: 20px; font-size: 21px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a></a><span class="co"># Comparar precisión y recall para tres umbrales</span></span>
-<span id="cb60-2"><a></a>purrr<span class="sc">::</span><span class="fu">map_df</span>(<span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>, <span class="fl">0.7</span>), <span class="cf">function</span>(u) {</span>
-<span id="cb60-3"><a></a>  pred_probs <span class="sc">|&gt;</span></span>
-<span id="cb60-4"><a></a>    <span class="fu">mutate</span>(<span class="at">.pred_u =</span> <span class="fu">factor</span>(</span>
-<span id="cb60-5"><a></a>      dplyr<span class="sc">::</span><span class="fu">if_else</span>(.pred_si <span class="sc">&gt;=</span> u, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
-<span id="cb60-6"><a></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;si&quot;</span>)</span>
-<span id="cb60-7"><a></a>    )) <span class="sc">|&gt;</span></span>
-<span id="cb60-8"><a></a>    <span class="fu">summarise</span>(</span>
-<span id="cb60-9"><a></a>      <span class="at">umbral    =</span> u,</span>
-<span id="cb60-10"><a></a>      <span class="at">precision =</span> <span class="fu">precision_vec</span>(crecimiento_alto, .pred_u, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>),</span>
-<span id="cb60-11"><a></a>      <span class="at">recall    =</span> <span class="fu">recall_vec</span>(crecimiento_alto, .pred_u, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb60-12"><a></a>    )</span>
-<span id="cb60-13"><a></a>})</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a></a><span class="co"># Comparar precisión y recall para tres umbrales</span></span>
+<span id="cb58-2"><a></a>purrr<span class="sc">::</span><span class="fu">map_df</span>(<span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>, <span class="fl">0.7</span>), <span class="cf">function</span>(u) {</span>
+<span id="cb58-3"><a></a>  pred_probs <span class="sc">|&gt;</span></span>
+<span id="cb58-4"><a></a>    <span class="fu">mutate</span>(<span class="at">.pred_u =</span> <span class="fu">factor</span>(</span>
+<span id="cb58-5"><a></a>      dplyr<span class="sc">::</span><span class="fu">if_else</span>(.pred_si <span class="sc">&gt;=</span> u, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
+<span id="cb58-6"><a></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no&quot;</span>, <span class="st">&quot;si&quot;</span>)</span>
+<span id="cb58-7"><a></a>    )) <span class="sc">|&gt;</span></span>
+<span id="cb58-8"><a></a>    <span class="fu">summarise</span>(</span>
+<span id="cb58-9"><a></a>      <span class="at">umbral    =</span> u,</span>
+<span id="cb58-10"><a></a>      <span class="at">precision =</span> <span class="fu">precision_vec</span>(crecimiento_alto, .pred_u, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>),</span>
+<span id="cb58-11"><a></a>      <span class="at">recall    =</span> <span class="fu">recall_vec</span>(crecimiento_alto, .pred_u, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb58-12"><a></a>    )</span>
+<span id="cb58-13"><a></a>})</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
   umbral precision recall
@@ -2221,7 +2180,7 @@ indice_gobierno_digital                    1.00</code></pre>
 </tr>
 </tbody>
 </table>
-<p>Este es el <span class="alert">compromiso precisión-recall</span> en acción. El umbral óptimo depende del problema.</p>
+<p>Este es el <span class="alert">compromiso precisión-recall</span> en acción. El umbral óptimo depende del problema</p>
 <p><a href="#/sec:masalla"><span class="button">Volver</span></a></p>
 </div>
 </section>
@@ -2229,21 +2188,21 @@ indice_gobierno_digital                    1.00</code></pre>
 <h2>Apéndice 5: Validación cruzada</h2>
 <div style="margin-top: 20px; font-size: 21px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a></a><span class="co"># Crear los folds para validación cruzada (5 particiones, estratificadas)</span></span>
-<span id="cb62-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb62-3"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb62-4"><a></a></span>
-<span id="cb62-5"><a></a><span class="co"># Ajustar el modelo en cada fold</span></span>
-<span id="cb62-6"><a></a>cv_results <span class="ot">&lt;-</span> modelo_log <span class="sc">|&gt;</span></span>
-<span id="cb62-7"><a></a>  <span class="fu">fit_resamples</span>(</span>
-<span id="cb62-8"><a></a>    crecimiento_alto <span class="sc">~</span> .,</span>
-<span id="cb62-9"><a></a>    <span class="at">resamples =</span> folds,</span>
-<span id="cb62-10"><a></a>    <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, roc_auc),</span>
-<span id="cb62-11"><a></a>    <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb62-12"><a></a>  )</span>
-<span id="cb62-13"><a></a></span>
-<span id="cb62-14"><a></a><span class="co"># collect_metrics() devuelve media y error estándar de cada métrica</span></span>
-<span id="cb62-15"><a></a><span class="fu">collect_metrics</span>(cv_results)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a></a><span class="co"># Crear los folds para validación cruzada (5 particiones, estratificadas)</span></span>
+<span id="cb60-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb60-3"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<span id="cb60-4"><a></a></span>
+<span id="cb60-5"><a></a><span class="co"># Ajustar el modelo en cada fold</span></span>
+<span id="cb60-6"><a></a>cv_results <span class="ot">&lt;-</span> modelo_log <span class="sc">|&gt;</span></span>
+<span id="cb60-7"><a></a>  <span class="fu">fit_resamples</span>(</span>
+<span id="cb60-8"><a></a>    crecimiento_alto <span class="sc">~</span> .,</span>
+<span id="cb60-9"><a></a>    <span class="at">resamples =</span> folds,</span>
+<span id="cb60-10"><a></a>    <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, roc_auc),</span>
+<span id="cb60-11"><a></a>    <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb60-12"><a></a>  )</span>
+<span id="cb60-13"><a></a></span>
+<span id="cb60-14"><a></a><span class="co"># collect_metrics() devuelve media y error estándar de cada métrica</span></span>
+<span id="cb60-15"><a></a><span class="fu">collect_metrics</span>(cv_results)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 6
   .metric  .estimator  mean     n std_err .config        
@@ -2251,9 +2210,9 @@ indice_gobierno_digital                    1.00</code></pre>
 1 accuracy binary     0.759     5  0.0236 pre0_mod0_post0
 2 roc_auc  binary     0.864     5  0.0136 pre0_mod0_post0</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a></a><span class="co"># Comparar con las métricas de la división única</span></span>
-<span id="cb64-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
-<span id="cb64-3"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a></a><span class="co"># Comparar con las métricas de la división única</span></span>
+<span id="cb62-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
+<span id="cb62-3"><a></a>  <span class="fu">metrics</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 3
   .metric  .estimator .estimate
@@ -2307,6 +2266,47 @@ indice_gobierno_digital                    1.00</code></pre>
 <li>Es especialmente útil para <span class="alert">comparar modelos</span> sin tener que elegir un umbral</li>
 </ul>
 <p><a href="#/sec:exercise07"><span class="button">Volver al ejercicio</span></a></p>
+</div>
+</section>
+<section id="sec:appendix07" class="slide level2">
+<h2>Apéndice 7: Interpretar los coeficientes</h2>
+<div style="margin-top: 20px; font-size: 20px;">
+<div class="columns">
+<div class="column" style="width:45%;">
+<p><strong>Recordatorio: regresión logística</strong></p>
+<ul>
+<li>Los coeficientes están en escala de <span class="alert">log-odds</span></li>
+<li>Un coeficiente positivo aumenta la probabilidad de “sí”</li>
+<li>Un coeficiente negativo la disminuye</li>
+<li>Para convertir a odds ratio: <code>exp(coeficiente)</code></li>
+</ul>
+<p><strong>Pregunta para discutir:</strong></p>
+<ul>
+<li>¿Los signos tienen sentido teórico? Por ejemplo, ¿la inflación alta se asocia con menor crecimiento?</li>
+</ul>
+</div><div class="column" style="width:55%;">
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a></a><span class="co"># Ver los odds ratios</span></span>
+<span id="cb64-2"><a></a><span class="fu">tidy</span>(ajuste) <span class="sc">|&gt;</span></span>
+<span id="cb64-3"><a></a>  <span class="fu">mutate</span>(<span class="at">odds_ratio =</span> <span class="fu">exp</span>(estimate)) <span class="sc">|&gt;</span></span>
+<span id="cb64-4"><a></a>  <span class="fu">select</span>(term, estimate, odds_ratio, p.value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 4
+  term                    estimate odds_ratio  p.value
+  &lt;chr&gt;                      &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)             -4.64       0.00963 0.0701  
+2 gasto_educacion          0.588      1.80    0.0299  
+3 acceso_internet          0.0634     1.07    0.000658
+4 urbanizacion            -0.00648    0.994   0.683   
+5 gasto_salud             -0.168      0.845   0.443   
+6 inflacion               -0.166      0.847   0.00938 
+7 desempleo               -0.318      0.727   0.00438 
+8 inversion_extranjera     0.355      1.43    0.0505  
+9 indice_gobierno_digital  5.35     211.      0.00848 </code></pre>
+</div>
+</div>
+</div></div>
+<p><a href="#/sec:ajustar"><span class="button">Volver</span></a></p>
 </div>
 
 

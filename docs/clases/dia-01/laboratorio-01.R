@@ -96,12 +96,8 @@ ajuste <- modelo_log |>
   fit(crecimiento_alto ~ ., data = datos_train)
 
 # Ver los coeficientes en escala log-odds
+# (la interpretación como odds ratios está en el Apéndice 7)
 tidy(ajuste)
-
-# Odds ratios = exp(coeficiente)
-tidy(ajuste) |>
-  mutate(odds_ratio = exp(estimate)) |>
-  select(term, estimate, odds_ratio, p.value)
 
 # Predecir clases en los datos de prueba.
 # .pred_class es la columna que tidymodels crea por ti;
@@ -245,3 +241,16 @@ collect_metrics(cv_results)
 # Comparar con las métricas de la división única
 predicciones |>
   metrics(truth = crecimiento_alto, estimate = .pred_class)
+
+
+# --- Apéndice 7: Interpretar los coeficientes ----------------
+# (El Apéndice 6 de las diapositivas es solo la tabla de
+#  interpretación del AUC, sin código nuevo.)
+
+# Los coeficientes de la regresión logística están en escala de
+# log-odds. Para leerlos como odds ratios: exp(coeficiente).
+# Un coeficiente positivo aumenta la probabilidad de "si";
+# uno negativo la disminuye.
+tidy(ajuste) |>
+  mutate(odds_ratio = exp(estimate)) |>
+  select(term, estimate, odds_ratio, p.value)

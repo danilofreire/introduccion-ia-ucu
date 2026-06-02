@@ -249,17 +249,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kknn)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/satisfaccion_democracia.csv"</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">satisfecho =</span> <span class="fu">factor</span>(satisfecho, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>)),</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">zona =</span> <span class="fu">factor</span>(zona),</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">genero =</span> <span class="fu">factor</span>(genero),</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">pais =</span> <span class="fu">factor</span>(pais)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/satisfaccion_democracia.csv"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">satisfecho =</span> <span class="fu">factor</span>(satisfecho, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>)),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">zona =</span> <span class="fu">factor</span>(zona),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">genero =</span> <span class="fu">factor</span>(genero),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pais =</span> <span class="fu">factor</span>(pais)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -267,7 +266,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="2" class="anchored" data-anchor-id="exploración"><span class="header-section-number">2</span> Exploración</h2>
 <section id="pregunta-1-resumen-del-dataset" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-del-dataset"><span class="header-section-number">2.1</span> Pregunta 1: Resumen del dataset</h3>
-<p>Calculen la proporción de satisfechos (<code>"si"</code>) por país. Cuál país tiene la proporción más alta? Cuál tiene la más baja?</p>
+<p>Calculen la proporción de satisfechos (<code>"si"</code>) por país. ¿Cuál país tiene la proporción más alta? ¿Cuál tiene la más baja?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>prop_pais <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(pais, satisfecho) <span class="sc">|&gt;</span></span>
@@ -302,7 +301,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 18 Guatemala            si            17 0.567</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La proporción de satisfechos varia entre países, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educación, etc.) en cada país. Las diferencias entre países son en parte producto de la simulación aleatoria, pero se observa variabilidad que podría existir en datos reales de Latinobarometro.</p>
+<p><strong>Respuesta:</strong> La proporción de satisfechos varía entre países, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educación, etc.) en cada país. Las diferencias entre países son en parte producto de la simulación aleatoria, pero se observa variabilidad que podría existir en datos reales de Latinobarómetro.</p>
 </section>
 <section id="pregunta-2-confianza-y-satisfacción" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-confianza-y-satisfacción"><span class="header-section-number">2.2</span> Pregunta 2: Confianza y satisfacción</h3>
@@ -346,7 +345,7 @@ ingreso_hogar       0.030         -0.035         1.000             -0.082
 confianza_gobierno -0.009         -0.077        -0.082              1.000</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Las correlaciones entre estas variables son generalmente debiles (valores absolutos menores a 0.3). Esto indica que cada variable aporta información relativamente independiente, lo cual es bueno para un modelo de regresión: poca multicolinealidad. La correlación más alta probablemente es entre <code>educacion_anos</code> e <code>ingreso_hogar</code>, lo cual tiene sentido porque mayor educación se asocia con mayores ingresos.</p>
+<p><strong>Respuesta:</strong> Las correlaciones entre estas variables son muy débiles (todos los valores absolutos por debajo de 0.1). Esto indica que cada variable aporta información casi independiente, lo cual es bueno para un modelo de regresión: prácticamente no hay multicolinealidad. En una encuesta de opinión como esta, no sorprende que edad, educación, ingreso y confianza apenas se correlacionen entre sí.</p>
 </section>
 </section>
 <section id="feature-engineering" class="level2" data-number="3">
@@ -413,7 +412,7 @@ confianza_gobierno -0.009         -0.077        -0.082              1.000</code>
 2 si    si            70 0.686</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La variable <code>confianza_baja</code> muestra una diferencia mucho mayor en la proporción de satisfechos que <code>joven</code>. Las personas con confianza baja en el gobierno tienen una proporción de satisfacción mucho menor que las de confianza alta. La edad, en cambio, muestra diferencias más modestas. Esto sugiere que <code>confianza_baja</code> sera un predictor más útil para el modelo.</p>
+<p><strong>Respuesta:</strong> La variable <code>confianza_baja</code> muestra una diferencia mucho mayor en la proporción de satisfechos que <code>joven</code>. Las personas con confianza baja en el gobierno tienen una proporción de satisfacción mucho menor que las de confianza alta. La edad, en cambio, muestra diferencias más modestas. Esto sugiere que <code>confianza_baja</code> será un predictor más útil para el modelo.</p>
 </section>
 </section>
 <section id="modelos" class="level2" data-number="4">
@@ -467,8 +466,8 @@ Proporciones en prueba:</code></pre>
 </div>
 </div>
 </section>
-<section id="pregunta-7-tres-modelos-con-fórmula-básica" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-7-tres-modelos-con-fórmula-básica"><span class="header-section-number">4.2</span> Pregunta 7: Tres modelos con fórmula básica</h3>
+<section id="pregunta-7-dos-modelos-con-fórmula-básica" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-7-dos-modelos-con-fórmula-básica"><span class="header-section-number">4.2</span> Pregunta 7: Dos modelos con fórmula básica</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definir modelos</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>modelo_logistico <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
@@ -479,46 +478,42 @@ Proporciones en prueba:</code></pre>
 <span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"rpart"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>modelo_knn <span class="ot">&lt;-</span> <span class="fu">nearest_neighbor</span>(<span class="at">neighbors =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"kknn"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Folds</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> satisfecho)</span>
 <span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Folds</span></span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> satisfecho)</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Formula basica</span></span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>formula_basica <span class="ot">&lt;-</span> satisfecho <span class="sc">~</span> edad <span class="sc">+</span> educacion_anos <span class="sc">+</span> ingreso_hogar <span class="sc">+</span></span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>                               confianza_gobierno <span class="sc">+</span> consumo_noticias <span class="sc">+</span></span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>                               participacion_politica <span class="sc">+</span> zona</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluar cada modelo</span></span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>evaluar <span class="ot">&lt;-</span> <span class="cf">function</span>(modelo, formula, folds, nombre) {</span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  resultados <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>    modelo, formula, <span class="at">resamples =</span> folds,</span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy),</span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>(resultados) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> nombre)</span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>eval_log <span class="ot">&lt;-</span> <span class="fu">evaluar</span>(modelo_logistico, formula_basica, folds, <span class="st">"Logistico"</span>)</span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>eval_arb <span class="ot">&lt;-</span> <span class="fu">evaluar</span>(modelo_arbol, formula_basica, folds, <span class="st">"Arbol"</span>)</span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>eval_knn <span class="ot">&lt;-</span> <span class="fu">evaluar</span>(modelo_knn, formula_basica, folds, <span class="st">"KNN"</span>)</span>
-<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(eval_log, eval_arb, eval_knn) <span class="sc">|&gt;</span></span>
-<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, mean, std_err) <span class="sc">|&gt;</span></span>
-<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Formula basica</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>formula_basica <span class="ot">&lt;-</span> satisfecho <span class="sc">~</span> edad <span class="sc">+</span> educacion_anos <span class="sc">+</span> ingreso_hogar <span class="sc">+</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>                               confianza_gobierno <span class="sc">+</span> consumo_noticias <span class="sc">+</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>                               participacion_politica <span class="sc">+</span> zona</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluar cada modelo con validación cruzada (inline, sin función auxiliar)</span></span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>eval_log <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  modelo_logistico, formula_basica, <span class="at">resamples =</span> folds,</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy),</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Logistico"</span>)</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>eval_arb <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>  modelo_arbol, formula_basica, <span class="at">resamples =</span> folds,</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy),</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Arbol"</span>)</span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(eval_log, eval_arb) <span class="sc">|&gt;</span></span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, mean, std_err) <span class="sc">|&gt;</span></span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 4
+<pre><code># A tibble: 2 × 4
   modelo    .metric   mean std_err
   &lt;chr&gt;     &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;
 1 Logistico accuracy 0.706 0.0114 
-2 KNN       accuracy 0.695 0.0332 
-3 Arbol     accuracy 0.628 0.00898</code></pre>
+2 Arbol     accuracy 0.628 0.00898</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La regresión logística y el KNN suelen tener accuracy similar, mientras que el árbol de decisión tiende a ser ligeramente inferior. Las diferencias entre modelos son generalmente pequenas para este dataset, lo que indica que la relación entre predictores y outcome es razonablemente lineal (favoreciendo a la regresión logística).</p>
+<p><strong>Respuesta:</strong> La regresión logística supera al árbol de decisión en este dataset (≈0.71 vs.&nbsp;≈0.63 de accuracy). Con predictores cuya relación con el outcome es aproximadamente lineal, la regresión logística tiene ventaja; el árbol, que parte el espacio en cortes y umbrales, capta peor esa estructura suave. Nota: la accuracy del logístico (≈0.71) coincide casi con la proporción de la clase mayoritaria, así que conviene mirar también precision, recall y AUC, no solo la accuracy.</p>
 </section>
 <section id="pregunta-8-mejor-modelo-con-fórmula-extendida" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-8-mejor-modelo-con-fórmula-extendida"><span class="header-section-number">4.3</span> Pregunta 8: Mejor modelo con fórmula extendida</h3>
@@ -529,11 +524,16 @@ Proporciones en prueba:</code></pre>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                            participacion_politica <span class="sc">+</span> zona <span class="sc">+</span></span>
 <span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                            confianza_baja <span class="sc">+</span> ingreso_x_educacion</span>
 <span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluar el mejor modelo con formula extendida</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>eval_log_ext <span class="ot">&lt;-</span> <span class="fu">evaluar</span>(modelo_logistico, formula_ext, folds, <span class="st">"Logistico (ext)"</span>)</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparar</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy formula basica:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluar el modelo logístico con la fórmula extendida (inline, sin función auxiliar)</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>eval_log_ext <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  modelo_logistico, formula_ext, <span class="at">resamples =</span> folds,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy),</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">"second"</span>)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Logistico (ext)"</span>)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparar</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy formula basica:</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Accuracy formula basica:</code></pre>
 </div>
@@ -636,7 +636,7 @@ Prediction no si
 <pre><code>AUC: 0.701 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El AUC permite evaluar la capacidad discriminativa del modelo. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente. Para un modelo con variables sociodemograficas como las nuestras, un AUC en el rango aceptable-bueno es un resultado razonable, dado que la satisfacción democrática es un fenómeno complejo que depende de muchos factores no observados.</p>
+<p><strong>Respuesta:</strong> El AUC permite evaluar la capacidad discriminativa del modelo. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente. Para un modelo con variables sociodemográficas como las nuestras, un AUC en el rango aceptable-bueno es un resultado razonable, dado que la satisfacción democrática es un fenómeno complejo que depende de muchos factores no observados.</p>
 </section>
 <section id="pregunta-11-curva-roc" class="level3" data-number="5.3">
 <h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-curva-roc"><span class="header-section-number">5.3</span> Pregunta 11: Curva ROC</h3>
@@ -678,7 +678,7 @@ Prediction no si
 8 educacion_anos         -0.0329    0.0305   0.281          0.968</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La variable con el efecto más fuerte es <code>confianza_gobierno</code>, con un odds ratio que indica un aumento considerable en las chances de satisfacción por cada punto adicional de confianza. Las variables con efectos más debiles (p-valores altos) son las que tienen menos relación con la satisfacción democrática. El orden de importancia de los predictores tiene sentido teórico: la confianza en el gobierno es el predictor más directo de la satisfacción con la democracia.</p>
+<p><strong>Respuesta:</strong> La variable con el efecto más fuerte es <code>confianza_gobierno</code>, con un odds ratio que indica un aumento considerable en las chances de satisfacción por cada punto adicional de confianza. Las variables con efectos más débiles (p-valores altos) son las que tienen menos relación con la satisfacción democrática. El orden de importancia de los predictores tiene sentido teórico: la confianza en el gobierno es el predictor más directo de la satisfacción con la democracia.</p>
 </section>
 </section>
 <section id="reflexion" class="level2" data-number="6">
@@ -696,11 +696,11 @@ Prediction no si
 <p><strong>Árbol de decisión:</strong></p>
 <ul>
 <li>Captura relaciones no lineales e interacciones de forma automática, sin necesidad de especificarlas</li>
-<li>Muy facil de interpretar visualmente: se puede mostrar el árbol completo</li>
-<li>Funciona bien con variables categoricas sin necesidad de crear dummies</li>
+<li>Muy fácil de interpretar visualmente: se puede mostrar el árbol completo</li>
+<li>Funciona bien con variables categóricas sin necesidad de crear dummies</li>
 <li>Preferible cuando la estructura de los datos es jerárquica (por ejemplo, la edad importa solo para personas con baja educación)</li>
 </ul>
-<p>En este laboratorio, la regresión logística funciona igual o mejor que el árbol porque la relación entre los predictores y la satisfacción es aproximadamente lineal. El árbol tiene a sobreajustar (cortes arbitrarios) con datasets de este tamaño. Para un organismo que necesita recomendaciones claras de política, la regresión logística es preferible porque los coeficientes indican directamente qué factores modificar.</p>
+<p>En este laboratorio, la regresión logística funciona igual o mejor que el árbol porque la relación entre los predictores y la satisfacción es aproximadamente lineal. El árbol tiende a sobreajustar (cortes arbitrarios) con datasets de este tamaño. Para un organismo que necesita recomendaciones claras de política, la regresión logística es preferible porque los coeficientes indican directamente qué factores modificar.</p>
 
 
 </section>

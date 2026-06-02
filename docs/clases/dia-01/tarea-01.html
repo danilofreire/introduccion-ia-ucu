@@ -301,18 +301,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-5-modelo-con-un-solo-predictor" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-modelo-con-un-solo-predictor"><span class="header-section-number">3.2</span> Pregunta 5: Modelo con un solo predictor</h3>
-<p>Ajusten una regresión logística que use <strong>solo</strong> <code>indice_gobierno_digital</code> como predictor. Reporten el coeficiente estimado, su p-valor y el odds ratio. ¿Cómo se interpreta el odds ratio en este caso?</p>
-<p><em>Pista:</em> usen <code>fit(crecimiento_alto ~ indice_gobierno_digital, data = ...)</code>.</p>
+<section id="pregunta-5-la-línea-base" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-la-línea-base"><span class="header-section-number">3.2</span> Pregunta 5: La línea base</h3>
+<p>Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba de la pregunta anterior, calculen la accuracy de un “modelo” que siempre predice la clase mayoritaria de <code>crecimiento_alto</code> (sin usar ningún predictor). ¿Cuál es esa accuracy?</p>
+<p><em>Pista:</em> la respuesta sale de las proporciones de <code>crecimiento_alto</code> en el conjunto de prueba.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-6-modelo-completo" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-modelo-completo"><span class="header-section-number">3.3</span> Pregunta 6: Modelo completo</h3>
-<p>Ahora ajusten el modelo completo con los 8 predictores (como en el laboratorio). Comparen la accuracy del modelo con un solo predictor vs.&nbsp;el modelo completo sobre el conjunto de prueba. ¿Cuánto mejora?</p>
+<section id="pregunta-6-cuánto-mejora-el-modelo-completo" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-cuánto-mejora-el-modelo-completo"><span class="header-section-number">3.3</span> Pregunta 6: ¿Cuánto mejora el modelo completo?</h3>
+<p>Ajusten el modelo logístico completo con los 8 predictores (como en el laboratorio). Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente “adivinar” la clase mayoritaria?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -323,7 +323,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="4" class="anchored" data-anchor-id="evaluación"><span class="header-section-number">4</span> Evaluación</h2>
 <section id="pregunta-7-matriz-de-confusión" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-matriz-de-confusión"><span class="header-section-number">4.1</span> Pregunta 7: Matriz de confusión</h3>
-<p>Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. ¿Cuántos falsos positivos y falsos negativos hay? ¿Cuál tipo de error es más frecuente?</p>
+<p>Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. ¿Cuántos falsos positivos y falsos negativos hay? ¿Qué tipo de error es más frecuente?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>

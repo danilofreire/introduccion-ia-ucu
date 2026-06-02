@@ -1,6 +1,7 @@
 # ============================================================
 # IA para Científicos Sociales - UCU
-# Laboratorio 2: Exploración avanzada y comparación de modelos
+# Laboratorio 2: Validación cruzada y comparación de modelos
+# (dataset: indicadores_mundiales.csv, mismo que el lab 1)
 #
 # Autor: Danilo Freire
 # Fecha: mayo de 2026
@@ -10,7 +11,7 @@
 # ============================================================
 
 
-# --- Parte 1: Nuevo dataset ----------------------------------
+# --- Parte 1: Carga y exploración ----------------------------
 
 # Cargar paquetes
 library(tidymodels)
@@ -20,24 +21,24 @@ library(rpart)  # Motor de árbol de decisión
 # Tema de ggplot
 theme_set(theme_minimal(base_size = 14))
 
-# Cargar el dataset
-satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
-glimpse(satisfaccion)
+# Cargar el dataset (mismo del lab 1)
+datos <- read_csv("datos/indicadores_mundiales.csv")
+glimpse(datos)
 
 
 # --- Estadísticas descriptivas -------------------------------
 
 # Resumen rápido de las variables numéricas
-satisfaccion |> select(where(is.numeric)) |> summary()
+datos |> select(where(is.numeric)) |> summary()
 
-# Medias por nivel de satisfacción (predictores clave)
-satisfaccion |>
-  group_by(satisfecho) |>
+# Medias por nivel de crecimiento (3 predictores ilustrativos; los otros
+# 5 los exploran en el Ejercicio 1 y en los Apéndices 2-4)
+datos |>
+  group_by(crecimiento_alto) |>
   summarise(
-    confianza_media     = mean(confianza_gobierno),
-    educacion_media     = mean(educacion_anos),
-    ingreso_mediano     = median(ingreso_hogar),
-    participacion_media = mean(participacion_politica)
+    educacion_media     = mean(gasto_educacion),
+    internet_medio      = mean(acceso_internet),
+    urbanizacion_media  = mean(urbanizacion)
   )
 
 
@@ -46,42 +47,59 @@ satisfaccion |>
 # (Borren este bloque cuando tengan su respuesta)
 #
 # 1. ¿Cuántas observaciones? ¿Hay valores faltantes?
-# 2. ¿Cómo se distribuye la variable objetivo `satisfecho`?
-# 3. Elijan una pregunta y respondan con código o gráfico:
-#    - ¿Cómo varía la satisfacción por zona o por país?
-#    - ¿Qué relación hay entre ingreso y educación?
+# 2. ¿Cómo se distribuye la variable objetivo `crecimiento_alto`?
+# 3. Elijan UNA pregunta y respondan con una comparación numérica
+#    (el gráfico es opcional):
+#    - Elijan una de gasto_salud, desempleo, inversion_extranjera,
+#      indice_gobierno_digital y comparen su media (o mediana) entre
+#      países con crecimiento_alto = "si" y "no". ¿La diferencia es grande?
+#    - ¿Están altamente correlacionados acceso_internet y urbanizacion?
+#      Si lo están, podríamos no necesitar a los dos en el modelo.
+#
+# Ejemplos:
+# datos |>
+#   group_by(crecimiento_alto) |>
+#   summarise(media_gasto_salud = mean(gasto_salud))
+#
+# cor(datos$acceso_internet, datos$urbanizacion)
 #
 # Pistas en los Apéndices 1-4 (al final del script).
 
 
 # --- Parte 2: Feature engineering ----------------------------
 
-# Convertir variables categóricas a factores
-satisfaccion <- satisfaccion |>
+# Preparar los datos
+# Creamos un frame nuevo (datos_modelo) listo para modelar.
+# `datos` queda intacto con `pais` y `continente` para los apéndices.
+datos_modelo <- datos |>
+  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si"))) |>
+  select(-pais, -continente)
+
+glimpse(datos_modelo)
+
+# Mantenemos el orden c("no", "si") para que "si" sea la clase positiva.
+# Más adelante usaremos event_level = "second".
+
+
+# --- Crear nuevas variables ----------------------------------
+
+datos_modelo <- datos_modelo |>
   mutate(
-    satisfecho = factor(satisfecho, levels = c("no", "si")),
-    zona       = factor(zona),
-    genero     = factor(genero),
-    pais       = factor(pais)
+    # Grupos de urbanización (rural, mixto, urbano)
+    grupo_urbanizacion = cut(urbanizacion,
+                             breaks = c(0, 50, 75, 100),
+                             labels = c("rural", "mixto", "urbano"),
+                             include.lowest = TRUE),
+
+    # Intensidad fiscal social: PIB que va a salud + educación
+    gasto_social = gasto_educacion + gasto_salud,
+
+    # Indicador binario de alto desempleo (lo usaremos como ejemplo)
+    alto_desempleo = factor(if_else(desempleo > 7, "alto", "bajo"))
   )
 
-# Crear nuevas variables
-satisfaccion <- satisfaccion |>
-  mutate(
-    # Grupos de edad
-    grupo_edad = cut(edad,
-                     breaks = c(0, 30, 50, 70, 100),
-                     labels = c("joven", "adulto", "mayor", "anciano")),
-
-    # Ingreso per cápita (hogar promedio de 3.5 personas)
-    ingreso_percapita = ingreso_hogar / 3.5,
-
-    # Indicador de alta participación
-    alta_participacion = if_else(participacion_politica > 50, "alta", "baja")
-  )
-
-satisfaccion |>
-  select(grupo_edad, ingreso_percapita, alta_participacion) |>
+datos_modelo |>
+  select(grupo_urbanizacion, gasto_social, alto_desempleo) |>
   head()
 
 
@@ -90,14 +108,17 @@ satisfaccion |>
 # (Borren este bloque cuando tengan su respuesta)
 #
 # Elijan UNA variable derivada y créenla. Opciones sugeridas:
-# - Grupos de ingreso por terciles (ingreso_hogar)
-# - Consumidor alto de noticias: > 5 horas (consumo_noticias)
-# - Baja confianza en el gobierno: <= 4 (confianza_gobierno)
-# - Interacción zona × género (zona, genero)
+# - Gasto en educación alto: por encima de la mediana (gasto_educacion)
+# - Acceso a internet por terciles (acceso_internet)
+# - Inflación alta: > 5% (inflacion)
+# - Apertura financiera: IED > mediana (inversion_extranjera)
 #
-# Ejemplo:
-# satisfaccion <- satisfaccion |>
-#   mutate(educacion_alta = if_else(educacion_anos > 12, "alta", "baja"))
+# Ejemplo (internet por terciles):
+# datos_modelo <- datos_modelo |>
+#   mutate(internet_grupos = cut(acceso_internet,
+#                                breaks = quantile(acceso_internet, c(0, 1/3, 2/3, 1)),
+#                                labels = c("bajo", "medio", "alto"),
+#                                include.lowest = TRUE))
 #
 # Más ejemplos en el Apéndice 5.
 
@@ -105,14 +126,19 @@ satisfaccion |>
 # --- Dividir los datos ---------------------------------------
 
 set.seed(2026)
-datos_split <- initial_split(satisfaccion, prop = 0.75, strata = satisfecho)
+datos_split <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
 datos_train <- training(datos_split)
 datos_test  <- testing(datos_split)
 
 # Folds para validación cruzada (5 particiones estratificadas)
-folds <- vfold_cv(datos_train, v = 5, strata = satisfecho)
+folds <- vfold_cv(datos_train, v = 5, strata = crecimiento_alto)
 
 cat("Train:", nrow(datos_train), "| Test:", nrow(datos_test))
+
+# Con 179 países y 5 folds, cada partición tiene ~27 países en validación.
+# Es suficiente para entrenar, pero las métricas tendrán más ruido fold-a-fold
+# que en un dataset grande. La variación entre folds es informativa, no un
+# defecto del modelo.
 
 
 # --- Parte 3: Comparación de modelos -------------------------
@@ -126,10 +152,11 @@ modelo_arbol <- decision_tree() |>
   set_engine("rpart") |>
   set_mode("classification")
 
-# Fórmula con variables originales
-formula_basica <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
-                               confianza_gobierno + consumo_noticias +
-                               participacion_politica + zona
+# Fórmula con las 8 variables numéricas originales
+formula_basica <- crecimiento_alto ~ gasto_educacion + acceso_internet +
+                                     urbanizacion + gasto_salud + inflacion +
+                                     desempleo + inversion_extranjera +
+                                     indice_gobierno_digital
 
 
 # --- Evaluar el modelo logístico -----------------------------
@@ -168,24 +195,60 @@ resultados |>
   pivot_wider(names_from = .metric, values_from = c(mean, std_err))
 
 
+# --- ¿Qué pasa si extendemos la fórmula? ---------------------
+
+# Ejemplo trabajado. Reemplazamos `desempleo` (continuo) por
+# `alto_desempleo` (binario) y vemos qué cambia. La idea: si el
+# predictor original ya captura la información, un recorte categórico
+# difícilmente ayudará.
+formula_ext <- crecimiento_alto ~ gasto_educacion + acceso_internet +
+                                  urbanizacion + gasto_salud + inflacion +
+                                  alto_desempleo + inversion_extranjera +
+                                  indice_gobierno_digital
+
+eval_log_ext <- fit_resamples(
+  modelo_logistico, formula_ext, resamples = folds,
+  metrics = metric_set(precision, recall, roc_auc),
+  control = control_resamples(event_level = "second")
+) |>
+  collect_metrics() |> mutate(modelo = "Logístico (ext)")
+
+# Comparar el logístico básico vs. el extendido
+bind_rows(eval_logistico, eval_log_ext) |>
+  select(modelo, .metric, mean, std_err) |>
+  pivot_wider(names_from = .metric, values_from = c(mean, std_err))
+
+# Lección: no todo feature engineering mejora el modelo. Cuando el
+# predictor original ya capta la información, agregarle (o reemplazarlo
+# por) un recorte categórico es redundante. Hay que medirlo, no asumirlo.
+
+
 # --- Ejercicio 3: ¿Ayuda el feature engineering? -------------
 #
 # (Borren este bloque cuando tengan su respuesta)
 #
-# Agreguen la variable derivada que crearon antes a la fórmula
-# y re-evalúen los dos modelos. Comparen con los resultados originales.
+# Agreguen LA variable derivada que crearon en el Ejercicio 2 a la
+# fórmula básica y re-evalúen los dos modelos.
 #
 # 1. ¿Mejora la regresión logística? ¿Y el árbol?
 # 2. ¿Cuál de los dos modelos es más sensible al feature nuevo?
 #
-# Solución completa en el Apéndice 6.
+# Ejemplo con internet_grupos:
+# formula_estudiante <- crecimiento_alto ~ gasto_educacion + acceso_internet +
+#                                          urbanizacion + gasto_salud + inflacion +
+#                                          desempleo + inversion_extranjera +
+#                                          indice_gobierno_digital + internet_grupos
+#
+# Solución trabajada en el Apéndice 6.
 
 
 # --- Modelo final en datos de test ---------------------------
 
-# Entrenar el modelo elegido con todos los datos de train
+# Entrenamos el modelo elegido con todos los datos de train. En el lab
+# usamos formula_ext para ilustrar augment(), aunque las métricas son
+# casi idénticas a formula_basica.
 ajuste_final <- modelo_logistico |>
-  fit(formula_basica, data = datos_train)
+  fit(formula_ext, data = datos_train)
 
 # augment() junta predicciones (clases + probabilidades) con los datos
 # originales en una sola línea. Equivale a hacer dos predict() + bind_cols().
@@ -193,9 +256,9 @@ ajuste_final <- modelo_logistico |>
 pred_test <- ajuste_final |> augment(datos_test)
 
 # Métricas finales (las mismas que usamos en validación cruzada)
-pred_test |> precision(truth = satisfecho, estimate = .pred_class, event_level = "second")
-pred_test |> recall(truth = satisfecho, estimate = .pred_class, event_level = "second")
-pred_test |> roc_auc(truth = satisfecho, .pred_si, event_level = "second")
+pred_test |> precision(truth = crecimiento_alto, estimate = .pred_class, event_level = "second")
+pred_test |> recall(truth = crecimiento_alto, estimate = .pred_class, event_level = "second")
+pred_test |> roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
 
 
 # ============================================================
@@ -206,203 +269,179 @@ pred_test |> roc_auc(truth = satisfecho, .pred_si, event_level = "second")
 
 # --- Apéndice 1: Exploración inicial -------------------------
 
-dim(satisfaccion)
+dim(datos)
 
-satisfaccion |>
-  count(satisfecho) |>
+datos |>
+  count(crecimiento_alto) |>
   mutate(prop = round(n / sum(n), 3))
 
-colSums(is.na(satisfaccion))
+colSums(is.na(datos))
 
-satisfaccion |>
+datos |>
   select(where(is.numeric)) |>
   summary()
 
-satisfaccion |> count(pais, sort = TRUE)
-satisfaccion |> count(zona)
 
+# --- Apéndice 2: Una variable a fondo ------------------------
 
-# --- Apéndice 2: Estadísticas por variable -------------------
+# Tomemos `inflacion`. En el cuerpo usamos su mediana en las estadísticas
+# descriptivas porque tiene cola larga: la media (≈ 12.7) es mayor que
+# la mediana (≈ 11.7), con países de hasta ~37% que estiran el promedio.
 
-# Estadísticas detalladas de una variable numérica
-satisfaccion |>
+datos |>
   summarise(
-    media   = mean(ingreso_hogar),
-    mediana = median(ingreso_hogar),
-    sd      = sd(ingreso_hogar),
-    p25     = quantile(ingreso_hogar, 0.25),
-    p75     = quantile(ingreso_hogar, 0.75),
-    min     = min(ingreso_hogar),
-    max     = max(ingreso_hogar)
+    media   = mean(inflacion),
+    mediana = median(inflacion),
+    sd      = sd(inflacion),
+    p25     = quantile(inflacion, 0.25),
+    p75     = quantile(inflacion, 0.75),
+    min     = min(inflacion),
+    max     = max(inflacion)
   )
 
-# Variables categóricas: conteos y proporciones
-satisfaccion |> count(zona)   |> mutate(prop = n / sum(n))
-satisfaccion |> count(genero) |> mutate(prop = n / sum(n))
-satisfaccion |> count(pais, sort = TRUE)
+# Histograma (muestra la cola larga)
+ggplot(datos, aes(x = inflacion)) +
+  geom_histogram(bins = 30, fill = "#2d4563") +
+  labs(x = "Inflación anual (%)", y = "Países")
 
-# Histograma de una variable numérica
-ggplot(satisfaccion, aes(x = ingreso_hogar)) +
-  geom_histogram(bins = 30, fill = "#2d4563")
+# Densidad por grupo (¿separa crecimiento alto de bajo?)
+ggplot(datos, aes(x = inflacion, fill = crecimiento_alto)) +
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
+  labs(x = "Inflación anual (%)")
 
-# Densidad (versión suavizada del histograma)
-ggplot(satisfaccion, aes(x = confianza_gobierno)) +
-  geom_density(fill = "#2d4563", alpha = 0.5)
+# Cambien el nombre de la variable (gasto_salud, desempleo,
+# indice_gobierno_digital, etc.) para repetir el análisis con otra.
+# La mayoría de los predictores son casi simétricos; inflacion es la excepción.
 
 
-# --- Apéndice 3: Relaciones con la satisfacción --------------
+# --- Apéndice 3: Predictores vs. objetivo --------------------
 
-# Numéricas vs satisfacción: medias por grupo
-satisfaccion |>
-  group_by(satisfecho) |>
+# Medias por grupo de las variables no mostradas en el cuerpo
+datos |>
+  group_by(crecimiento_alto) |>
   summarise(
-    edad          = mean(edad),
-    educacion     = mean(educacion_anos),
-    ingreso       = median(ingreso_hogar),
-    confianza     = mean(confianza_gobierno),
-    consumo       = mean(consumo_noticias),
-    participacion = mean(participacion_politica)
+    salud         = mean(gasto_salud),
+    inflacion     = mean(inflacion),
+    desempleo     = mean(desempleo),
+    ied           = mean(inversion_extranjera),
+    gob_digital   = mean(indice_gobierno_digital)
   )
 
-# Correlaciones entre todas las variables numéricas
-satisfaccion |>
+# Correlación entre todos los predictores numéricos
+# (¿hay pares redundantes?)
+datos |>
   select(where(is.numeric)) |>
   cor() |>
   round(2)
 
-# Categórica vs satisfacción: tabla cruzada
-satisfaccion |>
-  count(zona, satisfecho) |>
-  group_by(zona) |>
-  mutate(prop = round(n / sum(n), 3))
-
-# Diferencia de medias (numérica vs categórica)
-t.test(confianza_gobierno ~ satisfecho, data = satisfaccion)
-
-# Independencia (categórica vs categórica)
-chisq.test(satisfaccion$zona, satisfaccion$satisfecho)
+# Test formal para una variable concreta
+t.test(indice_gobierno_digital ~ crecimiento_alto, data = datos)
 
 
-# --- Apéndice 4: Más visualizaciones -------------------------
+# --- Apéndice 4: Boxplots y dispersión -----------------------
 
-# Boxplots: variables numéricas por nivel de satisfacción
-satisfaccion |>
-  select(satisfecho, confianza_gobierno, participacion_politica, edad) |>
-  pivot_longer(-satisfecho, names_to = "variable", values_to = "valor") |>
-  ggplot(aes(x = satisfecho, y = valor, fill = satisfecho)) +
+# Boxplots de las 4 variables no mostradas en el cuerpo, por nivel
+# de crecimiento.
+datos |>
+  select(crecimiento_alto, gasto_salud, desempleo, inversion_extranjera, indice_gobierno_digital) |>
+  pivot_longer(-crecimiento_alto, names_to = "variable", values_to = "valor") |>
+  ggplot(aes(x = crecimiento_alto, y = valor, fill = crecimiento_alto)) +
   geom_boxplot(alpha = 0.7) +
   facet_wrap(~variable, scales = "free_y") +
   scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
-  labs(title = "Variables numéricas por nivel de satisfacción") +
+  labs(title = "Las 4 variables no mostradas, por nivel de crecimiento",
+       x = NULL, y = NULL) +
   theme(legend.position = "none")
 
-# Satisfacción por zona
-satisfaccion |>
-  count(zona, satisfecho) |>
-  group_by(zona) |>
-  mutate(prop = n / sum(n)) |>
-  ggplot(aes(x = zona, y = prop, fill = satisfecho)) +
-  geom_col(position = "dodge", alpha = 0.8) +
-  scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
-  labs(title = "Satisfacción por zona", y = "Proporción")
-
-# Satisfacción por país
-satisfaccion |>
-  count(pais, satisfecho) |>
-  group_by(pais) |>
-  mutate(prop = n / sum(n)) |>
-  filter(satisfecho == "si") |>
-  ggplot(aes(x = reorder(pais, prop), y = prop)) +
-  geom_col(fill = "#27ae60", alpha = 0.8) +
-  coord_flip() +
-  labs(title = "Proporción de satisfechos por país", x = "", y = "Proporción")
-
-# Satisfacción por género
-satisfaccion |>
-  count(genero, satisfecho) |>
-  group_by(genero) |>
-  mutate(prop = n / sum(n)) |>
-  ggplot(aes(x = genero, y = prop, fill = satisfecho)) +
-  geom_col(position = "dodge", alpha = 0.8) +
-  scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
-  labs(title = "Satisfacción por género", y = "Proporción")
-
-# Ingreso vs educación
-ggplot(satisfaccion, aes(x = educacion_anos, y = ingreso_hogar, color = satisfecho)) +
-  geom_point(alpha = 0.4) +
+# Acceso a internet vs. urbanización (¿colinealidad?)
+ggplot(datos, aes(x = urbanizacion, y = acceso_internet, color = crecimiento_alto)) +
+  geom_point(alpha = 0.6) +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_manual(values = c("#e74c3c", "#27ae60")) +
-  labs(title = "Ingreso vs. educación por satisfacción")
+  labs(x = "Urbanización (%)", y = "Acceso a internet (%)")
+
+# La correlación numérica complementa el gráfico
+cor(datos$urbanizacion, datos$acceso_internet)
 
 
 # --- Apéndice 5: Crear más features --------------------------
 
-satisfaccion <- satisfaccion |>
+# Una posible solución para cada una de las cuatro opciones del Ej. 2
+datos_modelo <- datos_modelo |>
   mutate(
-    # 1. Grupos de ingreso por terciles
-    grupo_ingreso = cut(ingreso_hogar,
-                        breaks = quantile(ingreso_hogar, c(0, 1/3, 2/3, 1)),
-                        labels = c("bajo", "medio", "alto"),
-                        include.lowest = TRUE),
+    # 1. Gasto en educación alto (gasto_educacion)
+    educacion_alta = if_else(gasto_educacion > median(gasto_educacion), "alta", "baja"),
 
-    # 2. Consumidor alto de noticias
-    noticias_alto = if_else(consumo_noticias > 5, "alto", "bajo"),
+    # 2. Acceso a internet por terciles (acceso_internet)
+    internet_grupos = cut(acceso_internet,
+                          breaks = quantile(acceso_internet, c(0, 1/3, 2/3, 1)),
+                          labels = c("bajo", "medio", "alto"),
+                          include.lowest = TRUE),
 
-    # 3. Baja confianza en el gobierno
-    confianza_baja = if_else(confianza_gobierno <= 4, "si", "no"),
+    # 3. Inflación alta (inflacion)
+    inflacion_alta = if_else(inflacion > 5, "si", "no"),
 
-    # 4. Interacción zona + género
-    zona_genero = paste(zona, genero, sep = "_")
+    # 4. Apertura financiera: IED por encima de la mediana (inversion_extranjera)
+    apertura_financiera = if_else(inversion_extranjera > median(inversion_extranjera), "alta", "baja")
   )
 
-satisfaccion |> count(grupo_ingreso)
-satisfaccion |> count(noticias_alto)
-satisfaccion |> count(confianza_baja)
-satisfaccion |> count(zona_genero)
+datos_modelo |> count(educacion_alta)
+datos_modelo |> count(internet_grupos)
+datos_modelo |> count(inflacion_alta)
+datos_modelo |> count(apertura_financiera)
 
 
 # --- Apéndice 6: ¿Ayuda el feature engineering? --------------
 
-# Crear feature derivado
-satisfaccion <- satisfaccion |>
-  mutate(educacion_alta = if_else(educacion_anos > 12, "alta", "baja"),
-         educacion_alta = factor(educacion_alta))
+# Crear el feature derivado (si no lo hicieron antes)
+datos_modelo <- datos_modelo |>
+  mutate(
+    internet_grupos = cut(acceso_internet,
+                          breaks = quantile(acceso_internet, c(0, 1/3, 2/3, 1)),
+                          labels = c("bajo", "medio", "alto"),
+                          include.lowest = TRUE),
+    internet_grupos = factor(internet_grupos)
+  )
 
 # Re-crear folds con la columna nueva disponible
 set.seed(2026)
-split_ext <- initial_split(satisfaccion, prop = 0.75, strata = satisfecho)
-train_ext <- training(split_ext)
-folds_ext <- vfold_cv(train_ext, v = 5, strata = satisfecho)
+split_int <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
+train_int <- training(split_int)
+folds_int <- vfold_cv(train_int, v = 5, strata = crecimiento_alto)
 
-# Fórmula extendida
-formula_ext <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
-                            confianza_gobierno + consumo_noticias +
-                            participacion_politica + zona + educacion_alta
+# Fórmula con el feature nuevo
+formula_int <- crecimiento_alto ~ gasto_educacion + acceso_internet +
+                                  urbanizacion + gasto_salud + inflacion +
+                                  desempleo + inversion_extranjera +
+                                  indice_gobierno_digital + internet_grupos
 
-# Evaluar el logístico con folds_ext (mismo patrón que el cuerpo del lab)
-eval_log_ext <- fit_resamples(
-  modelo_logistico, formula_ext, resamples = folds_ext,
+# Evaluar el logístico con folds_int (mismo patrón que el cuerpo del lab)
+eval_log_int <- fit_resamples(
+  modelo_logistico, formula_int, resamples = folds_int,
   metrics = metric_set(precision, recall, roc_auc),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Logístico (ext)")
+  collect_metrics() |> mutate(modelo = "Logístico (internet)")
 
-# Evaluar el árbol con folds_ext
-eval_arb_ext <- fit_resamples(
-  modelo_arbol, formula_ext, resamples = folds_ext,
+# Evaluar el árbol con folds_int
+eval_arb_int <- fit_resamples(
+  modelo_arbol, formula_int, resamples = folds_int,
   metrics = metric_set(precision, recall, roc_auc),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Árbol (ext)")
+  collect_metrics() |> mutate(modelo = "Árbol (internet)")
 
-bind_rows(eval_logistico, eval_log_ext, eval_arbol, eval_arb_ext) |>
+bind_rows(eval_logistico, eval_log_int, eval_arbol, eval_arb_int) |>
   filter(.metric == "roc_auc") |>
   select(modelo, mean, std_err) |>
   arrange(desc(mean))
 
-# La mejora por agregar una variable derivada suele ser modesta.
-# El feature engineering rinde cuando captura relaciones no lineales o
-# interacciones que el modelo no puede descubrir por sí solo.
+# La mejora por agregar una sola variable derivada suele ser modesta.
+# El feature engineering rinde cuando las variables nuevas capturan
+# relaciones no lineales o interacciones que el modelo no puede
+# descubrir por sí solo (en un árbol esto pesa menos, porque ya captura
+# no linealidades automáticamente).
 
 
 # --- Apéndice 7: Visualizar la comparación de modelos --------
