@@ -136,10 +136,28 @@ Calculen precisión y recall (con `event_level = "second"`) para el modelo compl
 
 Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de inversión de la pregunta anterior?
 
-*Pista:* adapten el código del Apéndice 4 del laboratorio.
+Para no copiar y pegar el mismo cálculo cinco veces, usamos `map_df()` del paquete `purrr` (parte de `tidyverse`). `map_df()` toma una lista de valores, aplica la misma función a cada uno y junta todos los resultados en una sola tabla. Acá la lista son los cinco umbrales; por cada umbral `u` recalculamos la clase predicha y medimos precisión y recall. Usen esta estructura y completen las dos líneas marcadas con `___`:
+
+```r
+umbrales <- c(0.2, 0.35, 0.5, 0.65, 0.8)
+
+# pred_probs: probabilidades del modelo completo (predict(..., type = "prob"))
+tabla_umbrales <- map_df(umbrales, function(u) {
+  pred_probs |>
+    mutate(.pred_u = factor(if_else(.pred_si >= u, "si", "no"),
+                            levels = c("no", "si"))) |>
+    summarise(
+      umbral    = u,
+      precision = ___,   # precision_vec() sobre crecimiento_alto y .pred_u, con event_level = "second"
+      recall    = ___    # lo mismo con recall_vec()
+    )
+})
+
+tabla_umbrales
+```
 
 ```{r p9}
-# Escriban su código aquí
+# Completen la estructura de arriba aquí
 
 ```
 
@@ -187,6 +205,12 @@ Ajusten un modelo que use solo los 4 predictores con p-valor más bajo en el mod
 ### Pregunta 13: Variables sin efecto
 
 En el modelo completo, `urbanizacion` y `gasto_salud` no son significativas (p > 0.05). Sin embargo, ambas se correlacionan positivamente con `crecimiento_alto` en un análisis bivariado simple. Expliquen por qué una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotético de la vida real.
+
+**Respuesta:**
+
+### Pregunta 14: ¿Recomendarían este modelo?
+
+Sin escribir código nuevo, junten lo que ya calcularon (línea base, accuracy, precisión, recall, AUC, validación cruzada). Imaginen que un organismo les pide una recomendación: ¿usarían este modelo para decidir en qué países invertir? Argumenten a favor o en contra citando al menos una métrica con su valor, y digan qué error les preocuparía más (un falso positivo o un falso negativo) y por qué.
 
 **Respuesta:**
 

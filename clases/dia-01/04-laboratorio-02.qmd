@@ -430,6 +430,8 @@ resultados |>
 ```
 
 [Versión visual de esta comparación (barras con error estándar) en [[Apéndice 7]{.button}](#sec:appendix07)]{.alert}
+
+[Para discutir:]{.alert} las diferencias entre los dos modelos son chicas y sus errores estándar se solapan. ¿Pueden afirmar que un modelo es [claramente mejor]{.alert}? ¿Cuál reportarían y por qué?
 :::
 
 ## ¿Qué pasa si extendemos la fórmula?

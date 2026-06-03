@@ -375,3 +375,11 @@ En este caso, `urbanizacion` y `gasto_salud` se correlacionan con `crecimiento_a
 **Ejemplo hipotético:** Imaginemos que queremos predecir si un estudiante aprueba un examen. La cantidad de café que toma el estudiante se correlaciona positivamente con aprobar (los que toman más café tienden a aprobar más). Pero si incluimos "horas de estudio" en el modelo, el efecto del café desaparece. La explicación es que los estudiantes que estudian más horas también toman más café para mantenerse despiertos. El café no causa aprobar; es un indicador indirecto de horas de estudio, que es la variable con efecto causal real.
 
 Este es un concepto central en la inferencia causal y una razón por la que los modelos multivariados son más informativos que las correlaciones simples.
+
+### Pregunta 14: ¿Recomendarían este modelo?
+
+Sin escribir código nuevo, junten lo que ya calcularon (línea base, accuracy, precisión, recall, AUC, validación cruzada). Imaginen que un organismo les pide una recomendación: ¿usarían este modelo para decidir en qué países invertir? Argumenten a favor o en contra citando al menos una métrica con su valor, y digan qué error les preocuparía más (un falso positivo o un falso negativo) y por qué.
+
+**Respuesta:** No hay una única respuesta correcta; lo que se evalúa es el razonamiento. Una respuesta sólida reconoce que el modelo sí aporta valor (supera la línea base de ≈0.51 con una accuracy de ≈0.76 y un AUC de ≈0.86, un nivel "bueno"), pero también que no es perfecto: con un recall de ≈0.72 se le escapa cerca de un tercio de los países que sí crecen.
+
+Para un escenario de inversión, un falso positivo (invertir en un país que no crece) cuesta dinero directo, así que conviene priorizar la **precisión** y, si hace falta, subir el umbral de decisión (como vieron en la Pregunta 9) para reducir falsos positivos a costa de algo de recall. Una recomendación honesta sería: el modelo es un punto de partida razonable para ordenar prioridades, pero no para decidir de forma automática; las decisiones de inversión deberían combinar su salida con juicio experto, sobre todo en los países donde la probabilidad predicha queda cerca de 0.5.

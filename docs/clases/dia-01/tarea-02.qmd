@@ -190,3 +190,9 @@ Usen el modelo logístico para esta pregunta (los coeficientes de un árbol no s
 Los árboles de decisión y la regresión logística tienen ventajas y desventajas distintas. Basándose en los resultados del laboratorio, discutan en qué situaciones preferirían un árbol de decisión sobre una regresión logística, y viceversa. Consideren al menos dos criterios (por ejemplo, interpretabilidad, rendimiento, tipo de datos).
 
 **Respuesta:**
+
+### Pregunta 14: Una accuracy que engaña
+
+Miren de nuevo la accuracy del modelo logístico (Pregunta 7) y la proporción de personas satisfechas en los datos (el `count(satisfecho)`). Van a notar que son casi iguales. Sin escribir código nuevo, expliquen: ¿qué significa que la accuracy del modelo sea casi idéntica a la proporción de la clase mayoritaria? ¿El modelo realmente "aprendió" algo? ¿Qué métricas mirarían para responder eso mejor que la accuracy?
+
+**Respuesta:**

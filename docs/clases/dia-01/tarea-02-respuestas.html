@@ -701,6 +701,12 @@ Prediction no si
 <li>Preferible cuando la estructura de los datos es jerárquica (por ejemplo, la edad importa solo para personas con baja educación)</li>
 </ul>
 <p>En este laboratorio, la regresión logística funciona igual o mejor que el árbol porque la relación entre los predictores y la satisfacción es aproximadamente lineal. El árbol tiende a sobreajustar (cortes arbitrarios) con datasets de este tamaño. Para un organismo que necesita recomendaciones claras de política, la regresión logística es preferible porque los coeficientes indican directamente qué factores modificar.</p>
+</section>
+<section id="pregunta-14-una-accuracy-que-engaña" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-14-una-accuracy-que-engaña"><span class="header-section-number">6.2</span> Pregunta 14: Una accuracy que engaña</h3>
+<p>Miren de nuevo la accuracy del modelo logístico (Pregunta 7) y la proporción de personas satisfechas en los datos (el <code>count(satisfecho)</code>). Van a notar que son casi iguales. Sin escribir código nuevo, expliquen: ¿qué significa que la accuracy del modelo sea casi idéntica a la proporción de la clase mayoritaria? ¿El modelo realmente “aprendió” algo? ¿Qué métricas mirarían para responder eso mejor que la accuracy?</p>
+<p><strong>Respuesta:</strong> Alrededor del 71% de las personas están satisfechas, así que un “modelo” que prediga siempre “satisfecho” ya acertaría el 71% de las veces sin mirar ningún predictor. Que la accuracy del modelo logístico (≈0.71) coincida casi exactamente con esa proporción es una señal de alarma: medido por accuracy, el modelo apenas mejora sobre adivinar la clase mayoritaria.</p>
+<p>Eso no significa que el modelo sea inútil, sino que la accuracy es la métrica equivocada para juzgarlo acá. El AUC (≈0.70) muestra que sí hay algo de capacidad para ordenar a las personas por su probabilidad de estar satisfechas, y el recall alto indica que recupera a la mayoría de los satisfechos (a costa de muchos falsos positivos, como se ve en la matriz de confusión). La lección es la de “La paradoja de la precisión”: con clases desbalanceadas, la accuracy hay que leerla siempre contra la línea base, y conviene apoyarse en precisión, recall y AUC para saber si el modelo realmente aprendió.</p>
 
 
 </section>
