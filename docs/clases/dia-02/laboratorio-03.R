@@ -143,7 +143,7 @@ modelo_rf_tune <- rand_forest(
   trees = 500,
   min_n = tune()
 ) |>
-  set_engine("ranger", importance = "impurity") |>
+  set_engine("ranger", importance = "permutation") |>
   set_mode("classification")
 
 wf_rf_tune <- workflow() |>
@@ -227,7 +227,7 @@ bind_rows(roc_logit, roc_rf) |>
 rf_parsnip <- extract_fit_parsnip(ajuste_rf)
 
 vip(rf_parsnip, num_features = 15) +
-  labs(title = "Importancia de variables (Gini)",
+  labs(title = "Importancia de variables (permutación)",
        subtitle = "Random Forest para predicción de voto") +
   theme_minimal()
 

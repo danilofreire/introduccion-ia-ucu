@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -223,7 +223,7 @@ metricas_ols <- pred_ols |>
 :::
 
 :::{.callout-tip}
-**Checkpoint**: deberían ver 3 filas (rmse, rsq, mae) con RMSE ≈ 1.8-2.0 y R² ≈ 0.15-0.30
+**Checkpoint**: deberían ver 3 filas (rmse, rsq, mae) con RMSE ≈ 1.1-1.3 y R² ≈ 0.20-0.30
 :::
 
 [[Apéndice 1: Solución]{.button}](#sec:appendix01)
@@ -304,7 +304,7 @@ resultados_lasso <- tune_grid(
 :::
 
 :::{.callout-tip}
-**Checkpoint**: deberían ver ~10 filas con `mean` (RMSE) entre 1.0 y 2.0 según el λ
+**Checkpoint**: deberían ver ~10 filas con `mean` (RMSE) alrededor de 1.2 (sube si λ es muy grande)
 :::
 
 [[Apéndice 2: Solución]{.button}](#sec:appendix02)
@@ -384,7 +384,7 @@ metricas_lasso <- pred_lasso |>
 :::
 
 :::{.callout-tip}
-**Checkpoint**: con λ entre 0.003 y 0.01, deberían ver 1-3 variables con coeficiente exactamente 0 (eliminadas por LASSO)
+**Checkpoint**: con λ alrededor de 0.03, deberían ver unas 3 variables con coeficiente exactamente 0 (eliminadas por LASSO)
 :::
 
 [[Apéndice 3: Solución]{.button}](#sec:appendix03)
@@ -489,7 +489,7 @@ metricas_ridge <- pred_ridge |>
 :::
 
 :::{.callout-tip}
-**Checkpoint**: Ridge debería eliminar **0 variables** (puede mostrar valores como `1e-10`, que son prácticamente cero pero no exactos). RMSE similar a LASSO (~1.7-2.0)
+**Checkpoint**: Ridge debería eliminar **0 variables** (puede mostrar valores como `1e-10`, que son prácticamente cero pero no exactos). RMSE similar a LASSO (~1.1-1.3)
 :::
 
 [[Apéndice 4: Solución]{.button}](#sec:appendix04)
@@ -638,8 +638,8 @@ metricas_ols
 metricas_ols |> knitr::kable(digits = 3)
 ```
 
-- RMSE ≈ 1.85 — en promedio la predicción se aleja de la realidad en menos de 2 puntos (escala 1-10)
-- R² ≈ 0.18 — el modelo explica ~18% de la varianza de la satisfacción
+- RMSE ≈ 1.19 — en promedio la predicción se aleja de la realidad en ~1.2 puntos (escala 1-10)
+- R² ≈ 0.26 — el modelo explica ~26% de la varianza de la satisfacción
 
 [[Volver al ejercicio]{.button}](#sec:exercise01)
 :::
