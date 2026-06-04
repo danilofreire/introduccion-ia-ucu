@@ -510,7 +510,7 @@ Dos temas que no tocaremos hoy pero aparecen en los apéndices:
 
 En el [Laboratorio 2 (Sesión 1.4)]{.alert} vamos a:
 
-- Trabajar con modelos más complejos (árboldes de decisión)
+- Trabajar con modelos más complejos (árboles de decisión)
 - Explorar más a fondo el preprocesamiento
 - Comparar múltiples modelos
 - Practicar la interpretación de resultados

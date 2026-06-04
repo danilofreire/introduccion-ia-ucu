@@ -1639,7 +1639,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <ul>
 <li><span class="alert">Acceso a internet por terciles</span>: bajo, medio, alto (<code>acceso_internet</code>)</li>
 <li><span class="alert">Gasto en educación alto</span>: por encima de la mediana del dataset (<code>gasto_educacion</code>)</li>
-<li><span class="alert">Inflación alta</span>: tasa mayor a 5% (<code>inflacion</code>)</li>
+<li><span class="alert">Inflación alta</span>: tasa mayor a 15% (<code>inflacion</code>)</li>
 <li><span class="alert">Apertura financiera</span>: IED por encima de la mediana (<code>inversion_extranjera</code>)</li>
 <li><span class="alert">Otro que se les ocurra</span> (¡la creatividad es bienvenida!)</li>
 </ul>
@@ -1659,7 +1659,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </section>
 <section id="dividir-los-datos" class="slide level2">
 <h2>Dividir los datos</h2>
-<div style="margin-top: 30px; font-size: 24px;">
+<div style="margin-top: 30px; font-size: 23px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a><span class="co"># Fijar semilla</span></span>
 <span id="cb15-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
@@ -1682,7 +1682,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <li><code>training()</code> y <code>testing()</code>: Extraen los datasets de train y test</li>
 <li><code>vfold_cv()</code>: Crea folds para validación cruzada (5 folds, estratificados por <code>crecimiento_alto</code>)</li>
 </ul>
-<p>Con 179 países y 5 folds, cada partición tiene ~27 países en validación. Es suficiente para entrenar, pero las métricas tendrán <span class="alert">más ruido</span></p>
+<p>Con 179 países y 5 folds, cada partición tiene pocos países en validación. Es suficiente para entrenar, pero las métricas tendrán <span class="alert">más ruido</span></p>
 </div>
 </section></section>
 <section>
@@ -1792,23 +1792,19 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <p>Antes de pedirles que prueben su propia variable, miremos un ejemplo trabajado. Reemplazamos <span class="alert"><code>desempleo</code></span> (continuo) por <span class="alert"><code>alto_desempleo</code></span> (binario, la creamos antes en la demo) y re-evaluamos el modelo logístico:</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a></a><span class="co"># Fórmula extendida con un feature derivado</span></span>
-<span id="cb23-2"><a></a>formula_ext <span class="ot">&lt;-</span> crecimiento_alto <span class="sc">~</span> gasto_educacion <span class="sc">+</span> acceso_internet <span class="sc">+</span></span>
-<span id="cb23-3"><a></a>                                  urbanizacion <span class="sc">+</span> gasto_salud <span class="sc">+</span> inflacion <span class="sc">+</span></span>
-<span id="cb23-4"><a></a>                                  alto_desempleo <span class="sc">+</span> inversion_extranjera <span class="sc">+</span></span>
-<span id="cb23-5"><a></a>                                  indice_gobierno_digital</span>
-<span id="cb23-6"><a></a></span>
-<span id="cb23-7"><a></a><span class="co"># Logístico con formula_ext</span></span>
-<span id="cb23-8"><a></a>eval_log_ext <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb23-9"><a></a>  modelo_logistico, formula_ext, <span class="at">resamples =</span> folds,</span>
-<span id="cb23-10"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
-<span id="cb23-11"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb23-12"><a></a>) <span class="sc">|&gt;</span></span>
-<span id="cb23-13"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Logístico (ext)&quot;</span>)</span>
-<span id="cb23-14"><a></a></span>
-<span id="cb23-15"><a></a><span class="co"># Comparar el logístico básico vs. el extendido</span></span>
-<span id="cb23-16"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_ext) <span class="sc">|&gt;</span></span>
-<span id="cb23-17"><a></a>  <span class="fu">select</span>(modelo, .metric, mean, std_err) <span class="sc">|&gt;</span></span>
-<span id="cb23-18"><a></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> <span class="fu">c</span>(mean, std_err))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb23-2"><a></a>formula_ext <span class="ot">&lt;-</span> crecimiento_alto <span class="sc">~</span> acceso_internet <span class="sc">+</span> gasto_educacion <span class="sc">+</span> urbanizacion <span class="sc">+</span> gasto_salud <span class="sc">+</span> inflacion <span class="sc">+</span></span>
+<span id="cb23-3"><a></a>                                  alto_desempleo <span class="sc">+</span> inversion_extranjera <span class="sc">+</span> indice_gobierno_digital</span>
+<span id="cb23-4"><a></a></span>
+<span id="cb23-5"><a></a><span class="co"># Logístico con formula_ext</span></span>
+<span id="cb23-6"><a></a>eval_log_ext <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(modelo_logistico, formula_ext, <span class="at">resamples =</span> folds,</span>
+<span id="cb23-7"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb23-8"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb23-9"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Logístico (ext)&quot;</span>)</span>
+<span id="cb23-10"><a></a></span>
+<span id="cb23-11"><a></a><span class="co"># Comparar el logístico básico vs. el extendido</span></span>
+<span id="cb23-12"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_ext) <span class="sc">|&gt;</span></span>
+<span id="cb23-13"><a></a>  <span class="fu">select</span>(modelo, .metric, mean, std_err) <span class="sc">|&gt;</span></span>
+<span id="cb23-14"><a></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> <span class="fu">c</span>(mean, std_err))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 7
   modelo          mean_precision mean_recall mean_roc_auc std_err_precision
@@ -1828,37 +1824,35 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <section id="sec:exercise03" class="slide level2 scrollable">
 <h2>Ejercicio 3: ¿Ayuda el feature engineering?</h2>
 <div style="margin-top: 30px; font-size: 24px;">
-<p><strong>Tarea:</strong> Agreguen <span class="alert">la variable derivada que crearon antes</span> a la fórmula y re-evalúen</p>
+<p><strong>Tarea:</strong> Agreguen un feature a la fórmula y re-evalúen: la variable que crearon en el <span class="alert">Ejercicio 2</span>, o una <span class="alert">interacción</span> entre dos variables (como en el ejemplo)</p>
 <ol type="1">
 <li>¿Mejora la regresión logística? ¿Y el árbol?</li>
 <li>¿Cuál de los dos modelos es más sensible al feature nuevo?</li>
 </ol>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="co"># Acá pongan su feature en lugar del de la demo (ejemplo con internet_grupos)</span></span>
-<span id="cb25-2"><a></a>formula_estudiante <span class="ot">&lt;-</span> crecimiento_alto <span class="sc">~</span> gasto_educacion <span class="sc">+</span> acceso_internet <span class="sc">+</span></span>
-<span id="cb25-3"><a></a>                                         urbanizacion <span class="sc">+</span> gasto_salud <span class="sc">+</span> inflacion <span class="sc">+</span></span>
-<span id="cb25-4"><a></a>                                         desempleo <span class="sc">+</span> inversion_extranjera <span class="sc">+</span></span>
-<span id="cb25-5"><a></a>                                         indice_gobierno_digital <span class="sc">+</span> internet_grupos</span>
-<span id="cb25-6"><a></a></span>
-<span id="cb25-7"><a></a><span class="co"># Repetir el mismo bloque, ahora con formula_estudiante</span></span>
-<span id="cb25-8"><a></a>eval_log_est <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb25-9"><a></a>  modelo_logistico, formula_estudiante, <span class="at">resamples =</span> folds,</span>
-<span id="cb25-10"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
-<span id="cb25-11"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb25-12"><a></a>) <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="co"># Ejemplo: una interacción entre dos variables que se refuerzan</span></span>
+<span id="cb25-2"><a></a><span class="co"># (gobierno digital y acceso a internet). En una fórmula se escribe con &quot;:&quot;</span></span>
+<span id="cb25-3"><a></a>formula_estudiante <span class="ot">&lt;-</span> crecimiento_alto <span class="sc">~</span> gasto_educacion <span class="sc">+</span> acceso_internet <span class="sc">+</span></span>
+<span id="cb25-4"><a></a>                                         urbanizacion <span class="sc">+</span> gasto_salud <span class="sc">+</span> inflacion <span class="sc">+</span></span>
+<span id="cb25-5"><a></a>                                         desempleo <span class="sc">+</span> inversion_extranjera <span class="sc">+</span></span>
+<span id="cb25-6"><a></a>                                         indice_gobierno_digital <span class="sc">+</span></span>
+<span id="cb25-7"><a></a>                                         indice_gobierno_digital<span class="sc">:</span>acceso_internet</span>
+<span id="cb25-8"><a></a></span>
+<span id="cb25-9"><a></a><span class="co"># Repetir el mismo bloque, ahora con formula_estudiante</span></span>
+<span id="cb25-10"><a></a>eval_log_est <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(modelo_logistico, formula_estudiante, <span class="at">resamples =</span> folds,</span>
+<span id="cb25-11"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb25-12"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb25-13"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Logístico (estudiante)&quot;</span>)</span>
 <span id="cb25-14"><a></a></span>
 <span id="cb25-15"><a></a><span class="co"># Lo mismo cambiando modelo_logistico → modelo_arbol</span></span>
-<span id="cb25-16"><a></a>eval_arb_est <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb25-17"><a></a>  modelo_arbol, formula_estudiante, <span class="at">resamples =</span> folds,</span>
-<span id="cb25-18"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
-<span id="cb25-19"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb25-20"><a></a>) <span class="sc">|&gt;</span></span>
-<span id="cb25-21"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Árbol (estudiante)&quot;</span>)</span>
-<span id="cb25-22"><a></a></span>
-<span id="cb25-23"><a></a><span class="co"># Comparar los 4 modelos: básicos + el suyo</span></span>
-<span id="cb25-24"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_est, eval_arbol, eval_arb_est) <span class="sc">|&gt;</span></span>
-<span id="cb25-25"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;roc_auc&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(modelo, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb25-16"><a></a>eval_arb_est <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(modelo_arbol, formula_estudiante, <span class="at">resamples =</span> folds,</span>
+<span id="cb25-17"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb25-18"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb25-19"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Árbol (estudiante)&quot;</span>)</span>
+<span id="cb25-20"><a></a></span>
+<span id="cb25-21"><a></a><span class="co"># Comparar los 4 modelos: básicos + el suyo</span></span>
+<span id="cb25-22"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_est, eval_arbol, eval_arb_est) <span class="sc">|&gt;</span></span>
+<span id="cb25-23"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;roc_auc&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(modelo, mean, std_err)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><span class="alert">¡Tómense 5 minutos!</span></p>
 <p><a href="#/sec:appendix06"><span class="button">Ir al Apéndice 6</span></a></p>
@@ -2241,7 +2235,7 @@ mean in group no mean in group si
 <span id="cb54-11"><a></a>                          <span class="at">include.lowest =</span> <span class="cn">TRUE</span>),</span>
 <span id="cb54-12"><a></a></span>
 <span id="cb54-13"><a></a>    <span class="co"># 3. Inflación alta (inflacion)</span></span>
-<span id="cb54-14"><a></a>    <span class="at">inflacion_alta =</span> <span class="fu">if_else</span>(inflacion <span class="sc">&gt;</span> <span class="dv">5</span>, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
+<span id="cb54-14"><a></a>    <span class="at">inflacion_alta =</span> <span class="fu">if_else</span>(inflacion <span class="sc">&gt;</span> <span class="dv">15</span>, <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>),</span>
 <span id="cb54-15"><a></a></span>
 <span id="cb54-16"><a></a>    <span class="co"># 4. Apertura financiera: IED por encima de la mediana (inversion_extranjera)</span></span>
 <span id="cb54-17"><a></a>    <span class="at">apertura_financiera =</span> <span class="fu">if_else</span>(inversion_extranjera <span class="sc">&gt;</span> <span class="fu">median</span>(inversion_extranjera), <span class="st">&quot;alta&quot;</span>, <span class="st">&quot;baja&quot;</span>)</span>
@@ -2267,10 +2261,11 @@ mean in group no mean in group si
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a></a>datos_modelo <span class="sc">|&gt;</span> <span class="fu">count</span>(inflacion_alta)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 2
+<pre><code># A tibble: 2 × 2
   inflacion_alta     n
   &lt;chr&gt;          &lt;int&gt;
-1 si               179</code></pre>
+1 no               140
+2 si                39</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a></a>datos_modelo <span class="sc">|&gt;</span> <span class="fu">count</span>(apertura_financiera)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -2288,59 +2283,45 @@ mean in group no mean in group si
 <h2>Apéndice 6: ¿Ayuda el feature engineering?</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a></a><span class="co"># Crear el feature derivado (si no lo hicieron antes)</span></span>
-<span id="cb62-2"><a></a>datos_modelo <span class="ot">&lt;-</span> datos_modelo <span class="sc">|&gt;</span></span>
-<span id="cb62-3"><a></a>  <span class="fu">mutate</span>(</span>
-<span id="cb62-4"><a></a>    <span class="at">internet_grupos =</span> <span class="fu">cut</span>(acceso_internet,</span>
-<span id="cb62-5"><a></a>                          <span class="at">breaks =</span> <span class="fu">quantile</span>(acceso_internet, <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>, <span class="dv">1</span>)),</span>
-<span id="cb62-6"><a></a>                          <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;bajo&quot;</span>, <span class="st">&quot;medio&quot;</span>, <span class="st">&quot;alto&quot;</span>),</span>
-<span id="cb62-7"><a></a>                          <span class="at">include.lowest =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb62-8"><a></a>    <span class="at">internet_grupos =</span> <span class="fu">factor</span>(internet_grupos)</span>
-<span id="cb62-9"><a></a>  )</span>
-<span id="cb62-10"><a></a></span>
-<span id="cb62-11"><a></a><span class="co"># Re-crear folds con la columna nueva disponible</span></span>
-<span id="cb62-12"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb62-13"><a></a>split_int <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos_modelo, <span class="at">prop =</span> <span class="fl">0.75</span>, <span class="at">strata =</span> crecimiento_alto)</span>
-<span id="cb62-14"><a></a>train_int <span class="ot">&lt;-</span> <span class="fu">training</span>(split_int)</span>
-<span id="cb62-15"><a></a>folds_int <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train_int, <span class="at">v =</span> <span class="dv">5</span>, <span class="at">strata =</span> crecimiento_alto)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a></a><span class="co"># Una interacción no necesita una columna nueva: se agrega a la fórmula con &quot;:&quot;.</span></span>
+<span id="cb62-2"><a></a><span class="co"># Probamos indice_gobierno_digital × acceso_internet (dos variables que se refuerzan)</span></span>
+<span id="cb62-3"><a></a>formula_int <span class="ot">&lt;-</span> crecimiento_alto <span class="sc">~</span> gasto_educacion <span class="sc">+</span> acceso_internet <span class="sc">+</span></span>
+<span id="cb62-4"><a></a>                                  urbanizacion <span class="sc">+</span> gasto_salud <span class="sc">+</span> inflacion <span class="sc">+</span></span>
+<span id="cb62-5"><a></a>                                  desempleo <span class="sc">+</span> inversion_extranjera <span class="sc">+</span></span>
+<span id="cb62-6"><a></a>                                  indice_gobierno_digital <span class="sc">+</span></span>
+<span id="cb62-7"><a></a>                                  indice_gobierno_digital<span class="sc">:</span>acceso_internet</span>
+<span id="cb62-8"><a></a></span>
+<span id="cb62-9"><a></a><span class="co"># Evaluar el logístico (reusamos los mismos folds del cuerpo del lab)</span></span>
+<span id="cb62-10"><a></a>eval_log_int <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb62-11"><a></a>  modelo_logistico, formula_int, <span class="at">resamples =</span> folds,</span>
+<span id="cb62-12"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb62-13"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb62-14"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb62-15"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Logístico (interacción)&quot;</span>)</span>
 <span id="cb62-16"><a></a></span>
-<span id="cb62-17"><a></a><span class="co"># Fórmula con el feature nuevo (internet_grupos)</span></span>
-<span id="cb62-18"><a></a>formula_int <span class="ot">&lt;-</span> crecimiento_alto <span class="sc">~</span> gasto_educacion <span class="sc">+</span> acceso_internet <span class="sc">+</span></span>
-<span id="cb62-19"><a></a>                                  urbanizacion <span class="sc">+</span> gasto_salud <span class="sc">+</span> inflacion <span class="sc">+</span></span>
-<span id="cb62-20"><a></a>                                  desempleo <span class="sc">+</span> inversion_extranjera <span class="sc">+</span></span>
-<span id="cb62-21"><a></a>                                  indice_gobierno_digital <span class="sc">+</span> internet_grupos</span>
-<span id="cb62-22"><a></a></span>
-<span id="cb62-23"><a></a><span class="co"># Evaluar el logístico con folds_int (mismo patrón que el cuerpo del lab)</span></span>
-<span id="cb62-24"><a></a>eval_log_int <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb62-25"><a></a>  modelo_logistico, formula_int, <span class="at">resamples =</span> folds_int,</span>
-<span id="cb62-26"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
-<span id="cb62-27"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb62-28"><a></a>) <span class="sc">|&gt;</span></span>
-<span id="cb62-29"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Logístico (internet)&quot;</span>)</span>
-<span id="cb62-30"><a></a></span>
-<span id="cb62-31"><a></a><span class="co"># Evaluar el árbol con folds_int</span></span>
-<span id="cb62-32"><a></a>eval_arb_int <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb62-33"><a></a>  modelo_arbol, formula_int, <span class="at">resamples =</span> folds_int,</span>
-<span id="cb62-34"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
-<span id="cb62-35"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
-<span id="cb62-36"><a></a>) <span class="sc">|&gt;</span></span>
-<span id="cb62-37"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Árbol (internet)&quot;</span>)</span>
-<span id="cb62-38"><a></a></span>
-<span id="cb62-39"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_int, eval_arbol, eval_arb_int) <span class="sc">|&gt;</span></span>
-<span id="cb62-40"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;roc_auc&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb62-41"><a></a>  <span class="fu">select</span>(modelo, mean, std_err) <span class="sc">|&gt;</span></span>
-<span id="cb62-42"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb62-17"><a></a><span class="co"># Evaluar el árbol con la misma fórmula</span></span>
+<span id="cb62-18"><a></a>eval_arb_int <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
+<span id="cb62-19"><a></a>  modelo_arbol, formula_int, <span class="at">resamples =</span> folds,</span>
+<span id="cb62-20"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision, recall, roc_auc),</span>
+<span id="cb62-21"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(<span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb62-22"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb62-23"><a></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">&quot;Árbol (interacción)&quot;</span>)</span>
+<span id="cb62-24"><a></a></span>
+<span id="cb62-25"><a></a><span class="fu">bind_rows</span>(eval_logistico, eval_log_int, eval_arbol, eval_arb_int) <span class="sc">|&gt;</span></span>
+<span id="cb62-26"><a></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;roc_auc&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb62-27"><a></a>  <span class="fu">select</span>(modelo, mean, std_err) <span class="sc">|&gt;</span></span>
+<span id="cb62-28"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(mean))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 3
-  modelo                mean std_err
-  &lt;chr&gt;                &lt;dbl&gt;   &lt;dbl&gt;
-1 Logístico            0.846  0.0512
-2 Logístico (internet) 0.823  0.0617
-3 Árbol                0.717  0.0501
-4 Árbol (internet)     0.717  0.0501</code></pre>
+  modelo                   mean std_err
+  &lt;chr&gt;                   &lt;dbl&gt;   &lt;dbl&gt;
+1 Logístico (interacción) 0.851  0.0483
+2 Logístico               0.846  0.0512
+3 Árbol (interacción)     0.738  0.0687
+4 Árbol                   0.717  0.0501</code></pre>
 </div>
 </div>
-<p>La mejora por agregar una sola variable derivada suele ser modesta. El feature engineering rinde cuando las variables nuevas capturan relaciones no lineales o interacciones que el modelo no puede descubrir por sí solo (en un árbol esto pesa menos, porque ya captura no linealidades automáticamente)</p>
+<p>La interacción <code>indice_gobierno_digital:acceso_internet</code> mejora un poco el ROC-AUC de <span class="alert">ambos modelos</span>: capta el efecto conjunto de dos variables que se refuerzan, algo que las variables por separado no expresan (la mejora es chica y está dentro del error estándar, así que no conviene sobre-interpretarla). El contraste con <code>internet_grupos</code>, que <span class="alert">no ayudó</span>, deja la moraleja: discretizar una variable que ya está en el modelo suele ser redundante, mientras que una <span class="alert">interacción</span> o una transformación no lineal sí puede agregar información nueva</p>
 <p><a href="#/sec:exercise03"><span class="button">Volver al Ejercicio 3</span></a></p>
 </div>
 </section>

@@ -296,7 +296,7 @@ Opciones sugeridas (elijan la que más les interese). Entre paréntesis, la vari
 
 - [Acceso a internet por terciles]{.alert}: bajo, medio, alto (`acceso_internet`)
 - [Gasto en educación alto]{.alert}: por encima de la mediana del dataset (`gasto_educacion`)
-- [Inflación alta]{.alert}: tasa mayor a 5% (`inflacion`)
+- [Inflación alta]{.alert}: tasa mayor a 15% (`inflacion`)
 - [Apertura financiera]{.alert}: IED por encima de la mediana (`inversion_extranjera`)
 - [Otro que se les ocurra]{.alert} (¡la creatividad es bienvenida!)
 
@@ -318,7 +318,7 @@ datos_modelo <- datos_modelo |>
 
 ## Dividir los datos
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 
 ```{r lab2-split, prompt=FALSE, echo=TRUE}
 # Fijar semilla
@@ -339,7 +339,7 @@ cat("Train:", nrow(datos_train), "| Test:", nrow(datos_test))
 - `training()` y `testing()`: Extraen los datasets de train y test
 - `vfold_cv()`: Crea folds para validación cruzada (5 folds, estratificados por `crecimiento_alto`)
 
-Con 179 países y 5 folds, cada partición tiene ~27 países en validación. Es suficiente para entrenar, pero las métricas tendrán [más ruido]{.alert}
+Con 179 países y 5 folds, cada partición tiene pocos países en validación. Es suficiente para entrenar, pero las métricas tendrán [más ruido]{.alert}
 :::
 
 # Parte 3: Comparación de modelos {background-color="#2d4563"}
@@ -442,17 +442,13 @@ Antes de pedirles que prueben su propia variable, miremos un ejemplo trabajado. 
 
 ```{r lab2-comp-ext, prompt=FALSE, echo=TRUE}
 # Fórmula extendida con un feature derivado
-formula_ext <- crecimiento_alto ~ gasto_educacion + acceso_internet +
-                                  urbanizacion + gasto_salud + inflacion +
-                                  alto_desempleo + inversion_extranjera +
-                                  indice_gobierno_digital
+formula_ext <- crecimiento_alto ~ acceso_internet + gasto_educacion + urbanizacion + gasto_salud + inflacion +
+                                  alto_desempleo + inversion_extranjera + indice_gobierno_digital
 
 # Logístico con formula_ext
-eval_log_ext <- fit_resamples(
-  modelo_logistico, formula_ext, resamples = folds,
+eval_log_ext <- fit_resamples(modelo_logistico, formula_ext, resamples = folds,
   metrics = metric_set(precision, recall, roc_auc),
-  control = control_resamples(event_level = "second")
-) |>
+  control = control_resamples(event_level = "second")) |>
   collect_metrics() |> mutate(modelo = "Logístico (ext)")
 
 # Comparar el logístico básico vs. el extendido
@@ -470,32 +466,30 @@ bind_rows(eval_logistico, eval_log_ext) |>
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-**Tarea:** Agreguen [la variable derivada que crearon antes]{.alert} a la fórmula y re-evalúen
+**Tarea:** Agreguen un feature a la fórmula y re-evalúen: la variable que crearon en el [Ejercicio 2]{.alert}, o una [interacción]{.alert} entre dos variables (como en el ejemplo)
 
 1. ¿Mejora la regresión logística? ¿Y el árbol?
 2. ¿Cuál de los dos modelos es más sensible al feature nuevo?
 
 ```{r ej3-features-nuevos, eval=FALSE, prompt=FALSE, echo=TRUE}
-# Acá pongan su feature en lugar del de la demo (ejemplo con internet_grupos)
+# Ejemplo: una interacción entre dos variables que se refuerzan
+# (gobierno digital y acceso a internet). En una fórmula se escribe con ":"
 formula_estudiante <- crecimiento_alto ~ gasto_educacion + acceso_internet +
                                          urbanizacion + gasto_salud + inflacion +
                                          desempleo + inversion_extranjera +
-                                         indice_gobierno_digital + internet_grupos
+                                         indice_gobierno_digital +
+                                         indice_gobierno_digital:acceso_internet
 
 # Repetir el mismo bloque, ahora con formula_estudiante
-eval_log_est <- fit_resamples(
-  modelo_logistico, formula_estudiante, resamples = folds,
+eval_log_est <- fit_resamples(modelo_logistico, formula_estudiante, resamples = folds,
   metrics = metric_set(precision, recall, roc_auc),
-  control = control_resamples(event_level = "second")
-) |>
+  control = control_resamples(event_level = "second")) |>
   collect_metrics() |> mutate(modelo = "Logístico (estudiante)")
 
 # Lo mismo cambiando modelo_logistico → modelo_arbol
-eval_arb_est <- fit_resamples(
-  modelo_arbol, formula_estudiante, resamples = folds,
+eval_arb_est <- fit_resamples(modelo_arbol, formula_estudiante, resamples = folds,
   metrics = metric_set(precision, recall, roc_auc),
-  control = control_resamples(event_level = "second")
-) |>
+  control = control_resamples(event_level = "second")) |>
   collect_metrics() |> mutate(modelo = "Árbol (estudiante)")
 
 # Comparar los 4 modelos: básicos + el suyo
@@ -764,7 +758,7 @@ datos_modelo <- datos_modelo |>
                           include.lowest = TRUE),
 
     # 3. Inflación alta (inflacion)
-    inflacion_alta = if_else(inflacion > 5, "si", "no"),
+    inflacion_alta = if_else(inflacion > 15, "si", "no"),
 
     # 4. Apertura financiera: IED por encima de la mediana (inversion_extranjera)
     apertura_financiera = if_else(inversion_extranjera > median(inversion_extranjera), "alta", "baja")
@@ -785,43 +779,29 @@ datos_modelo |> count(apertura_financiera)
 :::{style="margin-top: 30px; font-size: 20px;"}
 
 ```{r appendix06, prompt=FALSE, echo=TRUE}
-# Crear el feature derivado (si no lo hicieron antes)
-datos_modelo <- datos_modelo |>
-  mutate(
-    internet_grupos = cut(acceso_internet,
-                          breaks = quantile(acceso_internet, c(0, 1/3, 2/3, 1)),
-                          labels = c("bajo", "medio", "alto"),
-                          include.lowest = TRUE),
-    internet_grupos = factor(internet_grupos)
-  )
-
-# Re-crear folds con la columna nueva disponible
-set.seed(2026)
-split_int <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
-train_int <- training(split_int)
-folds_int <- vfold_cv(train_int, v = 5, strata = crecimiento_alto)
-
-# Fórmula con el feature nuevo (internet_grupos)
+# Una interacción no necesita una columna nueva: se agrega a la fórmula con ":".
+# Probamos indice_gobierno_digital × acceso_internet (dos variables que se refuerzan)
 formula_int <- crecimiento_alto ~ gasto_educacion + acceso_internet +
                                   urbanizacion + gasto_salud + inflacion +
                                   desempleo + inversion_extranjera +
-                                  indice_gobierno_digital + internet_grupos
+                                  indice_gobierno_digital +
+                                  indice_gobierno_digital:acceso_internet
 
-# Evaluar el logístico con folds_int (mismo patrón que el cuerpo del lab)
+# Evaluar el logístico (reusamos los mismos folds del cuerpo del lab)
 eval_log_int <- fit_resamples(
-  modelo_logistico, formula_int, resamples = folds_int,
+  modelo_logistico, formula_int, resamples = folds,
   metrics = metric_set(precision, recall, roc_auc),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Logístico (internet)")
+  collect_metrics() |> mutate(modelo = "Logístico (interacción)")
 
-# Evaluar el árbol con folds_int
+# Evaluar el árbol con la misma fórmula
 eval_arb_int <- fit_resamples(
-  modelo_arbol, formula_int, resamples = folds_int,
+  modelo_arbol, formula_int, resamples = folds,
   metrics = metric_set(precision, recall, roc_auc),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Árbol (internet)")
+  collect_metrics() |> mutate(modelo = "Árbol (interacción)")
 
 bind_rows(eval_logistico, eval_log_int, eval_arbol, eval_arb_int) |>
   filter(.metric == "roc_auc") |>
@@ -829,7 +809,7 @@ bind_rows(eval_logistico, eval_log_int, eval_arbol, eval_arb_int) |>
   arrange(desc(mean))
 ```
 
-La mejora por agregar una sola variable derivada suele ser modesta. El feature engineering rinde cuando las variables nuevas capturan relaciones no lineales o interacciones que el modelo no puede descubrir por sí solo (en un árbol esto pesa menos, porque ya captura no linealidades automáticamente)
+La interacción `indice_gobierno_digital:acceso_internet` mejora un poco el ROC-AUC de [ambos modelos]{.alert}: capta el efecto conjunto de dos variables que se refuerzan, algo que las variables por separado no expresan (la mejora es chica y está dentro del error estándar, así que no conviene sobre-interpretarla). El contraste con `internet_grupos`, que [no ayudó]{.alert}, deja la moraleja: discretizar una variable que ya está en el modelo suele ser redundante, mientras que una [interacción]{.alert} o una transformación no lineal sí puede agregar información nueva
 
 [[Volver al Ejercicio 3]{.button}](#sec:exercise03)
 :::

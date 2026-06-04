@@ -110,7 +110,7 @@ datos_modelo |>
 # Elijan UNA variable derivada y créenla. Opciones sugeridas:
 # - Gasto en educación alto: por encima de la mediana (gasto_educacion)
 # - Acceso a internet por terciles (acceso_internet)
-# - Inflación alta: > 5% (inflacion)
+# - Inflación alta: > 15% (inflacion)
 # - Apertura financiera: IED > mediana (inversion_extranjera)
 #
 # Ejemplo (internet por terciles):
@@ -233,11 +233,12 @@ bind_rows(eval_logistico, eval_log_ext) |>
 # 1. ¿Mejora la regresión logística? ¿Y el árbol?
 # 2. ¿Cuál de los dos modelos es más sensible al feature nuevo?
 #
-# Ejemplo con internet_grupos:
+# Ejemplo con una interacción (gobierno digital × acceso a internet, con ":"):
 # formula_estudiante <- crecimiento_alto ~ gasto_educacion + acceso_internet +
 #                                          urbanizacion + gasto_salud + inflacion +
 #                                          desempleo + inversion_extranjera +
-#                                          indice_gobierno_digital + internet_grupos
+#                                          indice_gobierno_digital +
+#                                          indice_gobierno_digital:acceso_internet
 #
 # Solución trabajada en el Apéndice 6.
 
@@ -380,7 +381,7 @@ datos_modelo <- datos_modelo |>
                           include.lowest = TRUE),
 
     # 3. Inflación alta (inflacion)
-    inflacion_alta = if_else(inflacion > 5, "si", "no"),
+    inflacion_alta = if_else(inflacion > 15, "si", "no"),
 
     # 4. Apertura financiera: IED por encima de la mediana (inversion_extranjera)
     apertura_financiera = if_else(inversion_extranjera > median(inversion_extranjera), "alta", "baja")
@@ -394,54 +395,41 @@ datos_modelo |> count(apertura_financiera)
 
 # --- Apéndice 6: ¿Ayuda el feature engineering? --------------
 
-# Crear el feature derivado (si no lo hicieron antes)
-datos_modelo <- datos_modelo |>
-  mutate(
-    internet_grupos = cut(acceso_internet,
-                          breaks = quantile(acceso_internet, c(0, 1/3, 2/3, 1)),
-                          labels = c("bajo", "medio", "alto"),
-                          include.lowest = TRUE),
-    internet_grupos = factor(internet_grupos)
-  )
-
-# Re-crear folds con la columna nueva disponible
-set.seed(2026)
-split_int <- initial_split(datos_modelo, prop = 0.75, strata = crecimiento_alto)
-train_int <- training(split_int)
-folds_int <- vfold_cv(train_int, v = 5, strata = crecimiento_alto)
-
-# Fórmula con el feature nuevo
+# Una interacción no necesita una columna nueva: se agrega a la fórmula con ":".
+# Probamos indice_gobierno_digital × acceso_internet (dos variables que se refuerzan).
 formula_int <- crecimiento_alto ~ gasto_educacion + acceso_internet +
                                   urbanizacion + gasto_salud + inflacion +
                                   desempleo + inversion_extranjera +
-                                  indice_gobierno_digital + internet_grupos
+                                  indice_gobierno_digital +
+                                  indice_gobierno_digital:acceso_internet
 
-# Evaluar el logístico con folds_int (mismo patrón que el cuerpo del lab)
+# Evaluar el logístico (reusamos los mismos folds del cuerpo del lab)
 eval_log_int <- fit_resamples(
-  modelo_logistico, formula_int, resamples = folds_int,
+  modelo_logistico, formula_int, resamples = folds,
   metrics = metric_set(precision, recall, roc_auc),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Logístico (internet)")
+  collect_metrics() |> mutate(modelo = "Logístico (interacción)")
 
-# Evaluar el árbol con folds_int
+# Evaluar el árbol con la misma fórmula
 eval_arb_int <- fit_resamples(
-  modelo_arbol, formula_int, resamples = folds_int,
+  modelo_arbol, formula_int, resamples = folds,
   metrics = metric_set(precision, recall, roc_auc),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Árbol (internet)")
+  collect_metrics() |> mutate(modelo = "Árbol (interacción)")
 
 bind_rows(eval_logistico, eval_log_int, eval_arbol, eval_arb_int) |>
   filter(.metric == "roc_auc") |>
   select(modelo, mean, std_err) |>
   arrange(desc(mean))
 
-# La mejora por agregar una sola variable derivada suele ser modesta.
-# El feature engineering rinde cuando las variables nuevas capturan
-# relaciones no lineales o interacciones que el modelo no puede
-# descubrir por sí solo (en un árbol esto pesa menos, porque ya captura
-# no linealidades automáticamente).
+# La interacción mejora un poco el ROC-AUC de ambos modelos: capta el efecto
+# conjunto de dos variables que se refuerzan, algo que las variables por
+# separado no expresan (la mejora es chica, dentro del error estándar). El
+# contraste con internet_grupos (que no ayudó) deja la moraleja: discretizar
+# una variable que ya está en el modelo suele ser redundante, mientras que
+# una interacción o una transformación no lineal sí puede aportar información.
 
 
 # --- Apéndice 7: Visualizar la comparación de modelos --------
