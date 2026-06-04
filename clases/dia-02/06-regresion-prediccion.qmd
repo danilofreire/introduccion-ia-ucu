@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -106,7 +106,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 <br>
 
-[Ambos son valiosos!]{.alert} El ML aporta herramientas de predicción que complementan los métodos causales
+[¡Ambos son valiosos!]{.alert} El ML aporta herramientas de predicción que complementan los métodos causales
 :::
 :::
 :::
@@ -160,9 +160,7 @@ $$\min \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 + \lambda \cdot \text{penalización}(\
 **La intuición: un presupuesto para coeficientes**
 
 - OLS asigna coeficientes sin límite → sobreajuste con muchas variables
-- Regularización impone un [presupuesto]{.alert}: el modelo reparte un total finito entre todas las variables
-- $\lambda$ bajo: presupuesto generoso, muchas variables (similar a OLS)
-- $\lambda$ alto: presupuesto ajustado, solo las variables que más ayudan
+- Regularización impone un [presupuesto]{.alert}: el modelo reparte un total finito entre todas las variables, y $\lambda$ fija cuán ajustado es ese presupuesto
 :::
 :::
 :::
@@ -289,7 +287,7 @@ ajuste <- fit(modelo_lasso, satisfaccion_vida ~ ., data = datos_train)
 
 ## Ingeniería de variables para datos sociales
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 [Crear, transformar o seleccionar variables]{.alert} para mejorar el modelo:
 
 - [Variables categóricas]{.alert}: dummies (one-hot encoding)
@@ -303,23 +301,19 @@ ajuste <- fit(modelo_lasso, satisfaccion_vida ~ ., data = datos_train)
 **Con recipes de tidymodels:**
 
 ```r
+# Los pasos más comunes (hay muchos más step_*: ver el enlace de arriba)
 receta <- recipe(voto ~ ., data = datos_train) |>
+  step_impute_median(all_numeric_predictors()) |>   # imputar faltantes
   step_dummy(all_nominal_predictors()) |>           # categóricas → dummies
   step_normalize(all_numeric_predictors()) |>       # media=0, sd=1
   step_zv(all_predictors()) |>                      # quitar varianza cero
-  step_interact(terms = ~ edad:educacion_anios) |>  # interacción
-  step_impute_median(all_numeric_predictors()) |>   # imputar numéricas
-  step_other(religion, threshold = 0.05) |>         # agrupar raras
-  step_corr(all_numeric_predictors(),
-            threshold = 0.9) |>                     # quitar r > 0.9 (multicolinealidad)
-  step_log(ingreso, offset = 1) |>                  # log(ingreso + 1)  
-  step_poly(edad, degree = 2)                       # edad + edad²
+  step_interact(terms = ~ edad:educacion_anios)     # interacción edad×educación
 ```
 :::
 
 ## El flujo completo: `workflow()`
 
-:::{style="margin-top: 30px; font-size: 21px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
 - En tidymodels, `recipe` y `model` se combinan en un [workflow()]{.alert}
@@ -375,8 +369,6 @@ collect_predictions(resultado)
 :::{.columns}
 :::{.column width=55%}
 - $\lambda$ controla la [fuerza de la regularización]{.alert}
-- $\lambda = 0$: sin penalización (equivale a OLS)
-- $\lambda$ grande: coeficientes se encogen hacia cero
 - El valor correcto [depende de los datos]{.alert}, así que lo buscamos empíricamente
 
 **Estrategia práctica (3 pasos):**
@@ -402,59 +394,14 @@ collect_predictions(resultado)
 :::
 :::
 
-## Validación cruzada: ¿por qué y cómo?
+## Validación cruzada (recordatorio)
 
-:::{style="margin-top: 30px; font-size: 19px;"}
-:::{.columns}
-:::{.column width=55%}
-- Un solo split train/test puede dar resultados [inestables]{.alert} (depende de qué datos caen en cada grupo)
-- [Validación cruzada (CV)]{.alert} resuelve esto: divide los datos en $k$ partes (folds) y entrena $k$ veces, dejando un fold diferente como validación cada vez
-- `vfold_cv(datos, v = 5)` en tidymodels hace esto automáticamente
+:::{style="margin-top: 30px; font-size: 24px;"}
+- Ya la usamos en el [Día 1]{.alert} y en la [sesión 2.1]{.alert}: en vez de una sola división train/test, la [validación cruzada]{.alert} entrena y evalúa $k$ veces (rotando el fold de validación) y promedia las métricas, para una estimación más [estable]{.alert}
+- Acá la usamos para [elegir $\lambda$]{.alert}: evaluamos cada valor candidato con CV y nos quedamos con el mejor
+- En tidymodels: `folds <- vfold_cv(datos_train, v = 5)`; después `tune_grid()` la usa por dentro
 
-**Pasos de k-fold CV:**
-
-1. Dividir los datos en $k$ partes iguales (típicamente $k$ = 5 o 10)
-2. Para cada fold $i$: entrenar con los otros $k-1$ folds, evaluar con el fold $i$
-3. Promediar las $k$ métricas de evaluación
-4. Ese promedio es nuestra [estimación del error]{.alert} en datos nuevos
-
-**¿Por qué $k$ = 5 o 10?** Es un compromiso práctico: suficientes folds para una buena estimación sin gastar demasiado tiempo de cómputo.
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
-**5-fold CV ilustrado:**
-
-```
-Fold 1: [VAL] [Train] [Train] [Train] [Train]
-Fold 2: [Train] [VAL] [Train] [Train] [Train]
-Fold 3: [Train] [Train] [VAL] [Train] [Train]
-Fold 4: [Train] [Train] [Train] [VAL] [Train]
-Fold 5: [Train] [Train] [Train] [Train] [VAL]
-
-→ 5 estimaciones de error → promedio
-```
-
-**En tidymodels:**
-
-```r
-# Crear folds
-folds <- vfold_cv(datos_train, v = 5)
-
-# Evaluar un modelo con CV
-resultados <- fit_resamples(
-  modelo,
-  satisfaccion ~ .,
-  resamples = folds,
-  metrics = metric_set(rmse, rsq)
-)
-
-# Ver resultados promedio
-collect_metrics(resultados)
-```
-:::
-:::
-:::
+[$k$ = 5 o 10 es lo habitual: buena estimación sin gastar demasiado cómputo]{.alert}
 :::
 
 ## Tuning de la penalización con tidymodels
@@ -495,6 +442,8 @@ collect_metrics(resultado_final)
 
 - `select_best()` da el λ con menor RMSE. Veremos una alternativa más parsimoniosa en la próxima slide
 - Para [Elastic Net]{.alert}, marca también `mixture = tune()` y agrega `mixture(range = c(0, 1))` a la grilla con `levels = c(20, 5)` (20 de λ × 5 de α)
+
+[Es el mismo patrón de tuning de la sesión 2.1; lo corren paso a paso en el laboratorio]{.alert}
 :::
 
 ## Dos criterios para elegir λ
@@ -629,40 +578,6 @@ LASSO identifica automáticamente qué variables [realmente predicen]{.alert} la
 :::
 :::
 
-## Regularización para datos de alta dimensionalidad
-
-:::{style="margin-top: 30px; font-size: 23px;"}
-:::{.columns}
-:::{.column width=55%}
-**Útil cuando:**
-
-- [Muchas variables, pocas observaciones]{.alert} ($p \gg n$)
-- Variables altamente [correlacionadas]{.alert}
-- Solo algunas variables importan, sin hacer selección manual
-
-**Ejemplos en ciencias sociales:** análisis de texto (miles de palabras), datos genómicos, encuestas con muchas preguntas, datos administrativos
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**La regla del pulgar:**
-
-| Situación | Significado | Recomendación |
-|-----------|-------------|---------------|
-| $n \gg p$ | Muchos datos, pocas variables | OLS probablemente está bien |
-| $n \approx p$ | Datos y variables similares | Regularización ayuda |
-| $n \ll p$ | Pocas observaciones, muchas variables | Regularización es [necesaria]{.alert} (OLS no funciona) |
-:::
-
-<br>
-
-:::{style="font-size: 23px;"}
-[LASSO funciona incluso cuando $p > n$, lo cual es imposible con OLS clásico.]{.alert}
-:::
-:::
-:::
-:::
-
 ## Comparación: Regularización vs. Random Forest
 
 :::{style="margin-top: 30px; font-size: 26px;"}
@@ -737,33 +652,6 @@ Las variables con coeficiente = 0 (no mostradas) fueron [descartadas]{.alert} po
 :::
 :::
 
-## Guía práctica: ¿qué modelo uso?
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-:::{.columns}
-:::{.column width=50%}
-**Si priorizas [interpretabilidad]{.alert}:**
-
-- OLS para pocos predictores claros
-- LASSO cuando quieres que el modelo elija
-- Ridge si todos los predictores importan
-:::
-
-:::{.column width=50%}
-**Si priorizas [rendimiento]{.alert}:**
-
-- Random Forest para relaciones complejas
-- Elastic Net como buen punto de partida
-- Siempre comparar varios modelos con CV
-:::
-:::
-
-<br>
-
-[En ciencias sociales, la elección depende del objetivo: ¿explicar o predecir?]{.alert} Comparar varios modelos con validación cruzada es la mejor forma de elegir.
-:::
-
 ## Resumen de la sesión
 
 :::{style="margin-top: 30px; font-size: 25px;"}
@@ -804,7 +692,7 @@ Las variables con coeficiente = 0 (no mostradas) fueron [descartadas]{.alert} po
     - Análisis computacional de texto
     - Topic modeling
 
-[Nos vemos en el laboratorio!]{.alert} 🤓
+[¡Nos vemos en el laboratorio!]{.alert} 🤓
 :::
 
 # Apéndices {background-color="#2d4563"}
@@ -854,10 +742,44 @@ de cada variable?
 <br>
 
 :::{style="font-size: 21px;"}
-[El trade-off interpretabilidad-rendimiento es real. La elección depende del objetivo.]{.alert}
+[El trade-off interpretabilidad-rendimiento es real. La elección depende del objetivo]{.alert}
 :::
 :::
 :::
 :::
 
-# Nos vemos en el laboratorio! 😊 {background-color="#2d4563"}
+## Apéndice 2: Regularización en alta dimensionalidad
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=55%}
+**Útil cuando:**
+
+- [Muchas variables, pocas observaciones]{.alert} ($p \gg n$)
+- Variables altamente [correlacionadas]{.alert}
+- Solo algunas variables importan, sin hacer selección manual
+
+**Ejemplos en ciencias sociales:** análisis de texto (miles de palabras), datos genómicos, encuestas con muchas preguntas, datos administrativos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**La regla del pulgar:**
+
+| Situación | Significado | Recomendación |
+|-----------|-------------|---------------|
+| $n \gg p$ | Muchos datos, pocas variables | OLS probablemente está bien |
+| $n \approx p$ | Datos y variables similares | Regularización ayuda |
+| $n \ll p$ | Pocas observaciones, muchas variables | Regularización es [necesaria]{.alert} (OLS no funciona) |
+:::
+
+<br>
+
+:::{style="font-size: 23px;"}
+[LASSO funciona incluso cuando $p > n$, lo cual es imposible con OLS clásico]{.alert}
+:::
+:::
+:::
+:::
+
+# ¡Nos vemos en el laboratorio! 😊 {background-color="#2d4563"}

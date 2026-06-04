@@ -1283,7 +1283,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <a href="mailto:danilofreire@gmail.com">danilofreire@gmail.com</a>
 </div>
         <p class="quarto-title-affiliation">
-            Departament of Data and Decision Sciences <br> Emory University
+            Department of Data and Decision Sciences <br> Emory University
           </p>
     </div>
 </div>
@@ -1368,7 +1368,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </tbody>
 </table>
 <p><br></p>
-<p><span class="alert">Ambos son valiosos!</span> El ML aporta herramientas de predicción que complementan los métodos causales</p>
+<p><span class="alert">¡Ambos son valiosos!</span> El ML aporta herramientas de predicción que complementan los métodos causales</p>
 </div>
 </div></div>
 </div>
@@ -1424,9 +1424,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <p><strong>La intuición: un presupuesto para coeficientes</strong></p>
 <ul>
 <li>OLS asigna coeficientes sin límite → sobreajuste con muchas variables</li>
-<li>Regularización impone un <span class="alert">presupuesto</span>: el modelo reparte un total finito entre todas las variables</li>
-<li><span class="math inline">\(\lambda\)</span> bajo: presupuesto generoso, muchas variables (similar a OLS)</li>
-<li><span class="math inline">\(\lambda\)</span> alto: presupuesto ajustado, solo las variables que más ayudan</li>
+<li>Regularización impone un <span class="alert">presupuesto</span>: el modelo reparte un total finito entre todas las variables, y <span class="math inline">\(\lambda\)</span> fija cuán ajustado es ese presupuesto</li>
 </ul>
 </div></div>
 </div>
@@ -1581,7 +1579,7 @@ coeficientes pequeños</code></pre>
 </section>
 <section id="ingeniería-de-variables-para-datos-sociales" class="slide level2">
 <h2>Ingeniería de variables para datos sociales</h2>
-<div style="margin-top: 30px; font-size: 20px;">
+<div style="margin-top: 30px; font-size: 23px;">
 <p><span class="alert">Crear, transformar o seleccionar variables</span> para mejorar el modelo:</p>
 <ul>
 <li><span class="alert">Variables categóricas</span>: dummies (one-hot encoding)</li>
@@ -1593,22 +1591,18 @@ coeficientes pequeños</code></pre>
 <li><a href="https://recipes.tidymodels.org/reference/index.html" class="uri">https://recipes.tidymodels.org/reference/index.html</a></li>
 </ul>
 <p><strong>Con recipes de tidymodels:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a>receta <span class="ot">&lt;-</span> <span class="fu">recipe</span>(voto <span class="sc">~</span> ., <span class="at">data =</span> datos_train) <span class="sc">|&gt;</span></span>
-<span id="cb3-2"><a></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span>           <span class="co"># categóricas → dummies</span></span>
-<span id="cb3-3"><a></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span>       <span class="co"># media=0, sd=1</span></span>
-<span id="cb3-4"><a></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">|&gt;</span>                      <span class="co"># quitar varianza cero</span></span>
-<span id="cb3-5"><a></a>  <span class="fu">step_interact</span>(<span class="at">terms =</span> <span class="sc">~</span> edad<span class="sc">:</span>educacion_anios) <span class="sc">|&gt;</span>  <span class="co"># interacción</span></span>
-<span id="cb3-6"><a></a>  <span class="fu">step_impute_median</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span>   <span class="co"># imputar numéricas</span></span>
-<span id="cb3-7"><a></a>  <span class="fu">step_other</span>(religion, <span class="at">threshold =</span> <span class="fl">0.05</span>) <span class="sc">|&gt;</span>         <span class="co"># agrupar raras</span></span>
-<span id="cb3-8"><a></a>  <span class="fu">step_corr</span>(<span class="fu">all_numeric_predictors</span>(),</span>
-<span id="cb3-9"><a></a>            <span class="at">threshold =</span> <span class="fl">0.9</span>) <span class="sc">|&gt;</span>                     <span class="co"># quitar r &gt; 0.9 (multicolinealidad)</span></span>
-<span id="cb3-10"><a></a>  <span class="fu">step_log</span>(ingreso, <span class="at">offset =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span>                  <span class="co"># log(ingreso + 1)  </span></span>
-<span id="cb3-11"><a></a>  <span class="fu">step_poly</span>(edad, <span class="at">degree =</span> <span class="dv">2</span>)                       <span class="co"># edad + edad²</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="co"># Los pasos más comunes (hay muchos más step_*: ver el enlace de arriba)</span></span>
+<span id="cb3-2"><a></a>receta <span class="ot">&lt;-</span> <span class="fu">recipe</span>(voto <span class="sc">~</span> ., <span class="at">data =</span> datos_train) <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a></a>  <span class="fu">step_impute_median</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span>   <span class="co"># imputar faltantes</span></span>
+<span id="cb3-4"><a></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">|&gt;</span>           <span class="co"># categóricas → dummies</span></span>
+<span id="cb3-5"><a></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">|&gt;</span>       <span class="co"># media=0, sd=1</span></span>
+<span id="cb3-6"><a></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">|&gt;</span>                      <span class="co"># quitar varianza cero</span></span>
+<span id="cb3-7"><a></a>  <span class="fu">step_interact</span>(<span class="at">terms =</span> <span class="sc">~</span> edad<span class="sc">:</span>educacion_anios)     <span class="co"># interacción edad×educación</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="el-flujo-completo-workflow" class="slide level2">
 <h2>El flujo completo: <code>workflow()</code></h2>
-<div style="margin-top: 30px; font-size: 21px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <div class="columns">
 <div class="column" style="width:55%;">
 <ul>
@@ -1659,8 +1653,6 @@ coeficientes pequeños</code></pre>
 <div class="column" style="width:55%;">
 <ul>
 <li><span class="math inline">\(\lambda\)</span> controla la <span class="alert">fuerza de la regularización</span></li>
-<li><span class="math inline">\(\lambda = 0\)</span>: sin penalización (equivale a OLS)</li>
-<li><span class="math inline">\(\lambda\)</span> grande: coeficientes se encogen hacia cero</li>
 <li>El valor correcto <span class="alert">depende de los datos</span>, así que lo buscamos empíricamente</li>
 </ul>
 <p><strong>Estrategia práctica (3 pasos):</strong></p>
@@ -1683,88 +1675,54 @@ coeficientes pequeños</code></pre>
 </div></div>
 </div>
 </section>
-<section id="validación-cruzada-por-qué-y-cómo" class="slide level2 scrollable">
-<h2>Validación cruzada: ¿por qué y cómo?</h2>
-<div style="margin-top: 30px; font-size: 19px;">
-<div class="columns">
-<div class="column" style="width:55%;">
+<section id="validación-cruzada-recordatorio" class="slide level2">
+<h2>Validación cruzada (recordatorio)</h2>
+<div style="margin-top: 30px; font-size: 24px;">
 <ul>
-<li>Un solo split train/test puede dar resultados <span class="alert">inestables</span> (depende de qué datos caen en cada grupo)</li>
-<li><span class="alert">Validación cruzada (CV)</span> resuelve esto: divide los datos en <span class="math inline">\(k\)</span> partes (folds) y entrena <span class="math inline">\(k\)</span> veces, dejando un fold diferente como validación cada vez</li>
-<li><code>vfold_cv(datos, v = 5)</code> en tidymodels hace esto automáticamente</li>
+<li>Ya la usamos en el <span class="alert">Día 1</span> y en la <span class="alert">sesión 2.1</span>: en vez de una sola división train/test, la <span class="alert">validación cruzada</span> entrena y evalúa <span class="math inline">\(k\)</span> veces (rotando el fold de validación) y promedia las métricas, para una estimación más <span class="alert">estable</span></li>
+<li>Acá la usamos para <span class="alert">elegir <span class="math inline">\(\lambda\)</span></span>: evaluamos cada valor candidato con CV y nos quedamos con el mejor</li>
+<li>En tidymodels: <code>folds &lt;- vfold_cv(datos_train, v = 5)</code>; después <code>tune_grid()</code> la usa por dentro</li>
 </ul>
-<p><strong>Pasos de k-fold CV:</strong></p>
-<ol type="1">
-<li>Dividir los datos en <span class="math inline">\(k\)</span> partes iguales (típicamente <span class="math inline">\(k\)</span> = 5 o 10)</li>
-<li>Para cada fold <span class="math inline">\(i\)</span>: entrenar con los otros <span class="math inline">\(k-1\)</span> folds, evaluar con el fold <span class="math inline">\(i\)</span></li>
-<li>Promediar las <span class="math inline">\(k\)</span> métricas de evaluación</li>
-<li>Ese promedio es nuestra <span class="alert">estimación del error</span> en datos nuevos</li>
-</ol>
-<p><strong>¿Por qué <span class="math inline">\(k\)</span> = 5 o 10?</strong> Es un compromiso práctico: suficientes folds para una buena estimación sin gastar demasiado tiempo de cómputo.</p>
-</div><div class="column" style="width:45%;">
-<div style="text-align: center; font-size: 18px;">
-<p><strong>5-fold CV ilustrado:</strong></p>
-<pre><code>Fold 1: [VAL] [Train] [Train] [Train] [Train]
-Fold 2: [Train] [VAL] [Train] [Train] [Train]
-Fold 3: [Train] [Train] [VAL] [Train] [Train]
-Fold 4: [Train] [Train] [Train] [VAL] [Train]
-Fold 5: [Train] [Train] [Train] [Train] [VAL]
-
-→ 5 estimaciones de error → promedio</code></pre>
-<p><strong>En tidymodels:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># Crear folds</span></span>
-<span id="cb7-2"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
-<span id="cb7-3"><a></a></span>
-<span id="cb7-4"><a></a><span class="co"># Evaluar un modelo con CV</span></span>
-<span id="cb7-5"><a></a>resultados <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(</span>
-<span id="cb7-6"><a></a>  modelo,</span>
-<span id="cb7-7"><a></a>  satisfaccion <span class="sc">~</span> .,</span>
-<span id="cb7-8"><a></a>  <span class="at">resamples =</span> folds,</span>
-<span id="cb7-9"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, rsq)</span>
-<span id="cb7-10"><a></a>)</span>
-<span id="cb7-11"><a></a></span>
-<span id="cb7-12"><a></a><span class="co"># Ver resultados promedio</span></span>
-<span id="cb7-13"><a></a><span class="fu">collect_metrics</span>(resultados)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</div></div>
+<p><span class="alert"><span class="math inline">\(k\)</span> = 5 o 10 es lo habitual: buena estimación sin gastar demasiado cómputo</span></p>
 </div>
 </section>
 <section id="tuning-de-la-penalización-con-tidymodels" class="slide level2">
 <h2>Tuning de la penalización con tidymodels</h2>
 <div style="margin-top: 30px; font-size: 19px;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="co"># 1. Modelo con penalty a ajustar (tune() = &quot;búscalo con CV&quot;)</span></span>
-<span id="cb8-2"><a></a><span class="co"># mixture = 1 → LASSO. Para Elastic Net: mixture = tune() también</span></span>
-<span id="cb8-3"><a></a>modelo_lasso_tune <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;regression&quot;</span>)</span>
-<span id="cb8-4"><a></a></span>
-<span id="cb8-5"><a></a><span class="co"># 2. Workflow (mismo patrón que antes, ahora con penalty pendiente)</span></span>
-<span id="cb8-6"><a></a>wf_lasso <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span> <span class="fu">add_model</span>(modelo_lasso_tune)</span>
-<span id="cb8-7"><a></a></span>
-<span id="cb8-8"><a></a><span class="co"># 3. Grilla de valores candidatos de penalty (λ) en escala log10</span></span>
-<span id="cb8-9"><a></a>grilla_lambda <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">30</span>)</span>
-<span id="cb8-10"><a></a></span>
-<span id="cb8-11"><a></a><span class="co"># 4. Validación cruzada con 5 folds</span></span>
-<span id="cb8-12"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
-<span id="cb8-13"><a></a></span>
-<span id="cb8-14"><a></a><span class="co"># 5. Probar cada λ con CV (ahora le pasamos el workflow)</span></span>
-<span id="cb8-15"><a></a>resultados <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(wf_lasso,</span>
-<span id="cb8-16"><a></a>  <span class="at">resamples =</span> folds,</span>
-<span id="cb8-17"><a></a>  <span class="at">grid =</span> grilla_lambda,</span>
-<span id="cb8-18"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, rsq))</span>
-<span id="cb8-19"><a></a></span>
-<span id="cb8-20"><a></a><span class="co"># 6. Seleccionar el mejor λ</span></span>
-<span id="cb8-21"><a></a>mejor_lambda <span class="ot">&lt;-</span> <span class="fu">select_best</span>(resultados, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span>
-<span id="cb8-22"><a></a></span>
-<span id="cb8-23"><a></a><span class="co"># 7. Finalizar y evaluar en test (last_fit = fit en train + métricas en test)</span></span>
-<span id="cb8-24"><a></a>resultado_final <span class="ot">&lt;-</span> wf_lasso <span class="sc">|&gt;</span></span>
-<span id="cb8-25"><a></a>  <span class="fu">finalize_workflow</span>(mejor_lambda) <span class="sc">|&gt;</span></span>
-<span id="cb8-26"><a></a>  <span class="fu">last_fit</span>(<span class="at">split =</span> datos_split,</span>
-<span id="cb8-27"><a></a>           <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, rsq))</span>
-<span id="cb8-28"><a></a></span>
-<span id="cb8-29"><a></a><span class="fu">collect_metrics</span>(resultado_final)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a></a><span class="co"># 1. Modelo con penalty a ajustar (tune() = &quot;búscalo con CV&quot;)</span></span>
+<span id="cb6-2"><a></a><span class="co"># mixture = 1 → LASSO. Para Elastic Net: mixture = tune() también</span></span>
+<span id="cb6-3"><a></a>modelo_lasso_tune <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;regression&quot;</span>)</span>
+<span id="cb6-4"><a></a></span>
+<span id="cb6-5"><a></a><span class="co"># 2. Workflow (mismo patrón que antes, ahora con penalty pendiente)</span></span>
+<span id="cb6-6"><a></a>wf_lasso <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span> <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span> <span class="fu">add_model</span>(modelo_lasso_tune)</span>
+<span id="cb6-7"><a></a></span>
+<span id="cb6-8"><a></a><span class="co"># 3. Grilla de valores candidatos de penalty (λ) en escala log10</span></span>
+<span id="cb6-9"><a></a>grilla_lambda <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">0</span>)), <span class="at">levels =</span> <span class="dv">30</span>)</span>
+<span id="cb6-10"><a></a></span>
+<span id="cb6-11"><a></a><span class="co"># 4. Validación cruzada con 5 folds</span></span>
+<span id="cb6-12"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb6-13"><a></a></span>
+<span id="cb6-14"><a></a><span class="co"># 5. Probar cada λ con CV (ahora le pasamos el workflow)</span></span>
+<span id="cb6-15"><a></a>resultados <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(wf_lasso,</span>
+<span id="cb6-16"><a></a>  <span class="at">resamples =</span> folds,</span>
+<span id="cb6-17"><a></a>  <span class="at">grid =</span> grilla_lambda,</span>
+<span id="cb6-18"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, rsq))</span>
+<span id="cb6-19"><a></a></span>
+<span id="cb6-20"><a></a><span class="co"># 6. Seleccionar el mejor λ</span></span>
+<span id="cb6-21"><a></a>mejor_lambda <span class="ot">&lt;-</span> <span class="fu">select_best</span>(resultados, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span>
+<span id="cb6-22"><a></a></span>
+<span id="cb6-23"><a></a><span class="co"># 7. Finalizar y evaluar en test (last_fit = fit en train + métricas en test)</span></span>
+<span id="cb6-24"><a></a>resultado_final <span class="ot">&lt;-</span> wf_lasso <span class="sc">|&gt;</span></span>
+<span id="cb6-25"><a></a>  <span class="fu">finalize_workflow</span>(mejor_lambda) <span class="sc">|&gt;</span></span>
+<span id="cb6-26"><a></a>  <span class="fu">last_fit</span>(<span class="at">split =</span> datos_split,</span>
+<span id="cb6-27"><a></a>           <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, rsq))</span>
+<span id="cb6-28"><a></a></span>
+<span id="cb6-29"><a></a><span class="fu">collect_metrics</span>(resultado_final)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li><code>select_best()</code> da el λ con menor RMSE. Veremos una alternativa más parsimoniosa en la próxima slide</li>
 <li>Para <span class="alert">Elastic Net</span>, marca también <code>mixture = tune()</code> y agrega <code>mixture(range = c(0, 1))</code> a la grilla con <code>levels = c(20, 5)</code> (20 de λ × 5 de α)</li>
 </ul>
+<p><span class="alert">Es el mismo patrón de tuning de la sesión 2.1; lo corren paso a paso en el laboratorio</span></p>
 </div>
 </section>
 <section id="dos-criterios-para-elegir-λ" class="slide level2">
@@ -1778,7 +1736,7 @@ Fold 5: [Train] [Train] [Train] [Train] [VAL]
 <li>Mejor rendimiento predictivo</li>
 <li>Modelo más complejo (más variables)</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="fu">select_best</span>(resultados, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="fu">select_best</span>(resultados, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div><div class="column" style="width:50%;">
 <p><strong>λ 1SE</strong> (<code>select_by_one_std_err</code>)</p>
 <ul>
@@ -1786,11 +1744,11 @@ Fold 5: [Train] [Train] [Train] [Train] [VAL]
 <li>Modelo más <span class="alert">parsimonioso</span></li>
 <li>Sacrifica un poco de rendimiento por simplicidad</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">select_by_one_std_err</span>(</span>
-<span id="cb10-2"><a></a>  resultados,</span>
-<span id="cb10-3"><a></a>  <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>,</span>
-<span id="cb10-4"><a></a>  <span class="fu">desc</span>(penalty)</span>
-<span id="cb10-5"><a></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a><span class="fu">select_by_one_std_err</span>(</span>
+<span id="cb8-2"><a></a>  resultados,</span>
+<span id="cb8-3"><a></a>  <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>,</span>
+<span id="cb8-4"><a></a>  <span class="fu">desc</span>(penalty)</span>
+<span id="cb8-5"><a></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div></div>
 <p><br></p>
 <p><span class="alert">En ciencias sociales, el λ 1SE suele preferirse por producir modelos más interpretables</span></p>
@@ -1806,16 +1764,16 @@ Fold 5: [Train] [Train] [Train] [Train] [VAL]
 <li>Funcionan igual con regresión logística: se penalizan los coeficientes para evitar sobreajuste y seleccionar variables</li>
 <li>En tidymodels, basta con cambiar <code>linear_reg()</code> por <code>logistic_reg()</code>:</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="co"># Regresión logística con LASSO</span></span>
-<span id="cb11-2"><a></a>modelo_clasif <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(</span>
-<span id="cb11-3"><a></a>  <span class="at">penalty =</span> <span class="fu">tune</span>(),</span>
-<span id="cb11-4"><a></a>  <span class="at">mixture =</span> <span class="dv">1</span>          <span class="co"># LASSO</span></span>
-<span id="cb11-5"><a></a>) <span class="sc">|&gt;</span></span>
-<span id="cb11-6"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-7"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span>
-<span id="cb11-8"><a></a></span>
-<span id="cb11-9"><a></a><span class="co"># El resto del flujo es idéntico:</span></span>
-<span id="cb11-10"><a></a><span class="co"># workflow, recipe, tune_grid, etc.</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co"># Regresión logística con LASSO</span></span>
+<span id="cb9-2"><a></a>modelo_clasif <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>(</span>
+<span id="cb9-3"><a></a>  <span class="at">penalty =</span> <span class="fu">tune</span>(),</span>
+<span id="cb9-4"><a></a>  <span class="at">mixture =</span> <span class="dv">1</span>          <span class="co"># LASSO</span></span>
+<span id="cb9-5"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb9-6"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glmnet&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-7"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span>
+<span id="cb9-8"><a></a></span>
+<span id="cb9-9"><a></a><span class="co"># El resto del flujo es idéntico:</span></span>
+<span id="cb9-10"><a></a><span class="co"># workflow, recipe, tune_grid, etc.</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div><div class="column" style="width:45%;">
 <div style="font-size: 20px; margin-top: -10px;">
 <p><strong>Ejemplo: predecir voto</strong></p>
@@ -1874,60 +1832,6 @@ genero_jefe            0.00  ← eliminada</code></pre>
 </div>
 <div style="font-size: 21px;">
 <p>LASSO identifica automáticamente qué variables <span class="alert">realmente predicen</span> la pobreza</p>
-</div>
-</div></div>
-</div>
-</section>
-<section id="regularización-para-datos-de-alta-dimensionalidad" class="slide level2">
-<h2>Regularización para datos de alta dimensionalidad</h2>
-<div style="margin-top: 30px; font-size: 23px;">
-<div class="columns">
-<div class="column" style="width:55%;">
-<p><strong>Útil cuando:</strong></p>
-<ul>
-<li><span class="alert">Muchas variables, pocas observaciones</span> (<span class="math inline">\(p \gg n\)</span>)</li>
-<li>Variables altamente <span class="alert">correlacionadas</span></li>
-<li>Solo algunas variables importan, sin hacer selección manual</li>
-</ul>
-<p><strong>Ejemplos en ciencias sociales:</strong> análisis de texto (miles de palabras), datos genómicos, encuestas con muchas preguntas, datos administrativos</p>
-</div><div class="column" style="width:45%;">
-<div style="text-align: center; font-size: 20px;">
-<p><strong>La regla del pulgar:</strong></p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 28%">
-<col style="width: 33%">
-<col style="width: 38%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Situación</th>
-<th>Significado</th>
-<th>Recomendación</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="math inline">\(n \gg p\)</span></td>
-<td>Muchos datos, pocas variables</td>
-<td>OLS probablemente está bien</td>
-</tr>
-<tr class="even">
-<td><span class="math inline">\(n \approx p\)</span></td>
-<td>Datos y variables similares</td>
-<td>Regularización ayuda</td>
-</tr>
-<tr class="odd">
-<td><span class="math inline">\(n \ll p\)</span></td>
-<td>Pocas observaciones, muchas variables</td>
-<td>Regularización es <span class="alert">necesaria</span> (OLS no funciona)</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p><br></p>
-<div style="font-size: 23px;">
-<p><span class="alert">LASSO funciona incluso cuando <span class="math inline">\(p &gt; n\)</span>, lo cual es imposible con OLS clásico.</span></p>
 </div>
 </div></div>
 </div>
@@ -2012,15 +1916,15 @@ genero_jefe            0.00  ← eliminada</code></pre>
 </div><div class="column" style="width:45%;">
 <div style="font-size: 22px;">
 <p><strong>Extraer coeficientes en tidymodels:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a><span class="co"># Ajustar modelo final</span></span>
-<span id="cb14-2"><a></a>ajuste_final <span class="ot">&lt;-</span> <span class="fu">fit</span>(modelo_final,</span>
-<span id="cb14-3"><a></a>                    satisfaccion <span class="sc">~</span> .,</span>
-<span id="cb14-4"><a></a>                    <span class="at">data =</span> datos_train)</span>
-<span id="cb14-5"><a></a></span>
-<span id="cb14-6"><a></a><span class="co"># Ver coeficientes</span></span>
-<span id="cb14-7"><a></a><span class="fu">tidy</span>(ajuste_final) <span class="sc">|&gt;</span></span>
-<span id="cb14-8"><a></a>  <span class="fu">filter</span>(estimate <span class="sc">!=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span>   <span class="co"># solo no-cero</span></span>
-<span id="cb14-9"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="co"># Ajustar modelo final</span></span>
+<span id="cb12-2"><a></a>ajuste_final <span class="ot">&lt;-</span> <span class="fu">fit</span>(modelo_final,</span>
+<span id="cb12-3"><a></a>                    satisfaccion <span class="sc">~</span> .,</span>
+<span id="cb12-4"><a></a>                    <span class="at">data =</span> datos_train)</span>
+<span id="cb12-5"><a></a></span>
+<span id="cb12-6"><a></a><span class="co"># Ver coeficientes</span></span>
+<span id="cb12-7"><a></a><span class="fu">tidy</span>(ajuste_final) <span class="sc">|&gt;</span></span>
+<span id="cb12-8"><a></a>  <span class="fu">filter</span>(estimate <span class="sc">!=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span>   <span class="co"># solo no-cero</span></span>
+<span id="cb12-9"><a></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <pre><code># Resultado (ejemplo):
 term                  estimate
 ─────────────────────────────
@@ -2032,29 +1936,6 @@ desempleo_regional    -0.09</code></pre>
 <p>Las variables con coeficiente = 0 (no mostradas) fueron <span class="alert">descartadas</span> por LASSO</p>
 </div>
 </div></div>
-</div>
-</section>
-<section id="guía-práctica-qué-modelo-uso" class="slide level2">
-<h2>Guía práctica: ¿qué modelo uso?</h2>
-<div style="margin-top: 30px; font-size: 22px;">
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>Si priorizas <span class="alert">interpretabilidad</span>:</strong></p>
-<ul>
-<li>OLS para pocos predictores claros</li>
-<li>LASSO cuando quieres que el modelo elija</li>
-<li>Ridge si todos los predictores importan</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><strong>Si priorizas <span class="alert">rendimiento</span>:</strong></p>
-<ul>
-<li>Random Forest para relaciones complejas</li>
-<li>Elastic Net como buen punto de partida</li>
-<li>Siempre comparar varios modelos con CV</li>
-</ul>
-</div></div>
-<p><br></p>
-<p><span class="alert">En ciencias sociales, la elección depende del objetivo: ¿explicar o predecir?</span> Comparar varios modelos con validación cruzada es la mejor forma de elegir.</p>
 </div>
 </section>
 <section id="resumen-de-la-sesión" class="slide level2">
@@ -2099,7 +1980,7 @@ desempleo_regional    -0.09</code></pre>
 <li>Topic modeling</li>
 </ul></li>
 </ul>
-<p><span class="alert">Nos vemos en el laboratorio!</span> 🤓</p>
+<p><span class="alert">¡Nos vemos en el laboratorio!</span> 🤓</p>
 </div>
 </section></section>
 <section>
@@ -2144,13 +2025,67 @@ de cada variable?</code></pre>
 </div>
 <p><br></p>
 <div style="font-size: 21px;">
-<p><span class="alert">El trade-off interpretabilidad-rendimiento es real. La elección depende del objetivo.</span></p>
+<p><span class="alert">El trade-off interpretabilidad-rendimiento es real. La elección depende del objetivo</span></p>
+</div>
+</div></div>
+</div>
+</section>
+<section id="apéndice-2-regularización-en-alta-dimensionalidad" class="slide level2">
+<h2>Apéndice 2: Regularización en alta dimensionalidad</h2>
+<div style="margin-top: 30px; font-size: 23px;">
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><strong>Útil cuando:</strong></p>
+<ul>
+<li><span class="alert">Muchas variables, pocas observaciones</span> (<span class="math inline">\(p \gg n\)</span>)</li>
+<li>Variables altamente <span class="alert">correlacionadas</span></li>
+<li>Solo algunas variables importan, sin hacer selección manual</li>
+</ul>
+<p><strong>Ejemplos en ciencias sociales:</strong> análisis de texto (miles de palabras), datos genómicos, encuestas con muchas preguntas, datos administrativos</p>
+</div><div class="column" style="width:45%;">
+<div style="text-align: center; font-size: 20px;">
+<p><strong>La regla del pulgar:</strong></p>
+<table class="caption-top">
+<colgroup>
+<col style="width: 28%">
+<col style="width: 33%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Situación</th>
+<th>Significado</th>
+<th>Recomendación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\(n \gg p\)</span></td>
+<td>Muchos datos, pocas variables</td>
+<td>OLS probablemente está bien</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(n \approx p\)</span></td>
+<td>Datos y variables similares</td>
+<td>Regularización ayuda</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(n \ll p\)</span></td>
+<td>Pocas observaciones, muchas variables</td>
+<td>Regularización es <span class="alert">necesaria</span> (OLS no funciona)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br></p>
+<div style="font-size: 23px;">
+<p><span class="alert">LASSO funciona incluso cuando <span class="math inline">\(p &gt; n\)</span>, lo cual es imposible con OLS clásico</span></p>
 </div>
 </div></div>
 </div>
 </section></section>
 <section id="nos-vemos-en-el-laboratorio" class="title-slide slide level1 center" data-background-color="#2d4563">
-<h1>Nos vemos en el laboratorio! 😊</h1>
+<h1>¡Nos vemos en el laboratorio! 😊</h1>
 
 
 </section>
