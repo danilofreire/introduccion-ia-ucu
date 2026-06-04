@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -308,7 +308,7 @@ modelo_rf_tune <- rand_forest(
   trees = 500,         # Número de árboles (fijo, no se optimiza)
   min_n = tune()       # Mínimo de observaciones en nodo terminal
 ) |>
-  # importance = "impurity": calcular importancia con permutación
+  # importance = "permutation": importancia por permutación (la usaremos en el VIP)
   set_engine("ranger", importance = "permutation") |> # ranger es un motor rápido para Random Forest
   set_mode("classification")
 
@@ -569,7 +569,7 @@ datos_uruguay <- datos |>
 
 [En ciencias sociales, la interpretabilidad suele ser tan importante como el rendimiento]{.alert}
 
-[[Apéndice 4: XGBoost opcional]{.button}](#sec:appendix04)
+[[Apéndice 3: árbol de decisión]{.button}](#sec:appendix03) · [[Apéndice 4: XGBoost opcional]{.button}](#sec:appendix04)
 :::
 :::
 :::
@@ -655,7 +655,7 @@ ggplot(resultados, aes(x = threshold, y = f1)) +
 datos_uruguay <- datos |> filter(pais == "Uruguay")
 cat("Observaciones en Uruguay:", nrow(datos_uruguay), "\n")
 
-# Con pocos datos (~28 obs), no dividimos en train/test
+# Con pocos datos (~31 obs), no dividimos en train/test
 # Entrenamos con todo el subconjunto solo para comparar VIP
 receta_uy <- recipe(voto ~ ., data = datos_uruguay) |>
   step_rm(pais, satisfaccion_vida) |>
@@ -679,7 +679,7 @@ vip(extract_fit_parsnip(ajuste_rf_uy), num_features = 10) +
   theme_minimal()
 ```
 
-- Con tan pocos datos (~28 obs), los resultados son [inestables]{.alert}: cambian con la semilla
+- Con tan pocos datos (~31 obs), los resultados son [inestables]{.alert}: cambian con la semilla
 - El ranking de importancia puede diferir del modelo general
 - Para conclusiones confiables a nivel país, necesitaríamos [muestras más grandes]{.alert}
 
