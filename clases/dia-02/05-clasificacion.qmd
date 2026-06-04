@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -124,7 +124,7 @@ arbol_demo <- rpart(
 - Tres tipos de aprendizaje: [supervisado]{.alert}, [no supervisado]{.alert} y [por refuerzo]{.alert}
 - El flujo de trabajo de ML: recoger, preprocesar, dividir, entrenar, evaluar
 - [Sobreajuste]{.alert} (_overfitting_): memorizar en lugar de aprender
-- La [accuracy no es suficiente]{.alert}: necesitamos precisión, recall y otras métricas
+- La [exactitud]{.alert} (_accuracy_) no es suficiente: necesitamos precisión, recall y otras métricas
 - Ayer hicimos nuestros primeros modelos con [tidymodels](https://www.tidymodels.org/), una interfaz unificada para ML en R
 :::
 
@@ -198,16 +198,14 @@ Fuente: [Wikipedia](https://en.wikipedia.org/wiki/Logistic_function)
 **Ventajas**
 
 - [Simple e interpretable]{.alert}: los coeficientes tienen significado claro
-- Rápida de entrenar, funciona bien con pocos datos
+- [Rápida]{.alert} de entrenar, funciona bien con pocos datos
 - Produce [probabilidades]{.alert}, no solo clases
 - Buena [línea base]{.alert} (baseline) antes de probar modelos más complejos
-- Familiar para investigadores de ciencias sociales
 
 **Limitaciones**
 
 - Asume [relaciones lineales]{.alert} entre predictores y log-odds
-- No captura [interacciones complejas]{.alert} automáticamente
-- Puede ser insuficiente con patrones no lineales
+- No captura [interacciones complejas]{.alert} ni patrones no lineales automáticamente
 :::
 
 :::{.column width=50%}
@@ -218,7 +216,7 @@ Fuente: [Wikipedia](https://en.wikipedia.org/wiki/Logistic_function)
 - [Pobreza]{.alert}: ¿qué variables predicen si un hogar está por debajo de la línea de pobreza?
 - [Migración]{.alert}: ¿qué factores predicen la intención de emigrar?
 
-[La interpretabilidad es clave]{.alert} para informar políticas públicas, aunque a veces sacrifiquemos capacidad predictiva.
+[La interpretabilidad es clave]{.alert} para informar políticas públicas, aunque a veces sacrifiquemos capacidad predictiva
 :::
 :::
 
@@ -235,11 +233,11 @@ ajuste_log <- logistic_reg() |>
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-**Pregunta de investigación:** ¿qué factores predicen si un uruguayo apoya la democracia? Datos del Latinobarómetro Uruguay (simulados)
+**Pregunta de investigación:** ¿qué factores predicen si un uruguayo apoya la democracia? Datos del Latinobarómetro para Uruguay (simulados)
 
 **Variables:** edad, educación, ingreso, confianza en instituciones, percepción económica, zona, género
 
-**Outcome:** `apoya_democracia` (sí/no)
+**Variable de respuesta:** `apoya_democracia` (sí/no)
 
 [La regresión logística nos dice qué factores aumentan o disminuyen la probabilidad de apoyo, y en qué magnitud]{.alert}
 
@@ -343,8 +341,7 @@ tidy(ajuste_log) |>
 - Cada [hoja]{.alert} contiene una predicción
 - Ejemplo: "Si la educación > 12 años Y la edad > 30, entonces predecir: votó"
 - Puede capturar [relaciones no lineales]{.alert}
-- Muy [fácil de interpretar]{.alert}: se puede visualizar como un diagrama de flujo
-- Cualquiera puede entender la lógica del modelo, incluyendo personas sin formación técnica
+- Muy [fácil de interpretar]{.alert}: se visualiza como un diagrama de flujo que cualquiera entiende, incluso sin formación técnica
 :::
 
 :::{.column width=45%}
@@ -451,10 +448,9 @@ pred_arbol |> roc_auc(truth = apoya_democracia, .pred_si, event_level = "second"
 ```
 :::
 
-- Noten que la [interfaz es idéntica]{.alert}: solo cambiamos `logistic_reg()` por `decision_tree()`
-- Esta es la gran ventaja de tidymodels: [misma sintaxis para todos los modelos!]{.alert}
+- Noten que la [interfaz es idéntica]{.alert}: solo cambiamos `logistic_reg()` por `decision_tree()`, ¡la misma sintaxis para todos los modelos!
 - `tree_depth` y `min_n` son [hiperparámetros]{.alert}: controlan la complejidad del modelo
-- [`augment()`]{.alert} agrega las predicciones (`.pred_class`, `.pred_no`, `.pred_si`) al test set, así una sola llamada nos da todo lo necesario para calcular cualquier métrica de yardstick
+- [`augment()`]{.alert} agrega las predicciones al test set; una sola llamada da todo lo necesario para cualquier métrica de yardstick
 :::
 
 ## Visualizar un árbol de decisión
@@ -495,7 +491,7 @@ rpart.plot(arbol_demo,
            box.palette = "RdBu")
 ```
 
-[Cualquier persona puede entender este modelo]{.alert}, incluso sin formación técnica!
+[¡Cualquier persona puede entender este modelo]{.alert}, incluso sin formación técnica!
 :::
 :::
 :::
@@ -507,14 +503,8 @@ rpart.plot(arbol_demo,
 :::{.columns}
 :::{.column width=55%}
 - Un árbol sin restricciones crece hasta [memorizar]{.alert} los datos
-- [Poda]{.alert} (pruning): técnica para reducir la complejidad del árbol
-- Dos estrategias:
-    - [Pre-poda:]{.alert} detener el crecimiento antes (limitar profundidad, mínimo de observaciones)
-    - [Post-poda:]{.alert} dejar crecer el árbol completo y luego recortar ramas que no mejoran
-- En tidymodels, usamos hiperparámetros para pre-poda:
-    - `tree_depth`: profundidad máxima
-    - `min_n`: mínimo de observaciones por nodo
-    - `cost_complexity`: penalización por complejidad
+- La [poda]{.alert} (pruning) reduce su complejidad: [pre-poda]{.alert} (frenar el crecimiento antes) o [post-poda]{.alert} (recortar ramas que no mejoran)
+- En tidymodels se controla con hiperparámetros: `tree_depth` (profundidad máxima), `min_n` (mínimo por nodo) y `cost_complexity` (penalización por complejidad)
 :::
 
 :::{.column width=45%}
@@ -568,16 +558,16 @@ A partir de cierta profundidad, el error en test [empeora]{.alert} mientras el e
 :::{.column width=55%}
 - Un solo árbol es [inestable]{.alert} y propenso al sobreajuste
 - Solución: [combinar muchos árboles]{.alert} y promediar sus predicciones
-- [Random Forest]{.alert} ([Breiman, 2001](https://doi.org/10.1023/A:1010933404324)) = un [ensemble]{.alert} (conjunto) de árboles de decisión
+- [Random Forest]{.alert} ([Breiman, 2001](https://doi.org/10.1023/A:1010933404324)) = un [conjunto]{.alert} de árboles de decisión
 - Dos fuentes de aleatoriedad:
     1. [Bootstrap]{.alert}: cada árbol entrena con una muestra diferente de los datos (con reemplazo)
     2. [Subconjunto de variables]{.alert}: en cada división, cada árbol solo considera un subconjunto aleatorio de variables
-- El resultado: árboles [diversos]{.alert} que cometen errores diferentes
-- Al promediar, los errores se [cancelan]{.alert} y la predicción mejora
+- El resultado: árboles [diversos]{.alert} cuyos errores se [cancelan]{.alert} al promediar, y la predicción mejora
+- Así, RF [reduce la varianza]{.alert} sin aumentar mucho el sesgo, y suele funcionar bien [sin mucha afinación]{.alert} de hiperparámetros
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 26px;"}
+:::{style="text-align: center;"}
 ```
 Random Forest con 500 árboles:
 
@@ -599,40 +589,7 @@ Predicción final: VOTÓ
 (mayoría de votos entre los 500 árboles)
 ```
 
-[La sabiduría de la multitud:]{.alert} muchos modelos "mediocres" juntos hacen un modelo excelente!
-:::
-:::
-:::
-:::
-
-## ¿Por qué funciona Random Forest?
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
-- [Reduce la varianza]{.alert} sin aumentar mucho el sesgo
-- Cada árbol individual sobreajusta, pero al promediar, el sobreajuste se diluye
-- Analogía: si les piden a 500 personas que estimen el peso de un buey, [el promedio será sorprendentemente cercano al valor real]{.alert}
-- Funciona bien [sin mucha afinación]{.alert} de hiperparámetros
-- Resistente frente a outliers y ruido
-- Es uno de los [modelos más usados en la práctica]{.alert} por su combinación de rendimiento y simplicidad
-:::
-
-:::{.column width=45%}
-:::{style="margin-top: -20px;"}
-**Hiperparámetros principales**
-
-| Parámetro | Descripción |
-|-----------|-------------|
-| `trees` | Número de árboles (más = mejor, pero más lento) |
-| `mtry` | Variables a considerar en cada división |
-| `min_n` | Mínimo de observaciones por nodo |
-:::
-
-:::{style="font-size: 22px; margin-top: 10px;"}
-- Más árboles mejoran (con rendimientos decrecientes)
-- `mtry` = $\sqrt{p}$ para clasificación, $p/3$ para regresión. Restringir variables por split [fuerza a los árboles a ser diferentes]{.alert}
-- En la práctica, [los valores por defecto funcionan bien]{.alert}
+[La sabiduría de la multitud:]{.alert} ¡muchos modelos "mediocres" juntos hacen un modelo excelente!
 :::
 :::
 :::
@@ -647,7 +604,7 @@ De nuevo, con tidymodels solo cambiamos la especificación:
 :::{style="font-size: 22px;"}
 ```{r rf-fit, echo=TRUE, message=FALSE}
 # Ajustar Random Forest (importance = "permutation" lo usamos después en VIP)
-ajuste_rf <- rand_forest(trees = 500, mtry = 3, min_n = 5) |>
+ajuste_rf <- rand_forest(trees = 2000, mtry = 2, min_n = 5) |>
   set_engine("ranger", seed = 1, importance = "permutation") |>
   set_mode("classification") |>
   fit(apoya_democracia ~ ., data = datos_train)
@@ -660,12 +617,21 @@ pred_rf |> roc_auc(truth = apoya_democracia, .pred_si, event_level = "second")
 :::
 
 - `ranger` es una implementación [rápida y eficiente]{.alert} de Random Forest en R
-- Misma estructura para logística, árbol y RF!
+
+**Hiperparámetros principales**
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `trees` | Número de árboles (más = mejor, pero más lento) |
+| `mtry` | Variables a considerar en cada división |
+| `min_n` | Mínimo de observaciones por nodo |
+
+- `mtry` $= \sqrt{p}$ (clasificación) o $p/3$ (regresión); restringir las variables por división [fuerza a los árboles a ser diferentes]{.alert}. En la práctica, [los valores por defecto funcionan bien]{.alert}
 :::
 
 ## Importancia de variables
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - Los Random Forests no son tan interpretables como un solo árbol o una regresión logística
@@ -678,39 +644,12 @@ pred_rf |> roc_auc(truth = apoya_democracia, .pred_si, event_level = "second")
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 21px; margin-top: 20px;"}
+:::{style="font-size: 20px; margin-top: 20px;"}
 ```{r vip-rf, echo=TRUE, message=FALSE, warning=FALSE, fig.height=3.5, fig.width=5, fig.align="center", out.width="100%"}
-# Reusamos ajuste_rf,
-# que ya tiene importance = "permutation"
 vip(ajuste_rf, num_features = 7)
 ```
 :::
-:::
-:::
-:::
-
-## Tipos de importancia de variables
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
-**Importancia por permutación** (la que usamos)
-
-- Mezclar los valores de una variable y ver cuánto empeora el modelo
-- [Independiente del modelo]{.alert}: se puede usar con cualquier algoritmo
-- Más [confiable]{.alert} pero más lenta
-- Se activa con `importance = "permutation"` en el engine
-:::
-
-:::{.column width=45%}
-**Otras opciones**
-
-- [Gini (impureza)]{.alert}: suma de reducciones de impureza. Rápida, pero sesgada hacia variables con muchas categorías
-- [SHAP values]{.alert}: contribución de cada variable a cada predicción individual. Más avanzado; disponible con `shapr` o `fastshap`
-
-<br>
-
-[Para este curso usamos importancia por permutación, la más robusta]{.alert}
+- Usamos [importancia por permutación]{.alert} (robusta); existen otras como [Gini]{.alert} (rápida pero sesgada hacia variables con muchas categorías) y [SHAP]{.alert} (más detallada, más avanzada). Para profundizar: [Molnar, _Interpretable ML_](https://christophm.github.io/interpretable-ml-book/)
 :::
 :::
 :::
@@ -763,123 +702,82 @@ ajuste_rf |>
 
 # Ajuste de hiperparámetros (tuning) {background-color="#2d4563"}
 
-## ¿Por qué ajustar hiperparámetros?
+## Ajuste de hiperparámetros (tuning)
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
-:::{.column width=55%}
-- Los [hiperparámetros]{.alert} son decisiones que tomamos antes de entrenar
-- Ejemplos:
-    - Árbol: `tree_depth`, `min_n`
-    - Random Forest: `trees`, `mtry`, `min_n`
-- Los valores por defecto [suelen funcionar]{.alert}, pero no siempre son óptimos
-- El [tuning]{.alert} busca la mejor combinación de hiperparámetros
-- [Nunca usar datos de test para tuning]{.alert}: usamos validación cruzada (`vfold_cv()`)
-- `tune()` es la función de tidymodels para marcar qué parámetros queremos ajustar
-- `grid_regular()` o `grid_random()` nos ayudan a crear combinaciones de valores para probar
-- `tune_grid()` hace el proceso de ajuste y evaluación automáticamente
+:::{.column width=50%}
+- Los [hiperparámetros]{.alert} (ej. `mtry`, `min_n`) se fijan antes de entrenar; los valores por defecto suelen servir, pero no siempre son óptimos
+- El [tuning]{.alert} prueba muchas combinaciones y elige la mejor por [validación cruzada]{.alert} ([nunca con los datos de test]{.alert})
+- El patrón en tidymodels:
+    1. marcar parámetros con `tune()`
+    2. definir una grilla de valores
+    3. evaluar cada combinación con `tune_grid()` sobre los folds
+    4. `select_best()` + `finalize_model()` para el ajuste final
 :::
 
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 26px;"}
-**El proceso:**
-
-```
-1. Definir grilla de valores a probar
-   mtry: [2, 3, 4, 5]
-   min_n: [5, 10, 20]
-
-2. Para cada combinación:
-   - Validación cruzada (5 folds)
-   - Calcular métrica promedio
-
-3. Elegir la mejor combinación
-
-4. Entrenar modelo final con
-   todos los datos de train
-```
-
-[Este proceso se llama "grid search"]{.alert}
-:::
-:::
-:::
-:::
-
-## Ajuste de hiperparámetros con tidymodels
-
-:::{style="margin-top: 30px; font-size: 20px;"}
-
-El [tuning]{.alert} busca la mejor combinación de hiperparámetros usando validación cruzada (nunca el conjunto de prueba):
-
-```{r tuning-full, echo=TRUE, message=FALSE, warning=FALSE}
-# 1. Modelo con parámetros tune()
-modelo_rf_tune <- rand_forest(trees = 500, mtry = tune(), min_n = tune()) |>
+:::{.column width=50%}
+:::{style="font-size: 16px; margin-top: 20px;"}
+```{r tuning-overview, echo=TRUE, eval=FALSE}
+# 1. Hiperparámetros a ajustar con tune()
+modelo_rf_tune <- rand_forest(mtry = tune(), min_n = tune()) |>
   set_engine("ranger", seed = 1) |>
   set_mode("classification")
 
-# 2. Grilla de valores + folds para validación cruzada
-grilla <- grid_regular(mtry(range = c(2, 6)),
-                       min_n(range = c(5, 20)),
-                       levels = 4)
-folds  <- vfold_cv(datos_train, v = 5, strata = apoya_democracia)
+# 2. Grilla de valores + folds de validación cruzada
+grilla <- grid_regular(mtry(range = c(2, 10)),
+                       min_n(range = c(5, 20)), levels = 4)
+folds  <- vfold_cv(datos_train, v = 5,
+                   strata = apoya_democracia)
 
-# 3. Buscar la mejor combinación (puede tardar ~1-2 min la primera vez)
-set.seed(1)
+# 3. Probar cada combinación con CV
 resultados <- tune_grid(modelo_rf_tune,
-                        apoya_democracia ~ .,
-                        resamples = folds,
-                        grid = grilla,
-                        metrics = metric_set(accuracy, roc_auc))
+  apoya_democracia ~ ., resamples = folds,
+  grid = grilla, metrics = metric_set(roc_auc))
 
-# 4. Seleccionar y finalizar
+# 4. Elegir la mejor y entrenar el modelo final
 mejor <- select_best(resultados, metric = "roc_auc")
 ajuste_final <- finalize_model(modelo_rf_tune, mejor) |>
   fit(apoya_democracia ~ ., data = datos_train)
-
-# 5. Evaluar en datos de test
-pred_test <- augment(ajuste_final, datos_test)
-pred_test |> accuracy(truth = apoya_democracia, estimate = .pred_class)
-pred_test |> roc_auc(truth = apoya_democracia, .pred_si, event_level = "second")
 ```
+:::
+:::
+:::
 
-- `tune()` marca los hiperparámetros a ajustar; `tune_grid()` evalúa cada combinación con validación cruzada
-- `select_best()` elige la mejor según la métrica indicada; `finalize_model()` fija los hiperparámetros para el entrenamiento final
-- [El tuning mejora el rendimiento pero toma tiempo]{.alert}. Empiecen con valores por defecto y ajusten si es necesario
+[El tuning mejora el rendimiento pero toma tiempo. Lo ejecutan paso a paso en el laboratorio]{.alert}
 :::
 
 # Comparación de modelos {background-color="#2d4563"}
 
-## El poder de parsnip: misma interfaz, diferentes modelos
+## Comparando los tres modelos
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-La gran ventaja de tidymodels es que [cambiar de modelo es trivial]{.alert}:
+Como los tres ajustes comparten la misma estructura, podemos compararlos en una métrica común (ROC-AUC en test):
 
 :::{style="font-size: 20px;"}
 ```{r comparacion-modelos, echo=TRUE, message=FALSE, warning=FALSE}
-# Recap: las tres ajustes que vimos en este capítulo (misma estructura, distinta spec)
+# Repaso: los tres ajustes que vimos en este capítulo (misma estructura, distinta spec)
 ajuste_log <- logistic_reg() |> set_engine("glm") |> set_mode("classification") |>
   fit(apoya_democracia ~ ., data = datos_train)
 ajuste_arbol <- decision_tree(tree_depth = 5, min_n = 10) |> set_engine("rpart") |> set_mode("classification") |>
   fit(apoya_democracia ~ ., data = datos_train)
-ajuste_rf <- rand_forest(trees = 500, mtry = 3, min_n = 5) |> set_engine("ranger", seed = 1, importance = "permutation") |> set_mode("classification") |>
+ajuste_rf <- rand_forest(trees = 2000, mtry = 2, min_n = 5) |> set_engine("ranger", seed = 1, importance = "permutation") |> set_mode("classification") |>
   fit(apoya_democracia ~ ., data = datos_train)
 
-# Métrica: accuracy en test usando augment() + accuracy() para cada modelo
+# Métrica: ROC-AUC en test
 tibble(
-  modelo = c("Logística", "Árbol", "Random Forest"),
-  accuracy = c(
-    augment(ajuste_log,   datos_test) |> accuracy(apoya_democracia, .pred_class) |> pull(.estimate),
-    augment(ajuste_arbol, datos_test) |> accuracy(apoya_democracia, .pred_class) |> pull(.estimate),
-    augment(ajuste_rf,    datos_test) |> accuracy(apoya_democracia, .pred_class) |> pull(.estimate)
+  Modelo = c("Logística", "Árbol", "Random Forest"),
+  `ROC-AUC` = c(
+    augment(ajuste_log,   datos_test) |> roc_auc(apoya_democracia, .pred_si, event_level = "second") |> pull(.estimate),
+    augment(ajuste_arbol, datos_test) |> roc_auc(apoya_democracia, .pred_si, event_level = "second") |> pull(.estimate),
+    augment(ajuste_rf,    datos_test) |> roc_auc(apoya_democracia, .pred_si, event_level = "second") |> pull(.estimate)
   )
 ) |> knitr::kable(digits = 3)
 ```
 :::
 
-- [No hay que aprender una API diferente para cada modelo]{.alert}
-- Esto facilita la experimentación y la comparación
-- En la práctica, [siempre hay que comparar varios modelos]{.alert} antes de elegir uno
+- En la práctica, [siempre hay que comparar modelos]{.alert} antes de elegir uno
 :::
 
 ## ¿Qué modelo elegir?
@@ -910,25 +808,16 @@ tibble(
 ## Resumen de la sesión
 
 :::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=50%}
-**Modelos de clasificación:**
 
-- [Regresión logística:]{.alert} interpretable, produce probabilidades, ideal para entender relaciones
-- [Árboles de decisión:]{.alert} intuitivos, visualizables, pero sobreajustan
-- [Random Forests:]{.alert} combinan muchos árboles, excelente rendimiento, menos interpretables
-- [Gradient Boosting:]{.alert} aún mejor rendimiento, más difícil de ajustar
-:::
+**Lo que vimos hoy:**
 
-:::{.column width=50%}
-**Herramientas aprendidas:**
+- Tres modelos, del más interpretable al más predictivo: [regresión logística]{.alert}, [árboles de decisión]{.alert} y [Random Forests]{.alert}
+- [Importancia de variables]{.alert} y [dependencia parcial]{.alert} para interpretar modelos de caja negra
+- [Tuning de hiperparámetros]{.alert} con validación cruzada y [comparación]{.alert} de modelos en tidymodels
 
-- [Importancia de variables:]{.alert} permutación, Gini, SHAP
-- [Gráficos de dependencia parcial:]{.alert} entender el efecto de cada variable
-- [Tuning de hiperparámetros:]{.alert} grid search con validación cruzada
-- [Comparación de modelos:]{.alert} misma interfaz para todos en tidymodels
-:::
-:::
+**Para explorar:**
+
+- [Gradient Boosting]{.alert} (XGBoost): suele predecir aún mejor, pero es más difícil de ajustar (apéndice 2)
 
 <br>
 
@@ -949,7 +838,7 @@ tibble(
     - Regresión con datos socioeconómicos
     - Tuning, comparación e interpretación
 
-[Nos vemos después del descanso!]{.alert}
+[¡Nos vemos después del descanso!]{.alert}
 :::
 
 # Apéndices {background-color="#2d4563"}
@@ -1024,7 +913,7 @@ Como $`r round(g_split,3)` < `r round(g_root,3)`$, [esta división mejora la sep
 
 ## Apéndice 2: Más allá de Random Forest: Gradient Boosting
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - Random Forest es un [ensemble]{.alert} (muchos modelos juntos)
@@ -1036,11 +925,11 @@ Como $`r round(g_split,3)` < `r round(g_root,3)`$, [esta división mejora la sep
     - [LightGBM]{.alert}: rápido para datasets grandes
     - [CatBoost]{.alert}: bueno con variables categóricas
 
-[Suele tener mejor rendimiento que RF, pero es más difícil de ajustar.]{.alert}
+[Suele tener mejor rendimiento que RF, pero es más difícil de ajustar]{.alert}
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 23px;"}
+:::{style="text-align: center; font-size: 22px;"}
 **Random Forest vs. Gradient Boosting:**
 
 | | RF | Boosting |
@@ -1060,7 +949,7 @@ modelo_xgb <- boost_tree() |>
   set_mode("classification")
 ```
 
-[Lo veremos con más detalle en los laboratorios.]{.alert}
+[Lo veremos con más detalle en los laboratorios]{.alert}
 :::
 :::
 :::
@@ -1089,14 +978,14 @@ modelo_xgb <- boost_tree() |>
 **Otros ejemplos en ciencias sociales:**
 
 - [Predicción de deserción escolar]{.alert}: identificar estudiantes en riesgo antes de que abandonen
-- [Scoring crediticio alternativo]{.alert}: fintech como Nubank usan ML para evaluar clientes sin historial bancario
+- [Scoring crediticio alternativo]{.alert}: las fintech como Nubank usan ML para evaluar clientes sin historial bancario
 - [Detección de fraude electoral]{.alert}: análisis de patrones anómalos en resultados
 - [Predicción de violencia]{.alert}: modelos para anticipar zonas de riesgo
 - [Análisis de opinión pública]{.alert}: clasificación de textos sobre políticas públicas
 
-[En todos estos casos, RF es un punto de partida común.]{.alert}
+[En todos estos casos, RF es un punto de partida común]{.alert}
 :::
 :::
 :::
 
-# Nos vemos en la próxima sesión {background-color="#2d4563"}
+# Nos vemos en la próxima sesión 🤓 {background-color="#2d4563"}
