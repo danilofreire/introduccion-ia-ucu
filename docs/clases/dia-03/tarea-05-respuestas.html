@@ -295,7 +295,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 8 esperanza_vida      71.7   75.6     80.7      0.12</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La variable con mayor dispersión relativa suele ser el <span class="alert">PIB per cápita</span> (Uruguay ~17,000 vs.&nbsp;Honduras ~2,500, con mediana intermedia → rango_rel &gt; 1). El gasto en salud y la desigualdad tienen rangos relativos más bajos. Esto justifica usar <code>scale()</code> antes de aplicar K-means o PCA: si no escalamos, el PIB dominaría las distancias.</p>
+<p><strong>Respuesta:</strong> La variable con mayor dispersión relativa es el <span class="alert">PIB per cápita</span> (Uruguay ~17,200 vs.&nbsp;Nicaragua ~1,900, con mediana ~6,100 → rango_rel ≈ 2.5). La desigualdad (Gini, ≈ 0.30) y la esperanza de vida (≈ 0.12) tienen los rangos relativos más bajos. Esto justifica usar <code>scale()</code> antes de aplicar K-means o PCA: si no escalamos, el PIB dominaría las distancias.</p>
 </section>
 <section id="pregunta-2-países-con-valores-extremos" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-países-con-valores-extremos"><span class="header-section-number">2.2</span> Pregunta 2: Países con valores extremos</h3>
@@ -323,7 +323,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 6 Gini min El Salvador           4094           73.7        38.6</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> <strong>Uruguay</strong> suele aparecer en los extremos altos (PIB, esperanza de vida). <strong>Honduras</strong> o <strong>Nicaragua</strong> aparecen en los extremos bajos. <strong>Brasil</strong> o <strong>Colombia</strong> suelen liderar en desigualdad. Que un país aparezca varias veces en extremos confirma que es un caso atípico — los métodos de clustering lo tratarán como tal.</p>
+<p><strong>Respuesta:</strong> Los extremos son: PIB máximo <strong>Uruguay</strong> (17,185) y mínimo <strong>Nicaragua</strong> (1,881); esperanza de vida máxima <strong>Costa Rica</strong> (80.7) y mínima <strong>Bolivia</strong> (71.7); desigualdad (Gini) máxima <strong>Honduras</strong> (52.3) y mínima <strong>El Salvador</strong> (38.6). Algunos países aparecen en más de un extremo: Uruguay combina el PIB más alto con uno de los Gini más bajos (38.9), y Honduras junta un PIB bajo con la mayor desigualdad. Que un país aparezca varias veces en los extremos confirma que es un caso atípico, y los métodos de clustering lo tratarán como tal.</p>
 </section>
 <section id="pregunta-3-correlaciones" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
@@ -417,7 +417,7 @@ Panamá                             Panamá       4</code></pre>
 3     4            0.235</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> <strong>K=2 maximiza la silueta</strong> (~0.29), seguido de K=3 (~0.27) y K=4 (~0.24 - 0.25). Sin embargo, K=2 colapsa toda la región en “desarrollados” vs.&nbsp;“menos desarrollados”, lo cual es demasiado grueso para análisis políticos finos. <strong>K=3 ofrece un buen compromiso entre estructura estadística y sentido sustantivo</strong>: añade un grupo intermedio interpretable.</p>
+<p><strong>Respuesta:</strong> <strong>K=2 maximiza la silueta</strong> (~0.29), seguido de K=3 (~0.27) y K=4 (~0.24). Sin embargo, K=2 colapsa toda la región en “desarrollados” vs.&nbsp;“menos desarrollados”, lo cual es demasiado grueso para análisis políticos finos. <strong>K=3 ofrece un buen compromiso entre estructura estadística y sentido sustantivo</strong>: añade un grupo intermedio interpretable.</p>
 </section>
 <section id="pregunta-6-perfil-de-los-clusters" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-perfil-de-los-clusters"><span class="header-section-number">3.3</span> Pregunta 6: Perfil de los clusters</h3>
@@ -509,7 +509,7 @@ Proportion of Variance 0.52232 0.197670 0.1156400
 Cumulative Proportion  0.52232 0.719990 0.8356300</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los primeros 3 componentes acumulan aproximadamente el <strong>85-90%</strong> de la varianza (PC1 ~52% + PC2 ~20% + PC3 ~10-15%). Para fines descriptivos y visualización, <strong>2 componentes ya bastan</strong> (más del 70%). PC3 agrega información complementaria solo si queremos una representación más fiel del dataset original.</p>
+<p><strong>Respuesta:</strong> Los primeros 3 componentes acumulan aproximadamente el <strong>84%</strong> de la varianza (PC1 ~52% + PC2 ~20% + PC3 ~12%). Para fines descriptivos y visualización, <strong>2 componentes ya bastan</strong> (~72%). PC3 agrega información complementaria solo si queremos una representación más fiel del dataset original.</p>
 </section>
 <section id="pregunta-10-interpretar-pc3" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-interpretar-pc3"><span class="header-section-number">5.2</span> Pregunta 10: Interpretar PC3</h3>
@@ -522,7 +522,7 @@ Cumulative Proportion  0.52232 0.719990 0.8356300</code></pre>
             -0.03             -0.02              0.28              0.31 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> PC3 suele cargar fuertemente en variables que NO están en PC1 ni PC2 — por ejemplo, <code>gasto_salud_pib</code> o <code>acceso_internet</code> con signos opuestos a otras variables. Puede capturar una dimensión como <strong>“calidad de servicios públicos vs.&nbsp;mercado privado”</strong> o <strong>“intensidad de inversión social”</strong>. Su interpretación es más difícil porque captura varianza residual; conviene leerlo en conjunto con los datos.</p>
+<p><strong>Respuesta:</strong> PC3 carga sobre todo en <code>indice_gini</code> (≈ -0.72) y <code>anios_educacion</code> (≈ -0.54), con <code>gasto_salud_pib</code> (≈ +0.31) e <code>indice_democracia</code> (≈ +0.28) en el signo opuesto. Es decir, separa desigualdad y escolaridad (un polo) de gasto en salud y democracia (el otro). Podría leerse como un eje residual de <strong>“desigualdad y rezago educativo vs.&nbsp;inversión institucional”</strong>, pero al capturar solo ~12% de la varianza su interpretación sustantiva es ambigua y conviene no sobreinterpretarla.</p>
 </section>
 <section id="pregunta-11-países-extremos-en-pc2" class="level3" data-number="5.3">
 <h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-países-extremos-en-pc2"><span class="header-section-number">5.3</span> Pregunta 11: Países extremos en PC2</h3>
@@ -554,7 +554,7 @@ Cumulative Proportion  0.52232 0.719990 0.8356300</code></pre>
 18             Honduras  2.47  1.87</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los países más extremos en PC2 son aquellos con alta desigualdad pero baja urbanización/educación (en un extremo) y baja desigualdad pero alta urbanización (en el otro). Países como Brasil o Colombia (alta desigualdad) tienden a aparecer en un extremo; Uruguay o Costa Rica (baja desigualdad relativa) en el otro. PC2 captura la <strong>dimensión de desigualdad relativa al desarrollo</strong>.</p>
+<p><strong>Respuesta:</strong> Los extremos de PC2 son <strong>Venezuela</strong> (≈ -3.0) en un polo y <strong>Honduras</strong>, <strong>Costa Rica</strong> y <strong>Guatemala</strong> (≈ +1.2 a +1.9) en el otro. PC2 carga positivamente en Gini, esperanza de vida y gasto en salud, y negativamente en urbanización y educación, así que el polo positivo reúne países desiguales o poco urbanizados pero con buenos indicadores de salud (Costa Rica destaca por la esperanza de vida más alta del grupo). Es una dimensión secundaria que mezcla desigualdad y salud, menos limpia que PC1, que sí es un eje de desarrollo claro.</p>
 </section>
 </section>
 <section id="síntesis" class="level2" data-number="6">

@@ -54,7 +54,7 @@ textos |>
   theme(legend.position = "none")
 ```
 
-**Respuesta:** La distribución es desigual: **2018** y **2024** tienen ~12-13 textos cada uno (años más representados), mientras que **2020** tiene solo ~2 textos. Esto es relevante porque cualquier análisis comparativo entre años debe tener en cuenta que algunos años están subrepresentados — las conclusiones sobre 2020 serán menos robustas que sobre 2018 o 2024.
+**Respuesta:** La distribución es desigual: **2019** es el año con más textos (14), seguido de **2024** (13) y **2018** (12), mientras que **2020** tiene solo 2 textos. Esto es relevante porque cualquier análisis comparativo entre años debe tener en cuenta que algunos están subrepresentados: las conclusiones sobre 2020 serán mucho menos robustas que sobre 2019 o 2024.
 
 ### Pregunta 2: Longitud de los textos
 
@@ -74,7 +74,7 @@ mas_largo
 textos |> filter(id %in% c(mas_corto$id, mas_largo$id)) |> select(id, tema, texto)
 ```
 
-**Respuesta:** El texto más corto tiene ~10-15 palabras; el más largo ~25-30. La variación es moderada. Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).
+**Respuesta:** El texto más corto tiene 10 palabras (tokens) y el más largo 20; la variación es moderada. Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).
 
 ### Pregunta 3: Bigramas más frecuentes
 
@@ -93,43 +93,43 @@ bigramas <- textos |>
 bigramas
 ```
 
-**Respuesta:** Los bigramas más frecuentes capturan expresiones compuestas que las palabras sueltas pierden: **"educación pública"**, **"crecimiento económico"**, **"medio ambiente"**, **"salud pública"**, etc. Esto muestra una ventaja real de los bigramas — recuperan colocaciones (palabras que aparecen juntas con significado conjunto) que enriquecen el análisis.
+**Respuesta:** En este corpus pequeño casi ningún bigrama se repite mucho: los más frecuentes aparecen solo 2 veces (**"crecimiento económico"**, **"comunidades indígenas"**, **"implementado programas"**, **"alcanzado niveles"**). Aun así ilustran la ventaja de los bigramas: recuperan colocaciones (palabras que van juntas con significado conjunto, como "crecimiento económico") que las palabras sueltas pierden. Con un corpus más grande, estas colocaciones se repetirían lo suficiente como para ser muy informativas.
 
 ## TF-IDF
 
-### Pregunta 4: TF-IDF por año
+### Pregunta 4: Frecuencia bruta vs. TF-IDF
 
 ```{r p4}
-tfidf_anio <- tokens_limpios |>
-  count(anio, palabra) |>
-  bind_tf_idf(palabra, anio, n)
+# Top 10 por frecuencia bruta (todo el corpus)
+tokens_limpios |>
+  count(palabra, sort = TRUE) |>
+  head(10)
 
-tfidf_anio |>
-  group_by(anio) |>
+# Top 3 por tema según TF-IDF
+tokens_limpios |>
+  count(tema, palabra) |>
+  bind_tf_idf(palabra, tema, n) |>
+  group_by(tema) |>
   slice_max(tf_idf, n = 3) |>
-  arrange(anio, desc(tf_idf))
+  arrange(tema, desc(tf_idf)) |>
+  select(tema, palabra, tf_idf)
 ```
 
-**Respuesta:** El año **2020-2021** suele tener "pandemia", "covid", "vacunación", "confinamiento" como palabras distintivas — el COVID-19 deja una huella léxica clara. Años posteriores (2022-2024) tienen palabras de "recuperación", "post-pandemia" o conflictos actuales. Esto demuestra que TF-IDF detecta automáticamente eventos sociales mayores sin necesidad de etiquetas manuales.
+**Respuesta:** La lista por frecuencia bruta está dominada por palabras genéricas que aparecen en muchos temas: **región, programas, sigue, comunidades, año**. Son frecuentes pero no distinguen un tema de otro. En la lista de TF-IDF esas palabras genéricas desaparecen y emergen términos específicos de cada tema (económico, estudiantes, biodiversidad, etc.). La razón es el factor IDF: una palabra que aparece en muchos grupos tiene IDF bajo (el logaritmo se acerca a cero), así que su TF-IDF se hunde por más frecuente que sea. Esta es justamente la razón de ser de TF-IDF: la frecuencia no es lo mismo que la capacidad de distinguir.
 
-### Pregunta 5: Vocabulario de la pandemia
+### Pregunta 5: ¿Cuándo informa el TF-IDF por grupo?
 
 ```{r p5}
-tfidf_pandemia <- textos |>
-  mutate(periodo = if_else(anio %in% c(2020, 2021), "pandemia", "otros")) |>
-  unnest_tokens(palabra, texto) |>
-  anti_join(stopwords_es, by = "palabra") |>
-  filter(!str_detect(palabra, "^[0-9]+$"), nchar(palabra) > 2) |>
-  count(periodo, palabra) |>
-  bind_tf_idf(palabra, periodo, n)
-
-tfidf_pandemia |>
-  filter(periodo == "pandemia") |>
-  slice_max(tf_idf, n = 10) |>
-  select(palabra, tf, idf, tf_idf)
+tokens_limpios |>
+  count(anio, palabra) |>
+  bind_tf_idf(palabra, anio, n) |>
+  group_by(anio) |>
+  slice_max(tf_idf, n = 3) |>
+  arrange(anio, desc(tf_idf)) |>
+  select(anio, palabra, tf_idf)
 ```
 
-**Respuesta:** Las palabras distintivas del período pandemia incluyen términos como **pandemia, vacunación, covid, confinamiento, sanitaria, emergencia**. Este es exactamente el caso donde TF-IDF brilla: un evento histórico introduce vocabulario nuevo que NO aparece (o aparece poco) en otros períodos, y TF-IDF lo identifica automáticamente.
+**Respuesta:** Las palabras distintivas por año son idiosincráticas (*agrícolas*, *fiscal*, *año*, *agua*, *esenciales*…) y no cuentan una historia temporal: no aparece un "año de la pandemia" con vocabulario sanitario, aunque el corpus sí contenga textos de salud que mencionan "pandemia". El motivo es que los 5 temas están repartidos de forma pareja entre los años, así que el vocabulario casi no correlaciona con el tiempo. TF-IDF solo revela una señal interpretable cuando la variable de agrupamiento influye de verdad en las palabras que se usan, como sí ocurre con `tema`. La lección práctica: antes de confiar en un TF-IDF por grupo, pregúntense si ese grupo debería cambiar el vocabulario; agrupar por una variable arbitraria produce ruido que puede parecer señal.
 
 ### Pregunta 6: TF-IDF por tema vs. por país
 
@@ -159,7 +159,7 @@ cat("Top 5", pais_top, ":", paste(top_pais, collapse = ", "), "\n")
 intersect(top_salud, top_pais)
 ```
 
-**Respuesta:** El solapamiento es **mínimo o nulo**. Las palabras distintivas por tema capturan vocabulario sustantivo (hospitales, vacunación), mientras que las distintivas por país capturan referencias geográficas (nombres de ciudades, instituciones locales). Esto confirma que TF-IDF responde a la pregunta que le hacemos: si agrupamos por tema, encontramos vocabulario temático; si agrupamos por país, encontramos vocabulario nacional.
+**Respuesta:** El solapamiento es **nulo** (ninguna palabra en común). Las palabras distintivas del tema salud son sustantivas y temáticas (*salud, acceso, sistema, internacional*), mientras que las del país con más textos (Brasil) son palabras que solo aparecen en sus textos, sin un patrón temático claro (*agricultura, banco, becas*…). Esto confirma que TF-IDF responde a la pregunta que le hacemos: si agrupamos por tema, encontramos vocabulario temático; si agrupamos por país, encontramos lo que distingue a ese país, que con tan pocos textos suele ser idiosincrático.
 
 ## Sentimiento
 
@@ -212,7 +212,7 @@ sentimiento_pais <- sentimiento_doc |>
 sentimiento_pais
 ```
 
-**Respuesta:** Los países con tono más negativo en promedio tienden a ser aquellos que el corpus simula con temas de crisis o seguridad: **Venezuela, El Salvador, Honduras**. Los más positivos suelen ser países con menos textos sobre temas problemáticos. Un caveat importante: con tan pocos textos por país (algunos solo 1-2), el promedio es muy sensible al azar — interpretar con cautela.
+**Respuesta:** Los países con tono más negativo en promedio son **El Salvador** (≈ -1.5), **Panamá** (≈ -1.3) y **Colombia** (≈ -0.7); Argentina también aparece negativa (≈ -0.6), consistente con sus textos sobre inflación. Pero conviene no leer demasiado en esto: con tan pocos textos por país (El Salvador y Panamá tienen 2 o 3), el promedio es muy sensible al azar. De hecho, Venezuela sale ligeramente *positiva* pese a la intuición de "país en crisis", solo porque sus pocos textos no contienen muchas palabras del diccionario negativo. Es un recordatorio de que los promedios sobre muestras minúsculas son poco fiables.
 
 ### Pregunta 9: El documento más positivo
 
@@ -255,7 +255,7 @@ ggplot(sentimiento_tema_anio,
   theme_minimal()
 ```
 
-**Respuesta:** El heatmap revela patrones: el tema **seguridad** mantiene tono negativo en todos los años; **salud** se vuelve más negativo en 2020-2021 (pandemia); **economía** alterna entre tonos. Los años con pocos textos (2020) son menos confiables. El gradiente bicolor (rojo-blanco-verde) hace evidente que la mayoría de los temas se mueven entre -1 y +2 — el rango de variación es moderado.
+**Respuesta:** El heatmap se ve colorido, pero conviene leerlo con cautela: cada celda (tema × año) resume apenas 1 a 4 textos, así que los valores son sobre todo ruido. No emerge una tendencia temporal estable. Por ejemplo, seguridad es negativo en los años recientes (2022-2024) pero positivo en 2018 y 2021, y salud ni siquiera tiene textos en 2020. Las celdas más negativas se concentran en seguridad y economía de los últimos años, pero con tan pocos datos por celda no se puede afirmar una evolución. Es el mismo problema de muestras minúsculas que vimos en el sentimiento por país: cruzar dos dimensiones reparte 60 textos en demasiadas celdas como para que el resultado sea confiable.
 
 ## Síntesis
 
@@ -301,11 +301,11 @@ accuracy <- sum(diag(conf_mat)) / sum(conf_mat)
 cat("Accuracy:", round(accuracy, 3), "\n")
 ```
 
-**Respuesta:** El clasificador por keywords obtiene accuracy de ~70-85% según la calidad de las palabras-ancla. Es **transparente** (sabemos exactamente por qué clasifica cada texto), **rápido** y **fácil de mejorar** (agregar más palabras-ancla). Sus errores tienden a ocurrir cuando un texto cruza dos temas (p. ej. "pandemia y economía") o cuando el tema se discute sin las palabras clásicas. Para un corpus pequeño como este, este enfoque puede igualar a LDA en accuracy con mucha más claridad.
+**Respuesta:** Entre los documentos que sí logra clasificar, el accuracy es muy alto (≈ 0.96): cuando un texto contiene una palabra-ancla, casi siempre apunta al tema correcto. Pero el verdadero límite no es la precisión sino la **cobertura**: solo unos 28 de los 60 textos contienen alguna palabra-ancla, y el resto queda sin clasificar. Es el clásico compromiso precisión-cobertura de los métodos por diccionario: son **transparentes** (sabemos exactamente por qué se clasifica cada texto), rápidos y fáciles de mejorar (agregar más anclas sube la cobertura), pero un diccionario corto deja muchos casos afuera. Para subir la cobertura sin perder transparencia, habría que ampliar las anclas o combinarlas con TF-IDF.
 
 ### Pregunta 12: TF-IDF + sentimiento
 
-**Respuesta:** Hay una relación parcial pero no determinista. Los **temas** con vocabulario marcadamente negativo según TF-IDF (seguridad, con palabras como "violencia", "crimen") también tienen los scores de sentimiento más negativos — lo cual valida que las dos herramientas capturan la misma señal de fondo. Sin embargo, los **países** con tono más negativo no siempre son los más representados en temas problemáticos: a veces un país tiene un solo texto que, por azar, es muy negativo, y eso sesga su promedio. La combinación de TF-IDF (qué palabras) + sentimiento (cómo se sienten) y validación humana (¿son representativas las palabras-ancla?) construye un análisis más completo que cualquier método solo.
+**Respuesta:** A nivel de tema la relación es clara: los temas cuyo vocabulario distintivo (TF-IDF) es más negativo, como **seguridad** ("violencia", "crimen"), son también los de sentimiento promedio más bajo. Las dos herramientas capturan la misma señal de fondo por caminos distintos, lo que da confianza en el resultado. A nivel de país la relación se diluye: con tan pocos textos por país, un solo texto muy negativo arrastra el promedio, así que el orden de países es más ruido que señal. La moraleja es metodológica: TF-IDF (qué palabras) y sentimiento (con qué tono) se refuerzan cuando el agrupamiento tiene suficientes datos y vocabulario propio (tema), y se vuelven poco fiables cuando no (país con 1-2 textos).
 
 ### Pregunta 13: Reflexión
 

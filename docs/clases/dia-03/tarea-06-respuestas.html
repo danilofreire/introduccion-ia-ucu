@@ -287,7 +287,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La distribución es desigual: <strong>2018</strong> y <strong>2024</strong> tienen ~12-13 textos cada uno (años más representados), mientras que <strong>2020</strong> tiene solo ~2 textos. Esto es relevante porque cualquier análisis comparativo entre años debe tener en cuenta que algunos años están subrepresentados — las conclusiones sobre 2020 serán menos robustas que sobre 2018 o 2024.</p>
+<p><strong>Respuesta:</strong> La distribución es desigual: <strong>2019</strong> es el año con más textos (14), seguido de <strong>2024</strong> (13) y <strong>2018</strong> (12), mientras que <strong>2020</strong> tiene solo 2 textos. Esto es relevante porque cualquier análisis comparativo entre años debe tener en cuenta que algunos están subrepresentados: las conclusiones sobre 2020 serán mucho menos robustas que sobre 2019 o 2024.</p>
 </section>
 <section id="pregunta-2-longitud-de-los-textos" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-longitud-de-los-textos"><span class="header-section-number">2.2</span> Pregunta 2: Longitud de los textos</h3>
@@ -325,7 +325,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 3    56 medioambiente La transición energética requiere inversiones significati…</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El texto más corto tiene ~10-15 palabras; el más largo ~25-30. La variación es moderada. Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).</p>
+<p><strong>Respuesta:</strong> El texto más corto tiene 10 palabras (tokens) y el más largo 20; la variación es moderada. Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).</p>
 </section>
 <section id="pregunta-3-bigramas-más-frecuentes" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-bigramas-más-frecuentes"><span class="header-section-number">2.3</span> Pregunta 3: Bigramas más frecuentes</h3>
@@ -358,114 +358,129 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 10 alcanzado coberturas              1</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los bigramas más frecuentes capturan expresiones compuestas que las palabras sueltas pierden: <strong>“educación pública”</strong>, <strong>“crecimiento económico”</strong>, <strong>“medio ambiente”</strong>, <strong>“salud pública”</strong>, etc. Esto muestra una ventaja real de los bigramas — recuperan colocaciones (palabras que aparecen juntas con significado conjunto) que enriquecen el análisis.</p>
+<p><strong>Respuesta:</strong> En este corpus pequeño casi ningún bigrama se repite mucho: los más frecuentes aparecen solo 2 veces (<strong>“crecimiento económico”</strong>, <strong>“comunidades indígenas”</strong>, <strong>“implementado programas”</strong>, <strong>“alcanzado niveles”</strong>). Aun así ilustran la ventaja de los bigramas: recuperan colocaciones (palabras que van juntas con significado conjunto, como “crecimiento económico”) que las palabras sueltas pierden. Con un corpus más grande, estas colocaciones se repetirían lo suficiente como para ser muy informativas.</p>
 </section>
 </section>
 <section id="tf-idf" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="tf-idf"><span class="header-section-number">3</span> TF-IDF</h2>
-<section id="pregunta-4-tf-idf-por-año" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-tf-idf-por-año"><span class="header-section-number">3.1</span> Pregunta 4: TF-IDF por año</h3>
+<section id="pregunta-4-frecuencia-bruta-vs.-tf-idf" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-frecuencia-bruta-vs.-tf-idf"><span class="header-section-number">3.1</span> Pregunta 4: Frecuencia bruta vs.&nbsp;TF-IDF</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>tfidf_anio <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(anio, palabra) <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, anio, n)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>tfidf_anio <span class="sc">|&gt;</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(anio) <span class="sc">|&gt;</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(anio, <span class="fu">desc</span>(tf_idf))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 10 por frecuencia bruta (todo el corpus)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(palabra, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 116 × 6
+<pre><code># A tibble: 10 × 2
+   palabra         n
+   &lt;chr&gt;       &lt;int&gt;
+ 1 región          9
+ 2 salud           8
+ 3 programas       7
+ 4 sigue           7
+ 5 comunidades     5
+ 6 educación       4
+ 7 representan     4
+ 8 rurales         4
+ 9 seguridad       4
+10 afecta          3</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 3 por tema según TF-IDF</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(tema, palabra) <span class="sc">|&gt;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, tema, n) <span class="sc">|&gt;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tema) <span class="sc">|&gt;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(tema, <span class="fu">desc</span>(tf_idf)) <span class="sc">|&gt;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tema, palabra, tf_idf)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 82 × 3
+# Groups:   tema [5]
+   tema          palabra       tf_idf
+   &lt;chr&gt;         &lt;chr&gt;          &lt;dbl&gt;
+ 1 economia      económico     0.0460
+ 2 economia      país          0.0460
+ 3 economia      crecimiento   0.0307
+ 4 economia      exportaciones 0.0307
+ 5 economia      fiscal        0.0307
+ 6 economia      laboral       0.0307
+ 7 educacion     educación     0.0664
+ 8 educacion     estudiantes   0.0498
+ 9 educacion     escolar       0.0332
+10 medioambiente biodiversidad 0.0346
+# ℹ 72 more rows</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> La lista por frecuencia bruta está dominada por palabras genéricas que aparecen en muchos temas: <strong>región, programas, sigue, comunidades, año</strong>. Son frecuentes pero no distinguen un tema de otro. En la lista de TF-IDF esas palabras genéricas desaparecen y emergen términos específicos de cada tema (económico, estudiantes, biodiversidad, etc.). La razón es el factor IDF: una palabra que aparece en muchos grupos tiene IDF bajo (el logaritmo se acerca a cero), así que su TF-IDF se hunde por más frecuente que sea. Esta es justamente la razón de ser de TF-IDF: la frecuencia no es lo mismo que la capacidad de distinguir.</p>
+</section>
+<section id="pregunta-5-cuándo-informa-el-tf-idf-por-grupo" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-cuándo-informa-el-tf-idf-por-grupo"><span class="header-section-number">3.2</span> Pregunta 5: ¿Cuándo informa el TF-IDF por grupo?</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(anio, palabra) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, anio, n) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(anio) <span class="sc">|&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(anio, <span class="fu">desc</span>(tf_idf)) <span class="sc">|&gt;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(anio, palabra, tf_idf)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 116 × 3
 # Groups:   anio [7]
-    anio palabra          n     tf   idf tf_idf
-   &lt;dbl&gt; &lt;chr&gt;        &lt;int&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
- 1  2018 esenciales       2 0.0215  1.95 0.0418
- 2  2018 indígenas        2 0.0215  1.95 0.0418
- 3  2018 insuficiente     2 0.0215  1.95 0.0418
- 4  2018 permitido        2 0.0215  1.95 0.0418
- 5  2019 necesita         2 0.0180  1.95 0.0351
- 6  2019 mayor            2 0.0180  1.25 0.0226
- 7  2019 nuevo            2 0.0180  1.25 0.0226
- 8  2020 agrícolas        1 0.05    1.95 0.0973
- 9  2020 condicionada     1 0.05    1.95 0.0973
-10  2020 demostrado       1 0.05    1.95 0.0973
+    anio palabra      tf_idf
+   &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;
+ 1  2018 esenciales   0.0418
+ 2  2018 indígenas    0.0418
+ 3  2018 insuficiente 0.0418
+ 4  2018 permitido    0.0418
+ 5  2019 necesita     0.0351
+ 6  2019 mayor        0.0226
+ 7  2019 nuevo        0.0226
+ 8  2020 agrícolas    0.0973
+ 9  2020 condicionada 0.0973
+10  2020 demostrado   0.0973
 # ℹ 106 more rows</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El año <strong>2020-2021</strong> suele tener “pandemia”, “covid”, “vacunación”, “confinamiento” como palabras distintivas — el COVID-19 deja una huella léxica clara. Años posteriores (2022-2024) tienen palabras de “recuperación”, “post-pandemia” o conflictos actuales. Esto demuestra que TF-IDF detecta automáticamente eventos sociales mayores sin necesidad de etiquetas manuales.</p>
-</section>
-<section id="pregunta-5-vocabulario-de-la-pandemia" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-vocabulario-de-la-pandemia"><span class="header-section-number">3.2</span> Pregunta 5: Vocabulario de la pandemia</h3>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>tfidf_pandemia <span class="ot">&lt;-</span> textos <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">periodo =</span> <span class="fu">if_else</span>(anio <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2020</span>, <span class="dv">2021</span>), <span class="st">"pandemia"</span>, <span class="st">"otros"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(palabra, texto) <span class="sc">|&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(stopwords_es, <span class="at">by =</span> <span class="st">"palabra"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(palabra, <span class="st">"^[0-9]+$"</span>), <span class="fu">nchar</span>(palabra) <span class="sc">&gt;</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(periodo, palabra) <span class="sc">|&gt;</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, periodo, n)</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>tfidf_pandemia <span class="sc">|&gt;</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(periodo <span class="sc">==</span> <span class="st">"pandemia"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(palabra, tf, idf, tf_idf)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 49 × 4
-   palabra           tf   idf  tf_idf
-   &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
- 1 año           0.0370 0.693 0.0257 
- 2 fiscal        0.0247 0.693 0.0171 
- 3 pobreza       0.0247 0.693 0.0171 
- 4 agrícolas     0.0123 0.693 0.00856
- 5 agua          0.0123 0.693 0.00856
- 6 anunció       0.0123 0.693 0.00856
- 7 bolsillo      0.0123 0.693 0.00856
- 8 condicionada  0.0123 0.693 0.00856
- 9 consecutivo   0.0123 0.693 0.00856
-10 contaminación 0.0123 0.693 0.00856
-# ℹ 39 more rows</code></pre>
-</div>
-</div>
-<p><strong>Respuesta:</strong> Las palabras distintivas del período pandemia incluyen términos como <strong>pandemia, vacunación, covid, confinamiento, sanitaria, emergencia</strong>. Este es exactamente el caso donde TF-IDF brilla: un evento histórico introduce vocabulario nuevo que NO aparece (o aparece poco) en otros períodos, y TF-IDF lo identifica automáticamente.</p>
+<p><strong>Respuesta:</strong> Las palabras distintivas por año son idiosincráticas (<em>agrícolas</em>, <em>fiscal</em>, <em>año</em>, <em>agua</em>, <em>esenciales</em>…) y no cuentan una historia temporal: no aparece un “año de la pandemia” con vocabulario sanitario, aunque el corpus sí contenga textos de salud que mencionan “pandemia”. El motivo es que los 5 temas están repartidos de forma pareja entre los años, así que el vocabulario casi no correlaciona con el tiempo. TF-IDF solo revela una señal interpretable cuando la variable de agrupamiento influye de verdad en las palabras que se usan, como sí ocurre con <code>tema</code>. La lección práctica: antes de confiar en un TF-IDF por grupo, pregúntense si ese grupo debería cambiar el vocabulario; agrupar por una variable arbitraria produce ruido que puede parecer señal.</p>
 </section>
 <section id="pregunta-6-tf-idf-por-tema-vs.-por-país" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-tf-idf-por-tema-vs.-por-país"><span class="header-section-number">3.3</span> Pregunta 6: TF-IDF por tema vs.&nbsp;por país</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 5 salud (por tema)</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>top_salud <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(tema, palabra) <span class="sc">|&gt;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, tema, n) <span class="sc">|&gt;</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tema <span class="sc">==</span> <span class="st">"salud"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(palabra)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 5 del país con más textos</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>pais_top <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span> <span class="fu">count</span>(pais, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(pais)</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>top_pais <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(pais, palabra) <span class="sc">|&gt;</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, pais, n) <span class="sc">|&gt;</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pais <span class="sc">==</span> pais_top) <span class="sc">|&gt;</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(palabra)</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Top 5 salud:"</span>, <span class="fu">paste</span>(top_salud, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 5 salud (por tema)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>top_salud <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(tema, palabra) <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, tema, n) <span class="sc">|&gt;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(tema <span class="sc">==</span> <span class="st">"salud"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(palabra)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Top 5 del país con más textos</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>pais_top <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span> <span class="fu">count</span>(pais, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(pais)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>top_pais <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(pais, palabra) <span class="sc">|&gt;</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_tf_idf</span>(palabra, pais, n) <span class="sc">|&gt;</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pais <span class="sc">==</span> pais_top) <span class="sc">|&gt;</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(tf_idf, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(palabra)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Top 5 salud:"</span>, <span class="fu">paste</span>(top_salud, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Top 5 salud: salud, acceso, internacional, sistema, biomédica, bolsillo, carga, centros, coberturas, coordinación, crónicas, deficiencias, desafío, desatendido, desigualdad, emergido, empuja, enfermedades, enfrentan, expuso, financiamiento, fortalecido, gasto, graves, herramienta, históricas, hospitales, infantil, insuficientes, investigación, llegar, materno, medicamentos, mental, mortalidad, neonatal, nuevos, poblaciones, precarias, primaria, reducido, remotas, sanitario, servicios, telemedicina, tema, transmisibles, urbanas, vacunación, valiosa </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Top 5"</span>, pais_top, <span class="st">":"</span>, <span class="fu">paste</span>(top_pais, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Top 5"</span>, pais_top, <span class="st">":"</span>, <span class="fu">paste</span>(top_pais, <span class="at">collapse =</span> <span class="st">", "</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Top 5 Brasil : agricultura, bajos, banco, becas, beneficiará, carbono, carga, crónicas, derechos, desempleo, emisiones, enfermedades, estabilizar, externas, frente, fuerza, fuerzas, históricos, humanos, infantil, materno, mercado, moneda, monetaria, mortalidad, muestra, necesitan, neonatal, política, presiones, productividad, programa, proporcional, puede, recuperación, recursos, reducido, sacrificar, signos, tasas, transmisibles, universitarias, uso </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Solapamiento</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">intersect</span>(top_salud, top_pais)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Solapamiento</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">intersect</span>(top_salud, top_pais)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "carga"         "crónicas"      "enfermedades"  "infantil"     
 [5] "materno"       "mortalidad"    "neonatal"      "reducido"     
 [9] "transmisibles"</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El solapamiento es <strong>mínimo o nulo</strong>. Las palabras distintivas por tema capturan vocabulario sustantivo (hospitales, vacunación), mientras que las distintivas por país capturan referencias geográficas (nombres de ciudades, instituciones locales). Esto confirma que TF-IDF responde a la pregunta que le hacemos: si agrupamos por tema, encontramos vocabulario temático; si agrupamos por país, encontramos vocabulario nacional.</p>
+<p><strong>Respuesta:</strong> El solapamiento es <strong>nulo</strong> (ninguna palabra en común). Las palabras distintivas del tema salud son sustantivas y temáticas (<em>salud, acceso, sistema, internacional</em>), mientras que las del país con más textos (Brasil) son palabras que solo aparecen en sus textos, sin un patrón temático claro (<em>agricultura, banco, becas</em>…). Esto confirma que TF-IDF responde a la pregunta que le hacemos: si agrupamos por tema, encontramos vocabulario temático; si agrupamos por país, encontramos lo que distingue a ese país, que con tan pocos textos suele ser idiosincrático.</p>
 </section>
 </section>
 <section id="sentimiento" class="level2" data-number="4">
@@ -473,24 +488,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-7-ampliar-diccionarios" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-ampliar-diccionarios"><span class="header-section-number">4.1</span> Pregunta 7: Ampliar diccionarios</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>positivas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"crecimiento"</span>, <span class="st">"mejora"</span>, <span class="st">"mejorado"</span>, <span class="st">"oportunidad"</span>, <span class="st">"fortalecido"</span>,</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">"innovadores"</span>, <span class="st">"renovables"</span>, <span class="st">"sólido"</span>, <span class="st">"beneficio"</span>, <span class="st">"avance"</span>,</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>               <span class="st">"estabilizar"</span>, <span class="st">"reducir"</span>, <span class="st">"éxito"</span>, <span class="st">"progreso"</span>, <span class="st">"esperanza"</span>,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">"desarrollo"</span>, <span class="st">"inversión"</span>, <span class="st">"expansión"</span>, <span class="st">"estable"</span>, <span class="st">"positivo"</span>,</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">"consolidación"</span>, <span class="st">"fortalecimiento"</span>, <span class="st">"incremento"</span>, <span class="st">"modernización"</span>,</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">"inclusión"</span>, <span class="st">"sustentable"</span>, <span class="st">"eficiente"</span>, <span class="st">"transparencia"</span>,</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">"participación"</span>, <span class="st">"cooperación"</span>, <span class="st">"innovación"</span>, <span class="st">"competitividad"</span>)</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>negativas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"crisis"</span>, <span class="st">"inflación"</span>, <span class="st">"pobreza"</span>, <span class="st">"violencia"</span>, <span class="st">"amenaza"</span>,</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>               <span class="st">"problema"</span>, <span class="st">"deuda"</span>, <span class="st">"riesgo"</span>, <span class="st">"deficiencias"</span>, <span class="st">"grave"</span>,</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>               <span class="st">"crimen"</span>, <span class="st">"narcotráfico"</span>, <span class="st">"deforestación"</span>, <span class="st">"informalidad"</span>,</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">"inseguridad"</span>, <span class="st">"contaminación"</span>, <span class="st">"desempleo"</span>, <span class="st">"vulnerables"</span>,</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">"corrupción"</span>, <span class="st">"recesión"</span>, <span class="st">"desigualdad"</span>, <span class="st">"exclusión"</span>,</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"abandono"</span>, <span class="st">"fracaso"</span>, <span class="st">"estancamiento"</span>, <span class="st">"deterioro"</span>,</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"marginación"</span>, <span class="st">"represión"</span>, <span class="st">"polarización"</span>, <span class="st">"fragmentación"</span>,</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>               <span class="st">"atraso"</span>, <span class="st">"conflicto"</span>, <span class="st">"tensión"</span>, <span class="st">"deficiente"</span>, <span class="st">"precario"</span>)</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Positivas:"</span>, <span class="fu">length</span>(positivas), <span class="st">"  Negativas:"</span>, <span class="fu">length</span>(negativas), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>positivas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"crecimiento"</span>, <span class="st">"mejora"</span>, <span class="st">"mejorado"</span>, <span class="st">"oportunidad"</span>, <span class="st">"fortalecido"</span>,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">"innovadores"</span>, <span class="st">"renovables"</span>, <span class="st">"sólido"</span>, <span class="st">"beneficio"</span>, <span class="st">"avance"</span>,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>               <span class="st">"estabilizar"</span>, <span class="st">"reducir"</span>, <span class="st">"éxito"</span>, <span class="st">"progreso"</span>, <span class="st">"esperanza"</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">"desarrollo"</span>, <span class="st">"inversión"</span>, <span class="st">"expansión"</span>, <span class="st">"estable"</span>, <span class="st">"positivo"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">"consolidación"</span>, <span class="st">"fortalecimiento"</span>, <span class="st">"incremento"</span>, <span class="st">"modernización"</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">"inclusión"</span>, <span class="st">"sustentable"</span>, <span class="st">"eficiente"</span>, <span class="st">"transparencia"</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">"participación"</span>, <span class="st">"cooperación"</span>, <span class="st">"innovación"</span>, <span class="st">"competitividad"</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>negativas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"crisis"</span>, <span class="st">"inflación"</span>, <span class="st">"pobreza"</span>, <span class="st">"violencia"</span>, <span class="st">"amenaza"</span>,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>               <span class="st">"problema"</span>, <span class="st">"deuda"</span>, <span class="st">"riesgo"</span>, <span class="st">"deficiencias"</span>, <span class="st">"grave"</span>,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>               <span class="st">"crimen"</span>, <span class="st">"narcotráfico"</span>, <span class="st">"deforestación"</span>, <span class="st">"informalidad"</span>,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">"inseguridad"</span>, <span class="st">"contaminación"</span>, <span class="st">"desempleo"</span>, <span class="st">"vulnerables"</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">"corrupción"</span>, <span class="st">"recesión"</span>, <span class="st">"desigualdad"</span>, <span class="st">"exclusión"</span>,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"abandono"</span>, <span class="st">"fracaso"</span>, <span class="st">"estancamiento"</span>, <span class="st">"deterioro"</span>,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"marginación"</span>, <span class="st">"represión"</span>, <span class="st">"polarización"</span>, <span class="st">"fragmentación"</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>               <span class="st">"atraso"</span>, <span class="st">"conflicto"</span>, <span class="st">"tensión"</span>, <span class="st">"deficiente"</span>, <span class="st">"precario"</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Positivas:"</span>, <span class="fu">length</span>(positivas), <span class="st">"  Negativas:"</span>, <span class="fu">length</span>(negativas), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Positivas: 32   Negativas: 35 </code></pre>
 </div>
@@ -500,25 +515,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-8-sentimiento-por-país" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-sentimiento-por-país"><span class="header-section-number">4.2</span> Pregunta 8: Sentimiento por país</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sentimiento_doc <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">valencia =</span> <span class="fu">case_when</span>(</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> positivas <span class="sc">~</span>  <span class="dv">1</span>L,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> negativas <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span>L,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>L</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id, pais) <span class="sc">|&gt;</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">score =</span> <span class="fu">sum</span>(valencia), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>sentimiento_pais <span class="ot">&lt;-</span> sentimiento_doc <span class="sc">|&gt;</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pais) <span class="sc">|&gt;</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_textos =</span> <span class="fu">n</span>(),</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_promedio =</span> <span class="fu">round</span>(<span class="fu">mean</span>(score), <span class="dv">2</span>),</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(score_promedio)</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>sentimiento_pais</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sentimiento_doc <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">valencia =</span> <span class="fu">case_when</span>(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> positivas <span class="sc">~</span>  <span class="dv">1</span>L,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> negativas <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span>L,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>L</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id, pais) <span class="sc">|&gt;</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">score =</span> <span class="fu">sum</span>(valencia), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>sentimiento_pais <span class="ot">&lt;-</span> sentimiento_doc <span class="sc">|&gt;</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pais) <span class="sc">|&gt;</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_textos =</span> <span class="fu">n</span>(),</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">score_promedio =</span> <span class="fu">round</span>(<span class="fu">mean</span>(score), <span class="dv">2</span>),</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(score_promedio)</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>sentimiento_pais</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 18 × 3
    pais                 n_textos score_promedio
@@ -543,25 +558,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 18 Uruguay                     1           1   </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los países con tono más negativo en promedio tienden a ser aquellos que el corpus simula con temas de crisis o seguridad: <strong>Venezuela, El Salvador, Honduras</strong>. Los más positivos suelen ser países con menos textos sobre temas problemáticos. Un caveat importante: con tan pocos textos por país (algunos solo 1-2), el promedio es muy sensible al azar — interpretar con cautela.</p>
+<p><strong>Respuesta:</strong> Los países con tono más negativo en promedio son <strong>El Salvador</strong> (≈ -1.5), <strong>Panamá</strong> (≈ -1.3) y <strong>Colombia</strong> (≈ -0.7); Argentina también aparece negativa (≈ -0.6), consistente con sus textos sobre inflación. Pero conviene no leer demasiado en esto: con tan pocos textos por país (El Salvador y Panamá tienen 2 o 3), el promedio es muy sensible al azar. De hecho, Venezuela sale ligeramente <em>positiva</em> pese a la intuición de “país en crisis”, solo porque sus pocos textos no contienen muchas palabras del diccionario negativo. Es un recordatorio de que los promedios sobre muestras minúsculas son poco fiables.</p>
 </section>
 <section id="pregunta-9-el-documento-más-positivo" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-9-el-documento-más-positivo"><span class="header-section-number">4.3</span> Pregunta 9: El documento más positivo</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>doc_mas_positivo <span class="ot">&lt;-</span> sentimiento_doc <span class="sc">|&gt;</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(score)) <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">1</span>)</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>doc_mas_positivo</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>doc_mas_positivo <span class="ot">&lt;-</span> sentimiento_doc <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(score)) <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">1</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>doc_mas_positivo</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
      id pais   score
   &lt;dbl&gt; &lt;chr&gt;  &lt;int&gt;
 1     1 México     3</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>textos <span class="sc">|&gt;</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> doc_mas_positivo<span class="sc">$</span>id) <span class="sc">|&gt;</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, tema, pais, anio, texto)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>textos <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(id <span class="sc">==</span> doc_mas_positivo<span class="sc">$</span>id) <span class="sc">|&gt;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, tema, pais, anio, texto)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 5
      id tema     pais    anio texto                                             
@@ -574,26 +589,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-10-heatmap-sentimiento-por-tema-y-año" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="pregunta-10-heatmap-sentimiento-por-tema-y-año"><span class="header-section-number">4.4</span> Pregunta 10: Heatmap sentimiento por tema y año</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>sentimiento_tema_anio <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">valencia =</span> <span class="fu">case_when</span>(</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> positivas <span class="sc">~</span>  <span class="dv">1</span>L,</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> negativas <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span>L,</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>L</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id, tema, anio) <span class="sc">|&gt;</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">score =</span> <span class="fu">sum</span>(valencia), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tema, anio) <span class="sc">|&gt;</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">score_promedio =</span> <span class="fu">mean</span>(score), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sentimiento_tema_anio,</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(anio), <span class="at">y =</span> tema, <span class="at">fill =</span> score_promedio)) <span class="sc">+</span></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(score_promedio, <span class="dv">1</span>)), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"#E74C3C"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"#27AE60"</span>,</span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">midpoint =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Tono promedio por tema × año"</span>,</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Año"</span>, <span class="at">y =</span> <span class="st">"Tema"</span>, <span class="at">fill =</span> <span class="st">"Score"</span>) <span class="sc">+</span></span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>sentimiento_tema_anio <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">valencia =</span> <span class="fu">case_when</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> positivas <span class="sc">~</span>  <span class="dv">1</span>L,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> negativas <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span>L,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="dv">0</span>L</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id, tema, anio) <span class="sc">|&gt;</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">score =</span> <span class="fu">sum</span>(valencia), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(tema, anio) <span class="sc">|&gt;</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">score_promedio =</span> <span class="fu">mean</span>(score), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(sentimiento_tema_anio,</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(anio), <span class="at">y =</span> tema, <span class="at">fill =</span> score_promedio)) <span class="sc">+</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(score_promedio, <span class="dv">1</span>)), <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"#E74C3C"</span>, <span class="at">mid =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"#27AE60"</span>,</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">midpoint =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Tono promedio por tema × año"</span>,</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Año"</span>, <span class="at">y =</span> <span class="st">"Tema"</span>, <span class="at">fill =</span> <span class="st">"Score"</span>) <span class="sc">+</span></span>
+<span id="cb31-20"><a href="#cb31-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -602,7 +617,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El heatmap revela patrones: el tema <strong>seguridad</strong> mantiene tono negativo en todos los años; <strong>salud</strong> se vuelve más negativo en 2020-2021 (pandemia); <strong>economía</strong> alterna entre tonos. Los años con pocos textos (2020) son menos confiables. El gradiente bicolor (rojo-blanco-verde) hace evidente que la mayoría de los temas se mueven entre -1 y +2 — el rango de variación es moderado.</p>
+<p><strong>Respuesta:</strong> El heatmap se ve colorido, pero conviene leerlo con cautela: cada celda (tema × año) resume apenas 1 a 4 textos, así que los valores son sobre todo ruido. No emerge una tendencia temporal estable. Por ejemplo, seguridad es negativo en los años recientes (2022-2024) pero positivo en 2018 y 2021, y salud ni siquiera tiene textos en 2020. Las celdas más negativas se concentran en seguridad y economía de los últimos años, pero con tan pocos datos por celda no se puede afirmar una evolución. Es el mismo problema de muestras minúsculas que vimos en el sentimiento por país: cruzar dos dimensiones reparte 60 textos en demasiadas celdas como para que el resultado sea confiable.</p>
 </section>
 </section>
 <section id="síntesis" class="level2" data-number="5">
@@ -610,39 +625,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-11-clasificador-por-palabras-clave" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-11-clasificador-por-palabras-clave"><span class="header-section-number">5.1</span> Pregunta 11: Clasificador por palabras clave</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>ancla <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">economia      =</span> <span class="fu">c</span>(<span class="st">"crecimiento"</span>, <span class="st">"inflación"</span>, <span class="st">"empleo"</span>, <span class="st">"pib"</span>, <span class="st">"mercado"</span>,</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"inversión"</span>, <span class="st">"fiscal"</span>, <span class="st">"monetaria"</span>, <span class="st">"desempleo"</span>),</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">educacion     =</span> <span class="fu">c</span>(<span class="st">"estudiantes"</span>, <span class="st">"docentes"</span>, <span class="st">"escuelas"</span>, <span class="st">"universidad"</span>,</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"educativa"</span>, <span class="st">"alumnos"</span>, <span class="st">"aprendizaje"</span>, <span class="st">"escolar"</span>),</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">salud         =</span> <span class="fu">c</span>(<span class="st">"hospitales"</span>, <span class="st">"vacunación"</span>, <span class="st">"pandemia"</span>, <span class="st">"médicos"</span>,</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"sanitaria"</span>, <span class="st">"enfermedades"</span>, <span class="st">"covid"</span>),</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">seguridad     =</span> <span class="fu">c</span>(<span class="st">"violencia"</span>, <span class="st">"crimen"</span>, <span class="st">"policía"</span>, <span class="st">"delincuencia"</span>,</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"narcotráfico"</span>, <span class="st">"robos"</span>, <span class="st">"inseguridad"</span>),</span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">medioambiente =</span> <span class="fu">c</span>(<span class="st">"deforestación"</span>, <span class="st">"biodiversidad"</span>, <span class="st">"bosque"</span>, <span class="st">"clima"</span>,</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"renovables"</span>, <span class="st">"contaminación"</span>, <span class="st">"sustentable"</span>)</span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Para cada documento, contar palabras de cada ancla</span></span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>clasificacion <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tema_predicho =</span> <span class="fu">case_when</span>(</span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>economia      <span class="sc">~</span> <span class="st">"economia"</span>,</span>
-<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>educacion     <span class="sc">~</span> <span class="st">"educacion"</span>,</span>
-<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>salud         <span class="sc">~</span> <span class="st">"salud"</span>,</span>
-<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>seguridad     <span class="sc">~</span> <span class="st">"seguridad"</span>,</span>
-<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>medioambiente <span class="sc">~</span> <span class="st">"medioambiente"</span>,</span>
-<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
-<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(tema_predicho)) <span class="sc">|&gt;</span></span>
-<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(id, tema_predicho) <span class="sc">|&gt;</span></span>
-<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
-<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(textos <span class="sc">|&gt;</span> <span class="fu">select</span>(id, <span class="at">tema_real =</span> tema), <span class="at">by =</span> <span class="st">"id"</span>)</span>
-<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de confusión</span></span>
-<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a>conf_mat <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">Real =</span> clasificacion<span class="sc">$</span>tema_real, <span class="at">Predicho =</span> clasificacion<span class="sc">$</span>tema_predicho)</span>
-<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a>conf_mat</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>ancla <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">economia      =</span> <span class="fu">c</span>(<span class="st">"crecimiento"</span>, <span class="st">"inflación"</span>, <span class="st">"empleo"</span>, <span class="st">"pib"</span>, <span class="st">"mercado"</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"inversión"</span>, <span class="st">"fiscal"</span>, <span class="st">"monetaria"</span>, <span class="st">"desempleo"</span>),</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">educacion     =</span> <span class="fu">c</span>(<span class="st">"estudiantes"</span>, <span class="st">"docentes"</span>, <span class="st">"escuelas"</span>, <span class="st">"universidad"</span>,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"educativa"</span>, <span class="st">"alumnos"</span>, <span class="st">"aprendizaje"</span>, <span class="st">"escolar"</span>),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">salud         =</span> <span class="fu">c</span>(<span class="st">"hospitales"</span>, <span class="st">"vacunación"</span>, <span class="st">"pandemia"</span>, <span class="st">"médicos"</span>,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"sanitaria"</span>, <span class="st">"enfermedades"</span>, <span class="st">"covid"</span>),</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">seguridad     =</span> <span class="fu">c</span>(<span class="st">"violencia"</span>, <span class="st">"crimen"</span>, <span class="st">"policía"</span>, <span class="st">"delincuencia"</span>,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"narcotráfico"</span>, <span class="st">"robos"</span>, <span class="st">"inseguridad"</span>),</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">medioambiente =</span> <span class="fu">c</span>(<span class="st">"deforestación"</span>, <span class="st">"biodiversidad"</span>, <span class="st">"bosque"</span>, <span class="st">"clima"</span>,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"renovables"</span>, <span class="st">"contaminación"</span>, <span class="st">"sustentable"</span>)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Para cada documento, contar palabras de cada ancla</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>clasificacion <span class="ot">&lt;-</span> tokens_limpios <span class="sc">|&gt;</span></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tema_predicho =</span> <span class="fu">case_when</span>(</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>economia      <span class="sc">~</span> <span class="st">"economia"</span>,</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>educacion     <span class="sc">~</span> <span class="st">"educacion"</span>,</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>salud         <span class="sc">~</span> <span class="st">"salud"</span>,</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>seguridad     <span class="sc">~</span> <span class="st">"seguridad"</span>,</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>    palabra <span class="sc">%in%</span> ancla<span class="sc">$</span>medioambiente <span class="sc">~</span> <span class="st">"medioambiente"</span>,</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(tema_predicho)) <span class="sc">|&gt;</span></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(id, tema_predicho) <span class="sc">|&gt;</span></span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(textos <span class="sc">|&gt;</span> <span class="fu">select</span>(id, <span class="at">tema_real =</span> tema), <span class="at">by =</span> <span class="st">"id"</span>)</span>
+<span id="cb32-30"><a href="#cb32-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-31"><a href="#cb32-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de confusión</span></span>
+<span id="cb32-32"><a href="#cb32-32" aria-hidden="true" tabindex="-1"></a>conf_mat <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">Real =</span> clasificacion<span class="sc">$</span>tema_real, <span class="at">Predicho =</span> clasificacion<span class="sc">$</span>tema_predicho)</span>
+<span id="cb32-33"><a href="#cb32-33" aria-hidden="true" tabindex="-1"></a>conf_mat</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>               Predicho
 Real            economia educacion medioambiente salud seguridad
@@ -652,18 +667,18 @@ Real            economia educacion medioambiente salud seguridad
   salud                0         0             0     4         0
   seguridad            0         0             0     0         4</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Accuracy</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>accuracy <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">diag</span>(conf_mat)) <span class="sc">/</span> <span class="fu">sum</span>(conf_mat)</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy:"</span>, <span class="fu">round</span>(accuracy, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Accuracy</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>accuracy <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">diag</span>(conf_mat)) <span class="sc">/</span> <span class="fu">sum</span>(conf_mat)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Accuracy:"</span>, <span class="fu">round</span>(accuracy, <span class="dv">3</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Accuracy: 0.964 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El clasificador por keywords obtiene accuracy de ~70-85% según la calidad de las palabras-ancla. Es <strong>transparente</strong> (sabemos exactamente por qué clasifica cada texto), <strong>rápido</strong> y <strong>fácil de mejorar</strong> (agregar más palabras-ancla). Sus errores tienden a ocurrir cuando un texto cruza dos temas (p.&nbsp;ej. “pandemia y economía”) o cuando el tema se discute sin las palabras clásicas. Para un corpus pequeño como este, este enfoque puede igualar a LDA en accuracy con mucha más claridad.</p>
+<p><strong>Respuesta:</strong> Entre los documentos que sí logra clasificar, el accuracy es muy alto (≈ 0.96): cuando un texto contiene una palabra-ancla, casi siempre apunta al tema correcto. Pero el verdadero límite no es la precisión sino la <strong>cobertura</strong>: solo unos 28 de los 60 textos contienen alguna palabra-ancla, y el resto queda sin clasificar. Es el clásico compromiso precisión-cobertura de los métodos por diccionario: son <strong>transparentes</strong> (sabemos exactamente por qué se clasifica cada texto), rápidos y fáciles de mejorar (agregar más anclas sube la cobertura), pero un diccionario corto deja muchos casos afuera. Para subir la cobertura sin perder transparencia, habría que ampliar las anclas o combinarlas con TF-IDF.</p>
 </section>
 <section id="pregunta-12-tf-idf-sentimiento" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-12-tf-idf-sentimiento"><span class="header-section-number">5.2</span> Pregunta 12: TF-IDF + sentimiento</h3>
-<p><strong>Respuesta:</strong> Hay una relación parcial pero no determinista. Los <strong>temas</strong> con vocabulario marcadamente negativo según TF-IDF (seguridad, con palabras como “violencia”, “crimen”) también tienen los scores de sentimiento más negativos — lo cual valida que las dos herramientas capturan la misma señal de fondo. Sin embargo, los <strong>países</strong> con tono más negativo no siempre son los más representados en temas problemáticos: a veces un país tiene un solo texto que, por azar, es muy negativo, y eso sesga su promedio. La combinación de TF-IDF (qué palabras) + sentimiento (cómo se sienten) y validación humana (¿son representativas las palabras-ancla?) construye un análisis más completo que cualquier método solo.</p>
+<p><strong>Respuesta:</strong> A nivel de tema la relación es clara: los temas cuyo vocabulario distintivo (TF-IDF) es más negativo, como <strong>seguridad</strong> (“violencia”, “crimen”), son también los de sentimiento promedio más bajo. Las dos herramientas capturan la misma señal de fondo por caminos distintos, lo que da confianza en el resultado. A nivel de país la relación se diluye: con tan pocos textos por país, un solo texto muy negativo arrastra el promedio, así que el orden de países es más ruido que señal. La moraleja es metodológica: TF-IDF (qué palabras) y sentimiento (con qué tono) se refuerzan cuando el agrupamiento tiene suficientes datos y vocabulario propio (tema), y se vuelven poco fiables cuando no (país con 1-2 textos).</p>
 </section>
 <section id="pregunta-13-reflexión" class="level3" data-number="5.3">
 <h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-13-reflexión"><span class="header-section-number">5.3</span> Pregunta 13: Reflexión</h3>

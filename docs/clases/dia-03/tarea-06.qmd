@@ -88,9 +88,9 @@ Tokenicen el corpus original en **bigramas** (pares consecutivos de palabras) us
 
 ## TF-IDF
 
-### Pregunta 4: TF-IDF por año
+### Pregunta 4: Frecuencia bruta vs. TF-IDF
 
-Calculen TF-IDF agrupando por `anio` (no por tema). Identifiquen las 3 palabras más distintivas de cada año. ¿Qué año tiene "pandemia" o "covid" como palabra distintiva?
+Calculen las 10 palabras más frecuentes de todo el corpus (conteo bruto sobre `tokens_limpios`) y, por separado, las 3 palabras más distintivas de cada tema según TF-IDF. ¿Qué palabras dominan la lista por frecuencia bruta pero no aparecen como distintivas en TF-IDF? ¿Por qué?
 
 ```{r p4}
 # Escriban su código aquí
@@ -99,11 +99,11 @@ Calculen TF-IDF agrupando por `anio` (no por tema). Identifiquen las 3 palabras 
 
 **Respuesta:**
 
-### Pregunta 5: Vocabulario de la pandemia
+### Pregunta 5: ¿Cuándo informa el TF-IDF por grupo?
 
-Comparen las palabras de los textos de 2020-2021 con las del resto. Usen `bind_tf_idf()` con un agrupamiento de dos niveles: "pandemia" (2020-2021) vs. "otros años". ¿Qué palabras son distintivas del período pandemia?
+Calculen TF-IDF agrupando por `anio` y miren las 3 palabras más distintivas de cada año. ¿Cuentan una historia temporal coherente (por ejemplo, un "año de la pandemia" con vocabulario sanitario), o son palabras sueltas sin patrón? Comparen con el TF-IDF por tema. ¿Qué condición debe cumplir una variable de agrupamiento para que el TF-IDF revele una señal interpretable?
 
-*Pista:* `mutate(periodo = if_else(anio %in% c(2020, 2021), "pandemia", "otros"))` y luego TF-IDF por `periodo`.
+*Pista:* es el mismo patrón que el TF-IDF por tema, cambiando `tema` por `anio` en `count()` y `bind_tf_idf()`.
 
 ```{r p5}
 # Escriban su código aquí
@@ -190,7 +190,7 @@ Construyan un clasificador simple por diccionario de palabras clave: para cada t
 
 ### Pregunta 12: TF-IDF + sentimiento
 
-Vuelvan a la pregunta 8 (sentimiento por país) y la pregunta 4 (TF-IDF por año). ¿Hay relación entre los países con tono más negativo y las palabras distintivas de los años de crisis? Comenten en 3-5 oraciones.
+Conecten el TF-IDF por tema (pregunta 6 y laboratorio) con el sentimiento por tema: ¿los temas cuyo vocabulario distintivo es más negativo (por ejemplo, seguridad) son también los de score de sentimiento más bajo? ¿Se sostiene la misma relación a nivel de país (pregunta 8)? Comenten en 3-5 oraciones.
 
 **Respuesta:**
 

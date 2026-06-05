@@ -55,7 +55,7 @@ resumen <- paises |>
 resumen
 ```
 
-**Respuesta:** La variable con mayor dispersión relativa suele ser el [PIB per cápita]{.alert} (Uruguay ~17,000 vs. Honduras ~2,500, con mediana intermedia → rango_rel > 1). El gasto en salud y la desigualdad tienen rangos relativos más bajos. Esto justifica usar `scale()` antes de aplicar K-means o PCA: si no escalamos, el PIB dominaría las distancias.
+**Respuesta:** La variable con mayor dispersión relativa es el [PIB per cápita]{.alert} (Uruguay ~17,200 vs. Nicaragua ~1,900, con mediana ~6,100 → rango_rel ≈ 2.5). La desigualdad (Gini, ≈ 0.30) y la esperanza de vida (≈ 0.12) tienen los rangos relativos más bajos. Esto justifica usar `scale()` antes de aplicar K-means o PCA: si no escalamos, el PIB dominaría las distancias.
 
 ### Pregunta 2: Países con valores extremos
 
@@ -73,7 +73,7 @@ extremos <- bind_rows(
 extremos
 ```
 
-**Respuesta:** **Uruguay** suele aparecer en los extremos altos (PIB, esperanza de vida). **Honduras** o **Nicaragua** aparecen en los extremos bajos. **Brasil** o **Colombia** suelen liderar en desigualdad. Que un país aparezca varias veces en extremos confirma que es un caso atípico — los métodos de clustering lo tratarán como tal.
+**Respuesta:** Los extremos son: PIB máximo **Uruguay** (17,185) y mínimo **Nicaragua** (1,881); esperanza de vida máxima **Costa Rica** (80.7) y mínima **Bolivia** (71.7); desigualdad (Gini) máxima **Honduras** (52.3) y mínima **El Salvador** (38.6). Algunos países aparecen en más de un extremo: Uruguay combina el PIB más alto con uno de los Gini más bajos (38.9), y Honduras junta un PIB bajo con la mayor desigualdad. Que un país aparezca varias veces en los extremos confirma que es un caso atípico, y los métodos de clustering lo tratarán como tal.
 
 ### Pregunta 3: Correlaciones
 
@@ -125,7 +125,7 @@ tibble(K = 2:4, silueta_promedio = round(siluetas, 3)) |>
   arrange(desc(silueta_promedio))
 ```
 
-**Respuesta:** **K=2 maximiza la silueta** (~0.29), seguido de K=3 (~0.27) y K=4 (~0.24 - 0.25). Sin embargo, K=2 colapsa toda la región en "desarrollados" vs. "menos desarrollados", lo cual es demasiado grueso para análisis políticos finos. **K=3 ofrece un buen compromiso entre estructura estadística y sentido sustantivo**: añade un grupo intermedio interpretable.
+**Respuesta:** **K=2 maximiza la silueta** (~0.29), seguido de K=3 (~0.27) y K=4 (~0.24). Sin embargo, K=2 colapsa toda la región en "desarrollados" vs. "menos desarrollados", lo cual es demasiado grueso para análisis políticos finos. **K=3 ofrece un buen compromiso entre estructura estadística y sentido sustantivo**: añade un grupo intermedio interpretable.
 
 ### Pregunta 6: Perfil de los clusters
 
@@ -189,7 +189,7 @@ pca <- prcomp(datos_scaled)
 summary(pca)$importance[, 1:3]
 ```
 
-**Respuesta:** Los primeros 3 componentes acumulan aproximadamente el **85-90%** de la varianza (PC1 ~52% + PC2 ~20% + PC3 ~10-15%). Para fines descriptivos y visualización, **2 componentes ya bastan** (más del 70%). PC3 agrega información complementaria solo si queremos una representación más fiel del dataset original.
+**Respuesta:** Los primeros 3 componentes acumulan aproximadamente el **84%** de la varianza (PC1 ~52% + PC2 ~20% + PC3 ~12%). Para fines descriptivos y visualización, **2 componentes ya bastan** (~72%). PC3 agrega información complementaria solo si queremos una representación más fiel del dataset original.
 
 ### Pregunta 10: Interpretar PC3
 
@@ -197,7 +197,7 @@ summary(pca)$importance[, 1:3]
 pca$rotation[, 3] |> round(2) |> sort()
 ```
 
-**Respuesta:** PC3 suele cargar fuertemente en variables que NO están en PC1 ni PC2 — por ejemplo, `gasto_salud_pib` o `acceso_internet` con signos opuestos a otras variables. Puede capturar una dimensión como **"calidad de servicios públicos vs. mercado privado"** o **"intensidad de inversión social"**. Su interpretación es más difícil porque captura varianza residual; conviene leerlo en conjunto con los datos.
+**Respuesta:** PC3 carga sobre todo en `indice_gini` (≈ -0.72) y `anios_educacion` (≈ -0.54), con `gasto_salud_pib` (≈ +0.31) e `indice_democracia` (≈ +0.28) en el signo opuesto. Es decir, separa desigualdad y escolaridad (un polo) de gasto en salud y democracia (el otro). Podría leerse como un eje residual de **"desigualdad y rezago educativo vs. inversión institucional"**, pero al capturar solo ~12% de la varianza su interpretación sustantiva es ambigua y conviene no sobreinterpretarla.
 
 ### Pregunta 11: Países extremos en PC2
 
@@ -209,7 +209,7 @@ pca$x[, 1:2] |>
   mutate(PC1 = round(PC1, 2), PC2 = round(PC2, 2))
 ```
 
-**Respuesta:** Los países más extremos en PC2 son aquellos con alta desigualdad pero baja urbanización/educación (en un extremo) y baja desigualdad pero alta urbanización (en el otro). Países como Brasil o Colombia (alta desigualdad) tienden a aparecer en un extremo; Uruguay o Costa Rica (baja desigualdad relativa) en el otro. PC2 captura la **dimensión de desigualdad relativa al desarrollo**.
+**Respuesta:** Los extremos de PC2 son **Venezuela** (≈ -3.0) en un polo y **Honduras**, **Costa Rica** y **Guatemala** (≈ +1.2 a +1.9) en el otro. PC2 carga positivamente en Gini, esperanza de vida y gasto en salud, y negativamente en urbanización y educación, así que el polo positivo reúne países desiguales o poco urbanizados pero con buenos indicadores de salud (Costa Rica destaca por la esperanza de vida más alta del grupo). Es una dimensión secundaria que mezcla desigualdad y salud, menos limpia que PC1, que sí es un eje de desarrollo claro.
 
 ## Síntesis
 
