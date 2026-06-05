@@ -157,11 +157,6 @@ fviz_nbclust(datos_scaled, kmeans,
 
 sil <- silhouette(km2$cluster, dist(datos_scaled))
 
-fviz_silhouette(sil, palette = c("#2d4563", "#e63946")) +
-  labs(title = "Silueta por observación (K=2)") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8))
-
 # Silueta promedio
 mean(sil[, "sil_width"])
 
@@ -306,3 +301,18 @@ ggplot(pca_3d, aes(x = PC1, y = PC3, color = cluster, label = pais)) +
   scale_color_manual(values = c("#2d4563", "#e63946")) +
   labs(title = "PC1 vs PC3") +
   theme_minimal()
+
+
+# --- Apéndice 3: Ejercicio adicional — K=4 -------------------
+
+km4 <- kmeans(datos_scaled, centers = 4, nstart = 25)
+
+# Silueta promedio
+sil4 <- silhouette(km4$cluster, dist(datos_scaled))
+mean(sil4[, "sil_width"])
+
+# Visualizar
+fviz_cluster(km4, data = datos_scaled,
+             palette = c("#2d4563", "#e63946", "#457b9d", "#f4a261"),
+             ggtheme = theme_minimal()) +
+  labs(title = "K-means con K=4")

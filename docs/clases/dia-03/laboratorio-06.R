@@ -36,14 +36,7 @@ glimpse(textos)
 # --- Distribución de textos por tema -------------------------
 
 textos |>
-  count(tema) |>
-  ggplot(aes(x = reorder(tema, n), y = n, fill = tema)) +
-  geom_col() +
-  coord_flip() +
-  labs(title = "Número de textos por tema",
-       x = "Tema", y = "Cantidad") +
-  theme_minimal() +
-  theme(legend.position = "none")
+  count(tema)
 
 
 # --- Ver un texto de ejemplo ---------------------------------

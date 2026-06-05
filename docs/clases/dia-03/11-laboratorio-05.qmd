@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -640,40 +640,6 @@ fviz_pca_biplot(pca,
 ```
 :::
 
-# Ejercicios adicionales {background-color="#2d4563"}
-
-## Ejercicio 1: Probar K=4
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-**Instrucciones:**
-
-1. Ejecutar K-means con K=4
-2. Visualizar los clusters
-3. Calcular la silueta
-4. ¿Mejora respecto a K=2?
-
-```{r}
-#| label: ejercicio-1
-#| echo: true
-#| eval: true
-#| fig-width: 8
-#| fig-height: 5
-
-km4 <- kmeans(datos_scaled, centers = 4, nstart = 25)
-
-# Silueta promedio
-sil4 <- silhouette(km4$cluster, dist(datos_scaled))
-mean(sil4[, 3])
-
-# Visualizar
-fviz_cluster(km4, data = datos_scaled,
-             palette = c("#2d4563", "#e63946", "#457b9d", "#f4a261"),
-             ggtheme = theme_minimal()) +
-  labs(title = "K-means con K=4")
-```
-:::
-
 ## Resumen del laboratorio
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -869,7 +835,39 @@ fviz_contrib(pca, choice = "var", axes = 1, fill = "#2d4563") +
 ```
 :::
 
-# Apéndice 3: Ejercicio adicional {background-color="#2d4563"}
+# Apéndice 3: Ejercicios adicionales {background-color="#2d4563"}
+
+## Ejercicio: Probar K=4
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Instrucciones:**
+
+1. Ejecutar K-means con K=4
+2. Visualizar los clusters
+3. Calcular la silueta
+4. ¿Mejora respecto a K=2?
+
+```{r}
+#| label: ejercicio-1
+#| echo: true
+#| eval: true
+#| fig-width: 8
+#| fig-height: 5
+
+km4 <- kmeans(datos_scaled, centers = 4, nstart = 25)
+
+# Silueta promedio
+sil4 <- silhouette(km4$cluster, dist(datos_scaled))
+mean(sil4[, 3])
+
+# Visualizar
+fviz_cluster(km4, data = datos_scaled,
+             palette = c("#2d4563", "#e63946", "#457b9d", "#f4a261"),
+             ggtheme = theme_minimal()) +
+  labs(title = "K-means con K=4")
+```
+:::
 
 ## Ejercicio: PCA con 3 componentes
 

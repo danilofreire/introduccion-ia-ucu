@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -110,11 +110,10 @@ if (!require("fontawesome", character.only = TRUE)) {
 #| warning: false
 
 # Si algún paquete falta:
-# install.packages(c("tidyverse", "tidytext", "topicmodels", "tm", "ggwordcloud"))
+# install.packages(c("tidyverse", "tidytext", "tm", "ggwordcloud"))
 
 library(tidyverse)
 library(tidytext)      # Análisis de texto tidy
-library(topicmodels)   # LDA
 library(tm)            # Stopwords en español
 library(ggwordcloud)   # Nubes de palabras
 
@@ -325,11 +324,11 @@ tfidf |>
 :::{.column width=50%}
 **¿Las palabras tienen sentido?**
 
-- Economía: crecimiento, inflación, empleo
-- Educación: estudiantes, docentes, escuelas
-- Salud: hospitales, vacunación, pandemia
-- Seguridad: violencia, crimen, policía
-- Medioambiente: deforestación, biodiversidad, bosque
+- Economía: crecimiento, exportaciones, fiscal
+- Educación: estudiantes, escolar, académico
+- Salud: salud, sistema, biomédica
+- Seguridad: violencia, justicia, social
+- Medioambiente: biodiversidad, sostenible, agua
 :::
 
 :::{.column width=50%}
@@ -510,7 +509,7 @@ textos |>
 :::
 
 :::{.callout-tip}
-**Checkpoint**: van a ver un texto sobre crisis, violencia, o emergencia. Pregunta de reflexión: ¿el método le da el "score" correcto, o exagera/subestima el tono real?
+**Checkpoint**: van a ver un texto sobre una crisis o un problema grave (por ejemplo, inflación o inseguridad). Pregunta de reflexión: ¿el método le da el "score" correcto, o exagera/subestima el tono real?
 :::
 
 [[Apéndice 1: Solución]{.button}](#sec:sol-sentimiento)
