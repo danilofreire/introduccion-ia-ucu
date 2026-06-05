@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -218,7 +218,7 @@ Fuente: [Machine Learning CoBan](https://machinelearningcoban.com/2017/01/01/kme
 
 ## Coeficiente de silueta
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 20px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
 - El [coeficiente de silueta]{.alert} mide qué tan bien cada observación encaja en su cluster
@@ -228,15 +228,13 @@ Fuente: [Machine Learning CoBan](https://machinelearningcoban.com/2017/01/01/kme
 
 $$s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}$$
 
-- Valores de $s(i)$:
-    - Cerca de [+1]{.alert}: el punto está bien clasificado
-    - Cerca de [0]{.alert}: el punto está en el borde entre clusters
-    - Cerca de [-1]{.alert}: el punto probablemente está en el cluster equivocado
+- Valores de $s(i)$: cerca de [+1]{.alert} (bien clasificado), [0]{.alert} (en el borde) o [-1]{.alert} (cluster equivocado)
+- Promediando $s(i)$ sobre todos los puntos obtenemos una medida de calidad para [elegir K]{.alert}: el K con mayor silueta indica clusters mejor definidos
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 24px;"}
-**Interpretación del promedio de silueta:**
+:::{style="text-align: center; font-size: 22px;"}
+**Interpretación del promedio**
 
 | Valor | Interpretación |
 |-------|----------------|
@@ -244,52 +242,10 @@ $$s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}$$
 | 0.51 - 0.70 | Estructura razonable |
 | 0.26 - 0.50 | Estructura débil |
 | < 0.25 | Sin estructura clara |
-
-<br>
-
-Podemos usar la silueta promedio para [elegir K]{.alert}: el K con mayor silueta indica clusters mejor definidos
-:::
-:::
-:::
 :::
 
-## Método de la silueta para elegir K
-
-:::{style="margin-top: 20px; font-size: 21px;"}
-:::{.columns}
-:::{.column width=55%}
-**Ventajas sobre el método del codo**
-
-- Mide [calidad]{.alert} (qué tan separados están los clusters), no solo compacidad interna
-- Escala interpretable: cerca de 1 indica clusters bien definidos, cerca de 0 clusters solapados
-- El máximo suele ser más fácil de identificar que un "codo" ambiguo
-
-**Advertencias**
-
-- Tiende a [favorecer valores pequeños de K]{.alert}: a veces elige K=2 aunque existan 4 grupos reales, si esos 4 son menos "limpios"
-- Si dos K dan siluetas similares, preferir el menor (parsimonia) o el que tenga más sentido teórico
-- Combinar siempre con [conocimiento del dominio]{.alert} y con el método del codo
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 26px;"}
-**Ejemplo**
-
-```
-Silueta promedio por K:
-
-K=2:  0.52
-K=3:  0.58  ← máximo
-K=4:  0.51
-K=5:  0.44
-K=6:  0.38
-
-La silueta sugiere K=3.
-El método del codo podría
-sugerir otro valor.
-
-Usar ambos + teoría para decidir.
-```
+:::{style="font-size: 19px; margin-top: 15px;"}
+A diferencia del codo, la silueta mide [separación]{.alert}, no solo compacidad. Advertencia: tiende a [favorecer K pequeños]{.alert}, así que conviene combinarla con el método del codo y con la teoría
 :::
 :::
 :::
@@ -719,43 +675,67 @@ fviz_pca_biplot(pca,
 :::
 :::
 
-<br>
+:::{style="margin-top: 30px;"}
+:::
 
 [En el laboratorio (Sesión 3.3) aplicaremos estas técnicas a datos simulados de países latinoamericanos]{.alert}
 :::
 
-## PCA vs. análisis factorial
+## Resumen de la sesión {#sec:resumen-3-1}
 
-:::{style="margin-top: 20px; font-size: 22px;"}
-
-Muchos índices que usamos en ciencias sociales (bienestar, confianza institucional, autoritarismo) parecen PCA pero son [análisis factorial]{.alert}. Son parientes cercanos que responden a preguntas distintas
-
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=50%}
-**PCA**
+**Clustering:**
 
-- No asume un modelo: busca [ejes que explican varianza]{.alert}
-- Los componentes son sumas ponderadas de las variables observadas
-- Cada PC intenta captar la máxima varianza posible, sin separar "error"
-- Pregunta: [¿cómo resumo estos datos?]{.alert}
+- [K-means]{.alert}: rápido, asume clusters esféricos, requiere elegir K
+- [Jerárquico]{.alert}: produce dendrograma, no requiere K de antemano
+- [Silueta]{.alert}: mide calidad de los clusters
+- [Escalar siempre]{.alert} antes de aplicar
+- Recomendación: [DBSCAN](https://en.wikipedia.org/wiki/DBSCAN) y [HDBSCAN](https://hdbscan.readthedocs.io/en/latest/) manejan [clusters no esféricos]{.alert}
 :::
 
 :::{.column width=50%}
-**Análisis factorial**
+**PCA:**
 
-- Asume un [modelo]{.alert}: variables observadas = factores latentes + error
-- Los factores son causas hipotéticas que generan las correlaciones
-- Estima por separado la varianza común y la específica de cada variable
-- Pregunta: [¿qué constructos latentes explican estas variables?]{.alert}
+- Reduce [dimensionalidad]{.alert} preservando varianza
+- Los [loadings]{.alert} indican qué variables contribuyen a cada componente
+- [Scree plot]{.alert} ayuda a elegir cuántos componentes conservar
+- [Biplot]{.alert} visualiza observaciones y variables juntas
+- Recomendación: [t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding) y [UMAP](https://umap-learn.readthedocs.io/en/latest/) son [alternativas no lineales]{.alert} para visualización
 :::
 :::
 
-<br>
-
-[Regla práctica:]{.alert} si vas a reportar un índice como "medida de X" (un constructo o actitud), querés análisis factorial. Si solo necesitás reducir dimensiones para visualizar, PCA alcanza
+:::{style="margin-top: 30px;"}
 :::
 
-## Cómo caracterizar un cluster en la práctica
+[Son herramientas de exploración: generan hipótesis, no las confirman]{.alert}
+
+:::{style="margin-top: 12px; text-align: center; font-size: 18px;"}
+Apéndices: [[caracterizar clusters]{.button}](#sec:apendice-cluster) · [[PCA vs. análisis factorial]{.button}](#sec:apendice-fa)
+:::
+:::
+
+## Próximos pasos
+
+:::{style="margin-top: 40px; font-size: 26px;"}
+
+- [Sesión 3.2:]{.alert} Análisis computacional de texto
+    - Tokenización y preprocesamiento
+    - TF-IDF y bag-of-words
+    - Topic Modeling (LDA)
+    - Introducción a embeddings
+
+- [Laboratorios (3.3 y 3.4):]{.alert}
+    - Clustering y PCA con datos de países
+    - Análisis de textos políticos latinoamericanos
+
+[Nos vemos en la próxima sesión]{.alert}
+:::
+
+# Apéndice {background-color="#2d4563"}
+
+## Cómo caracterizar un cluster en la práctica {#sec:apendice-cluster}
 
 :::{style="margin-top: 20px; font-size: 22px;"}
 
@@ -782,55 +762,43 @@ datos |>
 **4. Cuidado con la reificación:** los clusters [no son categorías naturales]{.alert}. Dependen de K y de las variables elegidas
 :::
 :::
+
+:::{style="text-align: center; margin-top: 10px;"}
+[[Volver al resumen]{.button}](#sec:resumen-3-1)
+:::
 :::
 
-## Resumen de la sesión
+## PCA vs. análisis factorial {#sec:apendice-fa}
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 20px; font-size: 22px;"}
+
+Muchos índices que usamos en ciencias sociales (bienestar, confianza institucional, autoritarismo) parecen PCA pero son [análisis factorial]{.alert}. Son parientes cercanos que responden a preguntas distintas
+
 :::{.columns}
 :::{.column width=50%}
-**Clustering:**
+**PCA**
 
-- [K-means]{.alert}: rápido, asume clusters esféricos, requiere elegir K
-- [Jerárquico]{.alert}: produce dendrograma, no requiere K de antemano
-- [Silueta]{.alert}: mide calidad de los clusters
-- [Escalar siempre]{.alert} antes de aplicar
+- No asume un modelo: busca [ejes que explican varianza]{.alert}
+- Los componentes son sumas ponderadas de las variables observadas
+- Cada PC intenta captar la máxima varianza posible, sin separar "error"
+- Pregunta: [¿cómo resumo estos datos?]{.alert}
 :::
 
 :::{.column width=50%}
-**PCA:**
+**Análisis factorial**
 
-- Reduce [dimensionalidad]{.alert} preservando varianza
-- Los [loadings]{.alert} indican qué variables contribuyen a cada componente
-- [Scree plot]{.alert} ayuda a elegir cuántos componentes conservar
-- [Biplot]{.alert} visualiza observaciones y variables juntas
+- Asume un [modelo]{.alert}: variables observadas = factores latentes + error
+- Los factores son causas hipotéticas que generan las correlaciones
+- Estima por separado la varianza común y la específica de cada variable
+- Pregunta: [¿qué constructos latentes explican estas variables?]{.alert}
 :::
 :::
 
-<br>
+[Regla práctica:]{.alert} si vas a reportar un índice como "medida de X" (un constructo o actitud), querés análisis factorial. Si solo necesitás reducir dimensiones para visualizar, PCA alcanza
 
-[Son herramientas de exploración: generan hipótesis, no las confirman]{.alert}
-
-:::{style="margin-top: 15px; text-align: center; font-size: 20px;"}
-**Más allá:** [DBSCAN]{.alert} y [HDBSCAN]{.alert} manejan clusters no esféricos; [t-SNE]{.alert} y [UMAP]{.alert} son alternativas no lineales a PCA para visualización
+:::{style="text-align: center; margin-top: 10px;"}
+[[Volver al resumen]{.button}](#sec:resumen-3-1)
 :::
-:::
-
-## Próximos pasos
-
-:::{style="margin-top: 40px; font-size: 26px;"}
-
-- [Sesión 3.2:]{.alert} Análisis computacional de texto
-    - Tokenización y preprocesamiento
-    - TF-IDF y bag-of-words
-    - Topic Modeling (LDA)
-    - Introducción a embeddings
-
-- [Laboratorios (3.3 y 3.4):]{.alert}
-    - Clustering y PCA con datos de países
-    - Análisis de textos políticos latinoamericanos
-
-[Nos vemos en la próxima sesión]{.alert}
 :::
 
 # Nos vemos en la sesión de análisis de texto! {background-color="#2d4563"}
