@@ -131,7 +131,7 @@ Definan un modelo LASSO (`mixture = 1`) con `penalty = tune()`. Creen una grilla
 
 Comparen el lambda que minimiza el RMSE (`select_best()`) con el lambda 1SE (`select_by_one_std_err()`). ¿Cuál es más grande? ¿Cuántas veces más grande? ¿Qué implica usar el lambda 1SE para la complejidad del modelo?
 
-*Pista:* `select_by_one_std_err()` toma los resultados del tuning, la métrica y la columna de penalty: `select_by_one_std_err(resultados_lasso, metric = "rmse", desc(penalty))`.
+*Pista:* usen `select_by_one_std_err()` sobre los resultados del tuning. Necesita la métrica (`"rmse"`) y la dirección en la que ordenar el `penalty`: piensen si quieren el lambda más grande o más pequeño dentro de un error estándar del mínimo.
 
 ```{r p8}
 # Escriban su código aquí
@@ -181,7 +181,7 @@ Ajusten un Elastic Net con tuning de `penalty` y `mixture`. Usen una grilla de 1
 
 Generen predicciones en el conjunto de prueba para OLS, LASSO, Ridge, Elastic Net y Random Forest (con `trees = 500`, `mtry = tune()`, `min_n = tune()`). Combinen las métricas en una tabla y ordénenla por RMSE. ¿Cuál modelo tiene el mejor RMSE? ¿Cuál tiene el mejor R²?
 
-*Pista:* Random Forest para regresión usa la misma `rand_forest()` que en el Laboratorio 3, pero con `set_mode("regression")`: `rand_forest(trees = 500, mtry = tune(), min_n = tune()) |> set_engine("ranger") |> set_mode("regression")`.
+*Pista:* Random Forest para regresión usa la misma `rand_forest()` del Laboratorio 3, pero con `set_mode("regression")` en lugar de clasificación. Los hiperparámetros a tunear son `mtry` y `min_n` (con `trees` fijo).
 
 ```{r p12}
 # Escriban su código aquí

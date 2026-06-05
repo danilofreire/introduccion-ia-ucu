@@ -184,7 +184,7 @@ cat("\nModelo completo (11 predictores):\n")
 metricas_completo
 ```
 
-**Respuesta:** El modelo reducido con solo 3 predictores (edad, educación e interés político) tiene un AUC algo menor que el modelo completo, pero la diferencia es moderada. Esto sugiere que estos tres predictores capturan una parte significativa de la información relevante. El modelo completo mejora algo porque incluye variables como confianza en el gobierno y satisfacción democrática, que aportan información adicional, pero la ganancia marginal de cada variable extra es pequeña.
+**Respuesta:** En esta muestra el modelo reducido con tres predictores (edad, educación e interés político) rinde apenas *mejor* que el completo en el conjunto de prueba: AUC ≈ 0.64 y accuracy ≈ 0.64, frente a AUC ≈ 0.63 y accuracy ≈ 0.61 del modelo con once predictores. No es un error: esos tres predictores son justamente los más fuertes (lo confirmamos en la pregunta 5), y agregar ocho variables débiles aporta poca señal pero sí ruido de estimación, lo que puede empeorar ligeramente el desempeño fuera de muestra. Es un recordatorio de que más predictores no implican mejor predicción: la parsimonia suele pagar, sobre todo con muestras moderadas.
 
 ### Pregunta 5: Coeficientes e interpretación
 
@@ -199,7 +199,11 @@ coefs |>
   select(term, estimate, std.error, statistic, p.value, odds_ratio)
 ```
 
-**Respuesta:** Los coeficientes están en escala normalizada (ya que aplicamos `step_normalize()`), así que los odds ratios se interpretan como el cambio en las chances de votar por cada desviación estándar de aumento en el predictor. La variable con el efecto más fuerte es probablemente `interes_politica` o `edad` (odds ratio más alejado de 1). La variable `percepcion_economia` tiene un efecto negativo: cuando las personas perciben una economía peor, la probabilidad de votar aumenta (voto de protesta).
+**Respuesta:** Una advertencia sobre la codificación antes de interpretar: como definimos `voto` con niveles `c("si", "no")`, R y `glm()` modelan la probabilidad del *segundo* nivel, es decir, P(no votar). Por eso un coeficiente negativo (odds ratio menor que 1) indica que la variable *aumenta* la probabilidad de votar, y uno positivo la reduce.
+
+Los coeficientes están en escala normalizada (aplicamos `step_normalize()`), así que cada uno mide el efecto de una desviación estándar del predictor. Ordenados por |z|, el efecto más fuerte es el de `educacion_anios` (z ≈ -3.3; odds ratio ≈ 0.65), seguido por `interes_politica` y `edad`. Los tres tienen coeficiente negativo: más educación, más interés político y más edad se asocian con *mayor* probabilidad de votar, justo lo que esperábamos teóricamente.
+
+¿Cuál tiene un efecto negativo sobre el voto? `percepcion_economia` tiene coeficiente positivo (≈ +0.06, odds ratio ≈ 1.07), lo que significa que quienes ven mejor la economía votan algo *menos*: es el patrón de voto de protesta. Eso sí, su z es pequeño (≈ 0.6), así que en esta muestra el efecto no es estadísticamente significativo y conviene ser cauteloso.
 
 ## Random Forest y tuning
 
@@ -322,7 +326,7 @@ cat("\nMejor modelo con 20 folds:\n")
 mejor_20f |> select(mtry, min_n, mean, std_err)
 ```
 
-**Respuesta:** Los hiperparámetros seleccionados pueden ser los mismos o ligeramente diferentes. El error estándar con 20 folds suele ser algo menor que con 10, porque cada fold de validación es más pequeño y promediamos sobre más particiones, lo que reduce la varianza de la estimación. Con un dataset de ~375 observaciones de entrenamiento, la diferencia práctica es pequeña: pasar a 20 folds tarda el doble pero las conclusiones rara vez cambian. La regla general es usar 10 folds como compromiso entre estabilidad y tiempo de cómputo.
+**Respuesta:** Los hiperparámetros seleccionados cambian un poco (en nuestra corrida `mtry` se mantiene pero `min_n` pasa de 13 a 21), lo cual es normal: con remuestreos distintos, varias combinaciones rinden casi igual y la "mejor" puede variar. Lo interesante es el error estándar: no baja con más folds. En nuestra corrida pasa de ≈ 0.020 con 10 folds a ≈ 0.028 con 20, es decir, sube un poco. La razón es que con 20 folds cada conjunto de validación tiene apenas unas 19 observaciones, así que el AUC de cada fold es más ruidoso; promediar sobre más particiones no compensa esa mayor variabilidad. El beneficio real de usar más folds es reducir el sesgo de la estimación (cada modelo entrena con más datos), no necesariamente la varianza. Por eso 10 folds es el compromiso habitual entre estabilidad y tiempo de cómputo.
 
 ## Interpretación
 
@@ -403,7 +407,7 @@ coefs_logit <- tidy(ajuste_completo) |>
 coefs_logit
 ```
 
-**Respuesta:** Los rankings pueden coincidir en los predictores más importantes (edad, interés político) pero diferir en los menos importantes. Las diferencias surgen porque: (1) el VIP mide cuánto contribuye cada variable a reducir la impureza en los árboles, mientras que el estadístico z mide la significancia del efecto lineal; (2) Random Forest captura interacciones y no-linealidades que la regresión logística ignora; (3) variables correlacionadas pueden repartir la importancia de forma diferente en cada método. Cuando ambos métodos coinciden en las variables más importantes, tenemos más confianza en que esos predictores son realmente relevantes.
+**Respuesta:** Los dos rankings coinciden en la cima en `educacion_anios` y `edad`, pero divergen en puntos reveladores. El caso más claro es `ingreso_hogar`: aparece tercero en el VIP (importancia Gini) y casi último en el ranking logístico (|z| ≈ 0.25). Esto ilustra un sesgo conocido de la importancia por impureza (Gini): tiende a inflar la importancia de variables continuas con muchos valores distintos, como el ingreso, porque ofrecen más puntos de corte posibles, aunque su efecto lineal sea débil. A la inversa, `interes_politica` tiene un efecto lineal fuerte (segundo por |z|) pero queda más abajo en el VIP. Las diferencias surgen porque: (1) la importancia Gini mide cuánto reduce cada variable la impureza en los árboles, mientras que el estadístico z mide la significancia del efecto lineal; (2) Random Forest reparte la importancia entre variables correlacionadas; (3) cada método responde a una estructura distinta. Una nota: en el laboratorio usamos importancia por permutación, menos sensible a este sesgo; aquí usamos Gini a propósito para mostrar que la métrica de importancia elegida cambia el ranking.
 
 ## Comparación de modelos
 
@@ -446,7 +450,7 @@ cat("\nRegresión logística:\n")
 metricas_completo
 ```
 
-**Respuesta:** El árbol de decisión tiene un AUC menor que el Random Forest y posiblemente menor que la regresión logística. Esto es esperable: un solo árbol con poda tiende a ser un clasificador más débil que un ensemble de 500 árboles. La ventaja del árbol es su interpretabilidad: se puede visualizar como un diagrama de flujo que muestra exactamente cómo se toman las decisiones. La pérdida de AUC respecto al Random Forest depende de la complejidad del problema, pero suele ser de 5-15 puntos.
+**Respuesta:** El resultado va contra la intuición habitual: en esta muestra el árbol de decisión (AUC ≈ 0.60) rinde *mejor* que el Random Forest sin tunear (AUC ≈ 0.57), y la regresión logística los supera a ambos (AUC ≈ 0.63). La regla de que "un solo árbol es más débil que un ensemble de 500" no se cumple aquí porque el problema es lineal, ruidoso y con pocas observaciones: el ensemble no encuentra estructura no lineal que aprovechar y la logística, bien especificada, gana. La ventaja del árbol sigue siendo su interpretabilidad: se visualiza como un diagrama de flujo que muestra exactamente cómo se decide. La lección es que un modelo más complejo no garantiza mejor desempeño; conviene compararlo siempre con un baseline lineal.
 
 ### Pregunta 12: Tabla comparativa completa
 
@@ -505,7 +509,7 @@ tabla |>
   arrange(desc(roc_auc))
 ```
 
-**Respuesta:** La tabla permite comparar los modelos en varias dimensiones. Random Forest y XGBoost suelen tener el mejor AUC, seguidos por la regresión logística y el árbol de decisión. Las diferencias en accuracy pueden ser pequeñas (2-5 puntos porcentuales), lo que plantea la pregunta de si la complejidad adicional de RF o XGBoost se justifica. La precisión y el recall pueden variar: algunos modelos son más conservadores (alta precisión, bajo recall) y otros más agresivos.
+**Respuesta:** Ordenada por AUC, la tabla sorprende: la regresión logística queda primera (AUC ≈ 0.63), seguida de XGBoost (≈ 0.61) y el árbol (≈ 0.60), y el Random Forest sin tunear queda último (≈ 0.57). La explicación es clara: el proceso que genera el voto es esencialmente lineal en los predictores (lo diseñamos así), de modo que la regresión logística está bien especificada y es difícil de superar. Los modelos de árboles no tienen no-linealidades que explotar, y el Random Forest con hiperparámetros fijos (`mtry = 4`, `min_n = 10`) ni siquiera está tuneado: cuando lo ajustamos por validación cruzada en las preguntas 7 y 8, su AUC sube a ≈ 0.62 y prácticamente empata con la logística. La moraleja es doble: el modelo más sofisticado no siempre gana, y conviene ajustar los hiperparámetros y elegir la familia de modelos según la estructura de los datos. Las diferencias en accuracy, precisión y recall son pequeñas y refuerzan la misma conclusión.
 
 ## Reflexión
 
@@ -519,6 +523,6 @@ tabla |>
 
 2. **Random Forest con VIP y PDP** como herramienta de exploración: el VIP confirma qué variables son más predictivas (sin asumir linealidad), y los PDPs revelan relaciones no lineales que la regresión logística no captura (por ejemplo, si el efecto de la edad se estabiliza a partir de cierta edad).
 
-3. **No recomendaría XGBoost** para este caso, porque la mejora marginal en AUC no compensa la pérdida total de interpretabilidad. Un funcionario público necesita poder explicar y justificar las decisiones, lo cual es difícil con un modelo de caja negra.
+3. **No recomendaría XGBoost** para este caso. En esta muestra su AUC es incluso menor que el de la regresión logística, así que perderíamos toda la interpretabilidad sin ganar precisión. Un funcionario público necesita poder explicar y justificar las decisiones, algo difícil con un modelo de caja negra.
 
-En ciencias sociales aplicadas, la interpretabilidad suele ser tan importante como el rendimiento predictivo. Un modelo ligeramente peor en AUC pero que permite entender los factores causales es más útil para la toma de decisiones que un modelo con 2% más de AUC pero opaco.
+En ciencias sociales aplicadas, la interpretabilidad suele ser tan importante como el rendimiento predictivo. En este caso ni siquiera hay que elegir: la regresión logística fue a la vez el modelo más interpretable y el de mejor AUC, así que la decisión es fácil. Y aun cuando exista un pequeño costo en precisión, un modelo que permite explicar y justificar las decisiones suele ser más útil para un organismo público que uno opaco con una ventaja marginal.

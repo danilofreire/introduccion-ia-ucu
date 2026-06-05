@@ -339,7 +339,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-8-lambda-mínimo-vs.-1se" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-lambda-mínimo-vs.-1se"><span class="header-section-number">4.2</span> Pregunta 8: Lambda mínimo vs.&nbsp;1SE</h3>
 <p>Comparen el lambda que minimiza el RMSE (<code>select_best()</code>) con el lambda 1SE (<code>select_by_one_std_err()</code>). ¿Cuál es más grande? ¿Cuántas veces más grande? ¿Qué implica usar el lambda 1SE para la complejidad del modelo?</p>
-<p><em>Pista:</em> <code>select_by_one_std_err()</code> toma los resultados del tuning, la métrica y la columna de penalty: <code>select_by_one_std_err(resultados_lasso, metric = "rmse", desc(penalty))</code>.</p>
+<p><em>Pista:</em> usen <code>select_by_one_std_err()</code> sobre los resultados del tuning. Necesita la métrica (<code>"rmse"</code>) y la dirección en la que ordenar el <code>penalty</code>: piensen si quieren el lambda más grande o más pequeño dentro de un error estándar del mínimo.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -378,7 +378,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-12-tabla-comparativa" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-tabla-comparativa"><span class="header-section-number">6.1</span> Pregunta 12: Tabla comparativa</h3>
 <p>Generen predicciones en el conjunto de prueba para OLS, LASSO, Ridge, Elastic Net y Random Forest (con <code>trees = 500</code>, <code>mtry = tune()</code>, <code>min_n = tune()</code>). Combinen las métricas en una tabla y ordénenla por RMSE. ¿Cuál modelo tiene el mejor RMSE? ¿Cuál tiene el mejor R²?</p>
-<p><em>Pista:</em> Random Forest para regresión usa la misma <code>rand_forest()</code> que en el Laboratorio 3, pero con <code>set_mode("regression")</code>: <code>rand_forest(trees = 500, mtry = tune(), min_n = tune()) |&gt; set_engine("ranger") |&gt; set_mode("regression")</code>.</p>
+<p><em>Pista:</em> Random Forest para regresión usa la misma <code>rand_forest()</code> del Laboratorio 3, pero con <code>set_mode("regression")</code> en lugar de clasificación. Los hiperparámetros a tunear son <code>mtry</code> y <code>min_n</code> (con <code>trees</code> fijo).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>

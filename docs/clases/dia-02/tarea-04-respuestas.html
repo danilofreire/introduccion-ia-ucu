@@ -306,7 +306,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 18 El Salvador           6.2   1.04    27</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La satisfacción con la vida varía entre países, lo cual es esperable dado que refleja diferencias en condiciones socioeconómicas, confianza institucional y otras variables contextuales. Las diferencias entre países son en parte producto de la simulación, pero representan patrones que se observan en datos reales de Latinobarómetro: países con mejores indicadores económicos y mayor confianza institucional tienden a reportar mayor satisfacción.</p>
+<p><strong>Respuesta:</strong> En esta muestra, México tiene la mayor satisfacción promedio (≈ 7.07) y El Salvador la menor (≈ 6.20), aunque la diferencia entre el primero y el último es de menos de un punto en una escala de 1 a 10 y cada país tiene pocas observaciones (entre 15 y 38), así que conviene no sobreinterpretar el ranking. La satisfacción con la vida varía entre países, lo cual es esperable dado que refleja diferencias en condiciones socioeconómicas, confianza institucional y otras variables contextuales. Estas diferencias son en parte producto de la simulación, pero representan patrones que se observan en datos reales de Latinobarómetro: países con mejores indicadores económicos y mayor confianza institucional tienden a reportar mayor satisfacción.</p>
 </section>
 <section id="pregunta-2-correlaciones-con-la-variable-objetivo" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-correlaciones-con-la-variable-objetivo"><span class="header-section-number">2.2</span> Pregunta 2: Correlaciones con la variable objetivo</h3>
@@ -335,7 +335,7 @@ edad                           0.07714857
 confianza_justicia             0.01001771</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Las variables con mayor correlación con la satisfacción son probablemente <code>percepcion_economia</code>, <code>satisfaccion_democracia</code> y <code>confianza_gobierno</code>, todas positivas. Esto tiene sentido: quienes perciben que la economía va bien, están satisfechos con la democracia y confían en el gobierno tienden a reportar mayor satisfacción con la vida. Variables como <code>edad</code> y <code>educacion_anios</code> probablemente tienen correlaciones más débiles, lo que sugiere que la satisfacción depende más de percepciones subjetivas que de características demográficas.</p>
+<p><strong>Respuesta:</strong> Las variables con mayor correlación con la satisfacción son <code>educacion_anios</code> (≈ 0.36) e <code>ingreso_hogar</code> (≈ 0.33), ambas positivas: las personas con más educación e ingresos reportan mayor satisfacción con la vida. Les siguen, con correlaciones moderadas y también positivas, <code>confianza_gobierno</code> (≈ 0.24) y <code>satisfaccion_democracia</code> (≈ 0.21). Es interesante que <code>percepcion_economia</code> tenga una correlación más bien débil (≈ 0.14): en este dataset, las condiciones materiales (educación e ingreso) pesan más que las percepciones subjetivas sobre la economía. La variable con menor relación es <code>confianza_justicia</code> (≈ 0.01), prácticamente nula.</p>
 </section>
 <section id="pregunta-3-distribución-por-zona" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-distribución-por-zona"><span class="header-section-number">2.3</span> Pregunta 3: Distribución por zona</h3>
@@ -442,7 +442,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 12 zona_urbana              -0.0178    0.0642    -0.278 0.781      </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los coeficientes normalizados permiten comparar directamente la importancia de cada variable. El predictor más importante (mayor coeficiente en valor absoluto) probablemente es <code>percepcion_economia</code> o <code>satisfaccion_democracia</code>, lo que indica que las percepciones subjetivas sobre la situación del país tienen más peso que variables demográficas como <code>edad</code> o <code>genero</code>. El predictor menos importante tiene un coeficiente cercano a cero, lo que sugiere que aporta poca información una vez que las demás variables están en el modelo.</p>
+<p><strong>Respuesta:</strong> Los coeficientes normalizados permiten comparar directamente la importancia de cada variable. El predictor más importante (mayor coeficiente en valor absoluto) es <code>educacion_anios</code> (≈ 0.38), seguido de <code>satisfaccion_democracia</code> (≈ 0.26), <code>confianza_gobierno</code> (≈ 0.25) e <code>ingreso_hogar</code> (≈ 0.22). Es decir, pesan tanto las condiciones socioeconómicas (educación, ingreso) como la relación con las instituciones (confianza en el gobierno, satisfacción con la democracia). Los predictores menos importantes, con coeficientes cercanos a cero, son <code>zona</code> y <code>confianza_justicia</code>: aportan poca información una vez que las demás variables están en el modelo.</p>
 </section>
 <section id="pregunta-6-evaluar-ols" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-evaluar-ols"><span class="header-section-number">3.3</span> Pregunta 6: Evaluar OLS</h3>
@@ -462,7 +462,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 3 mae     standard       0.945</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El R² indica el porcentaje de la variación en satisfacción que el modelo explica. Un R² en el rango de 0.3-0.5 es razonable para datos de encuestas sociales, donde la satisfacción con la vida depende de muchos factores difíciles de medir (personalidad, relaciones familiares, salud mental). El RMSE nos dice el error promedio en unidades de la variable objetivo: si es alrededor de 1.5, el modelo se equivoca en promedio en 1.5 puntos de la escala de 1 a 10.</p>
+<p><strong>Respuesta:</strong> El R² indica el porcentaje de la variación en satisfacción que el modelo explica. Aquí el R² es ≈ 0.26, es decir, el modelo explica alrededor del 26% de la variación, algo razonable para datos de encuestas sociales, donde la satisfacción con la vida depende de muchos factores difíciles de medir (personalidad, relaciones familiares, salud). El RMSE es ≈ 1.19: el modelo se equivoca en promedio en algo más de un punto de la escala de 1 a 10. El MAE (≈ 0.95) cuenta una historia parecida con una métrica menos sensible a los errores grandes.</p>
 </section>
 </section>
 <section id="lasso" class="level2" data-number="4">
@@ -535,7 +535,7 @@ Adding another scale for x, which will replace the existing scale.</code></pre>
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El lambda óptimo es el valor que minimiza el RMSE en la validación cruzada. Valores de lambda muy pequeños (cercanos a 0) producen un modelo similar a OLS, mientras que valores muy grandes eliminan todas las variables. El gráfico de autoplot muestra la curva típica en U: el RMSE baja al principio (la regularización reduce el sobreajuste) y luego sube (demasiada penalización elimina señal útil).</p>
+<p><strong>Respuesta:</strong> El lambda óptimo es el valor que minimiza el RMSE en la validación cruzada (≈ 0.03 en nuestra corrida). Valores de lambda muy pequeños (cercanos a 0) producen un modelo similar a OLS, mientras que valores muy grandes eliminan todas las variables. El gráfico de autoplot muestra la curva típica en U: el RMSE baja al principio (la regularización reduce el sobreajuste) y luego sube (demasiada penalización elimina señal útil).</p>
 </section>
 <section id="pregunta-8-lambda-mínimo-vs.-1se" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-lambda-mínimo-vs.-1se"><span class="header-section-number">4.2</span> Pregunta 8: Lambda mínimo vs.&nbsp;1SE</h3>
@@ -575,7 +575,7 @@ Lambda 1SE:</code></pre>
 Diferencia: 4.9 veces más grande</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El lambda 1SE es más grande que el mínimo, lo que produce un modelo más simple (más coeficientes eliminados). La regla 1SE dice: “elijamos el modelo más simple cuyo error esté dentro de un error estándar del mínimo”. La lógica es que si dos modelos tienen rendimiento estadísticamente similar, preferimos el más simple (principio de parsimonia). Esto es útil cuando queremos un modelo más interpretable o cuando sospechamos que el lambda mínimo podría sobreajustar ligeramente.</p>
+<p><strong>Respuesta:</strong> El lambda 1SE (≈ 0.15) es alrededor de 5 veces más grande que el lambda mínimo (≈ 0.03), lo que produce un modelo más simple (más coeficientes eliminados). La regla 1SE dice: “elijamos el modelo más simple cuyo error esté dentro de un error estándar del mínimo”. La lógica es que si dos modelos tienen rendimiento estadísticamente similar, preferimos el más simple (principio de parsimonia). Esto es útil cuando queremos un modelo más interpretable o cuando sospechamos que el lambda mínimo podría sobreajustar ligeramente.</p>
 </section>
 <section id="pregunta-9-variables-eliminadas-por-lasso" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-9-variables-eliminadas-por-lasso"><span class="header-section-number">4.3</span> Pregunta 9: Variables eliminadas por LASSO</h3>
@@ -620,7 +620,7 @@ Variables eliminadas: 3 de 12 </code></pre>
 <pre><code>Son: confianza_justicia, zona_urbana, uso_internet_semanal </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Las variables eliminadas probablemente son las que tienen correlación débil con la satisfacción o cuya información ya está capturada por otros predictores. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basándose en los datos.</p>
+<p><strong>Respuesta:</strong> Con el lambda mínimo, LASSO elimina 3 de las 12 variables (las deja exactamente en cero): <code>confianza_justicia</code>, <code>zona</code> y el nivel “semanal” de <code>uso_internet</code>. No es casualidad: son justamente las variables con menor correlación con la satisfacción (recordemos que <code>confianza_justicia</code> tenía correlación ≈ 0.01). LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basándose en los datos.</p>
 </section>
 </section>
 <section id="ridge-y-elastic-net" class="level2" data-number="5">
@@ -689,7 +689,7 @@ Media |coef| Ridge: 0.1366</code></pre>
 Media |coef| LASSO: 0.1291</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Ridge tiende a tener coeficientes más grandes en promedio porque reduce todos los coeficientes de forma proporcional, sin eliminar ninguno. LASSO, en cambio, pone algunos en exactamente cero, lo que baja el promedio. Ridge usa la penalización L2 (suma de cuadrados), que “encoge” pero no elimina. LASSO usa la penalización L1 (suma de valores absolutos), que produce soluciones “sparse” donde algunos coeficientes son exactamente cero. La diferencia se debe a la geometría de cada tipo de penalización.</p>
+<p><strong>Respuesta:</strong> En nuestra corrida, el promedio de |coeficiente| es ≈ 0.137 en Ridge y ≈ 0.129 en LASSO: Ridge tiende a tener coeficientes algo más grandes en promedio porque reduce todos los coeficientes de forma proporcional, sin eliminar ninguno. LASSO, en cambio, pone algunos en exactamente cero, lo que baja el promedio. Ridge usa la penalización L2 (suma de cuadrados), que “encoge” pero no elimina. LASSO usa la penalización L1 (suma de valores absolutos), que produce soluciones “sparse” donde algunos coeficientes son exactamente cero. La diferencia se debe a la geometría de cada tipo de penalización.</p>
 </section>
 <section id="pregunta-11-elastic-net-con-dos-hiperparámetros" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-11-elastic-net-con-dos-hiperparámetros"><span class="header-section-number">5.2</span> Pregunta 11: Elastic Net con dos hiperparámetros</h3>
@@ -746,7 +746,7 @@ Adding another scale for x, which will replace the existing scale.</code></pre>
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La mejor combinación de penalty y mixture indica si los datos se benefician más de la selección de variables (LASSO, mixture cercano a 1) o de la reducción proporcional (Ridge, mixture cercano a 0). Si el mixture óptimo es intermedio (por ejemplo, 0.5), el Elastic Net combina ambos enfoques, lo cual puede ser útil cuando hay grupos de predictores correlacionados. En este dataset, con variables relativamente independientes, la diferencia entre las tres formas de regularización es probablemente pequeña.</p>
+<p><strong>Respuesta:</strong> En esta corrida la mejor combinación tiene <code>mixture = 0</code>, es decir, el Elastic Net se inclina por Ridge puro. Esto sugiere que, en este dataset, conviene encoger todos los coeficientes de forma proporcional en lugar de eliminar variables: casi todos los predictores aportan algo y ninguno es claramente prescindible. Cuando el mixture óptimo es intermedio (por ejemplo, 0.5), el Elastic Net combina ambos enfoques, lo cual es útil cuando hay grupos de predictores correlacionados. Como las variables aquí son relativamente independientes, la diferencia entre las tres formas de regularización es pequeña, algo que confirmamos en la tabla comparativa.</p>
 </section>
 </section>
 <section id="comparación" class="level2" data-number="6">
@@ -812,7 +812,7 @@ Adding another scale for x, which will replace the existing scale.</code></pre>
 5 OLS            1.19 0.264 0.945</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Random Forest probablemente tiene el mejor RMSE porque puede capturar relaciones no lineales entre los predictores y la satisfacción. Los modelos lineales (OLS, LASSO, Ridge, Elastic Net) son muy similares entre sí porque: (a) el dataset tiene relaciones aproximadamente lineales, (b) hay pocos predictores irrelevantes, y (c) la ratio observaciones/predictores no es extrema. La mejora de regularización sobre OLS es marginal, lo que confirma que con p = 11 y n ~ 375, OLS ya es un modelo razonable.</p>
+<p><strong>Respuesta:</strong> Random Forest tiene el RMSE más bajo (≈ 1.17) y el mejor R² (≈ 0.30), pero la ventaja es minúscula: los cuatro modelos lineales (OLS, LASSO, Ridge, Elastic Net) se agrupan en RMSE ≈ 1.18-1.19, a menos de dos centésimas de Random Forest. La razón es que la relación entre los predictores y la satisfacción es aproximadamente lineal (la diseñamos así), de modo que no hay no-linealidades que Random Forest pueda aprovechar, y con p = 11 y n ≈ 375 los modelos lineales ya estiman bien. La mejora de regularización sobre OLS es marginal. En la práctica, los cinco modelos rinden casi igual: la diferencia está dentro del margen de ruido.</p>
 </section>
 <section id="pregunta-13-reflexión" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-13-reflexión"><span class="header-section-number">6.2</span> Pregunta 13: Reflexión</h3>

@@ -57,7 +57,7 @@ resumen_pais <- datos |>
 resumen_pais
 ```
 
-**Respuesta:** La satisfacción con la vida varía entre países, lo cual es esperable dado que refleja diferencias en condiciones socioeconómicas, confianza institucional y otras variables contextuales. Las diferencias entre países son en parte producto de la simulación, pero representan patrones que se observan en datos reales de Latinobarómetro: países con mejores indicadores económicos y mayor confianza institucional tienden a reportar mayor satisfacción.
+**Respuesta:** En esta muestra, México tiene la mayor satisfacción promedio (≈ 7.07) y El Salvador la menor (≈ 6.20), aunque la diferencia entre el primero y el último es de menos de un punto en una escala de 1 a 10 y cada país tiene pocas observaciones (entre 15 y 38), así que conviene no sobreinterpretar el ranking. La satisfacción con la vida varía entre países, lo cual es esperable dado que refleja diferencias en condiciones socioeconómicas, confianza institucional y otras variables contextuales. Estas diferencias son en parte producto de la simulación, pero representan patrones que se observan en datos reales de Latinobarómetro: países con mejores indicadores económicos y mayor confianza institucional tienden a reportar mayor satisfacción.
 
 ### Pregunta 2: Correlaciones con la variable objetivo
 
@@ -76,7 +76,7 @@ cors <- datos |>
 cors
 ```
 
-**Respuesta:** Las variables con mayor correlación con la satisfacción son probablemente `percepcion_economia`, `satisfaccion_democracia` y `confianza_gobierno`, todas positivas. Esto tiene sentido: quienes perciben que la economía va bien, están satisfechos con la democracia y confían en el gobierno tienden a reportar mayor satisfacción con la vida. Variables como `edad` y `educacion_anios` probablemente tienen correlaciones más débiles, lo que sugiere que la satisfacción depende más de percepciones subjetivas que de características demográficas.
+**Respuesta:** Las variables con mayor correlación con la satisfacción son `educacion_anios` (≈ 0.36) e `ingreso_hogar` (≈ 0.33), ambas positivas: las personas con más educación e ingresos reportan mayor satisfacción con la vida. Les siguen, con correlaciones moderadas y también positivas, `confianza_gobierno` (≈ 0.24) y `satisfaccion_democracia` (≈ 0.21). Es interesante que `percepcion_economia` tenga una correlación más bien débil (≈ 0.14): en este dataset, las condiciones materiales (educación e ingreso) pesan más que las percepciones subjetivas sobre la economía. La variable con menor relación es `confianza_justicia` (≈ 0.01), prácticamente nula.
 
 ### Pregunta 3: Distribución por zona
 
@@ -142,7 +142,7 @@ coef_ols <- tidy(ajuste_ols) |>
 coef_ols
 ```
 
-**Respuesta:** Los coeficientes normalizados permiten comparar directamente la importancia de cada variable. El predictor más importante (mayor coeficiente en valor absoluto) probablemente es `percepcion_economia` o `satisfaccion_democracia`, lo que indica que las percepciones subjetivas sobre la situación del país tienen más peso que variables demográficas como `edad` o `genero`. El predictor menos importante tiene un coeficiente cercano a cero, lo que sugiere que aporta poca información una vez que las demás variables están en el modelo.
+**Respuesta:** Los coeficientes normalizados permiten comparar directamente la importancia de cada variable. El predictor más importante (mayor coeficiente en valor absoluto) es `educacion_anios` (≈ 0.38), seguido de `satisfaccion_democracia` (≈ 0.26), `confianza_gobierno` (≈ 0.25) e `ingreso_hogar` (≈ 0.22). Es decir, pesan tanto las condiciones socioeconómicas (educación, ingreso) como la relación con las instituciones (confianza en el gobierno, satisfacción con la democracia). Los predictores menos importantes, con coeficientes cercanos a cero, son `zona` y `confianza_justicia`: aportan poca información una vez que las demás variables están en el modelo.
 
 ### Pregunta 6: Evaluar OLS
 
@@ -155,7 +155,7 @@ metricas_ols <- pred_ols |>
 metricas_ols
 ```
 
-**Respuesta:** El R² indica el porcentaje de la variación en satisfacción que el modelo explica. Un R² en el rango de 0.3-0.5 es razonable para datos de encuestas sociales, donde la satisfacción con la vida depende de muchos factores difíciles de medir (personalidad, relaciones familiares, salud mental). El RMSE nos dice el error promedio en unidades de la variable objetivo: si es alrededor de 1.5, el modelo se equivoca en promedio en 1.5 puntos de la escala de 1 a 10.
+**Respuesta:** El R² indica el porcentaje de la variación en satisfacción que el modelo explica. Aquí el R² es ≈ 0.26, es decir, el modelo explica alrededor del 26% de la variación, algo razonable para datos de encuestas sociales, donde la satisfacción con la vida depende de muchos factores difíciles de medir (personalidad, relaciones familiares, salud). El RMSE es ≈ 1.19: el modelo se equivoca en promedio en algo más de un punto de la escala de 1 a 10. El MAE (≈ 0.95) cuenta una historia parecida con una métrica menos sensible a los errores grandes.
 
 ## LASSO
 
@@ -197,7 +197,7 @@ autoplot(resultados_lasso) +
   labs(title = "Tuning de LASSO: RMSE vs. penalty")
 ```
 
-**Respuesta:** El lambda óptimo es el valor que minimiza el RMSE en la validación cruzada. Valores de lambda muy pequeños (cercanos a 0) producen un modelo similar a OLS, mientras que valores muy grandes eliminan todas las variables. El gráfico de autoplot muestra la curva típica en U: el RMSE baja al principio (la regularización reduce el sobreajuste) y luego sube (demasiada penalización elimina señal útil).
+**Respuesta:** El lambda óptimo es el valor que minimiza el RMSE en la validación cruzada (≈ 0.03 en nuestra corrida). Valores de lambda muy pequeños (cercanos a 0) producen un modelo similar a OLS, mientras que valores muy grandes eliminan todas las variables. El gráfico de autoplot muestra la curva típica en U: el RMSE baja al principio (la regularización reduce el sobreajuste) y luego sube (demasiada penalización elimina señal útil).
 
 ### Pregunta 8: Lambda mínimo vs. 1SE
 
@@ -215,7 +215,7 @@ print(lambda_1se)
 cat("\nDiferencia:", round(lambda_1se$penalty / lambda_min$penalty, 1), "veces más grande")
 ```
 
-**Respuesta:** El lambda 1SE es más grande que el mínimo, lo que produce un modelo más simple (más coeficientes eliminados). La regla 1SE dice: "elijamos el modelo más simple cuyo error esté dentro de un error estándar del mínimo". La lógica es que si dos modelos tienen rendimiento estadísticamente similar, preferimos el más simple (principio de parsimonia). Esto es útil cuando queremos un modelo más interpretable o cuando sospechamos que el lambda mínimo podría sobreajustar ligeramente.
+**Respuesta:** El lambda 1SE (≈ 0.15) es alrededor de 5 veces más grande que el lambda mínimo (≈ 0.03), lo que produce un modelo más simple (más coeficientes eliminados). La regla 1SE dice: "elijamos el modelo más simple cuyo error esté dentro de un error estándar del mínimo". La lógica es que si dos modelos tienen rendimiento estadísticamente similar, preferimos el más simple (principio de parsimonia). Esto es útil cuando queremos un modelo más interpretable o cuando sospechamos que el lambda mínimo podría sobreajustar ligeramente.
 
 ### Pregunta 9: Variables eliminadas por LASSO
 
@@ -238,7 +238,7 @@ if (nrow(eliminadas) > 0) {
 }
 ```
 
-**Respuesta:** LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Las variables eliminadas probablemente son las que tienen correlación débil con la satisfacción o cuya información ya está capturada por otros predictores. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basándose en los datos.
+**Respuesta:** Con el lambda mínimo, LASSO elimina 3 de las 12 variables (las deja exactamente en cero): `confianza_justicia`, `zona` y el nivel "semanal" de `uso_internet`. No es casualidad: son justamente las variables con menor correlación con la satisfacción (recordemos que `confianza_justicia` tenía correlación ≈ 0.01). LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basándose en los datos.
 
 ## Ridge y Elastic Net
 
@@ -283,7 +283,7 @@ cat("\nMedia |coef| Ridge:", round(mean(abs(comparacion$ridge)), 4))
 cat("\nMedia |coef| LASSO:", round(mean(abs(comparacion$lasso)), 4))
 ```
 
-**Respuesta:** Ridge tiende a tener coeficientes más grandes en promedio porque reduce todos los coeficientes de forma proporcional, sin eliminar ninguno. LASSO, en cambio, pone algunos en exactamente cero, lo que baja el promedio. Ridge usa la penalización L2 (suma de cuadrados), que "encoge" pero no elimina. LASSO usa la penalización L1 (suma de valores absolutos), que produce soluciones "sparse" donde algunos coeficientes son exactamente cero. La diferencia se debe a la geometría de cada tipo de penalización.
+**Respuesta:** En nuestra corrida, el promedio de |coeficiente| es ≈ 0.137 en Ridge y ≈ 0.129 en LASSO: Ridge tiende a tener coeficientes algo más grandes en promedio porque reduce todos los coeficientes de forma proporcional, sin eliminar ninguno. LASSO, en cambio, pone algunos en exactamente cero, lo que baja el promedio. Ridge usa la penalización L2 (suma de cuadrados), que "encoge" pero no elimina. LASSO usa la penalización L1 (suma de valores absolutos), que produce soluciones "sparse" donde algunos coeficientes son exactamente cero. La diferencia se debe a la geometría de cada tipo de penalización.
 
 ### Pregunta 11: Elastic Net con dos hiperparámetros
 
@@ -322,7 +322,7 @@ autoplot(resultados_enet) +
   labs(title = "Tuning de Elastic Net")
 ```
 
-**Respuesta:** La mejor combinación de penalty y mixture indica si los datos se benefician más de la selección de variables (LASSO, mixture cercano a 1) o de la reducción proporcional (Ridge, mixture cercano a 0). Si el mixture óptimo es intermedio (por ejemplo, 0.5), el Elastic Net combina ambos enfoques, lo cual puede ser útil cuando hay grupos de predictores correlacionados. En este dataset, con variables relativamente independientes, la diferencia entre las tres formas de regularización es probablemente pequeña.
+**Respuesta:** En esta corrida la mejor combinación tiene `mixture = 0`, es decir, el Elastic Net se inclina por Ridge puro. Esto sugiere que, en este dataset, conviene encoger todos los coeficientes de forma proporcional en lugar de eliminar variables: casi todos los predictores aportan algo y ninguno es claramente prescindible. Cuando el mixture óptimo es intermedio (por ejemplo, 0.5), el Elastic Net combina ambos enfoques, lo cual es útil cuando hay grupos de predictores correlacionados. Como las variables aquí son relativamente independientes, la diferencia entre las tres formas de regularización es pequeña, algo que confirmamos en la tabla comparativa.
 
 ## Comparación
 
@@ -378,7 +378,7 @@ tabla <- bind_rows(
 tabla
 ```
 
-**Respuesta:** Random Forest probablemente tiene el mejor RMSE porque puede capturar relaciones no lineales entre los predictores y la satisfacción. Los modelos lineales (OLS, LASSO, Ridge, Elastic Net) son muy similares entre sí porque: (a) el dataset tiene relaciones aproximadamente lineales, (b) hay pocos predictores irrelevantes, y (c) la ratio observaciones/predictores no es extrema. La mejora de regularización sobre OLS es marginal, lo que confirma que con p = 11 y n ~ 375, OLS ya es un modelo razonable.
+**Respuesta:** Random Forest tiene el RMSE más bajo (≈ 1.17) y el mejor R² (≈ 0.30), pero la ventaja es minúscula: los cuatro modelos lineales (OLS, LASSO, Ridge, Elastic Net) se agrupan en RMSE ≈ 1.18-1.19, a menos de dos centésimas de Random Forest. La razón es que la relación entre los predictores y la satisfacción es aproximadamente lineal (la diseñamos así), de modo que no hay no-linealidades que Random Forest pueda aprovechar, y con p = 11 y n ≈ 375 los modelos lineales ya estiman bien. La mejora de regularización sobre OLS es marginal. En la práctica, los cinco modelos rinden casi igual: la diferencia está dentro del margen de ruido.
 
 ### Pregunta 13: Reflexión
 

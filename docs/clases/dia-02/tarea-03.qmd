@@ -102,6 +102,8 @@ Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(2026)` y estra
 
 Usando el modelo logístico completo (con todos los predictores del laboratorio), extraigan los coeficientes con `tidy()` y calculen los odds ratios (`exp(estimate)`). ¿Cuál variable tiene el efecto más fuerte sobre la probabilidad de votar? ¿Cuál tiene un efecto negativo?
 
+*Pista:* presten atención a cómo definimos los niveles de `voto` en la configuración (`c("si", "no")`). R modela la probabilidad del segundo nivel, así que verifiquen en qué dirección apunta cada coeficiente antes de interpretarlo: un signo puede significar lo contrario de lo que parece a primera vista.
+
 ```{r p5}
 # Escriban su código aquí
 
@@ -126,7 +128,7 @@ Entrenen tres modelos de Random Forest con 100, 500 y 1000 árboles respectivame
 
 En el laboratorio usamos `grid_regular()` para crear la grilla de búsqueda. Ahora usen `grid_random()` con `size = 20` para el mismo modelo de Random Forest con `mtry` y `min_n` a ajustar. Comparen el mejor AUC obtenido con cada tipo de grilla.
 
-*Pista:* `grid_random(mtry(range = c(2, 8)), min_n(range = c(5, 30)), size = 20)`.
+*Pista:* es la misma idea que `grid_regular()` del laboratorio, pero con `grid_random()`. Pásenle los rangos de `mtry()` y `min_n()` (los mismos que usaron antes) y el argumento `size` para fijar cuántas combinaciones probar.
 
 ```{r p7}
 # Escriban su código aquí
@@ -191,9 +193,9 @@ Entrenen un modelo `decision_tree()` con `cost_complexity = 0.01`, `tree_depth =
 
 Creen una tabla que compare cuatro modelos (regresión logística, Random Forest, XGBoost y árbol de decisión) con las métricas: accuracy, AUC, precision, recall y F1-score. Usen `bind_rows()` para combinar y `pivot_wider()` para formatear.
 
-*Pista (XGBoost):* la sintaxis está en el [Apéndice 4 del Laboratorio 3](07-laboratorio-03.html#sec:appendix04): `boost_tree(trees = 500, tree_depth = tune(), learn_rate = tune()) |> set_engine("xgboost") |> set_mode("classification")`.
+*Pista (XGBoost):* la sintaxis está en el [Apéndice 4 del Laboratorio 3](07-laboratorio-03.html#sec:appendix04). Usen `boost_tree()` con el motor `xgboost` en modo clasificación; pueden fijar los hiperparámetros (por ejemplo `trees`, `tree_depth`, `learn_rate`) en valores razonables.
 
-*Pista (métricas):* para cada modelo, generen predicciones con `predict()` y `predict(type = "prob")`, luego calculen las métricas con `metrics()` y `f_meas()`.
+*Pista (métricas):* para cada modelo necesitan tanto la clase predicha como la probabilidad; `augment()` les da ambas en un paso. Después combinen `metrics()` con `f_meas()` (y `precision()`/`recall()` si las quieren) para armar la tabla.
 
 ```{r p12}
 # Escriban su código aquí

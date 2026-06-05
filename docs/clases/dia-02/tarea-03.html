@@ -318,6 +318,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-5-coeficientes-e-interpretación" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-coeficientes-e-interpretación"><span class="header-section-number">3.2</span> Pregunta 5: Coeficientes e interpretación</h3>
 <p>Usando el modelo logístico completo (con todos los predictores del laboratorio), extraigan los coeficientes con <code>tidy()</code> y calculen los odds ratios (<code>exp(estimate)</code>). ¿Cuál variable tiene el efecto más fuerte sobre la probabilidad de votar? ¿Cuál tiene un efecto negativo?</p>
+<p><em>Pista:</em> presten atención a cómo definimos los niveles de <code>voto</code> en la configuración (<code>c("si", "no")</code>). R modela la probabilidad del segundo nivel, así que verifiquen en qué dirección apunta cada coeficiente antes de interpretarlo: un signo puede significar lo contrario de lo que parece a primera vista.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -337,7 +338,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-7-grilla-aleatoria-vs.-regular" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-7-grilla-aleatoria-vs.-regular"><span class="header-section-number">4.2</span> Pregunta 7: Grilla aleatoria vs.&nbsp;regular</h3>
 <p>En el laboratorio usamos <code>grid_regular()</code> para crear la grilla de búsqueda. Ahora usen <code>grid_random()</code> con <code>size = 20</code> para el mismo modelo de Random Forest con <code>mtry</code> y <code>min_n</code> a ajustar. Comparen el mejor AUC obtenido con cada tipo de grilla.</p>
-<p><em>Pista:</em> <code>grid_random(mtry(range = c(2, 8)), min_n(range = c(5, 30)), size = 20)</code>.</p>
+<p><em>Pista:</em> es la misma idea que <code>grid_regular()</code> del laboratorio, pero con <code>grid_random()</code>. Pásenle los rangos de <code>mtry()</code> y <code>min_n()</code> (los mismos que usaron antes) y el argumento <code>size</code> para fijar cuántas combinaciones probar.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -386,8 +387,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-12-tabla-comparativa-completa" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-12-tabla-comparativa-completa"><span class="header-section-number">6.2</span> Pregunta 12: Tabla comparativa completa</h3>
 <p>Creen una tabla que compare cuatro modelos (regresión logística, Random Forest, XGBoost y árbol de decisión) con las métricas: accuracy, AUC, precision, recall y F1-score. Usen <code>bind_rows()</code> para combinar y <code>pivot_wider()</code> para formatear.</p>
-<p><em>Pista (XGBoost):</em> la sintaxis está en el <a href="07-laboratorio-03.html#sec:appendix04">Apéndice 4 del Laboratorio 3</a>: <code>boost_tree(trees = 500, tree_depth = tune(), learn_rate = tune()) |&gt; set_engine("xgboost") |&gt; set_mode("classification")</code>.</p>
-<p><em>Pista (métricas):</em> para cada modelo, generen predicciones con <code>predict()</code> y <code>predict(type = "prob")</code>, luego calculen las métricas con <code>metrics()</code> y <code>f_meas()</code>.</p>
+<p><em>Pista (XGBoost):</em> la sintaxis está en el <a href="07-laboratorio-03.html#sec:appendix04">Apéndice 4 del Laboratorio 3</a>. Usen <code>boost_tree()</code> con el motor <code>xgboost</code> en modo clasificación; pueden fijar los hiperparámetros (por ejemplo <code>trees</code>, <code>tree_depth</code>, <code>learn_rate</code>) en valores razonables.</p>
+<p><em>Pista (métricas):</em> para cada modelo necesitan tanto la clase predicha como la probabilidad; <code>augment()</code> les da ambas en un paso. Después combinen <code>metrics()</code> con <code>f_meas()</code> (y <code>precision()</code>/<code>recall()</code> si las quieren) para armar la tabla.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
