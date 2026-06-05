@@ -5,7 +5,7 @@ author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
     email: danilofreire@gmail.com
-    affiliations: "Departament of Data and Decision Sciences <br> Emory University"
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
 format:
   clean-revealjs:
     self-contained: true
@@ -161,25 +161,6 @@ Las computadoras trabajan con [números]{.alert}, pero el texto son [palabras]{.
 
 # Preprocesamiento {background-color="#2d4563"}
 
-## Cargar paquetes
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-
-- Para análisis de texto en R, hay varios paquetes útiles. Aquí usaremos principalmente:
-
-```r
-library(tidytext)       # tokenización y TF-IDF
-library(dplyr)          # manipulación de datos
-library(tidyr)          # pivotar datos
-library(stringr)        # manejo de texto
-library(tibble)         # data frames modernos
-library(tm)             # stopwords y preprocesamiento básico
-library(topicmodels)    # LDA para topic modeling
-library(ggplot2)        # visualización
-library(readr)          # lectura de datos
-```
-:::
-
 ## Nuestro corpus de trabajo
 
 :::{style="margin-top: 30px; font-size: 22px;"}
@@ -193,6 +174,7 @@ library(readr)          # lectura de datos
 - [Varios países]{.alert} de América Latina, entre 2018 y 2024
 - Los textos son [simulados]{.alert}: no provienen de discursos reales, pero imitan el vocabulario típico de cada tema
 - Usaremos el mismo corpus en todos los ejemplos de hoy: tokenización, TF-IDF, sentimiento, LDA y embeddings
+- Paquetes principales: [tidytext]{.alert} (tokenización y TF-IDF), [tm]{.alert} (stopwords), [topicmodels]{.alert} (LDA), además de tidyverse
 :::
 
 :::{.column width=50%}
@@ -526,67 +508,35 @@ tidy(modelo_lda, matrix = "beta") |>
 
 # Introducción a embeddings {background-color="#2d4563"}
 
-## Limitaciones de bag-of-words y TF-IDF
+## De representaciones dispersas a densas
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 20px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- Bag-of-words y TF-IDF son [representaciones dispersas]{.alert} (sparse)
-    - Cada palabra es una dimensión independiente
-    - No capturan [significado]{.alert} ni [relaciones semánticas]{.alert}
-    - "perro" y "can" son tan diferentes como "perro" y "democracia"
-- Problemas:
-    - [Sinónimos]{.alert}: palabras diferentes, significado igual
-    - [Polisemia]{.alert}: misma palabra, significados diferentes
-    - [Orden]{.alert}: "el gato come pescado" = "el pescado come gato"
-- Solución: [representaciones densas]{.alert} que capturan significado
+- Bag-of-words y TF-IDF son [representaciones dispersas]{.alert} (sparse): cada palabra es una dimensión independiente y no capturan [significado]{.alert}
+    - "perro" y "can" son tan distintos como "perro" y "democracia"
+    - No manejan [sinónimos]{.alert}, [polisemia]{.alert} ni [orden]{.alert}
+- Un [embedding]{.alert} es un vector [denso]{.alert} que representa una palabra: las que tienen significados similares quedan [cercanas]{.alert}
+- Idea central: "una palabra se conoce por la compañía que frecuenta" (Firth, 1957). Si dos palabras aparecen en [contextos similares]{.alert}, sus embeddings se parecen
+- Métodos clásicos: [Word2Vec]{.alert} (2013), GloVe (2014); modernos: [BERT]{.alert}, GPT (mañana)
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 24px;"}
-**Disperso vs. Denso**
+:::{style="text-align: center; font-size: 22px;"}
+**Disperso vs. denso**
 
 ```
 Bag-of-words (disperso):
-"perro" = [0,0,0,1,0,0,0,0,0,0...]
-           (10,000 dimensiones,
-            casi todas cero)
+"perro" = [0,0,0,1,0,0,0,...]
+  (10.000 dims, casi todo cero)
 
 Embedding (denso):
 "perro" = [0.23, -0.45, 0.12, ...]
-           (300 dimensiones,
-            todas con valores)
+  (300 dims, todas con valores)
 
-Los embeddings codifican
+El embedding codifica
 SIGNIFICADO en cada dimensión.
 ```
-:::
-:::
-:::
-:::
-
-## ¿Qué son los embeddings?
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=55%}
-- Un [embedding]{.alert} es un vector denso que representa una palabra (o texto)
-- Las palabras con [significados similares]{.alert} tienen vectores [cercanos]{.alert}
-- La idea central: "una palabra se conoce por la compañía que frecuenta" (Firth, 1957)
-- Si dos palabras aparecen en [contextos similares]{.alert}, tienen significados similares
-    - "El ___ ladra fuerte" → perro, can, cachorro
-    - Estos deberían tener embeddings cercanos
-- Métodos clásicos: [Word2Vec]{.alert} (Google, 2013), GloVe (Stanford, 2014)
-- Métodos modernos: [BERT]{.alert}, GPT (veremos mañana)
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center;"}
-[![Embeddings en 3D](figures/embeddings-3d.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/embeddings-3d.png"}
-
-Las palabras similares se agrupan en el espacio de embeddings
-
-<https://projector.tensorflow.org/>
 :::
 :::
 :::
@@ -617,108 +567,39 @@ Los embeddings capturan relaciones semánticas como operaciones vectoriales
 :::
 :::
 
-## Embeddings preentrenados
+## Embeddings en la práctica
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 20px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=50%}
-- Entrenar embeddings requiere [muchísimos datos]{.alert} (miles de millones de palabras)
-- En la práctica, usamos [embeddings preentrenados]{.alert}:
-    - [Word2Vec](https://code.google.com/archive/p/word2vec/) en Google News (inglés)
-    - [fastText](https://fasttext.cc/) (Facebook): disponible para español
+**Embeddings preentrenados**
+
+- Entrenarlos requiere [muchísimos datos]{.alert} (miles de millones de palabras), así que en la práctica usamos [preentrenados]{.alert}:
+    - [Word2Vec](https://code.google.com/archive/p/word2vec/) (Google News, inglés)
+    - [fastText](https://fasttext.cc/) (Facebook): hay versión para [español](https://fasttext.cc/docs/en/crawl-vectors.html)
     - [GloVe](https://nlp.stanford.edu/projects/glove/) (Stanford)
-- Para español:
     - [Spanish Billion Words Corpus](https://crscardellino.ar/SBWCE/)
-    - [fastText embeddings para español](https://fasttext.cc/docs/en/crawl-vectors.html)
-- Cómo usarlos: cargar los embeddings y buscar el vector de cada palabra
 :::
 
 :::{.column width=50%}
-:::{style="font-size: 17px;"}
-**Mini-embeddings por LSA sobre nuestro corpus**
+**De palabras a documentos**
 
-```{r lsa-demo, echo=TRUE, eval=TRUE}
-# Matriz palabra x documento con TF-IDF
-matriz <- tokens_limpios |>
-  count(id, palabra) |>
-  bind_tf_idf(palabra, id, n) |>
-  cast_sparse(palabra, id, tf_idf) |>
-  as.matrix()
-
-# SVD: cada palabra en 10 dimensiones (nu = 10) 
-# y cada documento en 10 dimensiones (nv = 10)
-# $u = embeddings de palabras; $v = los de documentos
-reduccion <- svd(matriz, nu = 10, nv = 10)
-embeddings <- reduccion$u
-rownames(embeddings) <- rownames(matriz)
-
-# Similitud coseno entre dos vectores
-coseno <- function(a, b) {
-  sum(a * b) /
-    (sqrt(sum(a^2)) * sqrt(sum(b^2)))
-}
-
-# Vecinos más cercanos de "salud"
-objetivo <- embeddings["salud", ]
-sims <- apply(embeddings, 1,
-              coseno, b = objetivo)
-head(sort(sims, decreasing = TRUE), 6)
-```
-:::
-:::
-:::
-:::
-
-## Embeddings de documentos
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=50%}
-- Los embeddings de palabras representan tokens individuales. Para representar [documentos completos]{.alert} tenemos varias opciones
-- Enfoques simples:
-    - [Promedio]{.alert} de los embeddings del documento (con o sin ponderar por TF-IDF)
-- Enfoques más sofisticados:
-    - [Doc2Vec]{.alert}: extensión de Word2Vec para documentos
+- Para representar [documentos completos]{.alert}:
+    - [Promedio]{.alert} de los embeddings de sus palabras (con o sin ponderar por TF-IDF)
+    - [Doc2Vec]{.alert}: extensión de Word2Vec
     - [Sentence-BERT]{.alert}: embeddings de oraciones con transformers
 - Permiten [medir similitud semántica]{.alert} entre textos
 :::
-
-:::{.column width=50%}
-:::{style="font-size: 19px;"}
-**Búsqueda semántica en nuestro corpus**
-
-```{r doc-emb-demo, echo=TRUE, eval=TRUE}
-# Embeddings de documentos desde el SVD: 
-# cada fila es un documento (10 dims)
-doc_emb <- reduccion$v
-rownames(doc_emb) <- colnames(matriz)
-
-# Vector de consulta: la "huella semántica" del 
-# doc 1 (economía, México)
-consulta <- doc_emb["1", ]
-
-# Top 4 documentos más similares
-# apply(..., 1, ...) recorre cada fila (cada documento) 
-# y le aplica coseno
-top <- apply(doc_emb, 1, coseno, b = consulta) |>
-  sort(decreasing = TRUE) |>
-  head(4)
-
-# Mostrar id, similitud y tema desde el corpus
-tibble(id = as.integer(names(top)),
-       sim = round(top, 3)) |>
-  left_join(corpus |> select(id, tema), by = "id")
-```
-
-Los documentos más cercanos al primero (tema [economía]{.alert}) son otros textos del mismo tema y uno de medio ambiente (que comparte vocabulario económico). LSA aprende la similitud sin conocer las etiquetas
 :::
-:::
+
+:::{style="text-align: center; margin-top: 12px; font-size: 19px;"}
+En el apéndice construimos mini-embeddings con LSA (SVD sobre TF-IDF) y buscamos palabras y documentos similares en nuestro corpus &nbsp; [[Ver demo (LSA)]{.button}](#sec:apendice-lsa)
 :::
 :::
 
 # Aplicaciones {background-color="#2d4563"}
 
-## Aplicaciones en política y medios
+## Aplicaciones en política y medios {#sec:resumen-3-2}
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
@@ -749,9 +630,170 @@ Los documentos más cercanos al primero (tema [economía]{.alert}) son otros tex
 :::
 :::
 :::
+
+:::{style="text-align: center; margin-top: 8px; font-size: 19px;"}
+[[Ver caso integrado completo]{.button}](#sec:apendice-caso)
+:::
 :::
 
-## Caso integrado (1/2): explorar las respuestas
+## ¿Qué método para qué problema?
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+| Problema de investigación | Método recomendado | Por qué |
+|---------------------------|--------------------|---------|
+| Contar palabras y frases comunes | [Bag-of-words]{.alert} | Simple, interpretable, rápido |
+| Identificar términos [distintivos]{.alert} de un grupo | [TF-IDF]{.alert} | Pondera por rareza en el corpus |
+| Descubrir [temas latentes]{.alert} sin etiquetas | [LDA]{.alert} | No supervisado, útil si no sabes qué temas buscas |
+| Medir el [tono]{.alert} de un texto | [Diccionarios]{.alert} de sentimiento | Transparente y validable |
+| Medir [similitud semántica]{.alert} entre textos | [Embeddings]{.alert} (Word2Vec, LSA) | Capturan significado, no sólo palabras |
+| Extraer [entidades]{.alert} (personas, lugares, partidos) | [NER]{.alert} (paquetes `spacyr`, `cleanNLP`) | Identifica menciones específicas en el texto |
+| Clasificar, resumir, extraer información compleja | [LLMs]{.alert} (Día 4) | Estado del arte en casi todas las tareas |
+
+:::{style="text-align: center; font-size: 20px; margin-top: 30px;"}
+Regla práctica: [empezar simple]{.alert}, validar contra lectura manual y escalar a métodos complejos sólo si el simple falla
+:::
+:::
+
+## Limitaciones de los métodos clásicos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Bag-of-words / TF-IDF:**
+
+- No capturan [orden]{.alert} de palabras
+- No capturan [significado]{.alert}
+- Dependen de [stopwords]{.alert} predefinidas
+- Sensibles a [errores ortográficos]{.alert}
+:::
+
+:::{.column width=50%}
+**LDA:**
+
+- Elegir K es [arbitrario]{.alert}
+- Temas pueden ser [incoherentes]{.alert}
+- Malo para [textos cortos]{.alert}
+- No captura [relaciones]{.alert} entre temas
+:::
+:::
+
+<br>
+
+:::{style="text-align: center; font-size: 22px;"}
+[Los LLMs (transformers) superan estas limitaciones]{.alert}
+
+Mañana veremos cómo BERT, GPT y otros modelos revolucionan el análisis de texto
+:::
+:::
+
+## Resumen y próximos pasos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vimos hoy**
+
+- [Tokenización]{.alert} y stopwords
+- [Bag-of-words]{.alert} y [TF-IDF]{.alert}
+- [Sentimiento]{.alert} con diccionarios
+- [LDA]{.alert}: temas latentes
+- [Embeddings]{.alert}: representaciones densas
+- [Caso integrado]{.alert} sobre encuesta abierta
+
+Los métodos clásicos son el [fundamento]{.alert} del análisis de texto. Entenderlos es la base para usar bien los LLMs
+:::
+
+:::{.column width=50%}
+**Qué viene**
+
+- [Laboratorios 3.3 y 3.4]{.alert}:
+    - Clustering y PCA con datos de países latinoamericanos
+    - Análisis de textos políticos con TF-IDF y LDA
+- [Día 4]{.alert}: LLMs y aplicaciones avanzadas
+    - Transformers, BERT, GPT
+    - APIs y casos de investigación
+    - Cuándo un LLM supera al pipeline clásico (y cuándo no)
+:::
+:::
+:::
+
+# Apéndice {background-color="#2d4563"}
+
+## Mini-embeddings de palabras con LSA {#sec:apendice-lsa}
+
+:::{style="margin-top: 20px; font-size: 19px;"}
+
+Aplicamos [SVD]{.alert} sobre la matriz TF-IDF (palabra x documento) para obtener mini-embeddings: cada palabra y cada documento queda representado en 10 dimensiones. Es la idea detrás de [LSA]{.alert} (Latent Semantic Analysis)
+
+```{r lsa-demo, echo=TRUE, eval=TRUE}
+# Matriz palabra x documento con TF-IDF
+matriz <- tokens_limpios |>
+  count(id, palabra) |>
+  bind_tf_idf(palabra, id, n) |>
+  cast_sparse(palabra, id, tf_idf) |>
+  as.matrix()
+
+# SVD: cada palabra en 10 dimensiones (nu = 10)
+# y cada documento en 10 dimensiones (nv = 10)
+# $u = embeddings de palabras; $v = los de documentos
+reduccion <- svd(matriz, nu = 10, nv = 10)
+embeddings <- reduccion$u
+rownames(embeddings) <- rownames(matriz)
+
+# Similitud coseno entre dos vectores
+coseno <- function(a, b) {
+  sum(a * b) / (sqrt(sum(a^2)) * sqrt(sum(b^2)))
+}
+
+# Vecinos más cercanos de "salud"
+objetivo <- embeddings["salud", ]
+sims <- apply(embeddings, 1, coseno, b = objetivo)
+head(sort(sims, decreasing = TRUE), 6)
+```
+
+Los vecinos más cercanos de "salud" son palabras del mismo campo semántico (mortalidad, infantil, materno), aprendidas sin etiquetas
+
+:::{style="text-align: center; margin-top: 8px;"}
+[[Volver]{.button}](#sec:resumen-3-2)
+:::
+:::
+
+## Búsqueda semántica de documentos
+
+:::{style="margin-top: 20px; font-size: 19px;"}
+
+Con los embeddings de documentos (la matriz $v$ del SVD) buscamos los textos más parecidos a uno dado, midiendo similitud coseno
+
+```{r doc-emb-demo, echo=TRUE, eval=TRUE}
+# Embeddings de documentos desde el SVD:
+# cada fila es un documento (10 dims)
+doc_emb <- reduccion$v
+rownames(doc_emb) <- colnames(matriz)
+
+# Vector de consulta: la "huella semántica" del
+# doc 1 (economía, México)
+consulta <- doc_emb["1", ]
+
+# Top 4 documentos más similares
+top <- apply(doc_emb, 1, coseno, b = consulta) |>
+  sort(decreasing = TRUE) |>
+  head(4)
+
+# Mostrar id, similitud y tema desde el corpus
+tibble(id = as.integer(names(top)),
+       sim = round(top, 3)) |>
+  left_join(corpus |> select(id, tema), by = "id")
+```
+
+Los documentos más cercanos al primero (tema [economía]{.alert}) son otros del mismo tema y uno de medio ambiente, que comparte vocabulario económico. LSA aprende la similitud sin conocer las etiquetas
+
+:::{style="text-align: center; margin-top: 8px;"}
+[[Volver]{.button}](#sec:resumen-3-2)
+:::
+:::
+
+## Caso integrado (1/2): explorar las respuestas {#sec:apendice-caso}
 
 :::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
@@ -867,87 +909,9 @@ clasificacion |>
 :::
 :::
 :::
-:::
 
-## ¿Qué método para qué problema?
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-| Problema de investigación | Método recomendado | Por qué |
-|---------------------------|--------------------|---------|
-| Contar palabras y frases comunes | [Bag-of-words]{.alert} | Simple, interpretable, rápido |
-| Identificar términos [distintivos]{.alert} de un grupo | [TF-IDF]{.alert} | Pondera por rareza en el corpus |
-| Descubrir [temas latentes]{.alert} sin etiquetas | [LDA]{.alert} | No supervisado, útil si no sabes qué temas buscas |
-| Medir el [tono]{.alert} de un texto | [Diccionarios]{.alert} de sentimiento | Transparente y validable |
-| Medir [similitud semántica]{.alert} entre textos | [Embeddings]{.alert} (Word2Vec, LSA) | Capturan significado, no sólo palabras |
-| Extraer [entidades]{.alert} (personas, lugares, partidos) | [NER]{.alert} (paquetes `spacyr`, `cleanNLP`) | Identifica menciones específicas en el texto |
-| Clasificar, resumir, extraer información compleja | [LLMs]{.alert} (Día 4) | Estado del arte en casi todas las tareas |
-
-:::{style="text-align: center; font-size: 20px; margin-top: 30px;"}
-Regla práctica: [empezar simple]{.alert}, validar contra lectura manual y escalar a métodos complejos sólo si el simple falla
-:::
-:::
-
-## Limitaciones de los métodos clásicos
-
-:::{style="margin-top: 30px; font-size: 24px;"}
-:::{.columns}
-:::{.column width=50%}
-**Bag-of-words / TF-IDF:**
-
-- No capturan [orden]{.alert} de palabras
-- No capturan [significado]{.alert}
-- Dependen de [stopwords]{.alert} predefinidas
-- Sensibles a [errores ortográficos]{.alert}
-:::
-
-:::{.column width=50%}
-**LDA:**
-
-- Elegir K es [arbitrario]{.alert}
-- Temas pueden ser [incoherentes]{.alert}
-- Malo para [textos cortos]{.alert}
-- No captura [relaciones]{.alert} entre temas
-:::
-:::
-
-<br>
-
-:::{style="text-align: center; font-size: 22px;"}
-[Los LLMs (transformers) superan estas limitaciones]{.alert}
-
-Mañana veremos cómo BERT, GPT y otros modelos revolucionan el análisis de texto
-:::
-:::
-
-## Resumen y próximos pasos
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=50%}
-**Lo que vimos hoy**
-
-- [Tokenización]{.alert} y stopwords
-- [Bag-of-words]{.alert} y [TF-IDF]{.alert}
-- [Sentimiento]{.alert} con diccionarios
-- [LDA]{.alert}: temas latentes
-- [Embeddings]{.alert}: representaciones densas
-- [Caso integrado]{.alert} sobre encuesta abierta
-
-Los métodos clásicos son el [fundamento]{.alert} del análisis de texto. Entenderlos es la base para usar bien los LLMs
-:::
-
-:::{.column width=50%}
-**Qué viene**
-
-- [Laboratorios 3.3 y 3.4]{.alert}:
-    - Clustering y PCA con datos de países latinoamericanos
-    - Análisis de textos políticos con TF-IDF y LDA
-- [Día 4]{.alert}: LLMs y aplicaciones avanzadas
-    - Transformers, BERT, GPT
-    - APIs y casos de investigación
-    - Cuándo un LLM supera al pipeline clásico (y cuándo no)
-:::
+:::{style="text-align: center; margin-top: 8px;"}
+[[Volver]{.button}](#sec:resumen-3-2)
 :::
 :::
 
