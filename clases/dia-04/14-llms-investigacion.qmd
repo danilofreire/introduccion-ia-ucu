@@ -1,0 +1,960 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 4.2: LLMs como herramientas de investigación"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 4.2](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-04/14-llms-investigacion.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+# LLMs como herramientas de investigación {background-color="#2d4563"}
+
+## Repaso de la sesión 4.1
+
+:::{style="margin-top: 20px; font-size: 26px;"}
+:::{.columns}
+:::{.column width=50%}
+**El mecanismo (lo que vimos)**
+
+- Un LLM predice el [próximo token]{.alert}, no la verdad
+- Procesa texto como [subpalabras]{.alert} (tokens BPE)
+- Usa [atención]{.alert} para ponderar qué contexto importa
+- Los [embeddings son contextuales]{.alert}: la misma palabra cambia de vector según el entorno
+- La [escala]{.alert} (parámetros, datos, cómputo) produce [emergencia]{.alert}: capacidades nuevas que aparecen sólo a partir de cierto tamaño
+:::
+
+:::{.column width=50%}
+**La consecuencia (donde quedamos)**
+
+- El modelo optimiza $P(\text{token} \mid \text{contexto})$, no $P(\text{verdad})$
+- Por eso [alucina]{.alert}: genera contenido fluido pero falso
+- Casos teaser: el abogado de Nueva York con seis casos fantasma y otros ejemplos de alucinación
+
+:::{.callout-note}
+**Ahora**: lo que el mecanismo nos pide. Aprender cuatro defensas para usar LLMs con responsabilidad en investigación
+:::
+:::
+:::
+:::
+
+## Agenda de la sesión
+
+:::{style="margin-top: 30px; font-size: 28px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**El problema y las defensas**
+
+- El problema central + caso completo del abogado
+- [Defensa 1]{.alert}: buenos prompts
+- [Defensa 2]{.alert}: salida estructurada
+- [Defensa 3]{.alert}: grounding con RAG
+- [Defensa 4]{.alert}: validación y reproducibilidad
+:::
+
+:::{.column width=50%}
+**Aplicación y herramientas**
+
+- Aplicaciones en investigación social
+- LLMs vs métodos clásicos
+- Cómo correr LLMs desde R:
+    - [OpenRouter]{.alert} (API agregadora, tier gratuito)
+    - [Ollama]{.alert} (modelos locales)
+    - El paquete [ellmer]{.alert}
+:::
+:::
+:::
+
+# El problema central {background-color="#2d4563"}
+
+## LLMs: potentes pero no confiables sin más
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los LLMs son [excelentes generadores de texto plausible]{.alert}
+- También son [pésimas fuentes de verdad sin verificación]{.alert}
+- En investigación social esto importa especialmente:
+    - Trabajamos con [hechos]{.alert} (eventos, fechas, citas, estadísticas)
+    - Necesitamos [reproducibilidad]{.alert} para que otros validen
+    - Nuestros lectores [confían]{.alert} en lo que publicamos
+- Un LLM que inventa un nombre, una fecha o una cita no es sólo molesto: arruina la investigación
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 22px;"}
+**La tensión central**
+
+Por un lado, los LLMs nos permiten hacer en minutos lo que antes llevaba semanas (anotar miles de textos, extraer entidades, sintetizar literatura)
+
+Por otro, [confiar en su salida sin defensas]{.alert} produce errores que se ven exactamente igual que los aciertos
+
+Esta clase es sobre [cómo aprovechar lo primero sin caer en lo segundo]{.alert} 😅
+:::
+:::
+:::
+:::
+
+## Caso completo: el abogado y los seis casos fantasma
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- **Mata vs. Avianca Inc.**, Tribunal del Distrito Sur de Nueva York, 2023
+- El demandante (Roberto Mata) alegaba lesiones por un carrito de servicio en un vuelo
+- Sus abogados pidieron a [ChatGPT]{.alert} precedentes legales para apoyar el caso
+- El modelo generó [seis casos]{.alert} completos:
+    - Nombres de partes (`Varghese v. China Southern Airlines`)
+    - Tribunales y jurisdicciones
+    - Números de expediente
+    - Citas con páginas exactas
+    - Argumentos detallados
+- [Los seis eran completamente ficticios]{.alert}
+- Los abogados los presentaron sin verificar
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![](figures/lawyer-case.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/lawyer-case.png"}
+
+:::{style="font-size: 22px;"}
+:::{.callout-note}
+Cuando el abogado le preguntó a ChatGPT si los casos eran reales, [el modelo le respondió que sí]{.alert}. Una alucinación encubre a otra.
+:::
+:::
+:::
+:::
+:::
+:::
+
+## Tipos de alucinación
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Fabricación]{.alert}: el modelo inventa datos, nombres, fechas o eventos que no existen
+- [Citas falsas]{.alert}: papers académicos, libros, números de expediente con apariencia real pero inventados
+- [Sicofancia]{.alert}: el modelo acuerda con la premisa del usuario aunque sea falsa ("Sí, claro, ese estudio existe...")
+- [Atribuciones erróneas]{.alert}: asigna una frase a un autor que nunca la dijo
+- [Confabulación silenciosa]{.alert}: cuando no sabe algo, llena el vacío con texto plausible en lugar de admitir ignorancia
+
+:::{.callout-note}
+Las cuatro defensas que veremos atacan distintas alucinaciones. Ninguna defensa por sí sola las elimina todas. Es un problema [estructural]{.alert} del mecanismo, no un bug
+:::
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Tasas de alucinación por modelo](figures/hallucination-rates.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/hallucination-rates.png"}
+
+:::{style="font-size: 22px;"}
+Modelos de frontera tienen tasas de alucinación bajas pero no nulas, incluso en tareas simples
+
+[Para investigación, "bajo" no es "aceptable"]{.alert}
+:::
+:::
+:::
+:::
+:::
+
+# Defensa 1: Buenos prompts {background-color="#2d4563"}
+
+## Anatomía de un buen prompt: PTCF
+
+:::{style="margin-top: 25px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=52%}
+- Un [buen prompt]{.alert} reduce la varianza de la respuesta hacia lo que querés. Mismo modelo y mismo input: [distintos prompts dan resultados muy distintos]{.alert}
+- Es [prompt engineering]{.alert}. Sus cuatro componentes son el framework [PTCF]{.alert}:
+    - **[Persona]{.alert}**: ¿quién es el modelo? ("Sos un analista político...")
+    - **[Tarea]{.alert}**: ¿qué tiene que hacer? ("Clasificá la orientación ideológica...")
+    - **[Contexto]{.alert}**: lo que necesita saber (categorías, origen del texto)
+    - **[Formato]{.alert}**: estructura de salida (JSON con campos definidos)
+- No siempre hacen falta los cuatro: usá los que apliquen
+- Fuente: [Google (2024)](https://services.google.com/fh/files/misc/gemini_for_workspace_prompt_guide_october_2024_digital_final.pdf)
+:::
+
+:::{.column width=48%}
+:::{style="font-size: 21px;"}
+**Mala práctica común**
+
+Prompt: *"Analiza este texto."*
+
+Problema: ¿analizar qué? ¿sentimiento? ¿tema? El modelo elige por vos.
+
+**Buena práctica**
+
+Prompt: *"Sos un analista político con experiencia en discurso latinoamericano. Clasificá el sentimiento del siguiente texto como positivo, negativo o neutro. Responde en JSON con campos `sentimiento` y `justificacion`."*
+
+[Mismo modelo, salida mucho más útil.]{.alert}
+:::
+:::
+:::
+:::
+
+## System prompts: el rol persistente
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- El [system prompt]{.alert} se envía [antes]{.alert} de cualquier mensaje del usuario
+- Establece [reglas que valen para toda la conversación]{.alert}: rol, restricciones, formato
+- Es la forma más efectiva de obtener [comportamiento consistente]{.alert} cuando procesás muchos documentos
+
+**Ejemplo para anotación sistemática**
+
+```
+Sos un asistente de codificación para
+investigación en ciencias sociales en
+América Latina.
+
+Reglas:
+- Respondé siempre en español
+- Si no estás seguro, decilo explícitamente
+- No inventes datos ni estadísticas
+- No agregues comentarios fuera del JSON
+- Formato: JSON estricto, sin texto antes o después
+```
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![System prompts](figures/system-prompts.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/system-prompts.png"}
+
+Fuente: [GitHub - System Prompts and Models of AI Tools](https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools)
+
+:::{style="font-size: 22px;"}
+:::{.callout-note}
+El system prompt es invisible para el modelo en el sentido de que no lo cita, pero condiciona [todas]{.alert} las respuestas. Es la forma más limpia de fijar el comportamiento
+:::
+:::
+:::
+:::
+:::
+:::
+
+## Zero-shot vs few-shot
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**[Zero-shot]{.alert}: sin ejemplos**
+
+```
+Clasificá el sentimiento de
+este texto como positivo,
+negativo o neutro:
+
+"La economía creció un 5%
+pero el desempleo subió."
+```
+
+Funciona para tareas simples y bien definidas. Lo que vimos en la Sesión 4.1 como [emergencia]{.alert} hace esto posible.
+
+[Bueno para empezar y baseline.]{.alert}
+
+:::{.callout-note}
+**Pista**: few-shot funciona porque el modelo aprende del [patrón del prompt]{.alert} mismo. Es la capacidad emergente que vimos ayer (in-context learning)
+:::
+:::
+
+:::{.column width=50%}
+**[Few-shot]{.alert}: con ejemplos**
+
+```
+Ejemplos:
+- "La inflación es alta" → negativo
+- "El empleo mejoró" → positivo
+- "Los datos son de 2023" → neutro
+- "Cayó la pobreza pero subió
+  la deuda" → mixto
+
+Clasificá:
+"El crecimiento fue moderado" →
+```
+
+Mejora la precisión al [mostrar]{.alert} el formato y los matices ([Brown et al., 2020](https://arxiv.org/abs/2005.14165); [Min et al., 2022](https://arxiv.org/abs/2202.12837))
+
+[Tres a cinco ejemplos suelen ser óptimos]{.alert}
+
+[Ojo]{.alert}: ejemplos mal elegidos o sesgados pueden empeorar el resultado. La calidad importa más que la cantidad
+:::
+:::
+:::
+
+## Chain-of-thought: pensar paso a paso
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**La técnica**
+
+Pedir al modelo que [razone explícitamente]{.alert} antes de responder.
+
+```
+Antes de clasificar, razoná paso a paso:
+
+Texto: "A pesar de la crisis, el
+gobierno logró reducir la pobreza."
+
+Razonamiento:
+1. "crisis" es contexto negativo
+2. "logró reducir la pobreza" es resultado positivo
+3. "a pesar de" indica contraste
+4. El resultado supera al contexto
+
+Clasificación: POSITIVO
+```
+
+[Modelos de razonamiento]{.alert} (o-series, DeepSeek R1, extended thinking) ya hacen CoT internamente: a veces conviene elegir uno en vez de escribir los pasos a mano
+:::
+
+:::{.column width=50%}
+**Por qué funciona**
+
+- El modelo distribuye el "esfuerzo" en varios tokens
+- Captura mejor [negaciones, ironías y contrastes]{.alert}
+- Mejora notablemente las tareas de razonamiento ([Wei et al., 2022](https://arxiv.org/abs/2201.11903))
+
+**Cuándo usarlo**
+
+- Razonamiento numérico
+- Clasificación con varios matices
+- Cualquier tarea donde "la primera reacción" del modelo no basta
+
+[Costo]{.alert}: respuestas más largas → más tokens → más caro. Vale la pena para tareas complejas
+:::
+:::
+:::
+
+## Temperatura: balance entre creatividad y consistencia
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- La [temperatura]{.alert} controla qué tanto el modelo se aparta del token más probable ([Holtzman et al., 2020](https://arxiv.org/abs/1904.09751); [Renze y Guven, 2024](https://arxiv.org/abs/2402.05201))
+- Va típicamente de 0 a 2
+- Para investigación, casi siempre [temperatura baja]{.alert}:
+    - Análisis y clasificación: 0,0 - 0,2
+    - Resumen factual: 0,2 - 0,4
+    - Análisis abierto con creatividad: 0,3 - 0,5
+    - Escritura creativa: 0,7 - 1,0
+- Temperatura 0 no garantiza determinismo absoluto en APIs comerciales (cambios entre versiones, sampling en GPU), pero se acerca
+- Para máxima reproducibilidad: usar modelos locales con seed fijo
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 22px;"}
+**Recomendaciones rápidas**
+
+| Tarea | Temperatura |
+|-------|-------------|
+| Clasificación | 0,0 - 0,1 |
+| Extracción de datos | 0,0 - 0,2 |
+| Resumen | 0,2 - 0,4 |
+| Análisis abierto | 0,3 - 0,5 |
+| Escritura creativa | 0,7 - 1,0 |
+| Brainstorming | 0,8 - 1,2 |
+
+[Para investigación reproducible: temperatura 0 siempre que se pueda.]{.alert}
+:::
+:::
+:::
+:::
+
+# Defensa 2: Salida estructurada {background-color="#2d4563"}
+
+## Pedir JSON: la idea
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=55%}
+- El problema de la salida en prosa: [imposible de parsear consistentemente]{.alert}
+    - El modelo a veces empieza con "Claro, aquí está mi análisis..."
+    - A veces incluye comentarios fuera del JSON
+    - A veces cambia el orden de las claves
+- La solución: pedir una [estructura fija]{.alert}, idealmente JSON
+- JSON es legible para humanos y parseable por R con `jsonlite`
+
+:::{.callout-note}
+Incluir un [ejemplo de la estructura esperada]{.alert} en el prompt reduce drásticamente los errores de formato
+:::
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo: extracción de entidades**
+
+```
+Extraé las entidades del texto en JSON:
+
+{
+  "personas": [...],
+  "organizaciones": [...],
+  "lugares": [...],
+  "fechas": [...]
+}
+
+Texto: "El presidente Lacalle Pou se reunió
+con el FMI en Montevideo el 15 de marzo
+de 2024."
+```
+
+**Respuesta esperada**
+
+```json
+{
+  "personas": ["Lacalle Pou"],
+  "organizaciones": ["FMI"],
+  "lugares": ["Montevideo"],
+  "fechas": ["15 de marzo de 2024"]
+}
+```
+:::
+:::
+:::
+:::
+
+## Tipos estrictos: ir más allá de "JSON, por favor"
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Pedir "JSON" en texto plano no garantiza que el modelo lo respete
+- A veces lo viola: agrega comas finales, mezcla mayúsculas, cambia tipos
+- Mejor: usar APIs que [fuerzan]{.alert} un tipo durante la generación
+    - [Structured Output]{.alert} de OpenAI: garantiza que la salida cumpla un esquema JSON
+    - [Tool calling]{.alert} de Anthropic: el modelo "llama" a funciones con tipos
+    - [Tipos de ellmer]{.alert}: el paquete R abstrae estas funcionalidades
+- Ventaja: tu código R recibe una estructura [validada]{.alert}, no texto a parsear
+- Lo veremos en el lab con `extract_data()` de `ellmer`
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 22px;"}
+**Adelanto: tipos en ellmer**
+
+```r
+library(ellmer)
+
+clasificador <- chat_openrouter(...)
+
+clasificador$extract_data(
+  "La inflación es preocupante.",
+  type = type_object(
+    sentimiento = type_string(
+      "positivo/negativo/neutro"
+    ),
+    confianza = type_number(
+      "Confianza de 0 a 1"
+    )
+  )
+)
+```
+
+Resultado: una lista R lista para usar, sin parsear texto
+:::
+:::
+:::
+:::
+
+# Defensa 3: Grounding con RAG {background-color="#2d4563"}
+
+## El problema: el modelo no sabe lo que no entrenó
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los LLMs tienen [conocimiento congelado]{.alert} en su fecha de corte de entrenamiento
+- No saben:
+    - Eventos posteriores al entrenamiento
+    - Tus documentos privados o internos
+    - Tu corpus específico de investigación
+- Pero el modelo igual [intenta responder]{.alert}, y ahí aparece la alucinación
+
+**Ejemplo típico**
+
+Preguntar a un LLM sobre un artículo académico que el usuario tiene como PDF:
+
+- El modelo no lo conoce
+- Pero puede [inventar]{.alert} citas, autores y conclusiones
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 22px;"}
+**La solución**
+
+En lugar de confiar en lo que el modelo "recuerda", le damos [los documentos relevantes en el prompt]{.alert} y le pedimos que base la respuesta en ellos
+
+Eso se llama [RAG]{.alert}: Retrieval-Augmented Generation
+
+Combina la fluidez del LLM con la precisión de tus datos
+:::
+:::
+:::
+:::
+
+## RAG: buscar primero, generar después
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [RAG]{.alert} ([Lewis et al., 2020](https://arxiv.org/abs/2005.11401)): pipeline en cuatro pasos
+    1. La usuaria hace una [pregunta]{.alert}
+    2. El sistema [busca]{.alert} los documentos relevantes en una base de conocimiento (usando embeddings)
+    3. Los documentos se incluyen en el [contexto del prompt]{.alert}
+    4. El LLM genera una respuesta basada en [esos documentos específicos]{.alert}
+- La búsqueda usa los mismos embeddings que vimos en la Sesión 4.1
+- Reduce alucinaciones porque el modelo tiene [texto real]{.alert} para apoyarse
+- Más fácil de actualizar: cambiar los documentos no requiere reentrenar
+- Ya lo usan: ChatGPT con archivos, NotebookLM de Google, Perplexity, Claude con PDFs
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center;"}
+[![Pipeline de RAG](figures/rag-pipeline.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/rag-pipeline.png"}
+:::
+:::
+:::
+:::
+
+## Cuándo (y cuándo no) usar RAG
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Sí usar RAG cuando**
+
+- Tu corpus es [grande]{.alert} (cientos o miles de documentos)
+- Necesitás [actualizar]{.alert} la base de conocimiento sin reentrenar
+- Necesitás [trazabilidad]{.alert}: ¿de qué documento salió esta afirmación?
+- Trabajás con dominio [muy específico]{.alert} (papers, leyes, transcripciones)
+- Querés que el modelo [cite]{.alert} fuentes reales
+:::
+
+:::{.column width=50%}
+**No necesitás RAG cuando**
+
+- El documento [entra en el prompt directamente]{.alert} (ventanas de 200K+ tokens permiten artículos completos)
+- La tarea es de [razonamiento general]{.alert}, no de recuperación factual
+- La tarea es [creativa]{.alert} (escribir, brainstormear)
+- No tenés base de conocimiento estable: querés que el modelo use su entrenamiento
+
+:::{.callout-note}
+A veces "RAG" es exagerado. Si tu PDF entra en el contexto, podés pegarlo directamente.
+:::
+:::
+:::
+:::
+
+# Defensa 4: Validación y reproducibilidad {background-color="#2d4563"}
+
+## Validación: comparar con gold standard
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Antes de usar un LLM para anotar todo tu corpus, [validalo en una muestra]{.alert}
+- El procedimiento estándar:
+    1. Anotá [a mano]{.alert} 50 a 200 documentos
+    2. Pasá los mismos documentos por el LLM
+    3. Comparalos con métricas del día 02 (precisión, recall, F1, kappa de Cohen)
+    4. Si la calidad es aceptable, [escalá al corpus completo]{.alert}
+- Si dos anotadores humanos hacen la mitad cada uno, podés calcular [acuerdo entre humanos]{.alert} y comparar con el acuerdo LLM-humano
+
+**¿Qué es "aceptable"?**
+
+Depende de la tarea. Algunos benchmarks:
+
+- LLM kappa ≥ 0,7 vs gold standard o cercano al acuerdo interhumano
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px;"}
+**Ejemplo de tabla de validación**
+
+```
+Dataset: 100 textos políticos
+Gold standard: 2 investigadores
+
+         | Accuracy | F1
+---------|----------|------
+LLM      | 0,87     | 0,85
+Dicción. | 0,72     | 0,68
+LDA+sup. | 0,79     | 0,76
+Humano   | 0,91     | 0,89
+
+Conclusión: LLM cerca de humanos,
+supera métodos clásicos.
+```
+
+[Sin esta tabla, es difícil defender el uso del LLM en una publicación]{.alert}
+:::
+:::
+:::
+:::
+
+## Reproducibilidad: documentar todo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los LLMs son [un desafío para la reproducibilidad]{.alert}
+- Razones:
+    - Los modelos se actualizan (GPT-4 de marzo ≠ GPT-4 de diciembre)
+    - Las APIs pueden cambiar comportamiento silenciosamente
+    - Temperatura > 0 introduce aleatoriedad
+    - Los modelos cerrados son [cajas negras]{.alert}
+- Buenas prácticas:
+    - [Documentar]{.alert} modelo exacto, versión, fecha
+    - [Guardar]{.alert} los prompts completos usados
+    - Usar [temperatura 0]{.alert} cuando se pueda
+    - Guardar las [respuestas crudas]{.alert}, no sólo lo procesado
+    - Para máxima reproducibilidad: [modelo local]{.alert} con versión fija
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px;"}
+**Documentación mínima**
+
+```yaml
+modelo: claude-3-5-sonnet
+version: "2024-10-22"
+provider: openrouter
+fecha_ejecucion: 2026-04-10
+temperatura: 0
+max_tokens: 500
+system_prompt: |
+  Sos un clasificador...
+seed: 42  # si la API lo permite
+
+archivos_guardados:
+  - prompts_usados.json
+  - respuestas_crudas.json
+  - codigo_procesamiento.R
+```
+
+[Sin esto, el análisis no es replicable]{.alert}
+:::
+:::
+:::
+:::
+
+# Aplicaciones en investigación {background-color="#2d4563"}
+
+## Anotación automática de texto
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- El uso más común en ciencias sociales: [clasificar texto a escala]{.alert}
+- Ayer usamos diccionarios, TF-IDF y LDA. Los LLMs hacen lo mismo [con mejor calidad]{.alert} en muchas tareas:
+    - Capturan [contexto y significado]{.alert}, no sólo palabras
+    - Manejan [negaciones]{.alert} ("no es bueno" = negativo)
+    - Manejan [ironía y sarcasmo]{.alert} mejor que diccionarios
+    - Funcionan [multilingüe]{.alert} sin reentrenar
+- Evidencia: [Gilardi, Alizadeh y Kubli (2023)]{.alert} muestran que GPT-4 supera a anotadores humanos en muchas tareas de clasificación de tweets ([PNAS](https://doi.org/10.1073/pnas.2305016120))
+- Costo: centavos por texto vs. dólares por anotador humano
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo de prompt completo**
+
+```
+System: Sos un analista político. Clasificá
+textos según el tema principal. Temas
+posibles: economia, educacion, seguridad,
+salud, medio ambiente.
+
+Respondé SOLO con el tema, sin explicación.
+
+User: "La inflación sigue siendo un problema
+grave que afecta a las familias más
+vulnerables."
+
+Respuesta: economia
+```
+
+[En un lab veremos cómo procesar mil textos así, con ellmer y quallmer]{.alert}
+:::
+:::
+:::
+:::
+
+## Generación de datos sintéticos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Datos sintéticos]{.alert}: datos generados por un LLM que imitan datos reales
+- Casos legítimos en investigación:
+    - [Pilotos]{.alert}: probar un análisis antes de recoger datos reales
+    - [Aumentación]{.alert}: expandir datasets pequeños cuando es difícil obtener más datos
+    - [Privacidad]{.alert}: generar datos que preserven patrones sin exponer individuos
+    - [Entrenamiento]{.alert}: crear ejemplos para entrenar clasificadores
+- Precauciones serias:
+    - Los datos sintéticos [reflejan los sesgos]{.alert} del modelo que los genera
+    - [No reemplazan]{.alert} datos reales para conclusiones sustantivas
+    - Deben ser [validados]{.alert} contra datos reales cuando se pueda
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**Ejemplo de prompt**
+
+```
+Generá 10 respuestas simuladas a
+una encuesta sobre confianza en
+instituciones en Uruguay.
+
+Cada respuesta debe incluir:
+- edad (18-80)
+- género (M/F)
+- confianza_gobierno (1-4)
+- confianza_justicia (1-4)
+- comentario (1 oración)
+
+Formato: CSV con encabezados. Las
+respuestas deben reflejar la
+diversidad demográfica real.
+```
+
+Útiles como [complemento, no como sustituto]{.alert}
+:::
+:::
+:::
+:::
+
+## LLMs vs métodos clásicos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+:::{style="text-align: center;"}
+
+| Criterio | Diccionarios | TF-IDF + clasificador | LLM (zero-shot) | LLM (few-shot) |
+|----------|--------------|------------------------|-----------------|-----------------|
+| [Precisión]{.alert} | Baja | Moderada | Alta | Muy alta |
+| [Velocidad]{.alert} | Muy rápida | Rápida | Lenta | Lenta |
+| [Costo]{.alert} | Gratis | Gratis | USD/1000 textos | USD/1000 textos |
+| [Datos etiquetados]{.alert} | No | Sí (cientos) | No | 3-10 ejemplos |
+| [Reproducibilidad]{.alert} | Alta | Alta | Difícil | Difícil |
+| [Transparencia]{.alert} | Total | Moderada | Caja negra | Caja negra |
+| [Idiomas]{.alert} | Uno por uno | Uno por uno | Multilingüe | Multilingüe |
+| [Negación/ironía]{.alert} | Pobre | Pobre | Buena | Muy buena |
+
+:::
+
+<br>
+
+:::{style="font-size: 24px;"}
+[Recomendación]{.alert}: para volúmenes grandes y tareas comunes, considerar [híbridos]{.alert}. Usar el LLM para etiquetar un subconjunto y entrenar un clasificador clásico con esas etiquetas. Mejor calidad que diccionarios, mucho más barato que LLM en todo el corpus.
+:::
+:::
+
+# Cómo correr todo esto desde R {background-color="#2d4563"}
+
+## Tres alternativas para acceder a LLMs
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+| Opción | Ventajas | Limitaciones | Cuándo usarla |
+|---|---|---|---|
+| [OpenRouter]{.alert} | Una API key para docenas de modelos; [tier gratuito]{.alert}; sin tarjeta para empezar | Rate limits en modelos `:free`; depende de un agregador externo | Empezar, prototipos, volúmenes pequeños |
+| [Ollama]{.alert} (local) | [Cero costo]{.alert}; los datos no salen de tu máquina; versión exacta queda fija | Necesita 8+ GB de RAM; modelos chicos son menos potentes | [Privacidad]{.alert}, reproducibilidad, corpus grande |
+| APIs comerciales (OpenAI, Anthropic) | Mejor calidad disponible; respuestas rápidas | Tarjeta de crédito; pago por uso; caja negra | Cuando la institución cubre el costo o el proyecto lo justifica |
+
+<br>
+
+:::{style="text-align: center; font-size: 22px;"}
+Con [ellmer]{.alert} podés cambiar de proveedor [sin reescribir tu código]{.alert}. En los labs lo vemos paso a paso
+:::
+:::
+
+## `ellmer`: interfaz unificada para R
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- [ellmer]{.alert} ([ellmer.tidyverse.org](https://ellmer.tidyverse.org/)) es el paquete oficial de [Posit]{.alert} para hablar con LLMs desde R
+- Una sola interfaz para todos los proveedores:
+    - `chat_openrouter()`, `chat_ollama()`, `chat_openai()`, `chat_anthropic()`, `chat_google_gemini()`
+- Funciones principales:
+    - `chat$chat()`: enviar un mensaje
+    - `chat$extract_data()`: extraer datos con tipos validados (las defensas 1 y 2 en una sola llamada)
+    - `chat$tokens()`: contar tokens usados
+- Trabaja bien con `purrr::map()` para procesar muchos textos en pipeline
+
+[Detalles, errores comunes y mini-proyecto: en los Laboratorios 7 y 8]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px;"}
+**El patrón mínimo**
+
+```r
+library(ellmer)
+
+chat <- chat_openrouter(
+  model = "meta-llama/llama-3.2-3b-instruct:free",
+  system_prompt = "Sos un analista político..."
+)
+
+# Texto libre
+chat$chat("Resumí este texto...")
+
+# Extracción tipada (defensa 2)
+chat$extract_data(
+  "La economía está en crisis.",
+  type = type_object(
+    tema        = type_string(),
+    sentimiento = type_string(),
+    confianza   = type_number()
+  )
+)
+```
+
+[Cambiar `chat_openrouter` por `chat_ollama` y el resto del código sigue igual]{.alert}
+:::
+:::
+:::
+:::
+
+## Anticipo del día 5: instalar Ollama
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Mañana corremos un LLM [en su propia computadora]{.alert} con [Ollama]{.alert}, sin API ni tarjeta
+- Tres pasos, una sola vez:
+    1. Descargar Ollama: [ollama.com/download](https://ollama.com/download) (Windows, macOS, Linux)
+    2. Bajar el modelo del curso:
+
+    ```bash
+    ollama pull qwen3.5:4b
+    ```
+
+    3. Probarlo en la terminal:
+
+    ```bash
+    ollama run qwen3.5:4b
+    ```
+
+- `qwen3.5:4b` ocupa ~3,4 GB y corre con 8 GB de RAM
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 22px;"}
+**Háganlo antes de la clase**
+
+La descarga puede tardar varios minutos según la conexión. Si la dejan para el laboratorio, pierden tiempo de práctica
+
+:::{.callout-note}
+**Pista**: si su laptop tiene poca memoria, usen `qwen3.5:2b` (~2,7 GB). Funciona igual, con algo menos de calidad
+:::
+
+Lo mismo que hoy hacemos con `ellmer` en la nube, mañana lo haremos en local
+:::
+:::
+:::
+:::
+
+## Resumen: las cuatro defensas
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**Lo que aprendimos hoy**
+
+- [Defensa 1]{.alert}: buenos prompts (PTCF, system prompts, few-shot, CoT, temperatura baja)
+- [Defensa 2]{.alert}: salida estructurada (JSON con tipos estrictos)
+- [Defensa 3]{.alert}: grounding con RAG (cuando tu corpus no entra en el contexto)
+- [Defensa 4]{.alert}: validación contra gold standard + reproducibilidad
+:::
+
+:::{.column width=50%}
+**Herramientas**
+
+- [OpenRouter]{.alert} para empezar sin tarjeta
+- [Ollama]{.alert} para modelos locales y privacidad
+- [ellmer]{.alert} como interfaz unificada
+
+**Regla de oro**
+
+:::{.callout-note}
+[Nunca confiar en la salida de un LLM sin verificación]{.alert}. Los LLMs son [herramientas de borrador]{.alert}, no fuentes de verdad
+:::
+:::
+:::
+
+<br>
+
+:::{style="text-align: center; font-size: 22px;"}
+[Ninguna defensa por sí sola es suficiente. Las cuatro juntas hacen el trabajo más confiable]{.alert}
+:::
+:::
+
+## Próximos pasos
+
+:::{style="margin-top: 40px; font-size: 26px;"}
+
+- [Laboratorio 7]{.alert}: primeros pasos con `ellmer`
+    - Configurar OpenRouter y Ollama
+    - Chat básico y prompts
+    - Clasificación con few-shot
+
+- [Laboratorio 8]{.alert}: aplicaciones avanzadas
+    - Extracción estructurada con tipos
+    - Anotación a escala
+    - Comparación con métodos clásicos del día 03
+    - Auditoría de sesgos del modelo
+
+<br>
+
+[Mañana cerramos con modelos locales, ética y regulación]{.alert}
+:::
+
+# Nos vemos en el laboratorio 🤓 {background-color="#2d4563"}
