@@ -576,3 +576,6 @@ rsconnect/
 
 # Root-level site_libs created by quarto preview (real copy lives in docs/)
 /site_libs/
+
+# Agent config — never commit to public repo
+.claude/

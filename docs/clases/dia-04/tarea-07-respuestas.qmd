@@ -1,0 +1,263 @@
+---
+title: "Tarea 7: Primeros pasos con ellmer -- Respuestas"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-15"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta es la clave de respuestas de la Tarea 7. Cada pregunta incluye el código R completo y una respuesta escrita. Para que los chunks corran al renderizar, hace falta una API key de OpenRouter configurada en `OPENROUTER_API_KEY`.
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(ellmer)
+library(tidyverse)
+library(jsonlite)
+
+set.seed(2026)
+
+stopifnot(Sys.getenv("OPENROUTER_API_KEY") != "")
+
+textos <- read_csv("../dia-03/datos/textos_politicos.csv",
+                   show_col_types = FALSE)
+
+MODELO <- "google/gemma-4-31b-it:free"
+```
+
+## Configuración y chat básico
+
+### Pregunta 1: Primer chat
+
+```{r p1, eval=FALSE}
+chat <- chat_openrouter(
+  model = MODELO,
+  system_prompt = "Sos un investigador en ciencia política
+  latinoamericana. Respondés en dos oraciones, en español, con
+  vocabulario académico claro."
+)
+
+chat$chat("¿Qué es la democracia representativa?")
+```
+
+**Respuesta:** El system prompt se pasa como argumento del constructor `chat_openrouter()` y permanece activo durante toda la sesión del chat. Después de crear el objeto, llamamos al método `$chat()` para enviar un mensaje y recibir la respuesta como texto.
+
+### Pregunta 2: Historial de conversación
+
+```{r p2, eval=FALSE}
+chat$chat("¿Y qué desafíos enfrenta hoy en América Latina?")
+```
+
+**Respuesta:** La segunda respuesta se refiere a la democracia representativa sin que tengamos que repetir el término. `ellmer` guarda el historial completo dentro del objeto `chat` y lo reenvía al modelo en cada llamada. Eso permite que el modelo mantenga el hilo, pero también significa que el costo en tokens crece conversación tras conversación.
+
+### Pregunta 3: System prompt como variable de control
+
+```{r p3, eval=FALSE}
+mercado <- chat_openrouter(
+  model = MODELO,
+  system_prompt = "Sos un economista ortodoxo. Defendés la disciplina
+  fiscal, los mercados libres y la apertura comercial. Respondés en
+  tres oraciones."
+)
+
+social <- chat_openrouter(
+  model = MODELO,
+  system_prompt = "Sos un economista heterodoxo enfocado en
+  desigualdad. Defendés la redistribución y la intervención pública.
+  Respondés en tres oraciones."
+)
+
+pregunta <- "¿Cómo debería responder un país de ingresos medios a
+una crisis de inflación?"
+
+cat("--- Mercado ---\n", mercado$chat(pregunta), "\n\n")
+cat("--- Social ---\n",   social$chat(pregunta), "\n")
+```
+
+**Respuesta:** Las dos respuestas usan vocabulario y recomendaciones distintas: la "de mercado" enfatiza disciplina fiscal y tasa de interés; la "social" enfatiza salarios reales, transferencias y controles. El mismo modelo produce posiciones distintas según el rol que le asignamos. Esto muestra que el system prompt es una variable de control, no un detalle cosmético: puede inducir sesgo intencional o no intencional en los resultados.
+
+## Clasificación zero-shot
+
+### Pregunta 4: Función de clasificación
+
+```{r p4, eval=FALSE}
+clasificar_zero <- function(texto) {
+  chat <- chat_openrouter(
+    model = MODELO,
+    system_prompt = "Clasificá el siguiente texto político en
+    EXACTAMENTE una de estas categorías:
+    economia, educacion, seguridad, salud, medioambiente.
+
+    Reglas:
+    - Responder SOLO con el nombre de la categoría, en minúsculas
+    - Sin tildes, sin puntuación, sin explicación"
+  )
+  trimws(tolower(chat$chat(texto)))
+}
+
+clasificar_zero(textos$texto[1])
+clasificar_zero(textos$texto[5])
+clasificar_zero(textos$texto[10])
+```
+
+**Respuesta:** La función crea un chat nuevo dentro de cada llamada, de modo que la clasificación del texto N no contamina la del texto N+1. Esto cuesta más tokens (cada llamada envía el system prompt de nuevo) pero protege la independencia entre observaciones, que es lo que necesitamos para evaluar la accuracy con honestidad.
+
+### Pregunta 5: Clasificar en batch
+
+```{r p5, eval=FALSE}
+resultados_zero <- textos |>
+  slice(1:20) |>
+  mutate(tema_llm = map_chr(texto, clasificar_zero, .progress = TRUE))
+
+# Accuracy
+mean(resultados_zero$tema == resultados_zero$tema_llm)
+
+# Matriz de confusión
+table(real = resultados_zero$tema, llm = resultados_zero$tema_llm)
+```
+
+**Respuesta:** En una corrida típica con `google/gemma-4-31b-it:free`, la accuracy queda alta, entre 0,85 y 0,95, dependiendo de qué textos caen en los primeros veinte. La matriz de confusión muestra los pocos errores: cuando ocurren, suelen ser entre temas cercanos, como "economia" y "seguridad" en textos sobre desempleo y violencia urbana, o "salud" y "medioambiente" en textos sobre contaminación.
+
+### Pregunta 6: Inspección de errores
+
+```{r p6, eval=FALSE}
+errores <- resultados_zero |>
+  filter(tema != tema_llm) |>
+  select(texto, tema, tema_llm)
+
+errores
+```
+
+**Respuesta:** Muchos errores son "razonables": un texto sobre la contaminación que afecta a niños puede ser tanto `medioambiente` (etiqueta original) como `salud` (etiqueta del LLM) sin que ninguna sea claramente incorrecta. Otros son "claros": un texto sobre presupuesto escolar etiquetado como `educacion` que el modelo coloca en `economia` ignora que la mención al presupuesto es accesoria al tema principal. La conclusión metodológica es que la accuracy contra etiquetas "doradas" subestima el desempeño del modelo cuando las categorías no son mutuamente excluyentes.
+
+## Few-shot y comparación
+
+### Pregunta 7: Clasificador few-shot
+
+```{r p7, eval=FALSE}
+clasificar_few <- function(texto) {
+  chat <- chat_openrouter(
+    model = MODELO,
+    system_prompt = "Clasificá textos políticos en:
+    economia, educacion, seguridad, salud, medioambiente.
+
+    Ejemplos:
+    - 'La inflación volvió a subir este mes' -> economia
+    - 'Los docentes piden mejores salarios' -> educacion
+    - 'Aumentaron los robos en la capital' -> seguridad
+    - 'Se inauguró un nuevo hospital' -> salud
+    - 'Los incendios forestales se extienden' -> medioambiente
+
+    Responder SOLO con la categoría, sin tildes ni explicación."
+  )
+  trimws(tolower(chat$chat(texto)))
+}
+
+resultados_few <- textos |>
+  slice(1:20) |>
+  mutate(tema_llm = map_chr(texto, clasificar_few, .progress = TRUE))
+
+mean(resultados_few$tema == resultados_few$tema_llm)
+```
+
+**Respuesta:** Con cinco ejemplos típicos, la accuracy suele subir unos pocos puntos respecto al zero-shot. Con un modelo fuerte como gemma, el zero-shot ya es alto, así que el margen de mejora del few-shot es chico; el aporte principal de los ejemplos es fijar el formato exacto de la salida (categoría sola, sin texto extra) y anclar la frontera entre temas que se solapan.
+
+### Pregunta 8: Sensibilidad a los ejemplos
+
+```{r p8, eval=FALSE}
+clasificar_few_ambiguo <- function(texto) {
+  chat <- chat_openrouter(
+    model = MODELO,
+    system_prompt = "Clasificá en: economia, educacion, seguridad,
+    salud, medioambiente.
+
+    Ejemplos:
+    - 'El presupuesto público destinado al sector creció 8 puntos' -> economia
+    - 'El nuevo currículo prioriza pensamiento crítico' -> educacion
+    - 'Las cámaras de vigilancia llegaron a barrios periféricos' -> seguridad
+    - 'Las listas de espera aumentaron tras la reforma' -> salud
+    - 'La sequía obliga a racionar el agua potable' -> medioambiente
+
+    Responder SOLO con la categoría."
+  )
+  trimws(tolower(chat$chat(texto)))
+}
+
+resultados_amb <- textos |>
+  slice(1:20) |>
+  mutate(tema_llm = map_chr(texto, clasificar_few_ambiguo, .progress = TRUE))
+
+mean(resultados_amb$tema == resultados_amb$tema_llm)
+```
+
+**Respuesta:** La accuracy con ejemplos ambiguos suele ser menor que con ejemplos típicos pero mayor que zero-shot. La elección de los ejemplos importa: ejemplos prototípicos enseñan la categoría pura, ejemplos ambiguos enseñan a no sobre-confiar en palabras clave. Ninguna estrategia es siempre mejor; depende del corpus que tengamos.
+
+### Pregunta 9: Comparación con el Día 3
+
+```{r p9, eval=FALSE}
+# Cambiar 0.72 por el valor real del Día 3
+accuracy_lda <- 0.72
+
+comparacion <- tribble(
+  ~metodo,           ~accuracy,
+  "LDA (Día 3)",     accuracy_lda,
+  "LLM zero-shot",   mean(resultados_zero$tema == resultados_zero$tema_llm),
+  "LLM few-shot",    mean(resultados_few$tema == resultados_few$tema_llm)
+) |>
+  mutate(
+    tiempo_aprox = c("2 seg", "~2 min", "~2 min"),
+    costo_aprox  = c("$0", "<$0.01", "<$0.01")
+  )
+
+comparacion
+```
+
+**Respuesta:** La conclusión depende del corpus, pero en general el LLM few-shot supera al zero-shot, y ambos pueden superar a LDA cuando los temas no se distinguen bien por palabras clave puras. LDA gana en tiempo y costo: 100 textos por segundo gratis vs. 2 minutos por cada 20 textos y unos centavos. Para corpus pequeños el LLM es la mejor opción; para corpus de millones, LDA o un clasificador clásico siguen siendo la regla.
+
+### Pregunta 10: Acuerdo entre métodos
+
+```{r p10, eval=FALSE}
+# Suponiendo que resultados_lda existe del Día 3
+acuerdo <- tribble(
+  ~comparacion,                       ~prop_acuerdo,
+  "LDA vs LLM zero-shot",             mean(resultados_zero$tema_lda == resultados_zero$tema_llm),
+  "LDA vs LLM few-shot",              mean(resultados_few$tema_lda  == resultados_few$tema_llm),
+  "LLM zero-shot vs LLM few-shot",    mean(resultados_zero$tema_llm == resultados_few$tema_llm)
+)
+
+acuerdo
+```
+
+**Respuesta:** Los dos LLMs suelen estar más cerca entre sí (acuerdo > 0,80) que cualquiera de los dos con LDA (acuerdo ~0,60). Esto sugiere que los LLMs y LDA cometen errores estructuralmente distintos: LDA se confunde por palabras compartidas entre temas, los LLMs se confunden cuando un texto toca dos temas a la vez. Un ensamble (votación entre LDA y LLM) podría capturar lo mejor de cada uno.
+
+## Reflexión
+
+### Pregunta 11: Costo de procesar el dataset completo
+
+```{r p11}
+n_textos <- 60
+tokens_entrada_por_texto <- 200
+tokens_salida_por_texto  <- 5
+
+precio_entrada <- 0.80  # USD por millón
+precio_salida  <- 4.00  # USD por millón
+
+costo <- (n_textos * tokens_entrada_por_texto * precio_entrada +
+          n_textos * tokens_salida_por_texto  * precio_salida) / 1e6
+costo
+```
+
+**Respuesta:** El costo aproximado es de USD 0,01 para los 60 textos (un centavo). Esto es órdenes de magnitud más barato que un anotador humano (~USD 0,10 por texto en plataformas tipo Mechanical Turk, ~USD 1 por texto si es un investigador). Para 5.000 textos, el costo escalaría a ~USD 1, todavía trivial.
+
+### Pregunta 12: Recomendación para una investigación real
+
+**Respuesta:** Recomendaría un híbrido. Pasos: (1) usar el LLM (Claude 3.5 Haiku o similar) para anotar 500 tweets con el mejor prompt few-shot posible, costo aproximado USD 5; (2) validar contra una muestra de 100 tweets anotados a mano por el colega, calcular kappa de Cohen; (3) si kappa > 0,7, entrenar un clasificador clásico (regresión logística + TF-IDF o un modelo en `tidymodels`) sobre las 500 etiquetas del LLM; (4) usar el clasificador clásico para etiquetar los 4.500 restantes, gratis y reproducible. Esto combina la precisión del LLM, el costo controlado y la reproducibilidad de los métodos clásicos. Documentar el modelo exacto, el prompt y la fecha de uso del LLM en el material suplementario.

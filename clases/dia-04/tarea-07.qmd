@@ -1,0 +1,192 @@
+---
+title: "Tarea 7: Primeros pasos con ellmer"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-15"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta tarea aplica los conceptos del Laboratorio 7. Responder cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usar texto normal debajo del bloque de código.
+
+**Para trabajar en esta tarea:**
+
+1. Descarguen este archivo `.qmd` y el dataset `textos_politicos.csv` (en `clases/dia-03/datos/`) de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto
+3. Necesitan una API key de [OpenRouter](https://openrouter.ai/keys) configurada como `OPENROUTER_API_KEY` en `.Renviron`. Alternativa: instalar [Ollama](https://ollama.com/) y usar `chat_ollama()` en lugar de `chat_openrouter()`
+4. Abrir este archivo `.qmd` en RStudio y ejecutar los bloques de código con Ctrl+Enter (Cmd+Enter en Mac)
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(ellmer)
+library(tidyverse)
+library(jsonlite)
+
+set.seed(2026)
+
+# Verificar que la API key está configurada
+stopifnot(Sys.getenv("OPENROUTER_API_KEY") != "")
+
+# Cargar los textos del Día 3
+textos <- read_csv("../dia-03/datos/textos_politicos.csv",
+                   show_col_types = FALSE)
+
+# Modelo por defecto (cambiar si OpenRouter está saturado)
+MODELO <- "google/gemma-4-31b-it:free"
+```
+
+## Configuración y chat básico
+
+### Pregunta 1: Primer chat
+
+Crear un chat con `chat_openrouter()` usando `MODELO` y un system prompt en el que el modelo se presenta como un investigador en ciencia política latinoamericana. Pedirle que explique en dos oraciones qué es la democracia representativa. Mostrar la respuesta.
+
+*Pista:* el system prompt es un argumento del constructor `chat_openrouter()`, no algo que se envía después. La interfaz devuelve un objeto R6 con un método para enviar mensajes.
+
+```{r p1}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 2: Historial de conversación
+
+Usando el mismo objeto `chat` de la Pregunta 1, hacer una segunda pregunta que **dependa** de la primera (por ejemplo, "¿Y qué desafíos enfrenta hoy en América Latina?"). Verificar que la respuesta hace referencia al concepto introducido antes. Explicar por qué `chat$chat()` "recuerda" la conversación.
+
+```{r p2}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 3: System prompt como variable de control
+
+Crear dos chats con system prompts opuestos sobre el mismo tema (por ejemplo, uno con perspectiva de mercado y otro con perspectiva social), y hacer a ambos exactamente la misma pregunta sobre política económica. Mostrar las dos respuestas en formato comparativo. ¿Las respuestas difieren? ¿En qué?
+
+```{r p3}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Clasificación zero-shot
+
+### Pregunta 4: Función de clasificación
+
+Escribir una función `clasificar_zero(texto)` que reciba un texto y devuelva una de las cinco categorías de `textos_politicos.csv`. Probarla con los textos 1, 5 y 10 del dataset.
+
+*Pista:* dentro de la función conviene crear un chat nuevo cada vez para evitar que el historial sesgue la siguiente clasificación.
+
+```{r p4}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 5: Clasificar en batch
+
+Tomar los primeros 20 textos del dataset (con `slice(1:20)`) y clasificarlos usando la función de la Pregunta 4. Calcular la accuracy comparando con la columna `tema`. Mostrar la matriz de confusión.
+
+*Pista:* `map_chr(texto, clasificar_zero, .progress = TRUE)` aplica la función a cada texto y devuelve un vector de caracteres.
+
+```{r p5}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 6: Inspección de errores
+
+Filtrar los textos mal clasificados en la Pregunta 5 y mostrarlos con su tema real y su tema predicho. Para al menos dos de ellos, escribir una oración explicando si el error parece "razonable" (la etiqueta del LLM también sería defendible) o "claro" (el LLM se equivocó claramente).
+
+```{r p6}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Few-shot y comparación
+
+### Pregunta 7: Clasificador few-shot
+
+Escribir una nueva función `clasificar_few(texto)` que incluya cinco ejemplos (uno por categoría) en el system prompt. Aplicarla a los mismos 20 textos de la Pregunta 5. ¿Mejora la accuracy?
+
+*Pista:* los ejemplos van dentro del texto del system prompt; no es necesario usar argumentos especiales.
+
+```{r p7}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 8: Sensibilidad a los ejemplos
+
+Repetir la Pregunta 7 cambiando los ejemplos por otros cinco (uno por categoría) que sean menos típicos (más ambiguos o con vocabulario distinto). ¿Cambia la accuracy? ¿Qué dice esto sobre la elección de los ejemplos en few-shot?
+
+```{r p8}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 9: Comparación con el Día 3
+
+Recuperar (o recalcular) la accuracy del clasificador LDA del Día 3 sobre el mismo subconjunto de 20 textos. Construir una tabla con tres filas (LDA, LLM zero-shot, LLM few-shot) y columnas para accuracy, tiempo aproximado y costo aproximado.
+
+*Pista:* `tribble()` es la forma más legible de armar la tabla a mano.
+
+```{r p9}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 10: Acuerdo entre métodos
+
+Para cada par de métodos (LDA vs zero-shot, LDA vs few-shot, zero-shot vs few-shot), calcular el porcentaje de textos en los que ambos coinciden. ¿Los dos LLMs se equivocan en los mismos textos, o en distintos?
+
+```{r p10}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Reflexión
+
+### Pregunta 11: Costo de procesar el dataset completo
+
+`textos_politicos.csv` tiene 60 textos. Si quisieran clasificar los 60 con un modelo pago (por ejemplo, Claude 3.5 Haiku, que cuesta aproximadamente USD 0,80 por millón de tokens de entrada y USD 4,00 por millón de tokens de salida), estimar el costo total. Suponer 200 tokens de prompt + 5 tokens de respuesta por texto.
+
+*Pista:* la fórmula es `(tokens_entrada * precio_entrada + tokens_salida * precio_salida) / 1.000.000`.
+
+```{r p11}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 12: Recomendación para una investigación real
+
+Imaginen que un colega tiene 5.000 tweets de campañas electorales latinoamericanas y necesita clasificarlos por tema en una semana, con presupuesto ajustado. ¿Le recomendarían LDA, LLM zero-shot, LLM few-shot, o un híbrido (por ejemplo, usar el LLM para anotar 500 tweets y entrenar un clasificador clásico con esas etiquetas)? Justifiquen considerando precisión, costo y reproducibilidad.
+
+**Respuesta:**
