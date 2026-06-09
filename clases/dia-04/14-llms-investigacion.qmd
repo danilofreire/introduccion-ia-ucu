@@ -469,7 +469,7 @@ de 2024."
     - [Tool calling]{.alert} de Anthropic: el modelo "llama" a funciones con tipos
     - [Tipos de ellmer]{.alert}: el paquete R abstrae estas funcionalidades
 - Ventaja: tu código R recibe una estructura [validada]{.alert}, no texto a parsear
-- Lo veremos en el lab con `extract_data()` de `ellmer`
+- Lo aplicaremos en los labs (con `ellmer` y `quallmer`)
 :::
 
 :::{.column width=45%}
@@ -481,7 +481,7 @@ library(ellmer)
 
 clasificador <- chat_openrouter(...)
 
-clasificador$extract_data(
+clasificador$chat_structured(
   "La inflación es preocupante.",
   type = type_object(
     sentimiento = type_string(
@@ -660,8 +660,8 @@ supera métodos clásicos.
 **Documentación mínima**
 
 ```yaml
-modelo: claude-3-5-sonnet
-version: "2024-10-22"
+modelo: anthropic/claude-opus-4-8
+version: "2026-04-01"
 provider: openrouter
 fecha_ejecucion: 2026-04-10
 temperatura: 0
@@ -823,7 +823,7 @@ Con [ellmer]{.alert} podés cambiar de proveedor [sin reescribir tu código]{.al
     - `chat_openrouter()`, `chat_ollama()`, `chat_openai()`, `chat_anthropic()`, `chat_google_gemini()`
 - Funciones principales:
     - `chat$chat()`: enviar un mensaje
-    - `chat$extract_data()`: extraer datos con tipos validados (las defensas 1 y 2 en una sola llamada)
+    - `chat$chat_structured()`: extraer datos con tipos validados (las defensas 1 y 2 en una sola llamada)
     - `chat$tokens()`: contar tokens usados
 - Trabaja bien con `purrr::map()` para procesar muchos textos en pipeline
 
@@ -838,7 +838,7 @@ Con [ellmer]{.alert} podés cambiar de proveedor [sin reescribir tu código]{.al
 library(ellmer)
 
 chat <- chat_openrouter(
-  model = "meta-llama/llama-3.2-3b-instruct:free",
+  model = "nvidia/nemotron-3-super-120b-a12b:free",
   system_prompt = "Sos un analista político..."
 )
 
@@ -846,7 +846,7 @@ chat <- chat_openrouter(
 chat$chat("Resumí este texto...")
 
 # Extracción tipada (defensa 2)
-chat$extract_data(
+chat$chat_structured(
   "La economía está en crisis.",
   type = type_object(
     tema        = type_string(),
@@ -942,15 +942,14 @@ Lo mismo que hoy hacemos con `ellmer` en la nube, mañana lo haremos en local
 :::{style="margin-top: 40px; font-size: 26px;"}
 
 - [Laboratorio 7]{.alert}: primeros pasos con `ellmer`
-    - Configurar OpenRouter y Ollama
-    - Chat básico y prompts
-    - Clasificación con few-shot
+    - Configurar `ellmer` con OpenRouter
+    - Chat, system prompts y clasificación (zero-shot y few-shot)
+    - Comparación con LDA del día 3
 
-- [Laboratorio 8]{.alert}: aplicaciones avanzadas
-    - Extracción estructurada con tipos
-    - Anotación a escala
-    - Comparación con métodos clásicos del día 03
-    - Auditoría de sesgos del modelo
+- [Laboratorio 8]{.alert}: codificación cualitativa con `quallmer`
+    - Definir un codebook y codificar textos a escala
+    - Validar contra etiquetas humanas (accuracy, kappa)
+    - Comparar modelos y auditar sesgos
 
 <br>
 
