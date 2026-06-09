@@ -5,79 +5,124 @@
 # Autor: Danilo Freire
 # Fecha: abril de 2026
 #
-# Este script contiene todo el código del Laboratorio 7.
-# Antes de empezar, configurar la API key de OpenRouter:
-#   Sys.setenv(OPENROUTER_API_KEY = "sk-or-...")
-# o agregar la línea OPENROUTER_API_KEY=sk-or-... a .Renviron
-# (usethis::edit_r_environ() abre el archivo).
+# Este script contiene el código del Laboratorio 7, extraído
+# de las diapositivas (15-laboratorio-07.qmd). Las soluciones
+# de los ejercicios están incluidas. Los bloques comentados
+# (instalación, configuración de la key, apéndices) se corren
+# a mano según haga falta.
 #
-# Alternativa local: instalar Ollama (https://ollama.com/)
-# y cambiar chat_openrouter() por chat_ollama() en cada función.
+# Antes de empezar, guardar la API key de OpenRouter en .Renviron:
+#   OPENROUTER_API_KEY=sk-or-...
+# (usethis::edit_r_environ() abre el archivo; reiniciar R después).
 # ============================================================
 
+#
 
-# --- Parte 1: Configuración --------------------------------
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
 
-# Instalar paquetes (solo la primera vez)
-# install.packages(c("ellmer", "tidyverse", "jsonlite"))
-
-paquetes <- c("ellmer", "tidyverse", "jsonlite")
-
-for (pkg in paquetes) {
-  if (!require(pkg, character.only = TRUE)) {
-    install.packages(pkg, dependencies = TRUE)
-    library(pkg, character.only = TRUE)
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
   }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
 }
 
-# Verificar la API key
-stopifnot(Sys.getenv("OPENROUTER_API_KEY") != "")
 
-# Modelo por defecto. Cambiar si OpenRouter está saturado.
-MODELO <- "meta-llama/llama-3.2-3b-instruct:free"
+# --- instalar-ellmer -----------------------------------------
+
+# Instalar (solo la primera vez)
+# install.packages(c("ellmer", "jsonlite"))
 
 
-# --- Primer chat -------------------------------------------
+# --- cargar-paquetes -----------------------------------------
 
-chat <- chat_openrouter(model = MODELO)
+library(tidyverse)
+library(ellmer)
+library(jsonlite)
 
+packageVersion("ellmer")
+
+
+# --- configurar-api ------------------------------------------
+
+# Opción 1: sólo para esta sesión de R
+# Sys.setenv(OPENROUTER_API_KEY = "sk-or-...")
+
+# Opción 2 (recomendada): guardar en .Renviron permanentemente
+# Editar el archivo con:
+# usethis::edit_r_environ()
+# Agregar la línea (sin comillas):
+# OPENROUTER_API_KEY=sk-or-...
+# Guardar y reiniciar R
+
+# Verificar
+# Sys.getenv("OPENROUTER_API_KEY") != ""   # TRUE si está bien
+
+
+# --- primer-chat ---------------------------------------------
+
+chat <- chat_openrouter(model = "openai/gpt-oss-20b:free")
+
+# Mensaje simple
 respuesta <- chat$chat("Hola, ¿qué podés hacer?")
-cat(respuesta, "\n")
 
-# El historial se mantiene dentro del objeto
+# El historial se mantiene dentro del objeto chat
 chat$chat("¿Cuál fue mi primera pregunta?")
 
 
-# --- Chat con system prompt --------------------------------
+# --- system-prompt -------------------------------------------
 
 analista <- chat_openrouter(
-  model = MODELO,
-  system_prompt = "Sos un analista político con experiencia en
-  América Latina. Respondés de forma breve y académica, en español,
-  citando fuentes cuando es posible. Si no estás seguro, lo decís
-  explícitamente."
+  model = "openai/gpt-oss-20b:free",
+  system_prompt = "Sos un analista político con experiencia en América Latina.
+  Respondés de forma breve y académica, en español,
+  citando fuentes cuando es posible. Si no estás seguro, lo decís explícitamente."
 )
 
-analista$chat("¿Cuáles son los principales desafíos democráticos
-              de Uruguay en los últimos diez años?")
+analista$chat("¿Cuáles son los principales desafíos democráticos de Uruguay en los últimos diez años?")
 
 
-# --- Parte 2: Clasificación de textos ----------------------
+# --- cargar-textos -------------------------------------------
 
 textos <- read_csv("../dia-03/datos/textos_politicos.csv",
                    show_col_types = FALSE)
 
 glimpse(textos)
-textos |> count(tema)
+
+# El dataset está ordenado por tema: armamos una muestra balanceada
+set.seed(2026)
+muestra <- textos |>
+  group_by(tema) |>
+  slice_sample(n = 4) |>     # 4 por tema = 20 textos, las 5 categorías
+  ungroup() |>
+  slice_sample(prop = 1)     # mezclar el orden
+
+muestra |> count(tema)
 
 
-# --- Clasificador zero-shot --------------------------------
+# --- clasificador-zero ---------------------------------------
 
 clasificar_zero <- function(texto) {
   chat <- chat_openrouter(
-    model = MODELO,
-    system_prompt = "Clasificá el siguiente texto político en
-    EXACTAMENTE una de estas categorías:
+    model = "openai/gpt-oss-20b:free",
+    system_prompt = "Clasificá el siguiente texto político en EXACTAMENTE una de estas categorías:
     economia, educacion, seguridad, salud, medioambiente.
 
     Reglas estrictas:
@@ -89,35 +134,47 @@ clasificar_zero <- function(texto) {
 }
 
 # Probar con un texto
-clasificar_zero(textos$texto[1])
+muestra$texto[1]
+clasificar_zero(muestra$texto[1])
 
 
-# --- Clasificar en batch -----------------------------------
+# --- clasificar-batch ----------------------------------------
 
-resultados_zero <- textos |>
-  slice(1:20) |>
+# Clasificar los 20 textos de la muestra balanceada
+resultados_zero <- muestra |>
   mutate(tema_llm = map_chr(texto, clasificar_zero, .progress = TRUE))
 
+
+# --- clasificar-batch-mostrar --------------------------------
+
+resultados_zero |>
+  select(tema, tema_llm, texto) |>
+  head(8)
+
+
+# --- evaluar-zero --------------------------------------------
+
+evaluacion <- resultados_zero |>
+  mutate(correcto = tema == tema_llm)
+
 # Accuracy global
-acc_zero <- mean(resultados_zero$tema == resultados_zero$tema_llm)
-cat("Accuracy zero-shot:", round(acc_zero * 100, 1), "%\n")
+mean(evaluacion$correcto)
 
 # Matriz de confusión
-table(real = resultados_zero$tema, llm = resultados_zero$tema_llm)
+table(real = evaluacion$tema, llm = evaluacion$tema_llm)
 
-# Inspección de errores
-resultados_zero |>
-  filter(tema != tema_llm) |>
-  select(texto, tema, tema_llm)
+# ¿Dónde se equivoca más?
+evaluacion |>
+  filter(!correcto) |>
+  count(tema, tema_llm, sort = TRUE)
 
 
-# --- Clasificador few-shot ---------------------------------
+# --- clasificador-few ----------------------------------------
 
 clasificar_few <- function(texto) {
   chat <- chat_openrouter(
-    model = MODELO,
-    system_prompt = "Clasificá textos políticos en:
-    economia, educacion, seguridad, salud, medioambiente.
+    model = "openai/gpt-oss-20b:free",
+    system_prompt = "Clasificá textos políticos en: economia, educacion, seguridad, salud, medioambiente.
 
     Ejemplos:
     - 'La inflación volvió a subir este mes' -> economia
@@ -131,110 +188,224 @@ clasificar_few <- function(texto) {
   trimws(tolower(chat$chat(texto)))
 }
 
-resultados_few <- textos |>
-  slice(1:20) |>
+resultados_few <- muestra |>
   mutate(tema_llm = map_chr(texto, clasificar_few, .progress = TRUE))
 
-acc_few <- mean(resultados_few$tema == resultados_few$tema_llm)
-cat("Accuracy few-shot:", round(acc_few * 100, 1), "%\n")
+
+# --- clasificador-few-mostrar --------------------------------
+
+mean(resultados_few$tema == resultados_few$tema_llm)
 
 
-# --- Parte 3: Comparación con LDA del Día 3 ----------------
+# --- comparar-modelos ----------------------------------------
 
-# Reemplazar 0.72 por el valor real del Laboratorio 6
-accuracy_lda <- 0.72
+# La misma tarea con dos modelos: ¿cambian velocidad y resultados?
+clasificar_con <- function(texto, modelo) {
+  chat <- chat_openrouter(
+    model = modelo,
+    system_prompt = "Clasificá en: economia, educacion, seguridad, salud, medioambiente. Responder SOLO con la categoría, en minúsculas y sin tildes."
+  )
+  trimws(tolower(chat$chat(texto)))
+}
+
+prueba <- muestra |> slice(1:8)
+
+# Un modelo rápido vs uno más cuidadoso
+prueba <- prueba |>
+  mutate(
+    gpt_oss  = map_chr(texto, clasificar_con, "openai/gpt-oss-20b:free"),
+    nemotron = map_chr(texto, clasificar_con, "nvidia/nemotron-nano-9b-v2:free")
+  )
+
+
+# --- comparar-modelos-mostrar --------------------------------
+
+# ¿Coinciden entre sí los dos modelos?
+mean(prueba$gpt_oss == prueba$nemotron)
+
+# Guardar los resultados para reusarlos después (CSV)
+write_csv(prueba, "clasificacion_lab7.csv")
+
+
+# --- lda-corpus ----------------------------------------------
+
+library(tidytext)
+library(topicmodels)
+# Si falta algún paquete: install.packages(c("tidytext", "topicmodels", "tm"))
+
+# 1. Tokenizar y quitar stopwords (igual que el Día 3)
+extra_stop <- c("sigue", "siendo", "sido", "ser", "hacer", "ha", "han",
+  "hay", "más", "país", "países", "región", "regiones", "gobierno",
+  "toda", "todos", "todas")
+stop_es <- tibble(palabra = unique(c(tm::stopwords("spanish"), extra_stop)))
+
+tokens_limpios <- textos |>
+  select(id, tema, texto) |>
+  unnest_tokens(palabra, texto) |>
+  filter(!str_detect(palabra, "^[0-9]+$")) |>
+  anti_join(stop_es, by = "palabra")
+
+# 2. Matriz documento-término y LDA con k = 5
+dtm <- tokens_limpios |> count(id, palabra) |> cast_dtm(id, palabra, n)
+set.seed(123)
+modelo_lda <- LDA(dtm, k = 5, control = list(seed = 123))
+
+# 3. Tópico dominante de cada documento (gamma)
+doc_topic <- tidy(modelo_lda, matrix = "gamma") |>
+  group_by(document) |>
+  slice_max(gamma, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  transmute(id = as.integer(document), topic)
+
+# 4. Mapear cada tópico al tema real más frecuente (para medir accuracy)
+mapa <- doc_topic |>
+  left_join(select(textos, id, tema), by = "id") |>
+  count(topic, tema) |>
+  group_by(topic) |>
+  slice_max(n, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  select(topic, tema_lda = tema)
+
+lda_pred <- doc_topic |>
+  left_join(mapa, by = "topic") |>
+  left_join(select(textos, id, tema), by = "id")
+
+# Medir sólo sobre los 20 textos de la muestra (mismo set que los LLMs)
+accuracy_lda <- lda_pred |>
+  filter(id %in% muestra$id) |>
+  summarise(acc = mean(tema == tema_lda)) |>
+  pull(acc)
+accuracy_lda
+
+
+# --- clasif-gptoss-corpus ------------------------------------
+
+# resultados_zero (Parte 2) = gpt-oss-20b zero-shot sobre la muestra
+mean(resultados_zero$tema == resultados_zero$tema_llm)
+
+
+# --- clasif-nemotron-corpus ----------------------------------
+
+clasif_nemotron <- muestra |>
+  mutate(tema_llm = map_chr(texto, clasificar_con, "nvidia/nemotron-nano-9b-v2:free", .progress = TRUE))
+
+
+# --- clasif-nemotron-corpus-mostrar --------------------------
+
+mean(clasif_nemotron$tema == clasif_nemotron$tema_llm)
+
+
+# --- comparar ------------------------------------------------
 
 comparacion <- tribble(
-  ~metodo,           ~accuracy,    ~tiempo,    ~costo,
-  "LDA (Día 3)",     accuracy_lda, "2 seg",    "$0",
-  "LLM zero-shot",   acc_zero,     "~2 min",   "<$0.01",
-  "LLM few-shot",    acc_few,      "~2 min",   "<$0.01"
+  ~metodo,                 ~accuracy,          ~tiempo,         ~costo,
+  "LDA (no supervisado)",  accuracy_lda,       "~2 seg",        "$0",
+  "gpt-oss-20b",           accuracy_gptoss,    "ya en Parte 2", "<$0.01",
+  "nemotron-nano-9b",      accuracy_nemotron,  "~30 seg",       "<$0.01"
 )
 
-comparacion
+comparacion |> arrange(desc(accuracy))
 
 
-# --- Apéndice 1: Ollama (modelos locales) ------------------
+# --- ej1-sol -------------------------------------------------
 
-# Requiere haber descargado el modelo:
-#   ollama pull llama3.2
+academico <- chat_openrouter(
+  model = "openai/gpt-oss-20b:free",
+  system_prompt = "Sos un profesor universitario. Respondé de forma formal y académica, con referencias a literatura."
+)
+periodista <- chat_openrouter(
+  model = "openai/gpt-oss-20b:free",
+  system_prompt = "Sos un periodista de un diario nacional. Respondé de forma clara y accesible para el público general."
+)
+activista <- chat_openrouter(
+  model = "openai/gpt-oss-20b:free",
+  system_prompt = "Sos un activista social. Respondé con énfasis en la justicia social y los derechos humanos."
+)
 
-# chat_local <- chat_ollama(model = "llama3.2")
-# chat_local$chat("Explicame en una oración qué es un LLM.")
-#
-# clasificar_ollama <- function(texto) {
-#   chat <- chat_ollama(
-#     model = "llama3.2",
-#     system_prompt = "Clasificá en: economia, educacion, seguridad,
-#     salud, medioambiente. Responder SOLO con la categoría."
-#   )
-#   trimws(tolower(chat$chat(texto)))
-# }
-
-
-# --- Apéndice 2: Tres personalidades, misma pregunta -------
-
-# academico <- chat_openrouter(
-#   model = MODELO,
-#   system_prompt = "Sos un profesor universitario. Respondé de forma
-#   formal y académica."
-# )
-#
-# periodista <- chat_openrouter(
-#   model = MODELO,
-#   system_prompt = "Sos un periodista de un diario nacional.
-#   Respondé de forma clara y accesible."
-# )
-#
-# activista <- chat_openrouter(
-#   model = MODELO,
-#   system_prompt = "Sos un activista social. Respondé con énfasis
-#   en la justicia social y los derechos humanos."
-# )
-#
-# pregunta <- "¿Qué opinás sobre la desigualdad en América Latina?"
-# academico$chat(pregunta)
-# periodista$chat(pregunta)
-# activista$chat(pregunta)
+pregunta <- "¿Qué opinás sobre la desigualdad en América Latina?"
+academico$chat(pregunta)
+periodista$chat(pregunta)
+activista$chat(pregunta)
 
 
-# --- Apéndice 3: Few-shot con razonamiento (CoT) -----------
+# --- ej2-sol -------------------------------------------------
 
-# clasificar_cot <- function(texto) {
-#   chat <- chat_openrouter(
-#     model = MODELO,
-#     system_prompt = "Clasificá textos políticos en: economia,
-#     educacion, seguridad, salud, medioambiente.
-#
-#     Razoná paso a paso y al final escribí en una línea separada:
-#     CATEGORIA: <una de las cinco>"
-#   )
-#   respuesta <- chat$chat(texto)
-#   cat_line <- str_extract(respuesta, "CATEGORIA:\\s*\\w+")
-#   trimws(tolower(str_remove(cat_line, "CATEGORIA:\\s*")))
-# }
+parrafo1 <- "El gobierno anunció un paquete de medidas económicas que combina
+recortes en el gasto público con incentivos a la inversión privada. La oposición
+sostiene que el ajuste recaerá sobre los más vulnerables, mientras que los
+empresarios celebran la previsibilidad fiscal."
 
+parrafo2 <- "La reforma educativa propone extender la jornada escolar y actualizar
+los contenidos en ciencia y tecnología. Los sindicatos docentes reclaman que
+llega sin presupuesto para infraestructura ni para mejorar los salarios. Varias
+universidades ofrecieron colaborar en la formación de profesores."
 
-# --- Apéndice 4: NER con prompt JSON -----------------------
+resumir <- function(texto) {
+  chat <- chat_openrouter(
+    model = "openai/gpt-oss-20b:free",
+    system_prompt = "Resumí el texto en UNA sola oración bien corta, en español, sin opinar."
+  )
+  chat$chat(texto)
+}
 
-# ner <- chat_openrouter(
-#   model = MODELO,
-#   system_prompt = 'Extraé entidades nombradas del texto.
-#   Respondé en JSON estricto con esta estructura:
-#   {
-#     "personas": [],
-#     "organizaciones": [],
-#     "lugares": []
-#   }
-#   NO incluir texto fuera del JSON.'
-# )
-#
-# respuesta <- ner$chat(textos$texto[5])
-# cat(respuesta)
-# fromJSON(respuesta)
+resumir(parrafo1)
+resumir(parrafo2)
 
 
-# ============================================================
-# Fin del Laboratorio 7. Próximo: laboratorio-08.R
-# (extracción estructurada, datos sintéticos, auditoría de sesgos)
-# ============================================================
+# --- analizar-errores ----------------------------------------
+
+errores <- evaluacion |>
+  filter(!correcto) |>
+  select(texto, tema, tema_llm)
+
+errores
+
+# ¿Son errores "razonables"? A veces el LLM elige un tema
+# distinto pero igual de defendible (ej. salud vs medioambiente
+# en un texto sobre contaminación que afecta la salud)
+
+
+# --- cot -----------------------------------------------------
+
+clasificar_cot <- function(texto) {
+  chat <- chat_openrouter(
+    model = "openai/gpt-oss-20b:free",
+    system_prompt = "Clasificá textos políticos en: economia,
+    educacion, seguridad, salud, medioambiente.
+
+    Razoná paso a paso (qué palabras clave aparecen, qué institución
+    se menciona, qué política se debate) y al final escribí en una
+    línea separada:
+    CATEGORIA: <una de las cinco>"
+  )
+
+  respuesta <- chat$chat(texto)
+  # Extraer la línea final
+  cat_line <- str_extract(respuesta, "CATEGORIA:\\s*\\w+")
+  trimws(tolower(str_remove(cat_line, "CATEGORIA:\\s*")))
+}
+
+clasificar_cot(textos$texto[1])
+
+
+# --- ner -----------------------------------------------------
+
+ner <- chat_openrouter(
+  model = "openai/gpt-oss-20b:free",
+  system_prompt = 'Extraé entidades nombradas del texto.
+  Respondé en JSON estricto con esta estructura:
+  {
+    "personas": [],
+    "organizaciones": [],
+    "lugares": []
+  }
+  NO incluir texto fuera del JSON.'
+)
+
+respuesta <- ner$chat(textos$texto[5])
+cat(respuesta)
+
+# Parsear
+fromJSON(respuesta)
+
+
