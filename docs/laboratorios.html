@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -73,7 +73,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -160,6 +160,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="./referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
   </li>  
     </ul>
   </li>
@@ -270,16 +274,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="resource-card">
 <p><span class="resource-title">Lab 7: Primeros pasos con ellmer</span></p>
-<p><span class="resource-meta">Día 4, sesión 1. Uso de <code>ellmer</code> para interactuar con modelos de lenguaje desde R. Clasificación automática de textos y extracción de datos estructurados.</span></p>
+<p><span class="resource-meta">Día 4. Configuración de <code>ellmer</code> con OpenRouter (y Ollama local como alternativa). System prompts, clasificación zero-shot y few-shot de textos políticos, y comparación directa con el LDA del Día 3.</span></p>
 <div class="resource-links">
-<p>Código (próximamente)</p>
+<p><a href="clases/dia-04/15-laboratorio-07.html">Diapositivas (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/15-laboratorio-07.qmd">Diapositivas (.qmd)</a> | <a href="clases/dia-04/laboratorio-07.R">Código (.R)</a> | <a href="clases/dia-04/tarea-07.html">Tarea 7 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-07.qmd">Tarea 7 (.qmd)</a> | <a href="clases/dia-04/tarea-07-respuestas.html">Respuestas Tarea 7 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-07-respuestas.qmd">Respuestas Tarea 7 (.qmd)</a></p>
 </div>
 </div>
 <div class="resource-card">
-<p><span class="resource-title">Lab 8: Aplicaciones avanzadas de LLMs</span></p>
-<p><span class="resource-meta">Día 4, sesión 2. Análisis de sentimiento con LLMs, generación de datos sintéticos y auditoría de sesgos algorítmicos.</span></p>
+<p><span class="resource-title">Lab 8: Codificación y confiabilidad con LLMs</span></p>
+<p><span class="resource-meta">Día 4. Codificación de texto con <code>quallmer</code>: diseñar un codebook, medir retórica liberal-iliberal en una escala de intervalo, validar contra códigos humanos (<code>qlm_validate</code>) y medir confiabilidad con test-retest (<code>qlm_replicate</code> y <code>qlm_compare</code>). Auditoría de sesgo de género usando un LLM como codificador y generación de datos sintéticos de encuesta.</span></p>
 <div class="resource-links">
-<p>Código (próximamente)</p>
+<p><a href="clases/dia-04/16-laboratorio-08.html">Diapositivas (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/16-laboratorio-08.qmd">Diapositivas (.qmd)</a> | <a href="clases/dia-04/laboratorio-08.R">Código (.R)</a> | <a href="clases/dia-04/tarea-08.html">Tarea 8 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-08.qmd">Tarea 8 (.qmd)</a> | <a href="clases/dia-04/tarea-08-respuestas.html">Respuestas Tarea 8 (.html)</a> | <a href="https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-08-respuestas.qmd">Respuestas Tarea 8 (.qmd)</a></p>
 </div>
 </div>
 <div class="resource-card">
@@ -303,10 +307,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"cluster"</span>, <span class="st">"factoextra"</span>, <span class="st">"dendextend"</span>, <span class="st">"corrplot"</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"tidytext"</span>, <span class="st">"topicmodels"</span>, <span class="st">"tm"</span>, <span class="st">"ggwordcloud"</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 4: modelos de lenguaje (LLMs)</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ellmer"</span>, <span class="st">"jsonlite"</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ellmer"</span>, <span class="st">"jsonlite"</span>, <span class="st">"pak"</span>, <span class="st">"usethis"</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Día 5: auditoría de sesgo algorítmico</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"fairmodels"</span>, <span class="st">"DALEX"</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>El paquete <code>quallmer</code> (Día 4) no está en CRAN, así que se instala desde GitHub con <code>pak</code> (que acaban de instalar en el bloque anterior):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pak<span class="sc">::</span><span class="fu">pak</span>(<span class="st">"quallmer/quallmer"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Se enviarán instrucciones detalladas de instalación por correo electrónico antes del inicio del curso.</p>
 
 

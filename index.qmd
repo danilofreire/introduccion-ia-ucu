@@ -33,7 +33,7 @@ toc: false
 
 ::: {.info-item}
 [Herramientas]{.info-label}
-[R, RStudio, tidymodels]{.info-value}
+[R, RStudio, tidyverse, tidymodels, ollama]{.info-value}
 :::
 
 :::
@@ -49,7 +49,7 @@ El curso está diseñado para quienes ya tienen una base en R y buscan expandir 
 
 ## Diapositivas y materiales
 
-Cada jornada combina exposición teórica con laboratorios prácticos en R. Las diapositivas de cada sesión están disponibles abajo. Los ejercicios de laboratorio, tareas y lecturas complementarias se encuentran en las pestañas [Laboratorios](laboratorios.qmd) y [Lecturas](lecturas.qmd). El [Programa](programa.qmd) contiene la descripción completa del curso, los objetivos de aprendizaje y los requisitos de software. Las páginas de Referencia R ([supervisado](referencia-tidymodels.qmd), [no supervisado](referencia-no-supervisado.qmd) y [análisis de texto](referencia-texto.qmd)) resumen las funciones principales de cada tema para consulta rápida.
+Cada jornada combina exposición teórica con laboratorios prácticos en R. Las diapositivas de cada sesión están disponibles abajo. Los ejercicios de laboratorio, tareas y lecturas complementarias se encuentran en las pestañas [Laboratorios](laboratorios.qmd) y [Lecturas](lecturas.qmd). El [Programa](programa.qmd) contiene la descripción completa del curso, los objetivos de aprendizaje y los requisitos de software. Las páginas de Referencia R ([supervisado](referencia-tidymodels.qmd), [no supervisado](referencia-no-supervisado.qmd), [análisis de texto](referencia-texto.qmd) y [LLMs](referencia-llms.qmd)) resumen las funciones principales de cada tema para consulta rápida.
 
 ::: {.day-card}
 [Día 1]{.day-number}
@@ -112,8 +112,10 @@ Cada jornada combina exposición teórica con laboratorios prácticos en R. Las 
 [Sesión 4.2: LLMs como herramientas de investigación. Anotación, datos sintéticos, APIs.]{.day-topics}
 
 ::: {.resource-links}
-[Sesión 4.1: Entendiendo los LLMs](clases/dia-04/07-entendiendo-llms.html) |
-[Sesión 4.2: LLMs como herramientas](clases/dia-04/08-llms-investigacion.html)
+[Sesión 4.1: Entendiendo los LLMs](clases/dia-04/13-entendiendo-llms.html) |
+[Sesión 4.2: LLMs como herramientas](clases/dia-04/14-llms-investigacion.html) |
+[Lab 7: Primeros pasos con ellmer](clases/dia-04/15-laboratorio-07.html) |
+[Lab 8: Codificación y confiabilidad](clases/dia-04/16-laboratorio-08.html)
 :::
 :::
 

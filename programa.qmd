@@ -103,18 +103,31 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 
 ### Día 4: Modelos de lenguaje extensos (LLMs) y aplicaciones
 
-**[Sesión 4.1: Entendiendo los LLMs](clases/dia-04/07-entendiendo-llms.html)**
+**[Sesión 4.1: Entendiendo los LLMs](clases/dia-04/13-entendiendo-llms.html)**
 
-- Arquitectura Transformer: la intuición detrás de la atención
-- Capacidades de GPT-4 y Claude
-- Ingeniería de prompts: zero-shot, few-shot, chain-of-thought
+- La gran idea: predicción del próximo token
+- Tokens, embeddings contextuales y ventana de contexto
+- Atención y arquitectura transformer
+- Escala, emergencia, alucinaciones y el ecosistema actual
 
-**[Sesión 4.2: LLMs como herramientas de investigación](clases/dia-04/08-llms-investigacion.html)**
+**[Sesión 4.2: LLMs como herramientas de investigación](clases/dia-04/14-llms-investigacion.html)**
 
-- Anotación automática de textos
-- Generación de datos sintéticos
-- Uso de APIs desde R
-- Laboratorio: interacción con LLMs usando `ellmer` y auditoría de sesgos
+- Caso completo: el abogado y los seis casos fantasma
+- Cuatro defensas: buenos prompts, salida estructurada, RAG, validación
+- Anotación automática, datos sintéticos y comparación con métodos clásicos
+- Acceso desde R: OpenRouter, Ollama y el paquete `ellmer`
+
+**[Laboratorio 7: Primeros pasos con ellmer](clases/dia-04/15-laboratorio-07.html)**
+
+- Configurar `ellmer` con OpenRouter (alternativa local con Ollama)
+- System prompts, zero-shot y few-shot
+- Clasificación de textos políticos y comparación con LDA del Día 3
+
+**[Laboratorio 8: Codificación y confiabilidad con LLMs](clases/dia-04/16-laboratorio-08.html)**
+
+- Codificar texto con `quallmer`: diseñar un codebook y medir en escala de intervalo
+- Validar contra códigos humanos (`qlm_validate`) y medir confiabilidad (`qlm_replicate`, `qlm_compare`)
+- Auditoría de sesgo con un LLM como codificador y generación de datos sintéticos de encuesta
 
 ### Día 5: Ética, sesgo algorítmico y cierre
 
@@ -136,6 +149,8 @@ Los estudiantes deben tener instalado antes del inicio del curso:
 
 - [R](https://cran.r-project.org/) (versión 4.3 o superior)
 - [RStudio](https://posit.co/download/rstudio-desktop/) (versión 2022.07 o superior, que ya incluye [Quarto](https://quarto.org/))
+- [Ollama](https://ollama.com/), para ejecutar modelos de lenguaje en la propia computadora (Día 4)
+- Una cuenta gratuita en [OpenRouter](https://openrouter.ai/) con una clave de API (Día 4)
 
 ### Instrucciones de instalación
 
@@ -156,10 +171,16 @@ install.packages(c(
   "cluster", "factoextra", "dendextend", "corrplot",
   "tidytext", "topicmodels", "tm", "ggwordcloud",
   # Día 4: modelos de lenguaje (LLMs)
-  "ellmer", "jsonlite",
+  "ellmer", "jsonlite", "pak", "usethis",
   # Día 5: auditoría de sesgo algorítmico
   "fairmodels", "DALEX"
 ))
+```
+
+El paquete `quallmer` (Día 4) no está en CRAN, así que se instala desde GitHub con `pak` (que acaban de instalar en el bloque anterior):
+
+```r
+pak::pak("quallmer/quallmer")
 ```
 
 La instalación puede tomar unos minutos. Si aparecen errores, asegurarse de tener una conexión a internet estable y de estar usando una versión reciente de R (4.3 o superior).
@@ -173,3 +194,64 @@ cat("Todo listo para el curso!")
 ```
 
 Si ambos paquetes se cargan sin errores, la instalación fue exitosa.
+
+**Paso 5:** Instalar Ollama y descargar un modelo local. En el Día 4 vamos a ejecutar modelos de lenguaje directamente en la computadora, sin enviar datos a internet.
+
+1. Descargar Ollama desde <https://ollama.com/download> e instalarlo siguiendo las instrucciones para su sistema operativo
+2. Abrir una terminal y descargar el modelo que usaremos en clase. En Windows, buscar "Símbolo del sistema" o "PowerShell" en el menú de inicio; en macOS, abrir "Terminal" (está en Aplicaciones → Utilidades, o buscándola con Spotlight con `Cmd + Espacio`); en Linux, abrir la aplicación "Terminal" (en muchas distribuciones, con `Ctrl + Alt + T`). Una vez en la terminal, ejecutar:
+
+```bash
+ollama pull qwen3.5:4b
+```
+
+3. Si la computadora tiene menos de 8 GB de RAM, descargar la versión más liviana, que funciona igual pero ocupa menos memoria:
+
+```bash
+ollama pull qwen3.5:0.8b
+```
+
+4. Para verificar que el modelo quedó descargado, ejecutar `ollama list`. Debería aparecer en la lista de modelos instalados:
+
+```bash
+ollama list
+```
+
+5. Para comprobar que el modelo responde, ejecutar en la terminal:
+
+```bash
+ollama run qwen3.5:4b
+```
+
+Escribir una pregunta cualquiera y, para salir, escribir `/bye`. Mientras Ollama esté instalado y abierto, R podrá conectarse al modelo durante el laboratorio.
+
+### Clave de API de OpenRouter
+
+Para el Día 4 también usaremos modelos en la nube a través de [OpenRouter](https://openrouter.ai/), un servicio que da acceso a muchos modelos con una sola cuenta. Tiene modelos gratuitos, así que no hay que pagar nada para el curso.
+
+**Paso 1:** Crear una cuenta gratuita en [openrouter.ai](https://openrouter.ai/). Basta con un correo electrónico.
+
+**Paso 2:** Ir a [openrouter.ai/keys](https://openrouter.ai/keys) y generar una clave nueva ("Create Key"). Ponerle un nombre (por ejemplo, "Curso IA") y dejar el límite de gasto en $0.00.
+
+**Paso 3:** Copiar la clave y guardarla en un lugar seguro. Empieza con `sk-or-...` y se muestra una sola vez.
+
+**Paso 4:** Guardar la clave en R como variable de entorno, para no tener que escribirla en cada script. En la consola de RStudio, ejecutar:
+
+```r
+usethis::edit_r_environ()
+```
+
+Esto abre un archivo personal llamado `.Renviron`. Agregar esta línea (sin comillas), reemplazando el ejemplo por la clave propia:
+
+```
+OPENROUTER_API_KEY=sk-or-...
+```
+
+Guardar el archivo y reiniciar R (menú "Session" → "Restart R"). Para comprobar que quedó bien configurada, ejecutar:
+
+```r
+Sys.getenv("OPENROUTER_API_KEY") != ""   # TRUE si está bien
+```
+
+:::{.callout-warning}
+Nunca pegar la clave directamente en un script que se sube a GitHub. Guardarla siempre en `.Renviron`, como muestra el Paso 4
+:::

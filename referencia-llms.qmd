@@ -1,0 +1,501 @@
+---
+title: "Referencia rápida: LLMs en R con ellmer y quallmer"
+toc: true
+toc-depth: 3
+number-sections: true
+code-fold: false
+lang: es
+engine: knitr
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  eval = FALSE
+)
+```
+
+Esta página es una referencia rápida de las funciones que usamos en el Día 4 para trabajar con modelos de lenguaje (LLMs) desde R: la Sesión 4.1 (entender los LLMs), la Sesión 4.2 (LLMs como herramientas de investigación) y los Laboratorios 7 y 8.
+
+A diferencia de las otras páginas de referencia, **aquí el código no se ejecuta al construir el sitio**: cada llamada a un modelo consume una petición a una API, así que los bloques se muestran con una salida de ejemplo comentada (`#>`). Para correrlos de verdad, copien el código en RStudio con una clave de API configurada (ver más abajo). Las salidas que muestra el modelo varían entre corridas, ese es justamente uno de los temas del Día 4.
+
+Usamos dos paquetes que se complementan:
+
+- **`ellmer`**: la base. Conecta R con un modelo (OpenRouter, Ollama, OpenAI...), maneja el chat, los *system prompts* y la salida estructurada
+- **`quallmer`**: una capa por encima de `ellmer`, pensada para investigación social. Codifica muchos textos a la vez con un *codebook*, valida contra códigos humanos y mide confiabilidad
+
+El flujo típico de codificación con un LLM es:
+
+1. Conectar con un modelo
+2. Escribir un *system prompt* o un *codebook* que defina la tarea
+3. Codificar una muestra pequeña y mirarla a mano
+4. Validar contra códigos humanos (¿el LLM coincide con un experto?)
+5. Medir confiabilidad (¿el resultado es estable si repito o reformulo?)
+6. Auditar sesgos antes de codificar el corpus completo
+7. Guardar un registro reproducible de todo el proceso
+
+## Paquetes y configuración
+
+### Cargar paquetes
+
+```{r paquetes}
+library(ellmer)     # conexión con LLMs, chat y salida estructurada
+library(quallmer)   # codificación, validación y confiabilidad
+library(tidyverse)  # manipulación de datos
+```
+
+### La clave de API de OpenRouter
+
+`ellmer` lee la clave desde una variable de entorno, nunca desde el script. Se guarda una sola vez en el archivo personal `.Renviron`:
+
+```{r api-key}
+# Abrir el archivo .Renviron (se hace una sola vez)
+usethis::edit_r_environ()
+
+# Agregar esta línea, guardar y reiniciar R (Session -> Restart R):
+# OPENROUTER_API_KEY=sk-or-...
+
+# Comprobar que quedó configurada:
+Sys.getenv("OPENROUTER_API_KEY") != ""
+#> [1] TRUE
+```
+
+:::{.callout-warning}
+Nunca peguen la clave directamente en un script que se sube a GitHub. Va siempre en `.Renviron`
+:::
+
+### Elegir el modelo
+
+OpenRouter da acceso a muchos modelos con una sola cuenta, varios gratuitos (`:free`). Conviene fijar el nombre del modelo en una variable.
+
+```{r modelo}
+# Para chat_openrouter(): nombre SIN el prefijo "openrouter/"
+MODELO <- "nvidia/nemotron-3-super-120b-a12b:free"
+
+# Para qlm_code() de quallmer: el MISMO modelo, pero CON el prefijo
+MODELO_QLM <- "openrouter/nvidia/nemotron-3-super-120b-a12b:free"
+```
+
+:::{.callout-important}
+Esta es la trampa más común del Día 4. `chat_openrouter()` quiere el nombre del modelo **sin** `openrouter/` adelante; `qlm_code()` lo quiere **con** el prefijo. Si una llamada falla con un error de "modelo no encontrado", revisen el prefijo primero
+:::
+
+### Alternativa local: Ollama
+
+Si no quieren depender de una API en la nube (por privacidad o por costo), `ellmer` también habla con un modelo corriendo en su computadora vía [Ollama](https://ollama.com/). El resto del código es idéntico.
+
+```{r ollama}
+chat <- chat_ollama(model = "qwen3.5:4b")
+chat$chat("Hola, ¿funcionás de manera local?")
+```
+
+## Chat básico con ellmer
+
+### El primer chat
+
+`chat_openrouter()` crea un objeto de conversación. El método `$chat()` envía un mensaje y devuelve la respuesta como texto.
+
+```{r primer-chat}
+chat <- chat_openrouter(model = MODELO)
+
+chat$chat("¿Qué es la democracia representativa? Respondé en dos oraciones.")
+#> [1] "La democracia representativa es un sistema en el que la ciudadanía
+#>      elige a representantes para que tomen decisiones políticas en su
+#>      nombre. Combina la soberanía popular con la delegación..."
+```
+
+### System prompt: fijar un rol
+
+El *system prompt* define el papel del modelo y permanece activo durante toda la sesión del chat. Es la palanca principal para controlar el tono y el formato de las respuestas.
+
+```{r system-prompt}
+chat <- chat_openrouter(
+  model = MODELO,
+  system_prompt = "Sos un investigador en ciencia política latinoamericana.
+  Respondés en dos oraciones, en español, con vocabulario académico claro."
+)
+
+chat$chat("¿Qué desafíos enfrenta la democracia en América Latina?")
+```
+
+### El historial se acumula
+
+El objeto `chat` guarda toda la conversación y la reenvía al modelo en cada llamada. Eso permite hacer preguntas de seguimiento sin repetir el contexto, pero también hace crecer el costo en tokens.
+
+```{r historial}
+# Esta segunda pregunta "recuerda" la anterior sin que repitamos el tema
+chat$chat("¿Y cuál de esos desafíos es el más urgente?")
+```
+
+### El system prompt como variable de control
+
+Cambiar el rol cambia las respuestas, aunque el modelo y la pregunta sean los mismos. Por eso el *system prompt* es una decisión metodológica, no un detalle cosmético: puede inducir sesgo.
+
+```{r dos-roles}
+mercado <- chat_openrouter(model = MODELO,
+  system_prompt = "Sos un economista ortodoxo. Defendés la disciplina fiscal
+  y los mercados libres. Respondés en tres oraciones.")
+
+social <- chat_openrouter(model = MODELO,
+  system_prompt = "Sos un economista heterodoxo. Defendés la redistribución
+  y la intervención pública. Respondés en tres oraciones.")
+
+pregunta <- "¿Cómo responder a una crisis de inflación?"
+
+cat("--- Mercado ---\n", mercado$chat(pregunta), "\n\n")
+cat("--- Social ---\n",  social$chat(pregunta), "\n")
+```
+
+## Clasificación de texto
+
+### Zero-shot: clasificar sin ejemplos
+
+El patrón básico de anotación: una función que crea un chat nuevo por cada texto (para que un texto no contamine al siguiente) y devuelve sólo la categoría.
+
+```{r zero-shot}
+clasificar <- function(texto) {
+  chat <- chat_openrouter(
+    model = MODELO,
+    system_prompt = "Clasificá el texto político en EXACTAMENTE una categoría:
+    economia, educacion, seguridad, salud, medioambiente.
+    Respondé SOLO con la categoría, en minúsculas y sin tildes."
+  )
+  trimws(tolower(chat$chat(texto)))
+}
+
+clasificar("La inflación volvió a subir este mes")
+#> [1] "economia"
+```
+
+### Few-shot: mejorar con ejemplos
+
+Incluir un puñado de ejemplos en el prompt ("few-shot") suele subir la accuracy, sobre todo en casos ambiguos. Los ejemplos son una decisión de diseño: cambian los resultados y hay que documentarlos.
+
+```{r few-shot}
+clasificar_fewshot <- function(texto) {
+  chat <- chat_openrouter(
+    model = MODELO,
+    system_prompt = "Clasificá en: economia, educacion, seguridad, salud, medioambiente.
+
+    Ejemplos:
+    - 'La inflación volvió a subir' -> economia
+    - 'Los docentes piden mejores salarios' -> educacion
+    - 'Aumentaron los robos en la capital' -> seguridad
+    - 'Se inauguró un nuevo hospital' -> salud
+    - 'Los incendios forestales se extienden' -> medioambiente
+
+    Respondé SOLO con la categoría."
+  )
+  trimws(tolower(chat$chat(texto)))
+}
+```
+
+### ¿El modelo da siempre lo mismo?
+
+Un LLM no es determinista: la misma entrada puede dar salidas distintas. Repetir la clasificación y mirar la dispersión es una forma barata de detectar casos frontera.
+
+```{r no-determinismo}
+texto_ambiguo <- "El presupuesto de las escuelas creció ocho puntos"
+
+repeticiones <- map_chr(1:5, \(i) clasificar(texto_ambiguo))
+table(repeticiones)
+#> repeticiones
+#> economia educacion
+#>        2         3
+```
+
+## Salida estructurada
+
+Hasta acá el modelo devuelve texto libre. Con un esquema de tipos podemos pedirle un objeto con campos validados, que es lo que necesitamos para construir un dataset.
+
+### Definir un esquema con `type_*()`
+
+`type_object()` arma un registro con campos de distinto tipo. Cada campo lleva una descripción que el modelo usa como instrucción.
+
+```{r tipos, eval=FALSE}
+tipo_registro <- type_object(
+  tema = type_enum(c("economia", "educacion", "seguridad", "salud"),
+                   "El tema principal del texto"),
+  menciona_gobierno = type_boolean("¿Menciona al gobierno o al Estado?"),
+  urgencia = type_enum(c("baja", "media", "alta"), "Urgencia que transmite"),
+  n_actores = type_integer("Cantidad de actores políticos nombrados")
+)
+```
+
+Los tipos disponibles más usados:
+
+| Tipo | Para qué sirve |
+|------|----------------|
+| `type_string()`  | Texto libre (un resumen, una justificación) |
+| `type_enum()`    | Una opción de una lista cerrada (categorías) |
+| `type_integer()` | Un número entero (un conteo, un puntaje 0-10) |
+| `type_number()`  | Un número con decimales |
+| `type_boolean()` | Verdadero / falso |
+| `type_array()`   | Una lista de longitud variable de otro tipo |
+| `type_object()`  | Un registro con varios campos |
+
+### Extraer datos estructurados con `$chat_structured()`
+
+```{r chat-structured}
+extraer <- function(texto) {
+  chat <- chat_openrouter(model = MODELO,
+    system_prompt = "Extraés información estructurada de textos políticos.")
+  chat$chat_structured(texto, type = tipo_registro)
+}
+
+# De un texto a una fila tipada, lista para análisis
+textos |>
+  slice(1:3) |>
+  mutate(registro = map(texto, extraer)) |>
+  unnest_wider(registro)
+#> # A tibble: 3 x 5
+#>   texto                tema      menciona_gobierno urgencia n_actores
+#>   <chr>                <chr>     <lgl>             <chr>        <int>
+#> 1 "La inflación..."    economia  TRUE              alta             1
+#> 2 "Las escuelas..."    educacion FALSE             media            0
+#> 3 "Los robos..."       seguridad TRUE              alta             2
+```
+
+### Listas de longitud variable con `type_array()`
+
+Útil para extracción de entidades (NER): un texto puede tener cero, una o muchas personas.
+
+```{r type-array}
+tipo_entidades <- type_object(
+  personas       = type_array(type_string(), "nombres de personas"),
+  organizaciones = type_array(type_string(), "organizaciones e instituciones"),
+  lugares        = type_array(type_string(), "lugares geográficos")
+)
+
+chat <- chat_openrouter(model = MODELO,
+  system_prompt = "Extraés entidades nombradas de un texto.")
+
+chat$chat_structured(
+  "El presidente Lacalle Pou se reunió en Montevideo con el Mercosur.",
+  type = tipo_entidades
+)
+#> $personas       "Lacalle Pou"
+#> $organizaciones "Mercosur"
+#> $lugares        "Montevideo"
+```
+
+## Codificación a escala con quallmer
+
+`quallmer` automatiza el ciclo completo de anotación de un corpus. En vez de escribir una función a mano, se define un *codebook* y se aplica a un vector de textos.
+
+### Definir un codebook con `qlm_codebook()`
+
+El *codebook* es el corazón del método: nombra la construcción que se mide, fija la escala y describe los polos. Cuanto más operacionales las `instructions`, más confiable y replicable la codificación.
+
+```{r codebook, eval=FALSE}
+codebook <- qlm_codebook(
+  name = "ideologia",
+  instructions = paste(
+    "Medí la retórica del fragmento en una escala de -10 a +10.",
+    "-10 = muy iliberal (ataca instituciones, prensa o minorías);",
+    "+10 = muy liberal (defiende derechos, división de poderes, pluralismo);",
+    "0 = neutral o ambiguo.",
+    sep = "\n"),
+  schema = type_object(
+    score       = type_integer("Puntaje de -10 a +10"),
+    explicacion = type_string("Breve justificación del puntaje")
+  ),
+  role = "Sos un cientista político experto en discurso democrático.",
+  levels = list(score = "interval", explicacion = "nominal")
+)
+```
+
+El argumento `levels` le dice a `quallmer` cómo tratar cada campo al validar: `"interval"` (correlación y error), `"nominal"` (accuracy y kappa) u `"ordinal"`.
+
+### Codificar el corpus con `qlm_code()`
+
+```{r qlm-code, eval=FALSE}
+codificado <- qlm_code(
+  discursos$texto,        # vector de textos
+  codebook,
+  model = MODELO_QLM,     # ¡con el prefijo "openrouter/"!
+  max_active = 2          # peticiones en paralelo (bajo para modelos :free)
+)
+
+codificado
+#> # A tibble: 15 x 3
+#>    score explicacion                                   .error
+#>    <int> <chr>                                         <list>
+#>  1     8 "Defiende la independencia judicial y..."     <NULL>
+#>  2    -7 "Ataca a la prensa y concentra poder..."      <NULL>
+#>  3     2 "Apela al pueblo pero respeta las..."         <NULL>
+#>  ...
+```
+
+:::{.callout-tip}
+La columna `.error` guarda los fallos por fila en lugar de cortar todo el proceso. Si una fila falla (la API se saturó), su `score` queda `NA` y `.error` trae el detalle. Conviene revisarla: `filter(codificado, !map_lgl(.error, is.null))`
+:::
+
+## Validar contra códigos humanos
+
+Nunca se usa el LLM sin compararlo antes contra una muestra codificada a mano. Ese es el paso que vuelve "validable" todo lo demás.
+
+### Construir el gold standard con `qlm_humancoded()`
+
+```{r humancoded, eval=FALSE}
+# Tus propios puntajes para una submuestra (sin llamar a ninguna API)
+gold <- qlm_humancoded(
+  tibble(.id = 1:6, score = c(8, -7, 2, -3, 5, -9)),
+  name = "humano",
+  codebook = codebook
+)
+```
+
+### Comparar LLM y humano con `qlm_validate()`
+
+```{r validate, eval=FALSE}
+validacion <- qlm_validate(codificado, gold = gold,
+                           by = "score", level = "interval")
+
+# El print() de quallmer usa cli y no siempre se ve en HTML;
+# mostralo como tabla:
+as_tibble(validacion) |> select(measure, value)
+#> # A tibble (salida ilustrativa)
+#>   measure   value
+#>   <chr>     <dbl>
+#> 1 n         6
+#> 2 pearson   0.91   # ordena los discursos como vos
+#> 3 icc       0.78   # coincide en el orden, menos en el nivel exacto
+```
+
+Una correlación de Pearson alta significa que el modelo **ordena** los casos como el humano. Un ICC alto significa que además coincide en el **nivel** exacto, no sólo en el orden. Las filas exactas dependen del `level` (intervalo, nominal u ordinal).
+
+## Confiabilidad
+
+La validez pregunta "¿coincide con un experto?". La confiabilidad pregunta "¿el resultado es estable?". Son cosas distintas y las dos importan.
+
+### Test-retest con `qlm_replicate()`
+
+Volver a codificar con el **mismo** modelo mide cuánto varía el LLM entre corridas. Con un modelo **distinto**, mide acuerdo entre modelos.
+
+```{r replicate, eval=FALSE}
+# Misma codificación, segunda corrida (test-retest)
+codificado_b <- qlm_replicate(codificado, name = "corrida_b")
+```
+
+### Comparar dos codificaciones con `qlm_compare()`
+
+```{r compare, eval=FALSE}
+confiabilidad <- qlm_compare(codificado, codificado_b,
+                             by = "score", level = "interval",
+                             tolerance = 2)   # diferencias <= 2 cuentan como acuerdo
+
+as_tibble(confiabilidad) |> select(measure, value)
+#> # A tibble (salida ilustrativa)
+#>   measure              value
+#>   <chr>                <dbl>
+#> 1 percent_agreement    0.87
+#> 2 krippendorff_alpha   0.82   # > 0.80 suele tomarse como confiable
+#> 3 icc                  0.85
+#> 4 pearson              0.90
+```
+
+:::{.callout-note}
+`tolerance` es un argumento de `qlm_compare()`, no de `qlm_validate()`. Sirve para escalas de intervalo: define cuánta diferencia se tolera antes de contar un desacuerdo
+:::
+
+## Datos sintéticos
+
+Un LLM puede generar estímulos para experimentos (viñetas de encuesta, descripciones de candidatos) variando un atributo y manteniendo el resto constante. Hay que leerlos a mano: heredan los sesgos del modelo.
+
+```{r sinteticos}
+tipo_vineta <- type_object(
+  postura = type_enum(c("restrictiva", "abierta"), "postura migratoria"),
+  texto   = type_string("viñeta de 2-3 oraciones sobre el candidato")
+)
+tipo_vinetas <- type_array(tipo_vineta, "lista de viñetas")
+
+generador <- chat_openrouter(model = MODELO,
+  system_prompt = "Generás viñetas para un experimento de encuesta. Deben ser
+  realistas, comparables y diferir SÓLO en la postura migratoria.")
+
+vinetas <- generador$chat_structured(
+  "Generá 4 viñetas: 2 restrictivas y 2 abiertas.",
+  type = tipo_vinetas
+)
+as_tibble(vinetas)
+```
+
+## Auditar sesgos
+
+Antes de confiar en un modelo, conviene auditarlo: enviar entradas que sólo difieren en una etiqueta (género, ideología, nacionalidad) y ver si el trato cambia de forma sistemática. La auditoría no elimina el sesgo, pero lo vuelve visible y reportable.
+
+```{r auditoria}
+etiquetas <- c("un político de izquierda", "un político de derecha")
+
+describir <- function(etiqueta) {
+  chat <- chat_openrouter(model = MODELO,
+    system_prompt = "Sos un analista político. Respondés en tres oraciones.")
+  chat$chat(sprintf("Describí las propuestas económicas de %s.", etiqueta))
+}
+
+# Codificamos el TONO de cada descripción con un codebook, y comparamos
+codebook_tono <- qlm_codebook(
+  name = "tono",
+  instructions = "Puntuá el tono de -5 (muy crítico) a +5 (muy favorable).",
+  schema = type_object(tono = type_integer("de -5 a +5")),
+  role = "Analizás el tono de descripciones políticas.",
+  levels = list(tono = "interval")
+)
+
+respuestas <- tibble(etiqueta = etiquetas,
+                     respuesta = map_chr(etiquetas, describir))
+
+tono <- qlm_code(respuestas$respuesta, codebook_tono, model = MODELO_QLM)
+respuestas |> mutate(tono = tono$tono) |> select(etiqueta, tono)
+#> # A tibble: 2 x 2 (salida ilustrativa)
+#>   etiqueta                    tono
+#>   <chr>                      <int>
+#> 1 un político de izquierda       1
+#> 2 un político de derecha        -1   # un trato distinto = señal de sesgo
+```
+
+## Trazabilidad
+
+`qlm_trail()` guarda un registro reproducible de todo el proceso (codebook, codificaciones, métricas) en un archivo `.rds`. Sirve como material suplementario de un paper.
+
+```{r trail}
+# OJO: qlm_trail() devuelve de forma INVISIBLE. Para verlo, asignar y nombrar:
+trail <- qlm_trail(codificado, codificado_b, confiabilidad,
+                   path = "trail_ideologia")
+trail
+```
+
+## Recomendaciones prácticas
+
+- **Empezar por una muestra chica** y mirarla a mano antes de codificar miles de textos. El LLM puede equivocarse con un formato perfecto.
+- **Validar siempre** contra códigos humanos. Sin un *gold standard* propio no hay con qué comparar.
+- **Confiabilidad y validez son distintas**: un modelo puede ser muy estable (confiable) y estar sistemáticamente equivocado (no válido).
+- **Reportar el modelo y la fecha**: los modelos cambian. `nvidia/nemotron-3-...` de hoy puede no existir en un año. Documenten el nombre exacto y cuándo lo usaron.
+- **Temperatura baja (0)** para favorecer la reproducibilidad, y aun así esperar variación entre corridas.
+- **Auditar antes de publicar**: enviar entradas que sólo difieren en una etiqueta sensible y revisar si el trato cambia.
+- **El prefijo del modelo**: sin `openrouter/` para `chat_openrouter()`, con `openrouter/` para `qlm_code()`.
+- **Mostrar las métricas con `as_tibble() |> select(measure, value)`**: el `print()` de `quallmer` usa `cli` y a veces no aparece en HTML.
+
+## Resumen de funciones
+
+| Función | Paquete | Para qué sirve |
+|---------|---------|----------------|
+| `chat_openrouter()` | ellmer | Conecta con un modelo vía OpenRouter (modelo sin prefijo) |
+| `chat_ollama()` | ellmer | Conecta con un modelo local vía Ollama |
+| `$chat()` | ellmer | Envía un mensaje y devuelve texto |
+| `$chat_structured()` | ellmer | Devuelve un objeto tipado según un esquema |
+| `type_object()` | ellmer | Define un registro con varios campos |
+| `type_enum()` | ellmer | Campo con opciones de una lista cerrada |
+| `type_string()` / `type_integer()` / `type_number()` / `type_boolean()` | ellmer | Campos de texto, entero, decimal o lógico |
+| `type_array()` | ellmer | Lista de longitud variable de otro tipo |
+| `qlm_codebook()` | quallmer | Define el libro de códigos (instrucciones, escala, niveles) |
+| `qlm_code()` | quallmer | Codifica un vector de textos con un codebook (modelo con prefijo) |
+| `qlm_humancoded()` | quallmer | Construye un *gold standard* a partir de códigos humanos |
+| `qlm_validate()` | quallmer | Compara la codificación del LLM contra el *gold* |
+| `qlm_replicate()` | quallmer | Vuelve a codificar (test-retest o cruce de modelos) |
+| `qlm_compare()` | quallmer | Mide acuerdo entre dos codificaciones (alpha, ICC, Pearson) |
+| `qlm_trail()` | quallmer | Guarda un registro reproducible del proceso |
+
+Para la referencia de análisis de texto clásico (tokenización, TF-IDF, LDA), ver [Referencia: análisis de texto](referencia-texto.qmd). Para aprendizaje supervisado, ver [Referencia: tidymodels](referencia-tidymodels.qmd).

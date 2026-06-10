@@ -113,6 +113,12 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 :::
 
 ::: {.resource-card}
+[Benoit, K. et al. (2026). Using large language models to analyze political texts through natural language understanding. *American Journal of Political Science*.]{.resource-title}
+
+[Trabajo reciente sobre cómo usar LLMs para medir y escalar el contenido de textos políticos, con una evaluación de su validez frente a métodos establecidos. Conecta directamente los Días 3 y 4.]{.resource-meta}
+:::
+
+::: {.resource-card}
 [Vaswani, A. et al. (2017). Attention is all you need. *Advances in Neural Information Processing Systems*, 30.]{.resource-title}
 
 [El articulo original que propone la arquitectura Transformer. Lectura tecnica, pero la seccion 3 (atencion) es accesible.]{.resource-meta}
@@ -159,5 +165,5 @@ Estas lecturas no son obligatorias, pero ofrecen perspectivas valiosas para prof
 - Ziems, C. et al. (2024). Can large language models transform computational social science? *Computational Linguistics*, 50(1), 237-291.
 - Benoit, K. et al. (2016). Crowd-sourced text analysis: Reproducible and agile production of political data. *American Political Science Review*, 110(2), 278-295.
 - Blei, D. M., Ng, A. Y. & Jordan, M. I. (2003). Latent Dirichlet Allocation. *Journal of Machine Learning Research*, 3, 993-1022.
-- Hastie, T., Tibshirani, R. & Friedman, J. (2009). *The Elements of Statistical Learning* (2da edicion). Springer. Disponible en [hastie.su.domains](https://hastie.su.domains/ElemStatLearn/).
+- Hastie, T., Tibshirani, R. & Friedman, J. (2009). *The Elements of Statistical Learning* (2da edicion). Springer.
 - Knox, D. & Lucas, C. (2021). A dynamic model of speech for the social sciences. *American Political Science Review*, 115(2), 649-666.

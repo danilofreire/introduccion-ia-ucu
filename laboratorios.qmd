@@ -105,20 +105,32 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 ::: {.resource-card}
 [Lab 7: Primeros pasos con ellmer]{.resource-title}
 
-[Día 4, sesión 1. Uso de `ellmer` para interactuar con modelos de lenguaje desde R. Clasificación automática de textos y extracción de datos estructurados.]{.resource-meta}
+[Día 4. Configuración de `ellmer` con OpenRouter (y Ollama local como alternativa). System prompts, clasificación zero-shot y few-shot de textos políticos, y comparación directa con el LDA del Día 3.]{.resource-meta}
 
 ::: {.resource-links}
-Código (próximamente)
+[Diapositivas (.html)](clases/dia-04/15-laboratorio-07.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/15-laboratorio-07.qmd) |
+[Código (.R)](clases/dia-04/laboratorio-07.R) |
+[Tarea 7 (.html)](clases/dia-04/tarea-07.html) |
+[Tarea 7 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-07.qmd) |
+[Respuestas Tarea 7 (.html)](clases/dia-04/tarea-07-respuestas.html) |
+[Respuestas Tarea 7 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-07-respuestas.qmd)
 :::
 :::
 
 ::: {.resource-card}
-[Lab 8: Aplicaciones avanzadas de LLMs]{.resource-title}
+[Lab 8: Codificación y confiabilidad con LLMs]{.resource-title}
 
-[Día 4, sesión 2. Análisis de sentimiento con LLMs, generación de datos sintéticos y auditoría de sesgos algorítmicos.]{.resource-meta}
+[Día 4. Codificación de texto con `quallmer`: diseñar un codebook, medir retórica liberal-iliberal en una escala de intervalo, validar contra códigos humanos (`qlm_validate`) y medir confiabilidad con test-retest (`qlm_replicate` y `qlm_compare`). Auditoría de sesgo de género usando un LLM como codificador y generación de datos sintéticos de encuesta.]{.resource-meta}
 
 ::: {.resource-links}
-Código (próximamente)
+[Diapositivas (.html)](clases/dia-04/16-laboratorio-08.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/16-laboratorio-08.qmd) |
+[Código (.R)](clases/dia-04/laboratorio-08.R) |
+[Tarea 8 (.html)](clases/dia-04/tarea-08.html) |
+[Tarea 8 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-08.qmd) |
+[Respuestas Tarea 8 (.html)](clases/dia-04/tarea-08-respuestas.html) |
+[Respuestas Tarea 8 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-08-respuestas.qmd)
 :::
 :::
 
@@ -147,10 +159,16 @@ install.packages(c(
   "cluster", "factoextra", "dendextend", "corrplot",
   "tidytext", "topicmodels", "tm", "ggwordcloud",
   # Día 4: modelos de lenguaje (LLMs)
-  "ellmer", "jsonlite",
+  "ellmer", "jsonlite", "pak", "usethis",
   # Día 5: auditoría de sesgo algorítmico
   "fairmodels", "DALEX"
 ))
+```
+
+El paquete `quallmer` (Día 4) no está en CRAN, así que se instala desde GitHub con `pak` (que acaban de instalar en el bloque anterior):
+
+```r
+pak::pak("quallmer/quallmer")
 ```
 
 Se enviarán instrucciones detalladas de instalación por correo electrónico antes del inicio del curso.
