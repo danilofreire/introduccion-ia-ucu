@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Danilo Freire">
+
+<title>Tarea 7: Primeros pasos con ellmer – Respuestas – IA para Científicos Sociales</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">IA para Científicos Sociales</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../programa.html"> 
+<span class="menu-text">Programa</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../laboratorios.html"> 
+<span class="menu-text">Laboratorios</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../lecturas.html"> 
+<span class="menu-text">Lecturas</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-referencia-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Referencia R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
+        <li>
+    <a class="dropdown-item" href="../../referencia-tidymodels.html">
+ <span class="dropdown-text">Supervisado (tidymodels)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-no-supervisado.html">
+ <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-texto.html">
+ <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:danilofreire@gmail.com"> <i class="bi bi-envelope" role="img" aria-label="Email">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/danilofreire/introduccion-ia-ucu"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Alternar modo lector">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul class="collapse">
+  <li><a href="#instrucciones" id="toc-instrucciones" class="nav-link active" data-scroll-target="#instrucciones"><span class="header-section-number">1</span> Instrucciones</a></li>
+  <li><a href="#configuración-y-chat-básico" id="toc-configuración-y-chat-básico" class="nav-link" data-scroll-target="#configuración-y-chat-básico"><span class="header-section-number">2</span> Configuración y chat básico</a></li>
+  <li><a href="#clasificación-y-extracción" id="toc-clasificación-y-extracción" class="nav-link" data-scroll-target="#clasificación-y-extracción"><span class="header-section-number">3</span> Clasificación y extracción</a></li>
+  <li><a href="#robustez-y-sensibilidad" id="toc-robustez-y-sensibilidad" class="nav-link" data-scroll-target="#robustez-y-sensibilidad"><span class="header-section-number">4</span> Robustez y sensibilidad</a></li>
+  <li><a href="#más-allá-de-la-clasificación" id="toc-más-allá-de-la-clasificación" class="nav-link" data-scroll-target="#más-allá-de-la-clasificación"><span class="header-section-number">5</span> Más allá de la clasificación</a></li>
+  <li><a href="#reflexión" id="toc-reflexión" class="nav-link" data-scroll-target="#reflexión"><span class="header-section-number">6</span> Reflexión</a></li>
+  </ul>
+<div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-04/tarea-07-respuestas.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tarea 7: Primeros pasos con ellmer – Respuestas</h1>
+<p class="subtitle lead">IA para Científicos Sociales - UCU</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor/a</div>
+    <div class="quarto-title-meta-contents">
+             <p>Danilo Freire </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">15 de abril de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="instrucciones" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="instrucciones"><span class="header-section-number">1</span> Instrucciones</h2>
+<p>Esta es la clave de respuestas de la Tarea 7. Cada pregunta incluye el código R completo y una respuesta escrita. Los bloques que llaman a la API están marcados con <code>eval=FALSE</code> para no gastar peticiones al renderizar. Para correrlos hace falta una API key de OpenRouter configurada en <code>OPENROUTER_API_KEY</code>.</p>
+<section id="configuración" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="configuración"><span class="header-section-number">1.1</span> Configuración</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">Sys.getenv</span>(<span class="st">"OPENROUTER_API_KEY"</span>) <span class="sc">!=</span> <span class="st">""</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>textos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../dia-03/datos/textos_politicos.csv"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>MODELO <span class="ot">&lt;-</span> <span class="st">"nvidia/nemotron-3-super-120b-a12b:free"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="configuración-y-chat-básico" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="configuración-y-chat-básico"><span class="header-section-number">2</span> Configuración y chat básico</h2>
+<section id="pregunta-1-primer-chat" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-primer-chat"><span class="header-section-number">2.1</span> Pregunta 1: Primer chat</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un investigador en ciencia política</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">  latinoamericana. Respondés en dos oraciones, en español, con</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">  vocabulario académico claro."</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué es la democracia representativa?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> El system prompt se pasa como argumento del constructor <code>chat_openrouter()</code> y permanece activo durante toda la sesión del chat. Después de crear el objeto, llamamos al método <code>$chat()</code> para enviar un mensaje y recibir la respuesta como texto.</p>
+</section>
+<section id="pregunta-2-historial-de-conversación" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-historial-de-conversación"><span class="header-section-number">2.2</span> Pregunta 2: Historial de conversación</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Y qué desafíos enfrenta hoy en América Latina?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> La segunda respuesta se refiere a la democracia representativa sin que tengamos que repetir el término. <code>ellmer</code> guarda el historial completo dentro del objeto <code>chat</code> y lo reenvía al modelo en cada llamada. Eso permite que el modelo mantenga el hilo, pero también significa que el costo en tokens crece conversación tras conversación.</p>
+</section>
+<section id="pregunta-3-system-prompt-como-variable-de-control" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-system-prompt-como-variable-de-control"><span class="header-section-number">2.3</span> Pregunta 3: System prompt como variable de control</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mercado <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un economista ortodoxo. Defendés la disciplina</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">  fiscal, los mercados libres y la apertura comercial. Respondés en</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">  tres oraciones."</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>social <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un economista heterodoxo enfocado en</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="st">  desigualdad. Defendés la redistribución y la intervención pública.</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="st">  Respondés en tres oraciones."</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>pregunta <span class="ot">&lt;-</span> <span class="st">"¿Cómo debería responder un país de ingresos medios a</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="st">una crisis de inflación?"</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Mercado ---</span><span class="sc">\n</span><span class="st">"</span>, mercado<span class="sc">$</span><span class="fu">chat</span>(pregunta), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Social ---</span><span class="sc">\n</span><span class="st">"</span>,   social<span class="sc">$</span><span class="fu">chat</span>(pregunta), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> Las dos respuestas usan vocabulario y recomendaciones distintas: la “de mercado” enfatiza disciplina fiscal y tasa de interés; la “social” enfatiza salarios reales, transferencias y controles. El mismo modelo produce posiciones distintas según el rol que le asignamos. Esto muestra que el system prompt es una variable de control, no un detalle cosmético: puede inducir sesgo intencional o no intencional en los resultados.</p>
+</section>
+</section>
+<section id="clasificación-y-extracción" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="clasificación-y-extracción"><span class="header-section-number">3</span> Clasificación y extracción</h2>
+<section id="pregunta-4-función-de-clasificación" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-función-de-clasificación"><span class="header-section-number">3.1</span> Pregunta 4: Función de clasificación</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>clasificar_zero <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> MODELO,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá el siguiente texto político en</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">    EXACTAMENTE una de estas categorías:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">    economia, educacion, seguridad, salud, medioambiente.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">    Reglas:</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">    - Responder SOLO con el nombre de la categoría, en minúsculas</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="st">    - Sin tildes, sin puntuación, sin explicación"</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_zero</span>(textos<span class="sc">$</span>texto[<span class="dv">1</span>])</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_zero</span>(textos<span class="sc">$</span>texto[<span class="dv">5</span>])</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_zero</span>(textos<span class="sc">$</span>texto[<span class="dv">10</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> La función crea un chat nuevo dentro de cada llamada, de modo que la clasificación del texto N no contamina la del texto N+1. Esto cuesta más tokens (cada llamada envía el system prompt de nuevo) pero protege la independencia entre observaciones, que es lo que necesitamos para evaluar la accuracy con honestidad.</p>
+</section>
+<section id="pregunta-5-salida-estructurada" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-salida-estructurada"><span class="header-section-number">3.2</span> Pregunta 5: Salida estructurada</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>tipo_registro <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">tema =</span> <span class="fu">type_enum</span>(<span class="fu">c</span>(<span class="st">"economia"</span>, <span class="st">"educacion"</span>, <span class="st">"seguridad"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"salud"</span>, <span class="st">"medioambiente"</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"El tema principal del texto"</span>),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">menciona_gobierno =</span> <span class="fu">type_boolean</span>(<span class="st">"¿El texto menciona al gobierno o al Estado?"</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">urgencia =</span> <span class="fu">type_enum</span>(<span class="fu">c</span>(<span class="st">"baja"</span>, <span class="st">"media"</span>, <span class="st">"alta"</span>),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"La urgencia que transmite el texto"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>extraer <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> MODELO,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Extraés información estructurada de textos políticos."</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  chat<span class="sc">$</span><span class="fu">chat_structured</span>(texto, <span class="at">type =</span> tipo_registro)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>textos <span class="sc">|&gt;</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">25</span>, <span class="dv">50</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">registro =</span> <span class="fu">map</span>(texto, extraer)) <span class="sc">|&gt;</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_wider</span>(registro) <span class="sc">|&gt;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(tema, menciona_gobierno, urgencia)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> <code>chat_structured()</code> no devuelve texto libre sino una lista con los campos del esquema, y un <code>type_object()</code> admite campos de distinto tipo (<code>type_enum</code>, <code>type_boolean</code>, <code>type_integer</code>). Así pasamos de un texto a una fila de datos tipada en una sola llamada, que es exactamente lo que necesitamos para construir un dataset a partir de documentos. Es la misma idea que usa <code>qlm_code()</code> en el Lab 8. Como siempre, conviene validar: el modelo puede equivocarse en un campo aunque el formato sea correcto.</p>
+</section>
+</section>
+<section id="robustez-y-sensibilidad" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="robustez-y-sensibilidad"><span class="header-section-number">4</span> Robustez y sensibilidad</h2>
+<section id="pregunta-6-el-modelo-da-siempre-lo-mismo" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-6-el-modelo-da-siempre-lo-mismo"><span class="header-section-number">4.1</span> Pregunta 6: ¿El modelo da siempre lo mismo?</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>texto_ambiguo <span class="ot">&lt;-</span> textos<span class="sc">$</span>texto[<span class="dv">30</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>repeticiones <span class="ot">&lt;-</span> <span class="fu">map_chr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, \(i) <span class="fu">clasificar_zero</span>(texto_ambiguo))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(repeticiones)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> con un texto claro, las cinco corridas suelen coincidir; con un texto fronterizo (que toca dos temas) pueden aparecer dos o tres categorías distintas. La consecuencia metodológica es que el resultado de un LLM no es perfectamente reproducible: hay que fijar y reportar el modelo y su versión, considerar una temperatura baja (0), y para los casos límite correr la clasificación varias veces y tomar la mayoría. Esta variabilidad es justamente lo que las medidas de confiabilidad del Lab 8 buscan cuantificar.</p>
+</section>
+<section id="pregunta-7-sensibilidad-al-prompt" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-7-sensibilidad-al-prompt"><span class="header-section-number">4.2</span> Pregunta 7: Sensibilidad al prompt</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>muestra <span class="ot">&lt;-</span> textos <span class="sc">|&gt;</span> <span class="fu">group_by</span>(tema) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">ungroup</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>clasificar_breve <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá en: economia, educacion, seguridad, salud,</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">    medioambiente. Respondé sólo con la categoría."</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>clasificar_detallado <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá en: economia, educacion, seguridad, salud,</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="st">    medioambiente. Regla: si el texto toca dos temas, elegí el más concreto</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="st">    y central. Respondé sólo con la categoría, en minúsculas y sin tildes."</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>comparacion <span class="ot">&lt;-</span> muestra <span class="sc">|&gt;</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">breve =</span> <span class="fu">map_chr</span>(texto, clasificar_breve),</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">detallado =</span> <span class="fu">map_chr</span>(texto, clasificar_detallado))</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>comparacion <span class="sc">|&gt;</span> <span class="fu">filter</span>(breve <span class="sc">!=</span> detallado) <span class="sc">|&gt;</span> <span class="fu">select</span>(tema, breve, detallado)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> las dos versiones coinciden en los textos claros y difieren en los ambiguos; la regla extra del prompt detallado resuelve algunos de esos empates. La redacción del prompt es un “grado de libertad” del investigador: distintas formulaciones razonables pueden dar resultados distintos. Por eso hay que reportar el prompt exacto y, en lo posible, mostrar que el resultado es robusto a reformulaciones (como acá, comparando dos versiones).</p>
+</section>
+<section id="pregunta-8-sensibilidad-a-los-ejemplos" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-8-sensibilidad-a-los-ejemplos"><span class="header-section-number">4.3</span> Pregunta 8: Sensibilidad a los ejemplos</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>muestra8 <span class="ot">&lt;-</span> textos <span class="sc">|&gt;</span> <span class="fu">group_by</span>(tema) <span class="sc">|&gt;</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span> <span class="fu">ungroup</span>()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>clasificar_tipico <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá en: economia, educacion, seguridad, salud, medioambiente.</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">    Ejemplos:</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'La inflación volvió a subir este mes' -&gt; economia</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Los docentes piden mejores salarios' -&gt; educacion</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Aumentaron los robos en la capital' -&gt; seguridad</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Se inauguró un nuevo hospital' -&gt; salud</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Los incendios forestales se extienden' -&gt; medioambiente</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="st">    Responder SOLO con la categoría."</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>clasificar_ambiguo <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá en: economia, educacion, seguridad, salud, medioambiente.</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="st">    Ejemplos:</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'El presupuesto del sector creció 8 puntos' -&gt; economia</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'El nuevo currículo prioriza el pensamiento crítico' -&gt; educacion</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Las cámaras de vigilancia llegaron a los barrios' -&gt; seguridad</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Las listas de espera aumentaron tras la reforma' -&gt; salud</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'La sequía obliga a racionar el agua potable' -&gt; medioambiente</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="st">    Responder SOLO con la categoría."</span>)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>res8 <span class="ot">&lt;-</span> muestra8 <span class="sc">|&gt;</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tipico  =</span> <span class="fu">map_chr</span>(texto, clasificar_tipico),</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">ambiguo =</span> <span class="fu">map_chr</span>(texto, clasificar_ambiguo))</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">tipico  =</span> <span class="fu">mean</span>(res8<span class="sc">$</span>tema <span class="sc">==</span> res8<span class="sc">$</span>tipico),</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">ambiguo =</span> <span class="fu">mean</span>(res8<span class="sc">$</span>tema <span class="sc">==</span> res8<span class="sc">$</span>ambiguo))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> la accuracy con ejemplos típicos suele ser algo mayor que con ejemplos ambiguos. Los ejemplos prototípicos le enseñan al modelo la categoría “pura”; los ambiguos le enseñan a no sobre-confiar en palabras clave. Ninguna estrategia es siempre mejor: depende del corpus. La lección es que el few-shot no es neutral, los ejemplos son una decisión de diseño que cambia los resultados y hay que documentarla.</p>
+</section>
+</section>
+<section id="más-allá-de-la-clasificación" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="más-allá-de-la-clasificación"><span class="header-section-number">5</span> Más allá de la clasificación</h2>
+<section id="pregunta-9-extracción-de-entidades" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-9-extracción-de-entidades"><span class="header-section-number">5.1</span> Pregunta 9: Extracción de entidades</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tipo_entidades <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">personas =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"nombres de personas"</span>),</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">organizaciones =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"organizaciones o instituciones"</span>),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lugares =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"lugares geográficos"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Extraés entidades nombradas de un texto."</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>texto <span class="ot">&lt;-</span> <span class="st">"El presidente Lacalle Pou se reunió en Montevideo con representantes</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="st">del Mercosur para discutir un acuerdo con la Unión Europea."</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>entidades <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat_structured</span>(texto, <span class="at">type =</span> tipo_entidades)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>entidades</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> la extracción de entidades nombradas (NER) tradicionalmente requería un modelo entrenado por idioma; un LLM lo hace zero-shot con sólo un esquema. <code>type_array(type_string())</code> maneja un número variable de entidades (cero, una o varias). Sirve para armar redes de actores (quién se reunió con quién), bases de eventos o índices de organizaciones. Como con la clasificación, hay que validar: el modelo puede inventar una entidad o pasar por alto otra.</p>
+</section>
+<section id="pregunta-10-razonamiento-paso-a-paso" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-razonamiento-paso-a-paso"><span class="header-section-number">5.2</span> Pregunta 10: Razonamiento paso a paso</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>texto_dificil <span class="ot">&lt;-</span> textos<span class="sc">$</span>texto[<span class="dv">33</span>]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) clasificación directa</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>directa <span class="ot">&lt;-</span> <span class="fu">clasificar_zero</span>(texto_dificil)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) con razonamiento paso a paso (cadena de pensamiento)</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Clasificá el texto en: economia, educacion, seguridad,</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="st">  salud, medioambiente. Primero explicá tu razonamiento en una o dos</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="st">  oraciones. Terminá con una línea: 'Categoría: &lt;categoria&gt;'."</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>con_cot <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat</span>(texto_dificil)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>directa</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(con_cot)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> en textos claros, la cadena de pensamiento rara vez cambia la respuesta y es gasto extra. En textos ambiguos o que tocan dos temas, pedir el razonamiento puede cambiar (y mejorar) la decisión, y deja una justificación que se puede auditar. El costo es más tokens y más tiempo. La idea de la lecture 14: el razonamiento paso a paso ayuda en tareas que requieren inferencia, no en clasificaciones simples donde el modelo ya “sabe” la respuesta.</p>
+</section>
+</section>
+<section id="reflexión" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="reflexión"><span class="header-section-number">6</span> Reflexión</h2>
+<section id="pregunta-11-costo-de-procesar-el-dataset-completo" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-11-costo-de-procesar-el-dataset-completo"><span class="header-section-number">6.1</span> Pregunta 11: Costo de procesar el dataset completo</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>n_textos <span class="ot">&lt;-</span> <span class="dv">60</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>tokens_entrada_por_texto <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>tokens_salida_por_texto  <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>precio_entrada <span class="ot">&lt;-</span> <span class="fl">0.80</span>  <span class="co"># USD por millón</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>precio_salida  <span class="ot">&lt;-</span> <span class="fl">4.00</span>  <span class="co"># USD por millón</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>costo <span class="ot">&lt;-</span> (n_textos <span class="sc">*</span> tokens_entrada_por_texto <span class="sc">*</span> precio_entrada <span class="sc">+</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>          n_textos <span class="sc">*</span> tokens_salida_por_texto  <span class="sc">*</span> precio_salida) <span class="sc">/</span> <span class="fl">1e6</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>costo</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.0108</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> El costo aproximado es de USD 0,01 para los 60 textos (un centavo). Esto es órdenes de magnitud más barato que un anotador humano (~USD 0,10 por texto en plataformas tipo Mechanical Turk, ~USD 1 por texto si es un investigador). Para 5.000 textos, el costo escalaría a ~USD 1, todavía trivial.</p>
+</section>
+<section id="pregunta-12-recomendación-para-una-investigación-real" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-12-recomendación-para-una-investigación-real"><span class="header-section-number">6.2</span> Pregunta 12: Recomendación para una investigación real</h3>
+<p><strong>Respuesta:</strong> Recomendaría un híbrido. Pasos: (1) usar el LLM (Claude 3.5 Haiku o similar) para anotar 500 tweets con el mejor prompt few-shot posible, costo aproximado USD 5; (2) validar contra una muestra de 100 tweets anotados a mano por el colega, calcular kappa de Cohen; (3) si kappa &gt; 0,7, entrenar un clasificador clásico (regresión logística + TF-IDF o un modelo en <code>tidymodels</code>) sobre las 500 etiquetas del LLM; (4) usar el clasificador clásico para etiquetar los 4.500 restantes, gratis y reproducible. Esto combina la precisión del LLM, el costo controlado y la reproducibilidad de los métodos clásicos. Documentar el modelo exacto, el prompt y la fecha de uso del LLM en el material suplementario.</p>
+
+
+</section>
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 <a href="https://danilofreire.github.io">Danilo Freire</a>. Contenido bajo licencia <a href="https://opensource.org/licenses/MIT">MIT</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-04/tarea-07-respuestas.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Hecho con <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

@@ -41,7 +41,7 @@ textos <- read_csv("../dia-03/datos/textos_politicos.csv",
                    show_col_types = FALSE)
 
 # Modelo por defecto (cambiar si OpenRouter está saturado)
-MODELO <- "google/gemma-4-31b-it:free"
+MODELO <- "nvidia/nemotron-3-super-120b-a12b:free"
 ```
 
 ## Configuración y chat básico
@@ -81,7 +81,7 @@ Crear dos chats con system prompts opuestos sobre el mismo tema (por ejemplo, un
 
 **Respuesta:**
 
-## Clasificación zero-shot
+## Clasificación y extracción
 
 ### Pregunta 4: Función de clasificación
 
@@ -96,11 +96,11 @@ Escribir una función `clasificar_zero(texto)` que reciba un texto y devuelva un
 
 **Respuesta:**
 
-### Pregunta 5: Clasificar en batch
+### Pregunta 5: Salida estructurada
 
-Tomar los primeros 20 textos del dataset (con `slice(1:20)`) y clasificarlos usando la función de la Pregunta 4. Calcular la accuracy comparando con la columna `tema`. Mostrar la matriz de confusión.
+Una clasificación devuelve una sola etiqueta; muchas veces queremos varios campos a la vez. Usar `chat_structured()` con un `type_object` que tenga tres campos: `tema` (una de las cinco categorías), `menciona_gobierno` (TRUE/FALSE) y `urgencia` (baja / media / alta). Aplicarlo a tres textos del dataset y mostrar los resultados en una tabla.
 
-*Pista:* `map_chr(texto, clasificar_zero, .progress = TRUE)` aplica la función a cada texto y devuelve un vector de caracteres.
+*Pista:* los campos de un `type_object()` pueden ser de distinto tipo: `type_enum()`, `type_boolean()`, etc. `chat$chat_structured(texto, type = ...)` devuelve una lista con esos campos; `unnest_wider()` la convierte en columnas.
 
 ```{r p5}
 # Escriban su código aquí
@@ -109,9 +109,13 @@ Tomar los primeros 20 textos del dataset (con `slice(1:20)`) y clasificarlos usa
 
 **Respuesta:**
 
-### Pregunta 6: Inspección de errores
+## Robustez y sensibilidad
 
-Filtrar los textos mal clasificados en la Pregunta 5 y mostrarlos con su tema real y su tema predicho. Para al menos dos de ellos, escribir una oración explicando si el error parece "razonable" (la etiqueta del LLM también sería defendible) o "claro" (el LLM se equivocó claramente).
+### Pregunta 6: ¿El modelo da siempre lo mismo?
+
+Los LLMs no son deterministas: la misma pregunta puede dar respuestas distintas. Tomar UN texto ambiguo del dataset y clasificarlo cinco veces (creando un chat nuevo cada vez). Contar cuántas veces salió cada categoría. ¿Qué implica esto para la reproducibilidad de una investigación?
+
+*Pista:* `map_chr(1:5, \(i) clasificar_zero(texto))` repite la clasificación; `table()` cuenta las respuestas.
 
 ```{r p6}
 # Escriban su código aquí
@@ -120,13 +124,11 @@ Filtrar los textos mal clasificados en la Pregunta 5 y mostrarlos con su tema re
 
 **Respuesta:**
 
-## Few-shot y comparación
+### Pregunta 7: Sensibilidad al prompt
 
-### Pregunta 7: Clasificador few-shot
+El resultado depende de cómo se escribe el prompt. Escribir dos versiones del system prompt para clasificar: una **breve** (sólo las categorías) y una **detallada** (con una regla extra, por ejemplo "si el texto toca dos temas, elegí el más concreto"). Aplicar ambas a los mismos cinco textos y mostrar en qué textos difieren.
 
-Escribir una nueva función `clasificar_few(texto)` que incluya cinco ejemplos (uno por categoría) en el system prompt. Aplicarla a los mismos 20 textos de la Pregunta 5. ¿Mejora la accuracy?
-
-*Pista:* los ejemplos van dentro del texto del system prompt; no es necesario usar argumentos especiales.
+*Pista:* definir dos funciones que sólo cambien en el `system_prompt`, y `filter()` las filas donde las dos clasificaciones no coinciden.
 
 ```{r p7}
 # Escriban su código aquí
@@ -137,7 +139,9 @@ Escribir una nueva función `clasificar_few(texto)` que incluya cinco ejemplos (
 
 ### Pregunta 8: Sensibilidad a los ejemplos
 
-Repetir la Pregunta 7 cambiando los ejemplos por otros cinco (uno por categoría) que sean menos típicos (más ambiguos o con vocabulario distinto). ¿Cambia la accuracy? ¿Qué dice esto sobre la elección de los ejemplos en few-shot?
+El few-shot es sensible a QUÉ ejemplos se eligen. Escribir dos clasificadores few-shot: uno con ejemplos **típicos** (uno por categoría, muy claros) y otro con ejemplos **ambiguos** (más sutiles o con vocabulario distinto). Aplicar ambos a una muestra estratificada de diez textos y comparar la accuracy. ¿Importa la elección de los ejemplos?
+
+*Pista:* los ejemplos van dentro del system prompt. Una muestra estratificada (`group_by(tema) |> slice_sample(n = 2)`) cubre las cinco categorías.
 
 ```{r p8}
 # Escriban su código aquí
@@ -146,11 +150,13 @@ Repetir la Pregunta 7 cambiando los ejemplos por otros cinco (uno por categoría
 
 **Respuesta:**
 
-### Pregunta 9: Comparación con el Día 3
+## Más allá de la clasificación
 
-Recuperar (o recalcular) la accuracy del clasificador LDA del Día 3 sobre el mismo subconjunto de 20 textos. Construir una tabla con tres filas (LDA, LLM zero-shot, LLM few-shot) y columnas para accuracy, tiempo aproximado y costo aproximado.
+### Pregunta 9: Extracción de entidades
 
-*Pista:* `tribble()` es la forma más legible de armar la tabla a mano.
+Usar `chat_structured()` para extraer entidades nombradas de un texto político. Definir un `type_object` con tres `type_array`: `personas`, `organizaciones` y `lugares`. Aplicarlo a un texto (puede ser uno que escriban ustedes) y mostrar las entidades.
+
+*Pista:* `type_array(type_string(), "...")` representa una lista de strings de largo variable (cero, una o varias entidades).
 
 ```{r p9}
 # Escriban su código aquí
@@ -159,9 +165,11 @@ Recuperar (o recalcular) la accuracy del clasificador LDA del Día 3 sobre el mi
 
 **Respuesta:**
 
-### Pregunta 10: Acuerdo entre métodos
+### Pregunta 10: Razonamiento paso a paso
 
-Para cada par de métodos (LDA vs zero-shot, LDA vs few-shot, zero-shot vs few-shot), calcular el porcentaje de textos en los que ambos coinciden. ¿Los dos LLMs se equivocan en los mismos textos, o en distintos?
+Tomar un texto ambiguo y clasificarlo de dos formas: (a) directa (sólo la categoría) y (b) con cadena de pensamiento, pidiéndole al modelo que explique su razonamiento en una o dos oraciones ANTES de dar la categoría. ¿Cambia la respuesta? ¿Cuándo conviene pedir el razonamiento paso a paso?
+
+*Pista:* la diferencia está sólo en el system prompt: en (b) pedile que razone primero y termine con una línea del tipo `Categoría: <categoria>`.
 
 ```{r p10}
 # Escriban su código aquí

@@ -15,7 +15,7 @@ engine: knitr
 
 ## Instrucciones
 
-Esta es la clave de respuestas de la Tarea 7. Cada pregunta incluye el código R completo y una respuesta escrita. Para que los chunks corran al renderizar, hace falta una API key de OpenRouter configurada en `OPENROUTER_API_KEY`.
+Esta es la clave de respuestas de la Tarea 7. Cada pregunta incluye el código R completo y una respuesta escrita. Los bloques que llaman a la API están marcados con `eval=FALSE` para no gastar peticiones al renderizar. Para correrlos hace falta una API key de OpenRouter configurada en `OPENROUTER_API_KEY`.
 
 ### Configuración
 
@@ -31,7 +31,7 @@ stopifnot(Sys.getenv("OPENROUTER_API_KEY") != "")
 textos <- read_csv("../dia-03/datos/textos_politicos.csv",
                    show_col_types = FALSE)
 
-MODELO <- "google/gemma-4-31b-it:free"
+MODELO <- "nvidia/nemotron-3-super-120b-a12b:free"
 ```
 
 ## Configuración y chat básico
@@ -85,7 +85,7 @@ cat("--- Social ---\n",   social$chat(pregunta), "\n")
 
 **Respuesta:** Las dos respuestas usan vocabulario y recomendaciones distintas: la "de mercado" enfatiza disciplina fiscal y tasa de interés; la "social" enfatiza salarios reales, transferencias y controles. El mismo modelo produce posiciones distintas según el rol que le asignamos. Esto muestra que el system prompt es una variable de control, no un detalle cosmético: puede inducir sesgo intencional o no intencional en los resultados.
 
-## Clasificación zero-shot
+## Clasificación y extracción
 
 ### Pregunta 4: Función de clasificación
 
@@ -111,44 +111,85 @@ clasificar_zero(textos$texto[10])
 
 **Respuesta:** La función crea un chat nuevo dentro de cada llamada, de modo que la clasificación del texto N no contamina la del texto N+1. Esto cuesta más tokens (cada llamada envía el system prompt de nuevo) pero protege la independencia entre observaciones, que es lo que necesitamos para evaluar la accuracy con honestidad.
 
-### Pregunta 5: Clasificar en batch
+### Pregunta 5: Salida estructurada
 
 ```{r p5, eval=FALSE}
-resultados_zero <- textos |>
-  slice(1:20) |>
-  mutate(tema_llm = map_chr(texto, clasificar_zero, .progress = TRUE))
+tipo_registro <- type_object(
+  tema = type_enum(c("economia", "educacion", "seguridad",
+                     "salud", "medioambiente"),
+                   "El tema principal del texto"),
+  menciona_gobierno = type_boolean("¿El texto menciona al gobierno o al Estado?"),
+  urgencia = type_enum(c("baja", "media", "alta"),
+                       "La urgencia que transmite el texto")
+)
 
-# Accuracy
-mean(resultados_zero$tema == resultados_zero$tema_llm)
-
-# Matriz de confusión
-table(real = resultados_zero$tema, llm = resultados_zero$tema_llm)
-```
-
-**Respuesta:** En una corrida típica con `google/gemma-4-31b-it:free`, la accuracy queda alta, entre 0,85 y 0,95, dependiendo de qué textos caen en los primeros veinte. La matriz de confusión muestra los pocos errores: cuando ocurren, suelen ser entre temas cercanos, como "economia" y "seguridad" en textos sobre desempleo y violencia urbana, o "salud" y "medioambiente" en textos sobre contaminación.
-
-### Pregunta 6: Inspección de errores
-
-```{r p6, eval=FALSE}
-errores <- resultados_zero |>
-  filter(tema != tema_llm) |>
-  select(texto, tema, tema_llm)
-
-errores
-```
-
-**Respuesta:** Muchos errores son "razonables": un texto sobre la contaminación que afecta a niños puede ser tanto `medioambiente` (etiqueta original) como `salud` (etiqueta del LLM) sin que ninguna sea claramente incorrecta. Otros son "claros": un texto sobre presupuesto escolar etiquetado como `educacion` que el modelo coloca en `economia` ignora que la mención al presupuesto es accesoria al tema principal. La conclusión metodológica es que la accuracy contra etiquetas "doradas" subestima el desempeño del modelo cuando las categorías no son mutuamente excluyentes.
-
-## Few-shot y comparación
-
-### Pregunta 7: Clasificador few-shot
-
-```{r p7, eval=FALSE}
-clasificar_few <- function(texto) {
+extraer <- function(texto) {
   chat <- chat_openrouter(
     model = MODELO,
-    system_prompt = "Clasificá textos políticos en:
-    economia, educacion, seguridad, salud, medioambiente.
+    system_prompt = "Extraés información estructurada de textos políticos."
+  )
+  chat$chat_structured(texto, type = tipo_registro)
+}
+
+textos |>
+  slice(c(1, 25, 50)) |>
+  mutate(registro = map(texto, extraer)) |>
+  unnest_wider(registro) |>
+  select(tema, menciona_gobierno, urgencia)
+```
+
+**Respuesta:** `chat_structured()` no devuelve texto libre sino una lista con los campos del esquema, y un `type_object()` admite campos de distinto tipo (`type_enum`, `type_boolean`, `type_integer`). Así pasamos de un texto a una fila de datos tipada en una sola llamada, que es exactamente lo que necesitamos para construir un dataset a partir de documentos. Es la misma idea que usa `qlm_code()` en el Lab 8. Como siempre, conviene validar: el modelo puede equivocarse en un campo aunque el formato sea correcto.
+
+## Robustez y sensibilidad
+
+### Pregunta 6: ¿El modelo da siempre lo mismo?
+
+```{r p6, eval=FALSE}
+texto_ambiguo <- textos$texto[30]
+
+repeticiones <- map_chr(1:5, \(i) clasificar_zero(texto_ambiguo))
+table(repeticiones)
+```
+
+**Respuesta:** con un texto claro, las cinco corridas suelen coincidir; con un texto fronterizo (que toca dos temas) pueden aparecer dos o tres categorías distintas. La consecuencia metodológica es que el resultado de un LLM no es perfectamente reproducible: hay que fijar y reportar el modelo y su versión, considerar una temperatura baja (0), y para los casos límite correr la clasificación varias veces y tomar la mayoría. Esta variabilidad es justamente lo que las medidas de confiabilidad del Lab 8 buscan cuantificar.
+
+### Pregunta 7: Sensibilidad al prompt
+
+```{r p7, eval=FALSE}
+muestra <- textos |> group_by(tema) |> slice_sample(n = 1) |> ungroup()
+
+clasificar_breve <- function(texto) {
+  chat <- chat_openrouter(model = MODELO,
+    system_prompt = "Clasificá en: economia, educacion, seguridad, salud,
+    medioambiente. Respondé sólo con la categoría.")
+  trimws(tolower(chat$chat(texto)))
+}
+
+clasificar_detallado <- function(texto) {
+  chat <- chat_openrouter(model = MODELO,
+    system_prompt = "Clasificá en: economia, educacion, seguridad, salud,
+    medioambiente. Regla: si el texto toca dos temas, elegí el más concreto
+    y central. Respondé sólo con la categoría, en minúsculas y sin tildes.")
+  trimws(tolower(chat$chat(texto)))
+}
+
+comparacion <- muestra |>
+  mutate(breve = map_chr(texto, clasificar_breve),
+         detallado = map_chr(texto, clasificar_detallado))
+
+comparacion |> filter(breve != detallado) |> select(tema, breve, detallado)
+```
+
+**Respuesta:** las dos versiones coinciden en los textos claros y difieren en los ambiguos; la regla extra del prompt detallado resuelve algunos de esos empates. La redacción del prompt es un "grado de libertad" del investigador: distintas formulaciones razonables pueden dar resultados distintos. Por eso hay que reportar el prompt exacto y, en lo posible, mostrar que el resultado es robusto a reformulaciones (como acá, comparando dos versiones).
+
+### Pregunta 8: Sensibilidad a los ejemplos
+
+```{r p8, eval=FALSE}
+muestra8 <- textos |> group_by(tema) |> slice_sample(n = 2) |> ungroup()
+
+clasificar_tipico <- function(texto) {
+  chat <- chat_openrouter(model = MODELO,
+    system_prompt = "Clasificá en: economia, educacion, seguridad, salud, medioambiente.
 
     Ejemplos:
     - 'La inflación volvió a subir este mes' -> economia
@@ -157,87 +198,82 @@ clasificar_few <- function(texto) {
     - 'Se inauguró un nuevo hospital' -> salud
     - 'Los incendios forestales se extienden' -> medioambiente
 
-    Responder SOLO con la categoría, sin tildes ni explicación."
-  )
+    Responder SOLO con la categoría.")
   trimws(tolower(chat$chat(texto)))
 }
 
-resultados_few <- textos |>
-  slice(1:20) |>
-  mutate(tema_llm = map_chr(texto, clasificar_few, .progress = TRUE))
-
-mean(resultados_few$tema == resultados_few$tema_llm)
-```
-
-**Respuesta:** Con cinco ejemplos típicos, la accuracy suele subir unos pocos puntos respecto al zero-shot. Con un modelo fuerte como gemma, el zero-shot ya es alto, así que el margen de mejora del few-shot es chico; el aporte principal de los ejemplos es fijar el formato exacto de la salida (categoría sola, sin texto extra) y anclar la frontera entre temas que se solapan.
-
-### Pregunta 8: Sensibilidad a los ejemplos
-
-```{r p8, eval=FALSE}
-clasificar_few_ambiguo <- function(texto) {
-  chat <- chat_openrouter(
-    model = MODELO,
-    system_prompt = "Clasificá en: economia, educacion, seguridad,
-    salud, medioambiente.
+clasificar_ambiguo <- function(texto) {
+  chat <- chat_openrouter(model = MODELO,
+    system_prompt = "Clasificá en: economia, educacion, seguridad, salud, medioambiente.
 
     Ejemplos:
-    - 'El presupuesto público destinado al sector creció 8 puntos' -> economia
-    - 'El nuevo currículo prioriza pensamiento crítico' -> educacion
-    - 'Las cámaras de vigilancia llegaron a barrios periféricos' -> seguridad
+    - 'El presupuesto del sector creció 8 puntos' -> economia
+    - 'El nuevo currículo prioriza el pensamiento crítico' -> educacion
+    - 'Las cámaras de vigilancia llegaron a los barrios' -> seguridad
     - 'Las listas de espera aumentaron tras la reforma' -> salud
     - 'La sequía obliga a racionar el agua potable' -> medioambiente
 
-    Responder SOLO con la categoría."
-  )
+    Responder SOLO con la categoría.")
   trimws(tolower(chat$chat(texto)))
 }
 
-resultados_amb <- textos |>
-  slice(1:20) |>
-  mutate(tema_llm = map_chr(texto, clasificar_few_ambiguo, .progress = TRUE))
+res8 <- muestra8 |>
+  mutate(tipico  = map_chr(texto, clasificar_tipico),
+         ambiguo = map_chr(texto, clasificar_ambiguo))
 
-mean(resultados_amb$tema == resultados_amb$tema_llm)
+c(tipico  = mean(res8$tema == res8$tipico),
+  ambiguo = mean(res8$tema == res8$ambiguo))
 ```
 
-**Respuesta:** La accuracy con ejemplos ambiguos suele ser menor que con ejemplos típicos pero mayor que zero-shot. La elección de los ejemplos importa: ejemplos prototípicos enseñan la categoría pura, ejemplos ambiguos enseñan a no sobre-confiar en palabras clave. Ninguna estrategia es siempre mejor; depende del corpus que tengamos.
+**Respuesta:** la accuracy con ejemplos típicos suele ser algo mayor que con ejemplos ambiguos. Los ejemplos prototípicos le enseñan al modelo la categoría "pura"; los ambiguos le enseñan a no sobre-confiar en palabras clave. Ninguna estrategia es siempre mejor: depende del corpus. La lección es que el few-shot no es neutral, los ejemplos son una decisión de diseño que cambia los resultados y hay que documentarla.
 
-### Pregunta 9: Comparación con el Día 3
+## Más allá de la clasificación
+
+### Pregunta 9: Extracción de entidades
 
 ```{r p9, eval=FALSE}
-# Cambiar 0.72 por el valor real del Día 3
-accuracy_lda <- 0.72
-
-comparacion <- tribble(
-  ~metodo,           ~accuracy,
-  "LDA (Día 3)",     accuracy_lda,
-  "LLM zero-shot",   mean(resultados_zero$tema == resultados_zero$tema_llm),
-  "LLM few-shot",    mean(resultados_few$tema == resultados_few$tema_llm)
-) |>
-  mutate(
-    tiempo_aprox = c("2 seg", "~2 min", "~2 min"),
-    costo_aprox  = c("$0", "<$0.01", "<$0.01")
-  )
-
-comparacion
-```
-
-**Respuesta:** La conclusión depende del corpus, pero en general el LLM few-shot supera al zero-shot, y ambos pueden superar a LDA cuando los temas no se distinguen bien por palabras clave puras. LDA gana en tiempo y costo: 100 textos por segundo gratis vs. 2 minutos por cada 20 textos y unos centavos. Para corpus pequeños el LLM es la mejor opción; para corpus de millones, LDA o un clasificador clásico siguen siendo la regla.
-
-### Pregunta 10: Acuerdo entre métodos
-
-```{r p10, eval=FALSE}
-# Suponiendo que resultados_lda existe del Día 3
-acuerdo <- tribble(
-  ~comparacion,                       ~prop_acuerdo,
-  "LDA vs LLM zero-shot",             mean(resultados_zero$tema_lda == resultados_zero$tema_llm),
-  "LDA vs LLM few-shot",              mean(resultados_few$tema_lda  == resultados_few$tema_llm),
-  "LLM zero-shot vs LLM few-shot",    mean(resultados_zero$tema_llm == resultados_few$tema_llm)
+tipo_entidades <- type_object(
+  personas = type_array(type_string(), "nombres de personas"),
+  organizaciones = type_array(type_string(), "organizaciones o instituciones"),
+  lugares = type_array(type_string(), "lugares geográficos")
 )
 
-acuerdo
+chat <- chat_openrouter(
+  model = MODELO,
+  system_prompt = "Extraés entidades nombradas de un texto."
+)
+
+texto <- "El presidente Lacalle Pou se reunió en Montevideo con representantes
+del Mercosur para discutir un acuerdo con la Unión Europea."
+
+entidades <- chat$chat_structured(texto, type = tipo_entidades)
+entidades
 ```
 
-**Respuesta:** Los dos LLMs suelen estar más cerca entre sí (acuerdo > 0,80) que cualquiera de los dos con LDA (acuerdo ~0,60). Esto sugiere que los LLMs y LDA cometen errores estructuralmente distintos: LDA se confunde por palabras compartidas entre temas, los LLMs se confunden cuando un texto toca dos temas a la vez. Un ensamble (votación entre LDA y LLM) podría capturar lo mejor de cada uno.
+**Respuesta:** la extracción de entidades nombradas (NER) tradicionalmente requería un modelo entrenado por idioma; un LLM lo hace zero-shot con sólo un esquema. `type_array(type_string())` maneja un número variable de entidades (cero, una o varias). Sirve para armar redes de actores (quién se reunió con quién), bases de eventos o índices de organizaciones. Como con la clasificación, hay que validar: el modelo puede inventar una entidad o pasar por alto otra.
+
+### Pregunta 10: Razonamiento paso a paso
+
+```{r p10, eval=FALSE}
+texto_dificil <- textos$texto[33]
+
+# (a) clasificación directa
+directa <- clasificar_zero(texto_dificil)
+
+# (b) con razonamiento paso a paso (cadena de pensamiento)
+chat <- chat_openrouter(
+  model = MODELO,
+  system_prompt = "Clasificá el texto en: economia, educacion, seguridad,
+  salud, medioambiente. Primero explicá tu razonamiento en una o dos
+  oraciones. Terminá con una línea: 'Categoría: <categoria>'."
+)
+con_cot <- chat$chat(texto_dificil)
+
+directa
+cat(con_cot)
+```
+
+**Respuesta:** en textos claros, la cadena de pensamiento rara vez cambia la respuesta y es gasto extra. En textos ambiguos o que tocan dos temas, pedir el razonamiento puede cambiar (y mejorar) la decisión, y deja una justificación que se puede auditar. El costo es más tokens y más tiempo. La idea de la lecture 14: el razonamiento paso a paso ayuda en tareas que requieren inferencia, no en clasificaciones simples donde el modelo ya "sabe" la respuesta.
 
 ## Reflexión
 
