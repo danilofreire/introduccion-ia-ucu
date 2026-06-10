@@ -1,0 +1,16 @@
+id,orador,texto,score_humano
+1,Orador A,"La patria está por encima de todo. Quienes no respetan nuestras tradiciones ni nuestra bandera no merecen llamarse ciudadanos. Hace falta mano dura para restaurar el orden que perdimos.",-9
+2,Orador B,"El pueblo verdadero sabe quiénes son sus enemigos. No vamos a permitir que minorías extranjeras nos impongan su agenda. La seguridad y la familia son lo primero.",-8
+3,Orador C,"Necesitamos un líder fuerte que ponga orden de una vez. La democracia se vuelve un obstáculo cuando hay que tomar decisiones firmes por el bien de la nación.",-7
+4,Orador D,"Debemos proteger nuestra identidad nacional frente a las influencias que la debilitan. El Estado tiene que ser firme con quienes alteran la paz social.",-5
+5,Orador E,"La estabilidad y la seguridad deben ser la prioridad. A veces el orden exige limitar ciertos derechos por el bien común de la mayoría.",-4
+6,Orador F,"El gobierno tiene que equilibrar el orden público con el respeto a las libertades. Ni el caos ni la represión le sirven al país.",-1
+7,Orador G,"Las políticas económicas deben basarse en evidencia y en un diálogo amplio entre todos los sectores. Buscamos soluciones pragmáticas y sostenibles.",0
+8,Orador H,"Creemos en el orden, pero también en las libertades. Un Estado eficiente respeta la ley y rinde cuentas a la ciudadanía.",1
+9,Orador I,"Toda persona merece igual respeto ante la ley, sin importar su origen. El debate abierto y la crítica fortalecen a la república.",4
+10,Orador J,"Promovemos el acceso igualitario a la educación y la protección de los derechos humanos como base de la convivencia democrática.",5
+11,Orador K,"Defendemos la libertad de expresión y el derecho de cada quien a vivir como elija. La diversidad es una riqueza, nunca una amenaza.",6
+12,Orador L,"Las instituciones democráticas y la independencia de la justicia nos protegen a todos. Los derechos de las minorías son los derechos de todos.",7
+13,Orador M,"Una sociedad abierta se mide por cómo trata a los más vulnerables y por su tolerancia con quien piensa distinto. El pluralismo es el corazón de la democracia.",8
+14,Orador N,"Garantizar las libertades civiles, la igualdad ante la ley y la participación de toda la ciudadanía es nuestro compromiso. Ningún poder está por encima de la Constitución.",9
+15,Orador O,"Los enemigos internos quieren destruir nuestros valores y nuestra forma de vida. Solo la unidad bajo un mando firme puede salvarnos de la decadencia.",-8
