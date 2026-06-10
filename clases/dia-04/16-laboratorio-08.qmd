@@ -1,0 +1,896 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 4.4: Laboratorio 8 - Codificación cualitativa y confiabilidad con LLMs"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 4.4](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-04/16-laboratorio-08.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+execute:
+  echo: true
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+# httr2/cli dibujan un progress bar al correr qlm_code() en paralelo, y al
+# renderizar (no interactivo) eso provoca un crash ("self$queue_status").
+# Lo desactivamos para que el render no se caiga.
+options(cli.progress_show_after = Inf)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+
+# quallmer está en GitHub; instalarlo si falta (para que los chunks corran)
+if (!requireNamespace("quallmer", quietly = TRUE)) {
+  if (!requireNamespace("pak", quietly = TRUE)) install.packages("pak")
+  pak::pak("quallmer/quallmer")
+}
+```
+
+# Laboratorio 8: Codificación y confiabilidad con LLMs {background-color="#2d4563"}
+
+## Objetivos del laboratorio
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vamos a hacer**
+
+1. Definir un [libro de códigos]{.alert} y codificar discursos con `quallmer`
+2. [Validar]{.alert} la codificación del LLM contra puntajes humanos
+3. Medir la [confiabilidad]{.alert} replicando la codificación
+4. [Auditar sesgos]{.alert} del modelo por género y por país
+:::
+
+:::{.column width=50%}
+**La idea central**
+
+- El Lab 7 preguntaba: *¿puede un LLM hacer la tarea?*
+- El Lab 8 pregunta: *¿puedo confiar en el resultado como una medida?*
+- Es la tradición del [análisis de contenido]{.alert}: codebook, validación y acuerdo entre codificadores
+
+[Seguimos con OpenRouter. Necesitan la API key del Lab 7]{.alert}
+:::
+:::
+:::
+
+## Estructura del laboratorio
+
+:::{style="margin-top: 40px; font-size: 32px;"}
+
+| Parte | Contenido | Duración |
+|-------|-----------|----------|
+| 1 | Codificar y medir confiabilidad con `quallmer` | ~25 min |
+| 2 | Auditoría de sesgos por género y país | ~15 min |
+| 3 | Datos sintéticos y su validez | ~10 min |
+| -- | Ejercicios; apéndice: mini-proyecto | extra |
+
+<br>
+
+[Usamos un corpus nuevo: 15 fragmentos de discursos políticos con un puntaje humano de retórica liberal-iliberal]{.alert}
+:::
+
+# Parte 1: Codificar y medir confiabilidad {background-color="#2d4563"}
+
+## El paquete quallmer
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- En investigación cualitativa, [codificar]{.alert} es asignar categorías o puntajes a fragmentos de texto
+- Tradicionalmente lo hacen personas, leyendo y etiquetando: es rico, pero lento y caro
+- Dos codificadores rara vez coinciden al 100%: medimos el acuerdo con [Cohen's kappa](https://en.wikipedia.org/wiki/Cohen%27s_kappa) o el [alpha de Krippendorff](https://en.wikipedia.org/wiki/Krippendorff%27s_alpha)
+- [quallmer]{.alert} ([quallmer.github.io](https://quallmer.github.io/quallmer/)) aplica esa misma lógica usando un LLM como codificador
+- Construido sobre [ellmer](https://ellmer.github.io/): usa los mismos proveedores (OpenRouter, Ollama, etc.)
+- Pensado para investigación: trae [validación, confiabilidad y trazabilidad]{.alert} incorporadas
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 22px; margin-top: -10px;"}
+**El flujo de trabajo**
+
+1. `qlm_codebook()`: definir el libro de códigos
+2. `qlm_code()`: codificar los textos
+3. `qlm_validate()`: validar contra humanos (exactitud)
+4. `qlm_replicate()` + `qlm_compare()`: confiabilidad
+5. `qlm_trail()`: trazabilidad
+
+[Tratamos al LLM como un codificador más, y lo sometemos al mismo escrutinio que a un humano]{.alert}
+:::
+:::
+:::
+:::
+
+## Instalar y cargar
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: instalar-quallmer
+#| eval: false
+#| echo: true
+
+# quallmer está en GitHub (no en CRAN todavía)
+install.packages("pak")
+pak::pak("quallmer/quallmer")
+```
+
+```{r}
+#| label: cargar-quallmer
+#| eval: true
+#| echo: true
+#| cache: true
+
+library(quallmer)
+library(ellmer)
+library(tidyverse)
+
+# Verificar que la API key del Lab 7 sigue configurada
+Sys.getenv("OPENROUTER_API_KEY") != ""
+
+discursos <- read_csv("datos/discursos_ideologia.csv", show_col_types = FALSE)
+
+head(discursos)
+```
+
+[`quallmer` pide su propia copia de `ellmer`. La instalación tarda un minuto la primera vez]{.alert}
+:::
+
+## El caso: retórica liberal-iliberal
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=55%}
+- Una pregunta clásica de la ciencia política: ¿qué tan [liberal]{.alert} o [iliberal]{.alert} es el discurso de un político?
+- [Iliberal]{.alert}: nacionalismo, mano dura, orden y seguridad, distinción "nosotros / ellos", rechazo al pluralismo
+- [Liberal]{.alert}: derechos individuales, tolerancia, pluralismo, libertades civiles, Estado de derecho
+- Medimos cada discurso en una escala de [-10 (iliberal) a +10 (liberal)]{.alert}
+- Es una variable [continua]{.alert}, no una categoría: nos deja usar correlación y acuerdo de intervalo
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 20px; margin-top: -10px;"}
+**Nuestro corpus**
+
+- 15 fragmentos de discursos políticos latinoamericanos (ficticios, para el ejemplo)
+- Cada uno con un `score_humano`: el puntaje que le dio una persona
+- Inspirado en el ejemplo de [iliberalismo](https://quallmer.github.io/quallmer/articles/pkgdown/examples/example_illiberalism.html) de `quallmer`
+:::
+
+```{r}
+#| label: ver-corpus
+#| eval: true
+#| echo: true
+#| cache: true
+
+discursos |>
+  select(orador, score_humano) |> 
+  head()
+```
+:::
+:::
+:::
+
+## Paso 1: definir el codebook
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: codebook
+#| eval: true
+#| echo: true
+#| cache: true
+
+codebook_ideologia <- qlm_codebook(
+  name = "retorica_liberal",
+  instructions = paste(
+    "Analizá el estilo retórico de este fragmento de discurso político latinoamericano.",
+    "Retórica ILIBERAL (puntajes negativos): nacionalismo, apelaciones al orden y la",
+    "seguridad, tradición, mano dura, distinción entre 'nosotros' y 'ellos', rechazo al pluralismo.",
+    "Retórica LIBERAL (puntajes positivos): derechos individuales, tolerancia, pluralismo,",
+    "libertades civiles, derechos de las minorías, Estado de derecho, sociedad abierta.",
+    "Un puntaje de 0 indica retórica neutral o mixta.",
+    sep = "\n"),
+  schema = type_object(
+    score = type_integer("Puntaje de -10 (iliberal) a +10 (liberal)"),
+    explicacion = type_string("Breve justificación del puntaje")
+  ),
+  role = "Sos un cientista político experto en analizar retórica política.",
+  levels = list(score = "interval", explicacion = "nominal")
+)
+```
+
+El `schema` usa los tipos de `ellmer` (Lab 7). `type_integer()` pide un número entero; `levels` le dice a `quallmer` que `score` es una variable de [intervalo]{.alert}, para calcular las métricas correctas
+:::
+
+## Paso 2: codificar los discursos
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: codificar
+#| eval: true
+#| echo: true
+#| cache: true
+
+codificado <- qlm_code(
+  discursos$texto,
+  codebook_ideologia,
+  model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+  max_active = 3,   # pocas peticiones a la vez: los modelos :free se saturan
+  name = "nemotron"
+)
+
+codificado
+```
+
+:::{.callout-warning}
+Con `max_active` alto, los modelos `:free` devuelven errores `400`. Bajalo a 2-3, usá muestras chicas, o pasá a un modelo de pago. Para corpus grandes conviene un modelo local (Ollama, día 5)
+:::
+:::
+
+## Inspeccionar la codificación
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: inspeccionar
+#| eval: true
+#| echo: true
+#| cache: true
+
+# Comparar el puntaje del LLM con el humano, lado a lado
+tibble(
+  orador       = discursos$orador,
+  score_humano = discursos$score_humano,
+  score_llm    = codificado$score
+)
+```
+
+Miren la diferencia: el LLM tiende a ser [más conservador]{.alert}, sus puntajes se acercan al centro (0). Capta bien el [orden]{.alert} (quién es más iliberal que quién), pero comprime la [magnitud]{.alert}. Esto es justo lo que [la validación va a cuantificar]{.alert}
+:::
+
+## Paso 3: validar contra humanos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: validar
+#| eval: true
+#| echo: true
+#| cache: true
+
+# El "gold standard": el puntaje humano de cada discurso
+gold <- qlm_humancoded(
+  tibble(.id = seq_len(nrow(discursos)), score = discursos$score_humano),
+  name = "humano",
+  codebook = codebook_ideologia
+)
+
+# ¿Qué tan cerca está el LLM del juicio humano?
+# qlm_validate devuelve un tibble; lo mostramos como tabla
+validacion <- qlm_validate(codificado, gold = gold, by = "score", level = "interval")
+as_tibble(validacion) |> select(measure, value)
+```
+
+- [r]{.alert} (Pearson): ¿el LLM ordena los discursos como el humano? (correlación)
+- [mae / rmse]{.alert}: error promedio, en puntos de la escala
+- [icc]{.alert} (interclase): acuerdo [absoluto]{.alert}, castiga la diferencia de magnitud
+:::
+
+## Paso 4: confiabilidad (replicar y comparar)
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: replicar
+#| eval: true
+#| echo: true
+#| cache: true
+
+# Codificar los MISMOS textos: confiabilidad test-retest
+codificado_b <- qlm_replicate(codificado, name = "nemotron_b")
+
+# ¿Coinciden las dos corridas? (acuerdo entre codificadores)
+confiabilidad <- qlm_compare(
+  codificado, codificado_b,
+  by = "score", level = "interval", tolerance = 2
+)
+as_tibble(confiabilidad) |> select(measure, value)
+```
+
+:::{style="font-size: 19px;"}
+`qlm_replicate()` repite la codificación. Con el [mismo modelo]{.alert} mide [robustez]{.alert}. Cambiando `model =` a otro modelo, mide [confiabilidad entre modelos]{.alert}. Acá usamos el mismo modelo porque los `:free` se saturan; pero la lógica es idéntica
+
+[alpha_interval]{.alert} (Krippendorff): el estándar para acuerdo entre codificadores (< 0.67 poco confiable, 0.67-0.80 aceptable, > 0.80 bueno). `tolerance` es la tolerancia para considerar que dos puntajes "coinciden" (ej. ±2 puntos)
+
+[Validez (vs humanos) y confiabilidad (entre corridas) son cosas distintas. Un modelo puede ser muy [estable]{.alert} y aun así estar sistemáticamente [sesgado]{.alert}]{.alert}
+:::
+:::
+
+## Trazabilidad: el audit trail
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+```{r}
+#| label: trail
+#| eval: true
+#| echo: true
+#| cache: true
+
+# Registro completo: codebook, modelo, parámetros, fecha, las dos corridas
+# qlm_trail() escribe el .rds y devuelve el registro de forma invisible,
+# así que lo asignamos y lo mostramos en una línea aparte
+trail <- qlm_trail(codificado, codificado_b, confiabilidad, path = "trail_ideologia")
+trail
+```
+
+:::{.columns}
+:::{.column width=55%}
+- `qlm_trail()` sigue la idea de [Lincoln y Guba (1985)](https://books.google.com.br/books?id=2oA9aWlNeooC&printsec=frontcover&redir_esc=y#v=onepage&q&f=false) sobre confiabilidad en investigación cualitativa
+- Guarda en un `.rds` todo lo necesario para que otra persona [replique]{.alert} tu codificación
+:::
+
+:::{.column width=45%}
+- Es la [defensa 4]{.alert} de la lecture 14 (validación y reproducibilidad), automatizada
+- Va como material suplementario del paper
+:::
+:::
+:::
+
+## quallmer: capacidad vs confianza
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+| | Diccionario / LDA (Día 3) | LLM solo (Lab 7) | LLM + `quallmer` (Lab 8) |
+|--|--|--|--|
+| Qué da | Una clasificación | Una clasificación | Una medida [con validación]{.alert} |
+| Pregunta | ¿Agrupa el texto? | ¿Puede hacerlo? | ¿Puedo [confiar]{.alert} en el número? |
+| Reporta | Nada por sí solo | Nada por sí solo | Validez, confiabilidad, trazabilidad |
+
+<br>
+
+[El salto del Lab 7 al Lab 8 no es técnico, es [metodológico]{.alert}: pasamos de "el modelo clasifica" a "puedo defender esta medida ante un revisor"]{.alert}
+:::
+
+# Parte 2: Auditoría de sesgos {background-color="#2d4563"}
+
+## ¿Por qué auditar?
+
+:::{style="margin-top: 30px; font-size: 25px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los LLMs aprenden de [texto de internet]{.alert} y eso incluye estereotipos
+- Si los usamos para codificar o analizar, esos sesgos se [transmiten]{.alert} a nuestros resultados
+- En investigación social esto importa el doble:
+    - Es nuestro objeto de estudio
+    - Pero también es nuestra herramienta de medición
+- La [auditoría]{.alert} es un control mínimo: enviar el mismo prompt con [una sola palabra distinta]{.alert} y ver si la respuesta cambia
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 25px;"}
+**Pregunta clave**
+
+Si el modelo responde distinto según el género, país o partido, ¿es porque hay un patrón real en sus datos, o porque heredó un estereotipo del corpus?
+
+[Auditar nos ayuda a [reportar el riesgo]{.alert} aunque no podamos eliminarlo.]{.alert}
+:::
+:::
+:::
+:::
+
+## Ejemplo: sesgo de género
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: sesgo-genero
+#| eval: true
+#| echo: true
+#| cache: true
+#| results: false
+
+nombres <- tribble(
+  ~nombre,            ~genero,
+  "María García",     "F",
+  "Andrea Pérez",     "F",
+  "Luciana Méndez",   "F",
+  "Juan Rodríguez",   "M",
+  "Carlos López",     "M",
+  "Diego Fernández",  "M"
+)
+
+describir_candidato <- function(nombre) {
+  chat <- chat_openrouter(
+    model = "nvidia/nemotron-3-super-120b-a12b:free",
+    system_prompt = "Sos un consultor de recursos humanos. Respondés en dos o tres oraciones."
+  )
+  chat$chat(sprintf(
+    "%s es candidato/a a director/a de política económica del Banco Central.
+     Describí brevemente sus fortalezas y debilidades para el cargo. 
+     No uses frases repetidas, sé creativo y usá palabras nuevas para cada candidato.",
+    nombre
+  ))
+}
+
+respuestas_genero <- nombres |>
+  mutate(respuesta = map_chr(nombre, describir_candidato, .progress = TRUE))
+```
+
+```{r}
+#| label: sesgo-genero-mostrar
+#| eval: true
+#| echo: true
+
+respuestas_genero
+```
+
+[Mismo cargo, sólo cambia el nombre. ¿Cambian las palabras que el modelo usa según el género?]{.alert}
+:::
+
+## Medir el sesgo: un LLM como codificador
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+Leer seis respuestas a ojo no escala. Usamos un LLM como [codificador]{.alert} para ponerle un número al tono de cada descripción, igual que en la Parte 1, y comparamos por género
+
+```{r}
+#| label: sesgo-genero-coder
+#| eval: true
+#| echo: true
+#| cache: true
+
+# Codebook que puntúa qué tan positiva es cada descripción
+codebook_tono <- qlm_codebook(
+  name = "tono_candidato",
+  instructions = "Puntuá qué tan positiva es esta descripción de un
+  candidato, de -5 (muy negativa, destaca debilidades) a +5 (muy
+  positiva, destaca fortalezas). 0 es equilibrada.",
+  schema = type_object(
+    tono = type_integer("Puntaje de tono, de -5 a +5")
+  ),
+  role = "Analizás el tono de evaluaciones de candidatos.",
+  levels = list(tono = "interval")
+)
+
+# El LLM codifica sus PROPIAS respuestas (de la slide anterior)
+tono_genero <- qlm_code(
+  respuestas_genero$respuesta, codebook_tono,
+  model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+  max_active = 2
+)
+
+# ¿Describe a un género de forma más positiva que al otro?
+respuestas_genero |>
+  mutate(tono = tono_genero$tono) |>
+  group_by(genero) |>
+  summarise(tono_medio = mean(tono, na.rm = TRUE),
+            n = sum(!is.na(tono)))
+```
+
+[Convertimos el texto en una medida comparable: ahora el sesgo es un número, no una impresión. Con tres nombres por género es sólo una demostración; para un estudio real harían falta más nombres y otras dimensiones (por ejemplo, competencia vs calidez)]{.alert}
+:::
+
+## Documentar los hallazgos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Qué documentar siempre**
+
+- Modelo exacto y versión (`nvidia/nemotron-3-super-120b`, fecha de uso)
+- Proveedor y endpoint (OpenRouter)
+- Temperatura y otros parámetros
+- Los prompts completos
+- Las respuestas crudas
+:::
+
+:::{.column width=50%}
+**Cómo reportar**
+
+- Una sección de [limitaciones]{.alert} en el paper
+- [Transparencia]{.alert}: decir que se usó un LLM y cuál
+- [Replicabilidad]{.alert}: subir prompts y respuestas como material suplementario
+- [Discusión]{.alert} de los sesgos detectados, no esconderlos
+:::
+:::
+
+<br>
+
+[Una auditoría imperfecta y publicada es mejor que una auditoría perfecta y oculta]{.alert} 🤓
+:::
+
+# Parte 3: Datos sintéticos {background-color="#2d4563"}
+
+## ¿Para qué generar datos sintéticos?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Usos legítimos**
+
+- [Pilotos]{.alert}: probar un pipeline antes de recoger datos reales
+- [Viñetas]{.alert}: generar texto para experimentos factoriales
+- [Privacidad]{.alert}: no exponer respuestas individuales
+- [Enseñanza]{.alert}: datasets para clase sin trámites éticos
+:::
+
+:::{.column width=50%}
+**Riesgos**
+
+- Reflejan los [sesgos]{.alert} del modelo
+- No representan la población real
+- Pueden parecer "demasiado limpios"
+- [No reemplazan]{.alert} datos empíricos para conclusiones sustantivas
+:::
+:::
+
+<br>
+
+[El mismo problema de la Parte 1, al revés: si vamos a [usar]{.alert} datos sintéticos, tenemos que [validar]{.alert} que se parecen a la realidad]{.alert}
+:::
+
+## Generar respuestas de encuesta
+
+:::{style="margin-top: 30px; font-size: 18px;"}
+
+```{r}
+#| label: gen-encuesta
+#| eval: true
+#| echo: true
+#| cache: true
+
+tipo_respuesta <- type_object(
+  edad = type_integer("entre 18 y 80"),
+  genero = type_enum(c("M", "F"), "género"),
+  educacion = type_enum(c("primaria", "secundaria", "universitaria"), "nivel"),
+  confianza_gobierno = type_integer("1 a 4, donde 1=nada y 4=mucha"),
+  satisfaccion_democracia = type_integer("1 a 4"),
+  comentario = type_string("una oración corta, plausible para una persona uruguaya")
+)
+
+tipo_encuesta <- type_array(tipo_respuesta, "lista de respuestas")
+
+generador <- chat_openrouter(
+  model = "nvidia/nemotron-3-super-120b-a12b:free",
+  system_prompt = "Generás respuestas simuladas de encuesta de opinión
+  pública en Uruguay. Las respuestas deben ser DIVERSAS y reflejar
+  patrones plausibles (ej. menos confianza en jóvenes urbanos)."
+)
+
+datos_gen <- generador$chat_structured(
+  "Generá 15 respuestas para una encuesta sobre confianza institucional.",
+  type = tipo_encuesta
+)
+
+datos_sinteticos <- as_tibble(datos_gen)
+glimpse(datos_sinteticos)
+```
+:::
+
+## Validar contra patrones reales
+
+:::{style="margin-top: 30px; font-size: 20px;"}
+
+```{r}
+#| label: gen-validar
+#| eval: true
+#| echo: true
+#| cache: true
+
+# ¿La distribución de edad es plausible?
+ggplot(datos_sinteticos, aes(x = edad)) +
+  geom_histogram(binwidth = 10, fill = "#2d4563", colour = "white") +
+  labs(title = "Edad (datos sintéticos)", x = "Edad", y = "Cantidad") +
+  theme_minimal()
+
+# ¿Hay correlaciones esperables? (más confianza en gobierno suele ir
+# con más satisfacción con la democracia)
+cor(datos_sinteticos$confianza_gobierno, datos_sinteticos$satisfaccion_democracia)
+
+# ¿Están sobre-representados los universitarios?
+mean(datos_sinteticos$educacion == "universitaria")
+# En Uruguay real es ~25% (https://www.gub.uy/instituto-nacional-estadistica/comunicacion/noticias/niveles-educativos-para-poblacion-mayor-25-anos)
+# Si el sintético da ~43%, hay sesgo. Hay que cambiar el prompt o usar otro modelo, y validar de nuevo
+```
+
+[Validar datos sintéticos es el mismo reflejo que validar la codificación: [nunca confiar sin comparar]{.alert}. Los LLMs tienden a generar muestras más educadas, urbanas y optimistas que la población real]{.alert}
+:::
+
+## Cierre del Día 4
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que aprendimos**
+
+- Cómo funcionan los LLMs (lecture 13)
+- Las cuatro defensas para usarlos en investigación (lecture 14)
+- `ellmer` con OpenRouter (Lab 7)
+- Codificación, validación, confiabilidad y auditoría de sesgos (Lab 8)
+:::
+
+:::{.column width=50%}
+**Buenas prácticas**
+
+- [Validar]{.alert} contra una muestra codificada a mano
+- [Medir confiabilidad]{.alert} replicando la codificación
+- [Documentar]{.alert} todo (modelo, versión, prompts, parámetros)
+- [Auditar]{.alert} sesgos antes de publicar
+- [Ser transparentes]{.alert} sobre limitaciones
+:::
+:::
+
+<br>
+
+[Mañana cerramos con modelos locales, ética y las mini-propuestas de investigación]{.alert}
+:::
+
+# Ejercicios para practicar {background-color="#2d4563"}
+
+## Ejercicio 1: ampliar el codebook {#sec:exercise01}
+
+:::{style="margin-top: 30px; font-size: 17px;"}
+
+**Tarea (8 min):** ampliá el codebook para que, además del `score`, identifique la `dimension` retórica dominante (nacionalismo / seguridad / derechos / pluralismo / economia). Recodificá los discursos y mostrá una tabla cruzada de `dimension` por signo del `score`
+
+```{r}
+#| label: ej1-skeleton
+#| eval: false
+#| echo: true
+#| prompt: false
+
+codebook_amplio <- qlm_codebook(
+  name = "retorica_dimension",
+  instructions = "Puntuá la retórica de -10 (iliberal) a +10 (liberal) e
+  identificá la dimensión retórica dominante del fragmento.",
+  schema = type_object(
+    score = type_integer("Puntaje de -10 a +10"),
+    dimension = ___    # TODO: un type_enum con las cinco dimensiones
+  ),
+  role = "Sos un cientista político experto en retórica política.",
+  levels = list(score = "interval", dimension = "nominal")
+)
+
+codificado_amplio <- qlm_code(discursos$texto, codebook_amplio,
+                              model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+                              max_active = 2)
+
+codificado_amplio |>
+  mutate(signo = if_else(score < 0, "iliberal", "liberal")) |>
+  count(dimension, signo) |>
+  pivot_wider(names_from = signo, values_from = n, values_fill = 0)
+```
+
+:::{.callout-note appearance="simple" icon=false}
+**Pista**: un `type_object()` puede tener varios campos; el nuevo campo es su propio `type_enum()` con las cinco dimensiones
+:::
+
+[[Apéndice: Solución]{.button}](#sec:appendix01)
+:::
+
+## Ejercicio 2: un LLM como clasificador {#sec:exercise02}
+
+:::{style="margin-top: 30px; font-size: 17px;"}
+
+**Tarea (8 min):** usá un LLM como [clasificador]{.alert}. Tenés un dataset con frases de dos partidos ficticios. Definí un codebook que puntúe la orientación económica de cada frase (de -5 estatista a +5 promercado), codificá las frases y compará el puntaje medio por partido. ¿El modelo separa a los dos partidos?
+
+```{r}
+#| label: ej2-skeleton
+#| eval: false
+#| echo: true
+#| prompt: false
+
+frases_partidos <- tribble(
+  ~partido,                 ~frase,
+  "Partido del Trabajo",    "El Estado debe garantizar empleo con inversión pública.",
+  "Partido del Trabajo",    "Hay que subir los impuestos a las grandes fortunas.",
+  "Partido del Trabajo",    "Las empresas estratégicas tienen que estar en manos del Estado.",
+  "Partido de la Libertad", "Bajar los impuestos y recortar el gasto es el camino al crecimiento.",
+  "Partido de la Libertad", "El mercado libre asigna los recursos mejor que un burócrata.",
+  "Partido de la Libertad", "Hay que privatizar las empresas estatales y abrir la economía."
+)
+
+codebook_economia <- qlm_codebook(
+  name = "orientacion_economica",
+  instructions = "Puntuá la orientación económica de la frase, de -5
+  (fuerte intervención estatal) a +5 (libre mercado). 0 es mixta.",
+  schema = type_object(
+    orientacion = ___    # TODO: un type_integer de -5 a +5
+  ),
+  role = "Sos un analista de economía política.",
+  levels = list(orientacion = "interval")
+)
+
+codificado_partidos <- qlm_code(frases_partidos$frase, codebook_economia,
+                                model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+                                max_active = 2)
+
+frases_partidos |>
+  mutate(orientacion = codificado_partidos$orientacion) |>
+  group_by(___) |>    # TODO: ¿por qué variable conviene agrupar?
+  summarise(orientacion_media = mean(orientacion, na.rm = TRUE))
+```
+
+:::{.callout-note appearance="simple" icon=false}
+**Pista**: es el mismo patrón que la slide "Medir el sesgo": un codebook con un campo numérico, `qlm_code()`, y `group_by()` + `summarise()`
+:::
+
+[[Apéndice: Solución]{.button}](#sec:appendix02)
+:::
+
+# Apéndice: Soluciones de los ejercicios {background-color="#2d4563"}
+
+## Solución Ejercicio 1 {#sec:appendix01}
+
+:::{style="margin-top: 30px; font-size: 16px;"}
+
+```{r}
+#| label: ej1-sol
+#| eval: true
+#| echo: true
+#| cache: true
+
+codebook_amplio <- qlm_codebook(
+  name = "retorica_dimension",
+  instructions = "Puntuá la retórica de -10 (iliberal) a +10 (liberal) e
+  identificá la dimensión retórica dominante del fragmento.",
+  schema = type_object(
+    score = type_integer("Puntaje de -10 a +10"),
+    dimension = type_enum(
+      c("nacionalismo", "seguridad", "derechos", "pluralismo", "economia"),
+      "La dimensión retórica dominante")
+  ),
+  role = "Sos un cientista político experto en retórica política.",
+  levels = list(score = "interval", dimension = "nominal")
+)
+
+codificado_amplio <- qlm_code(discursos$texto, codebook_amplio,
+                              model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+                              max_active = 2)
+
+codificado_amplio |>
+  mutate(signo = if_else(score < 0, "iliberal", "liberal")) |>
+  count(dimension, signo) |>
+  pivot_wider(names_from = signo, values_from = n, values_fill = 0)
+```
+
+[[Volver al ejercicio]{.button}](#sec:exercise01)
+:::
+
+## Solución Ejercicio 2 {#sec:appendix02}
+
+:::{style="margin-top: 30px; font-size: 16px;"}
+
+```{r}
+#| label: ej2-sol
+#| eval: true
+#| echo: true
+#| cache: true
+
+frases_partidos <- tribble(
+  ~partido,                 ~frase,
+  "Partido del Trabajo",    "El Estado debe garantizar empleo con inversión pública.",
+  "Partido del Trabajo",    "Hay que subir los impuestos a las grandes fortunas.",
+  "Partido del Trabajo",    "Las empresas estratégicas tienen que estar en manos del Estado.",
+  "Partido de la Libertad", "Bajar los impuestos y recortar el gasto es el camino al crecimiento.",
+  "Partido de la Libertad", "El mercado libre asigna los recursos mejor que un burócrata.",
+  "Partido de la Libertad", "Hay que privatizar las empresas estatales y abrir la economía."
+)
+
+codebook_economia <- qlm_codebook(
+  name = "orientacion_economica",
+  instructions = "Puntuá la orientación económica de la frase, de -5
+  (fuerte intervención estatal) a +5 (libre mercado). 0 es mixta.",
+  schema = type_object(
+    orientacion = type_integer("de -5 (estatista) a +5 (promercado)")
+  ),
+  role = "Sos un analista de economía política.",
+  levels = list(orientacion = "interval")
+)
+
+codificado_partidos <- qlm_code(frases_partidos$frase, codebook_economia,
+                                model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+                                max_active = 2)
+
+# El clasificador separa a los dos partidos: Libertad promercado (positivo),
+# Trabajo estatista (negativo)
+frases_partidos |>
+  mutate(orientacion = codificado_partidos$orientacion) |>
+  group_by(partido) |>
+  summarise(orientacion_media = mean(orientacion, na.rm = TRUE),
+            n = sum(!is.na(orientacion)))
+```
+
+[[Volver al ejercicio]{.button}](#sec:exercise02)
+:::
+
+# Apéndice: mini-proyecto integrador {background-color="#2d4563"}
+
+## El proyecto (para hacer en casa)
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+
+**Objetivo**: armar un pipeline reproducible que mida una construcción propia con un LLM y reporte su confiabilidad
+
+**Pasos**
+
+1. Elegir un corpus de textos cortos (discursos, tuits, titulares)
+2. Definir una construcción y su escala (ej. populismo, polarización, tono) en un `qlm_codebook()`
+3. Codificar a mano una muestra de 15-20 textos (tu gold standard)
+4. Codificar los mismos textos con `qlm_code()`
+5. Validar contra tu codificación humana con `qlm_validate()`
+6. Replicar con `qlm_replicate()` y medir confiabilidad con `qlm_compare()`
+7. Guardar el `qlm_trail()` y documentar todo en un `.qmd` reproducible
+
+[Pueden trabajar en grupos de 2-3 personas. Lo discutimos al inicio del Día 5.]{.alert}
+:::
+
+## Pista: estructura del pipeline
+
+:::{style="margin-top: 30px; font-size: 19px;"}
+
+```{r}
+#| label: pipeline
+#| eval: false
+#| echo: true
+
+# 1. Datos: tu corpus con una columna de texto y tu puntaje humano
+discursos <- read_csv("datos/discursos_ideologia.csv", show_col_types = FALSE)
+
+# 2. Codebook (tu construcción y su escala)
+#    (ver Paso 1 del laboratorio)
+
+# 3. Codificar con quallmer
+codificado <- qlm_code(discursos$texto, codebook_ideologia,
+                       model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+                       max_active = 2)
+
+# 4. Validar contra tu codificación humana
+gold <- qlm_humancoded(
+  tibble(.id = seq_len(nrow(discursos)), score = discursos$score_humano),
+  name = "humano", codebook = codebook_ideologia)
+qlm_validate(codificado, gold = gold, by = "score", level = "interval")
+
+# 5. Confiabilidad: replicar y comparar
+codificado_b <- qlm_replicate(codificado, name = "rep")
+qlm_compare(codificado, codificado_b, by = "score", level = "interval", tolerance = 2)
+```
+:::
+
+# Fin del Día 4 {background-color="#2d4563"}
