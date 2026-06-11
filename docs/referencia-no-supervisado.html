@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -73,10 +73,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c82d23df098fe35fa8fa698ecfe1c56e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -138,7 +138,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./laboratorios.html"> 
-<span class="menu-text">Laboratorios</span></a>
+<span class="menu-text">Laboratorios y Tareas</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./lecturas.html"> 
@@ -160,6 +160,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="./referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
   </li>  
     </ul>
   </li>
@@ -310,11 +314,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 90
 Columns: 6
-$ pib         &lt;dbl&gt; 0.6890635, 4.3189195, 2.0522693, 3.2904571, 1.5769763, 3.9…
-$ educacion   &lt;dbl&gt; 3.9022606, 4.4851366, 2.6641886, 3.0225546, 2.0236293, 4.5…
-$ internet    &lt;dbl&gt; 1.9640495, 2.5399324, 2.3047820, 1.9570903, 2.5186439, 3.9…
-$ salud       &lt;dbl&gt; 1.9219549, 1.7700314, 2.1591763, 1.5586122, 3.6879433, 3.0…
-$ desigualdad &lt;dbl&gt; -1.7039272, -1.0330909, -1.1422167, -1.0476344, 0.9038007,…
+$ pib         &lt;dbl&gt; 3.5811529, 4.8114772, 2.5808460, 3.2274287, 1.6410054, 4.5…
+$ educacion   &lt;dbl&gt; 1.414789, 2.937925, 2.179774, 2.629537, 3.399682, 4.925100…
+$ internet    &lt;dbl&gt; 0.5879008, 3.7838290, 2.1014524, 2.9783056, 1.9771634, 3.6…
+$ salud       &lt;dbl&gt; 2.1784744, 1.6748550, 2.2056686, 1.6451850, 4.3726544, 3.5…
+$ desigualdad &lt;dbl&gt; -0.9889160, -1.1271576, -1.0295412, -1.6993760, -0.6795119…
 $ grupo_real  &lt;chr&gt; "alto", "alto", "alto", "alto", "alto", "alto", "alto", "a…</code></pre>
 </div>
 </div>
@@ -332,10 +336,10 @@ $ grupo_real  &lt;chr&gt; "alto", "alto", "alto", "alto", "alto", "alto", "alto"
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datos_scaled, <span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>           pib educacion  internet     salud desigualdad
-[1,] 0.3153484  1.564242 0.8534460 0.9228415  -0.9422918
-[2,] 1.9307527  1.803582 1.1011165 0.8353421  -0.5611013
-[3,] 0.9220194  1.055867 0.9999851 1.0594677  -0.6231101</code></pre>
+<pre><code>          pib educacion  internet     salud desigualdad
+[1,] 1.442561 0.6452436 0.2795019 1.0498135  -0.5833199
+[2,] 1.951106 1.3189628 1.7146198 0.7655716  -0.6652105
+[3,] 1.029093 0.9836143 0.9591557 1.0651618  -0.6073852</code></pre>
 </div>
 </div>
 </section>
@@ -372,11 +376,11 @@ $ grupo_real  &lt;chr&gt; "alto", "alto", "alto", "alto", "alto", "alto", "alto"
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">as.matrix</span>(d)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     1    2    3    4    5
-1 0.00 1.70 0.88 1.29 2.01
-2 1.70 0.00 1.28 0.80 2.22
-3 0.88 1.28 0.00 0.69 1.50
-4 1.29 0.80 0.69 0.00 1.88
-5 2.01 2.22 1.50 1.88 0.00</code></pre>
+1 0.00 1.69 0.86 1.32 1.84
+2 1.69 0.00 1.28 0.83 2.19
+3 0.86 1.28 0.00 0.72 1.41
+4 1.32 0.83 0.72 0.00 1.87
+5 1.84 2.19 1.41 1.87 0.00</code></pre>
 </div>
 </div>
 </section>
@@ -405,20 +409,20 @@ $ grupo_real  &lt;chr&gt; "alto", "alto", "alto", "alto", "alto", "alto", "alto"
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Asignación de cada observación</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(km<span class="sc">$</span>cluster, <span class="dv">15</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</code></pre>
+<pre><code> [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Centros de los clusters</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(km<span class="sc">$</span>centers, <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    pib educacion internet salud desigualdad
-1  1.07      1.11     1.10  1.02       -0.59
-2  0.00     -0.12    -0.04 -0.04        1.11
-3 -1.19     -1.10    -1.18 -1.08       -0.71</code></pre>
+1 -0.07      0.03    -0.02 -0.04        1.08
+2  1.14      1.10     1.10  1.03       -0.54
+3 -1.14     -1.21    -1.16 -1.06       -0.78</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tamaño de cada cluster</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>km<span class="sc">$</span>size</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 30 33 27</code></pre>
+<pre><code>[1] 34 29 27</code></pre>
 </div>
 </div>
 </section>
@@ -465,16 +469,16 @@ $ grupo_real  &lt;chr&gt; "alto", "alto", "alto", "alto", "alto", "alto", "alto"
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Silueta promedio</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(sil[, <span class="dv">3</span>]), <span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.504</code></pre>
+<pre><code>[1] 0.502</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualizar por observación</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_silhouette</span>(sil) <span class="sc">+</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  cluster size ave.sil.width
-1       1   30          0.51
-2       2   33          0.50
-3       3   27          0.50</code></pre>
+1       1   34          0.49
+2       2   29          0.50
+3       3   27          0.51</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -537,9 +541,9 @@ $ grupo_real  &lt;chr&gt; "alto", "alto", "alto", "alto", "alto", "alto", "alto"
 <div class="cell-output cell-output-stdout">
 <pre><code>       cluster
 real     1  2  3
-  alto  30  0  0
-  bajo   0  3 27
-  medio  0 30  0</code></pre>
+  alto   1 29  0
+  bajo   3  0 27
+  medio 30  0  0</code></pre>
 </div>
 </div>
 </section>
@@ -556,9 +560,9 @@ real     1  2  3
 <pre><code># A tibble: 3 × 6
   cluster   pib educacion internet salud desigualdad
     &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;
-1       1  2.38      2.81     2.54  2.09       -1.08
-2       2 -0.02     -0.19    -0.1   0.25        1.91
-3       3 -2.68     -2.58    -2.77 -1.56       -1.29</code></pre>
+1       1 -0.08      0.02    -0.08  0.25        1.82
+2       2  2.86      2.44     2.41  2.15       -0.91
+3       3 -2.67     -2.79    -2.61 -1.56       -1.32</code></pre>
 </div>
 </div>
 </section>
@@ -607,9 +611,9 @@ real     1  2  3
 <div class="cell-output cell-output-stdout">
 <pre><code>       jerarquico
 real     1  2  3
-  alto  30  0  0
-  bajo   0  1 29
-  medio  0 29  1</code></pre>
+  alto  28  2  0
+  bajo   0  4 26
+  medio  0 30  0</code></pre>
 </div>
 </div>
 </section>
@@ -700,9 +704,9 @@ real     1  2  3
 <div class="cell-output cell-output-stdout">
 <pre><code>Importance of components:
                           PC1    PC2     PC3     PC4     PC5
-Standard deviation     1.8829 0.9957 0.44434 0.38634 0.34117
-Proportion of Variance 0.7091 0.1983 0.03949 0.02985 0.02328
-Cumulative Proportion  0.7091 0.9074 0.94687 0.97672 1.00000</code></pre>
+Standard deviation     1.8906 0.9897 0.44368 0.36372 0.34200
+Proportion of Variance 0.7149 0.1959 0.03937 0.02646 0.02339
+Cumulative Proportion  0.7149 0.9108 0.95015 0.97661 1.00000</code></pre>
 </div>
 </div>
 </section>
@@ -735,11 +739,11 @@ Cumulative Proportion  0.7091 0.9074 0.94687 0.97672 1.00000</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(pca<span class="sc">$</span>rotation[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>              PC1   PC2   PC3
-pib         -0.50 -0.01  0.04
-educacion   -0.50 -0.07  0.27
-internet    -0.50 -0.06  0.49
-salud       -0.49  0.01 -0.82
-desigualdad -0.07  1.00  0.06</code></pre>
+pib         -0.50  0.06 -0.33
+educacion   -0.50  0.01 -0.19
+internet    -0.50  0.08 -0.32
+salud       -0.49  0.05  0.87
+desigualdad -0.09 -0.99  0.00</code></pre>
 </div>
 </div>
 <p>Para ordenar por valor absoluto del primer componente:</p>
@@ -748,12 +752,12 @@ desigualdad -0.07  1.00  0.06</code></pre>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"variable"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(PC1)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     variable         PC1         PC2         PC3
-1   educacion -0.50460453 -0.07166984  0.26627562
-2         pib -0.50097962 -0.01370075  0.03829003
-3    internet -0.49876169 -0.06143075  0.49497724
-4       salud -0.49079071  0.01024873 -0.82412329
-5 desigualdad -0.06895608  0.99538784  0.05873245</code></pre>
+<pre><code>     variable         PC1          PC2          PC3
+1   educacion -0.50452430  0.005298435 -0.186995940
+2         pib -0.50010880  0.057165985 -0.334692681
+3    internet -0.49909235  0.075955937 -0.320860879
+4       salud -0.48730811  0.049274174  0.866059045
+5 desigualdad -0.09372328 -0.994236757 -0.001831322</code></pre>
 </div>
 </div>
 </section>
@@ -785,13 +789,13 @@ desigualdad -0.07  1.00  0.06</code></pre>
 <span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">grupo_real =</span> grupo_real) <span class="sc">|&gt;</span></span>
 <span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">6</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>    PC1   PC2 grupo_real
-1 -1.76 -1.10       alto
-2 -2.80 -0.77       alto
-3 -1.97 -0.76       alto
-4 -2.08 -0.72       alto
-5 -2.29  0.42       alto
-6 -3.48  0.57       alto</code></pre>
+<pre><code>    PC1  PC2 grupo_real
+1 -1.64 0.74       alto
+2 -2.81 0.95       alto
+3 -1.95 0.79       alto
+4 -2.19 1.22       alto
+5 -2.62 0.62       alto
+6 -3.75 0.19       alto</code></pre>
 </div>
 </div>
 </section>
@@ -850,7 +854,7 @@ desigualdad -0.07  1.00  0.06</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>       cluster
 real     1  2  3
-  alto   0  0 30
+  alto   1  0 29
   bajo   3 27  0
   medio 30  0  0</code></pre>
 </div>
