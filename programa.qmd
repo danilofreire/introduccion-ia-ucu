@@ -216,23 +216,21 @@ Si ambos paquetes se cargan sin errores, la instalación fue exitosa.
 2. Abrir una terminal y descargar el modelo que usaremos en clase. En Windows, buscar "Símbolo del sistema" o "PowerShell" en el menú de inicio; en macOS, abrir "Terminal" (está en Aplicaciones → Utilidades, o buscándola con Spotlight con `Cmd + Espacio`); en Linux, abrir la aplicación "Terminal" (en muchas distribuciones, con `Ctrl + Alt + T`). Una vez en la terminal, ejecutar:
 
 ```bash
-ollama pull frob/qwen3.5-instruct:4b
+ollama pull granite4.1:3b
 ```
 
-Es la variante *instruct* (sin razonamiento) de `qwen3.5`, la que usamos para codificar texto en los laboratorios y las tareas. Ocupa unos 3,4 GB.
+Es [IBM Granite](https://www.ibm.com/granite), un modelo abierto (licencia Apache 2.0) optimizado para salida estructurada en JSON y con buen soporte multilingüe. Es el que usamos para codificar texto en los laboratorios y las tareas. Ocupa unos 2,1 GB.
 
-3. Opcional: las diapositivas también muestran la variante con razonamiento, `qwen3.5:4b`, para chatear desde la terminal. No hace falta para los laboratorios, pero si quieren probarla, `ollama pull qwen3.5:4b` (o la versión liviana `qwen3.5:0.8b` si la computadora tiene menos de 8 GB de RAM)
-
-4. Para verificar que el modelo quedó descargado, ejecutar `ollama list`. Debería aparecer en la lista de modelos instalados:
+3. Para verificar que el modelo quedó descargado, ejecutar `ollama list`. Debería aparecer en la lista de modelos instalados:
 
 ```bash
 ollama list
 ```
 
-5. Para comprobar que el modelo responde, ejecutar en la terminal:
+4. Para comprobar que el modelo responde, ejecutar en la terminal:
 
 ```bash
-ollama run frob/qwen3.5-instruct:4b
+ollama run granite4.1:3b
 ```
 
 Escribir una pregunta cualquiera y, para salir, escribir `/bye`. Mientras Ollama esté instalado y abierto, R podrá conectarse al modelo durante el laboratorio.

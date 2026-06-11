@@ -85,14 +85,13 @@ Esta es la trampa más común del Día 4. `chat_openrouter()` quiere el nombre d
 
 Si no quieren depender de una API en la nube (por privacidad o por costo), `ellmer` también habla con un modelo corriendo en su computadora vía [Ollama](https://ollama.com/). El resto del código es idéntico. Este es el flujo del Día 5, donde los datos no pueden salir de la máquina.
 
-En el curso usamos dos variantes del mismo modelo, y la elección importa:
+En el curso usamos [IBM Granite](https://www.ibm.com/granite), un modelo abierto (licencia Apache 2.0) optimizado para salida estructurada y con buen soporte multilingüe:
 
-- `qwen3.5:4b`: la variante con razonamiento. Buena para chatear y para problemas difíciles, pero "piensa" uno o dos minutos por cada texto
-- `frob/qwen3.5-instruct:4b`: la variante *instruct*, sin razonamiento. Es la que usamos para codificar con `quallmer`: rápida y estable con salida estructurada
+- `granite4.1:3b`: rápido y estable con salida estructurada (JSON). Es el que usamos para codificar con `quallmer`. No "piensa" antes de responder, así que cada texto se procesa en uno o dos segundos
 
 ```{r ollama}
-# En la terminal, una sola vez: ollama pull frob/qwen3.5-instruct:4b
-chat <- chat_ollama(model = "frob/qwen3.5-instruct:4b")
+# En la terminal, una sola vez: ollama pull granite4.1:3b
+chat <- chat_ollama(model = "granite4.1:3b")
 chat$chat("Hola, ¿funcionás de manera local?")
 ```
 
@@ -102,7 +101,7 @@ Para `qlm_code()` vale la misma regla del prefijo: el modelo lleva `"ollama/"` a
 codificado_local <- qlm_code(
   textos$texto,
   codebook,
-  model = "ollama/frob/qwen3.5-instruct:4b",   # CON el prefijo "ollama/"
+  model = "ollama/granite4.1:3b",   # CON el prefijo "ollama/"
   max_active = 1,
   params = params(temperature = 0)
 )

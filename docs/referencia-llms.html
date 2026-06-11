@@ -353,14 +353,13 @@ Importante
 <section id="alternativa-local-ollama" class="level3" data-number="1.4">
 <h3 data-number="1.4" class="anchored" data-anchor-id="alternativa-local-ollama"><span class="header-section-number">1.4</span> Alternativa local: Ollama</h3>
 <p>Si no quieren depender de una API en la nube (por privacidad o por costo), <code>ellmer</code> también habla con un modelo corriendo en su computadora vía <a href="https://ollama.com/">Ollama</a>. El resto del código es idéntico. Este es el flujo del Día 5, donde los datos no pueden salir de la máquina.</p>
-<p>En el curso usamos dos variantes del mismo modelo, y la elección importa:</p>
+<p>En el curso usamos <a href="https://www.ibm.com/granite">IBM Granite</a>, un modelo abierto (licencia Apache 2.0) optimizado para salida estructurada y con buen soporte multilingüe:</p>
 <ul>
-<li><code>qwen3.5:4b</code>: la variante con razonamiento. Buena para chatear y para problemas difíciles, pero “piensa” uno o dos minutos por cada texto</li>
-<li><code>frob/qwen3.5-instruct:4b</code>: la variante <em>instruct</em>, sin razonamiento. Es la que usamos para codificar con <code>quallmer</code>: rápida y estable con salida estructurada</li>
+<li><code>granite4.1:3b</code>: rápido y estable con salida estructurada (JSON). Es el que usamos para codificar con <code>quallmer</code>. No “piensa” antes de responder, así que cada texto se procesa en uno o dos segundos</li>
 </ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># En la terminal, una sola vez: ollama pull frob/qwen3.5-instruct:4b</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_ollama</span>(<span class="at">model =</span> <span class="st">"frob/qwen3.5-instruct:4b"</span>)</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># En la terminal, una sola vez: ollama pull granite4.1:3b</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_ollama</span>(<span class="at">model =</span> <span class="st">"granite4.1:3b"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"Hola, ¿funcionás de manera local?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Para <code>qlm_code()</code> vale la misma regla del prefijo: el modelo lleva <code>"ollama/"</code> adelante. Y conviene <code>max_active = 1</code>: el servidor local procesa de a un pedido por vez, así que el paralelismo que usamos con la nube acá da timeouts.</p>
@@ -368,7 +367,7 @@ Importante
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>codificado_local <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  textos<span class="sc">$</span>texto,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  codebook,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"ollama/frob/qwen3.5-instruct:4b"</span>,   <span class="co"># CON el prefijo "ollama/"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"ollama/granite4.1:3b"</span>,   <span class="co"># CON el prefijo "ollama/"</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_active =</span> <span class="dv">1</span>,</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">params =</span> <span class="fu">params</span>(<span class="at">temperature =</span> <span class="dv">0</span>)</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>

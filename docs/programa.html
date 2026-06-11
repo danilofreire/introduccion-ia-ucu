@@ -446,17 +446,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Descargar Ollama desde <a href="https://ollama.com/download" class="uri">https://ollama.com/download</a> e instalarlo siguiendo las instrucciones para su sistema operativo</li>
 <li>Abrir una terminal y descargar el modelo que usaremos en clase. En Windows, buscar “Símbolo del sistema” o “PowerShell” en el menú de inicio; en macOS, abrir “Terminal” (está en Aplicaciones → Utilidades, o buscándola con Spotlight con <code>Cmd + Espacio</code>); en Linux, abrir la aplicación “Terminal” (en muchas distribuciones, con <code>Ctrl + Alt + T</code>). Una vez en la terminal, ejecutar:</li>
 </ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull frob/qwen3.5-instruct:4b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Es la variante <em>instruct</em> (sin razonamiento) de <code>qwen3.5</code>, la que usamos para codificar texto en los laboratorios y las tareas. Ocupa unos 3,4 GB.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull granite4.1:3b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Es <a href="https://www.ibm.com/granite">IBM Granite</a>, un modelo abierto (licencia Apache 2.0) optimizado para salida estructurada en JSON y con buen soporte multilingüe. Es el que usamos para codificar texto en los laboratorios y las tareas. Ocupa unos 2,1 GB.</p>
 <ol start="3" type="1">
-<li><p>Opcional: las diapositivas también muestran la variante con razonamiento, <code>qwen3.5:4b</code>, para chatear desde la terminal. No hace falta para los laboratorios, pero si quieren probarla, <code>ollama pull qwen3.5:4b</code> (o la versión liviana <code>qwen3.5:0.8b</code> si la computadora tiene menos de 8 GB de RAM)</p></li>
-<li><p>Para verificar que el modelo quedó descargado, ejecutar <code>ollama list</code>. Debería aparecer en la lista de modelos instalados:</p></li>
+<li>Para verificar que el modelo quedó descargado, ejecutar <code>ollama list</code>. Debería aparecer en la lista de modelos instalados:</li>
 </ol>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> list</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<ol start="5" type="1">
+<ol start="4" type="1">
 <li>Para comprobar que el modelo responde, ejecutar en la terminal:</li>
 </ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> run frob/qwen3.5-instruct:4b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> run granite4.1:3b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Escribir una pregunta cualquiera y, para salir, escribir <code>/bye</code>. Mientras Ollama esté instalado y abierto, R podrá conectarse al modelo durante el laboratorio.</p>
 </section>
 <section id="clave-de-api-de-openrouter" class="level3">
