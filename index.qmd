@@ -128,7 +128,7 @@ Cada jornada combina exposición teórica con laboratorios prácticos en R. Las 
 
 [Sesión 5.2: Ética y regulación. Sesgo algorítmico, equidad, privacidad.]{.day-topics}
 
-[Sesión 5.4: Mini-propuestas de investigación y presentaciones.]{.day-topics}
+[Sesión 5.4: Mini-propuestas de investigación y cierre del curso.]{.day-topics}
 
 ::: {.resource-links}
 [Sesión 5.1: Modelos locales](clases/dia-05/17-modelos-locales.html) |

@@ -193,6 +193,6 @@ Para los Días 4 y 5 también necesitan [Ollama](https://ollama.com/download) in
 ollama pull frob/qwen3.5-instruct:4b
 ```
 
-Consulten la pestaña [Programa](programa.qmd) para las instrucciones de instalación paso a paso.
+Consulten la sección [Software necesario](programa.qmd#software-necesario) de la pestaña Programa para las instrucciones de instalación paso a paso.
 
 Se enviarán instrucciones detalladas de instalación por correo electrónico antes del inicio del curso.
