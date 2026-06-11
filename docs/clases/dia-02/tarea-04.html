@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -162,6 +162,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -243,10 +247,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="instrucciones" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="instrucciones"><span class="header-section-number">1</span> Instrucciones</h2>
-<p>Esta tarea usa el mismo dataset del Laboratorio 4 (<code>latinobarometro_sim.csv</code>). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
+<p>Esta tarea usa un dataset <span class="alert">nuevo</span>, distinto del que vimos en el Laboratorio 4: <code>desempeno_escuelas.csv</code>, con 400 escuelas simuladas. La variable de resultado es <code>puntaje_prueba</code> (el puntaje promedio de cada escuela en una prueba estandarizada, escala tipo PISA) y hay predictores numéricos y categóricos. Las técnicas son las del laboratorio (OLS, LASSO, Ridge, Elastic Net), pero los datos son otros, así que las respuestas también lo serán. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
 <p><strong>Para trabajar en esta tarea:</strong></p>
 <ol type="1">
-<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>latinobarometro_sim.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code></li>
+<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>desempeno_escuelas.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code>. Mantengan el CSV en una subcarpeta <code>datos/</code> junto al <code>.qmd</code></li>
 <li>Necesitan <a href="https://quarto.org/docs/get-started/">Quarto</a> instalado junto con RStudio. Las versiones recientes de RStudio (&gt;= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <a href="https://quarto.org/docs/get-started/" class="uri">https://quarto.org/docs/get-started/</a></li>
 <li>Abran este archivo <code>.qmd</code> en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)</li>
 <li>Cuando terminen, pueden renderizar el documento completo con el botón “Render” en RStudio</li>
@@ -258,17 +262,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/latinobarometro_sim.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/desempeno_escuelas.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">pais =</span> <span class="fu">factor</span>(pais),</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">zona =</span> <span class="fu">factor</span>(zona),</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">genero =</span> <span class="fu">factor</span>(genero),</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">uso_internet =</span> <span class="fu">factor</span>(uso_internet, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"nunca"</span>, <span class="st">"semanal"</span>, <span class="st">"diario"</span>))</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">departamento =</span> <span class="fu">factor</span>(departamento),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">sector =</span> <span class="fu">factor</span>(sector),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">zona =</span> <span class="fu">factor</span>(zona)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -276,7 +279,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="2" class="anchored" data-anchor-id="exploración"><span class="header-section-number">2</span> Exploración</h2>
 <section id="pregunta-1-resumen-del-dataset" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-del-dataset"><span class="header-section-number">2.1</span> Pregunta 1: Resumen del dataset</h3>
-<p>Calculen la media y desviación estándar de <code>satisfaccion_vida</code> por país. Ordenen los resultados de mayor a menor media. ¿Cuál país tiene la mayor satisfacción promedio? ¿Cuál tiene la menor?</p>
+<p>Calculen la media y desviación estándar de <code>puntaje_prueba</code> por departamento. Ordenen los resultados de mayor a menor media. ¿Cuál departamento tiene el mejor puntaje promedio? ¿Las diferencias entre departamentos son grandes comparadas con la desviación estándar dentro de cada uno?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -284,15 +287,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-2-correlaciones-con-la-variable-objetivo" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-correlaciones-con-la-variable-objetivo"><span class="header-section-number">2.2</span> Pregunta 2: Correlaciones con la variable objetivo</h3>
-<p>Calculen la correlación entre <code>satisfaccion_vida</code> y todas las variables numéricas del dataset (<code>edad</code>, <code>educacion_anios</code>, <code>ingreso_hogar</code>, <code>confianza_gobierno</code>, <code>confianza_justicia</code>, <code>satisfaccion_democracia</code>, <code>percepcion_economia</code>, <code>interes_politica</code>). ¿Cuáles dos variables tienen la mayor correlación con la satisfacción? ¿Son positivas o negativas?</p>
+<p>Calculen la correlación entre <code>puntaje_prueba</code> y todas las variables numéricas del dataset. ¿Cuáles dos variables tienen la mayor correlación con el puntaje? ¿Alguna correlación tiene un signo que les sorprenda?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-3-distribución-por-zona" class="level3" data-number="2.3">
-<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-distribución-por-zona"><span class="header-section-number">2.3</span> Pregunta 3: Distribución por zona</h3>
-<p>Creen un boxplot que muestre la distribución de <code>satisfaccion_vida</code> separada por <code>zona</code> (urbana/rural). Agreguen <code>labs()</code> con título y etiquetas claras. ¿Hay diferencia entre zonas?</p>
+<section id="pregunta-3-distribución-por-sector" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-distribución-por-sector"><span class="header-section-number">2.3</span> Pregunta 3: Distribución por sector</h3>
+<p>Creen un boxplot que muestre la distribución de <code>puntaje_prueba</code> separada por <code>sector</code> (público/privado). Agreguen <code>labs()</code> con título y etiquetas claras. ¿Hay diferencia entre sectores? ¿Esa diferencia bruta prueba que las escuelas privadas “enseñan mejor”?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -303,7 +306,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="3" class="anchored" data-anchor-id="modelo-baseline"><span class="header-section-number">3</span> Modelo baseline</h2>
 <section id="pregunta-4-división-de-datos-y-receta" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-división-de-datos-y-receta"><span class="header-section-number">3.1</span> Pregunta 4: División de datos y receta</h3>
-<p>Dividan los datos en 75% entrenamiento y 25% prueba con <code>set.seed(2026)</code>. Creen una receta que: (a) excluya <code>voto</code> y <code>pais</code>, (b) convierta las variables categóricas en dummies, (c) normalice los predictores numéricos, y (d) elimine predictores con varianza cero. ¿Cuántos predictores tiene la receta preparada?</p>
+<p>Dividan los datos en 80% entrenamiento y 20% prueba con <code>set.seed(2026)</code>. Creen una receta que: (a) excluya <code>escuela</code> (es un identificador, no un predictor), (b) convierta las variables categóricas en dummies, (c) normalice los predictores numéricos, y (d) elimine predictores con varianza cero. ¿Cuántos predictores tiene la receta preparada?</p>
+<p><em>Pista:</em> para excluir el identificador pueden usar <code>step_rm()</code> dentro de la receta.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -311,7 +315,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-5-modelo-ols" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-modelo-ols"><span class="header-section-number">3.2</span> Pregunta 5: Modelo OLS</h3>
-<p>Ajusten un modelo de regresión lineal (OLS) con <code>linear_reg()</code> usando la receta de la pregunta 4. Extraigan los coeficientes con <code>tidy()</code> y ordénenlos por valor absoluto. ¿Cuál es el predictor más importante? ¿Cuál es el menos importante?</p>
+<p>Ajusten un modelo de regresión lineal (OLS) con <code>linear_reg()</code> usando la receta de la pregunta 4. Extraigan los coeficientes con <code>tidy()</code> y ordénenlos por valor absoluto. ¿Cuál es el predictor más importante? ¿El signo de <code>tamano_clase</code> va en la dirección esperada?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -319,7 +323,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-6-evaluar-ols" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-evaluar-ols"><span class="header-section-number">3.3</span> Pregunta 6: Evaluar OLS</h3>
-<p>Generen predicciones del modelo OLS en el conjunto de prueba y calculen RMSE, R² y MAE con <code>metrics()</code>. ¿Qué porcentaje de la variación en satisfacción explica el modelo (R²)?</p>
+<p>Generen predicciones del modelo OLS en el conjunto de prueba y calculen RMSE, R² y MAE con <code>metrics()</code>. ¿Qué porcentaje de la variación en los puntajes explica el modelo (R²)? ¿Un RMSE de esa magnitud es grande o chico en la escala de la prueba?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -330,7 +334,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="4" class="anchored" data-anchor-id="lasso"><span class="header-section-number">4</span> LASSO</h2>
 <section id="pregunta-7-tuning-de-lasso" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-tuning-de-lasso"><span class="header-section-number">4.1</span> Pregunta 7: Tuning de LASSO</h3>
-<p>Definan un modelo LASSO (<code>mixture = 1</code>) con <code>penalty = tune()</code>. Creen una grilla de 30 valores de lambda entre 10^-4 y 10^0. Usen validación cruzada con 10 folds para encontrar el lambda óptimo. ¿Cuál es el mejor lambda según RMSE?</p>
+<p>Definan un modelo LASSO (<code>mixture = 1</code>) con <code>penalty = tune()</code>. Creen una grilla de 40 valores de lambda entre 10^-3 y 10^0.5, y usen validación cruzada con <span class="alert">5 folds</span> para encontrar el lambda óptimo. ¿Cuál es el mejor lambda según RMSE?</p>
+<p><em>Pista:</em> el rango de <code>penalty()</code> se da en exponentes de base 10: <code>range = c(-3, 0.5)</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -339,7 +344,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-8-lambda-mínimo-vs.-1se" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-lambda-mínimo-vs.-1se"><span class="header-section-number">4.2</span> Pregunta 8: Lambda mínimo vs.&nbsp;1SE</h3>
 <p>Comparen el lambda que minimiza el RMSE (<code>select_best()</code>) con el lambda 1SE (<code>select_by_one_std_err()</code>). ¿Cuál es más grande? ¿Cuántas veces más grande? ¿Qué implica usar el lambda 1SE para la complejidad del modelo?</p>
-<p><em>Pista:</em> usen <code>select_by_one_std_err()</code> sobre los resultados del tuning. Necesita la métrica (<code>"rmse"</code>) y la dirección en la que ordenar el <code>penalty</code>: piensen si quieren el lambda más grande o más pequeño dentro de un error estándar del mínimo.</p>
+<p><em>Pista:</em> <code>select_by_one_std_err()</code> necesita la métrica (<code>"rmse"</code>) y la dirección en la que ordenar el <code>penalty</code>: piensen si quieren el lambda más grande o más pequeño dentro de un error estándar del mínimo.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -347,7 +352,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-9-variables-eliminadas-por-lasso" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-9-variables-eliminadas-por-lasso"><span class="header-section-number">4.3</span> Pregunta 9: Variables eliminadas por LASSO</h3>
-<p>Ajusten el modelo LASSO final con el lambda mínimo. ¿Cuántas variables elimina LASSO (coeficiente = 0)? ¿Cuáles son? ¿Por qué creen que LASSO las considera poco útiles?</p>
+<p>Ajusten el modelo LASSO final con el lambda mínimo. ¿Cuántos predictores elimina LASSO (coeficiente = 0)? ¿Cuáles? Miren en particular <code>computadoras_alumno</code> y <code>horas_semanales</code>: ¿por qué creen que LASSO las considera poco útiles, si las computadoras “suenan” importantes para el aprendizaje?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -358,7 +363,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="5" class="anchored" data-anchor-id="ridge-y-elastic-net"><span class="header-section-number">5</span> Ridge y Elastic Net</h2>
 <section id="pregunta-10-comparar-coeficientes-ridge-vs.-lasso" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-10-comparar-coeficientes-ridge-vs.-lasso"><span class="header-section-number">5.1</span> Pregunta 10: Comparar coeficientes Ridge vs.&nbsp;LASSO</h3>
-<p>Ajusten un modelo Ridge (<code>mixture = 0</code>) con tuning de lambda usando la misma grilla y los mismos folds. Comparen los coeficientes de Ridge con los de LASSO. ¿Cuál de los dos tiene coeficientes más grandes en promedio? ¿Por qué?</p>
+<p>Ajusten un modelo Ridge (<code>mixture = 0</code>) con tuning de lambda usando la misma grilla y los mismos folds. Comparen los coeficientes de Ridge con los de LASSO. ¿Cuántos coeficientes deja exactamente en cero cada método? ¿Qué hace Ridge con los predictores que LASSO elimina?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -366,7 +371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-11-elastic-net-con-dos-hiperparámetros" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-11-elastic-net-con-dos-hiperparámetros"><span class="header-section-number">5.2</span> Pregunta 11: Elastic Net con dos hiperparámetros</h3>
-<p>Ajusten un Elastic Net con tuning de <code>penalty</code> y <code>mixture</code>. Usen una grilla de 15 lambdas y 5 valores de mixture. ¿Cuál es la mejor combinación? ¿El mixture óptimo se acerca más a LASSO (1) o a Ridge (0)?</p>
+<p>Ajusten un Elastic Net con tuning de <code>penalty</code> y <code>mixture</code>. Usen una grilla de 15 lambdas y 5 valores de mixture. ¿Cuál es la mejor combinación? ¿El mixture óptimo se acerca más a LASSO (1) o a Ridge (0)? ¿Qué les dice eso sobre la estructura de este dataset?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -377,7 +382,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="6" class="anchored" data-anchor-id="comparación"><span class="header-section-number">6</span> Comparación</h2>
 <section id="pregunta-12-tabla-comparativa" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-tabla-comparativa"><span class="header-section-number">6.1</span> Pregunta 12: Tabla comparativa</h3>
-<p>Generen predicciones en el conjunto de prueba para OLS, LASSO, Ridge, Elastic Net y Random Forest (con <code>trees = 500</code>, <code>mtry = tune()</code>, <code>min_n = tune()</code>). Combinen las métricas en una tabla y ordénenla por RMSE. ¿Cuál modelo tiene el mejor RMSE? ¿Cuál tiene el mejor R²?</p>
+<p>Generen predicciones en el conjunto de prueba para OLS, LASSO, Ridge, Elastic Net y Random Forest (con <code>trees = 500</code>, <code>mtry = tune()</code>, <code>min_n = tune()</code>). Combinen las métricas en una tabla y ordénenla por RMSE. ¿Cuál modelo tiene el mejor RMSE? ¿La diferencia entre el mejor y el peor es grande en términos prácticos?</p>
 <p><em>Pista:</em> Random Forest para regresión usa la misma <code>rand_forest()</code> del Laboratorio 3, pero con <code>set_mode("regression")</code> en lugar de clasificación. Los hiperparámetros a tunear son <code>mtry</code> y <code>min_n</code> (con <code>trees</code> fijo).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -390,7 +395,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>¿En este dataset, la regularización mejora mucho respecto a OLS? ¿Por qué sí o por qué no?</li>
 <li>¿En qué situaciones sería más útil LASSO que Ridge? ¿Y viceversa?</li>
-<li>Si tuvieran que presentar resultados a un tomador de decisiones que no sabe estadística, ¿cuál modelo elegirían y por qué?</li>
+<li>El ministerio de educación quiere usar el modelo para decidir a qué escuelas mandar más presupuesto. ¿Qué problema tiene usar un modelo predictivo para esa decisión causal? Piensen en la Pregunta 3</li>
 </ol>
 <p><strong>Respuesta:</strong></p>
 

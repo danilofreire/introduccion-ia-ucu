@@ -100,7 +100,7 @@ Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(2026)` y estra
 
 ### Pregunta 5: Coeficientes e interpretación
 
-Usando el modelo logístico completo (con todos los predictores del laboratorio), extraigan los coeficientes con `tidy()` y calculen los odds ratios (`exp(estimate)`). ¿Cuál variable tiene el efecto más fuerte sobre la probabilidad de votar? ¿Cuál tiene un efecto negativo?
+Usando el [modelo reducido de la pregunta 4]{.alert} (edad, educación e interés político), extraigan los coeficientes con `tidy()` y calculen los odds ratios (`exp(estimate)`). ¿Cuál de los tres predictores tiene el efecto más fuerte sobre la probabilidad de votar? ¿Los signos van en la dirección que esperarían teóricamente?
 
 *Pista:* presten atención a cómo definimos los niveles de `voto` en la configuración (`c("si", "no")`). R modela la probabilidad del segundo nivel, así que verifiquen en qué dirección apunta cada coeficiente antes de interpretarlo: un signo puede significar lo contrario de lo que parece a primera vista.
 
@@ -137,9 +137,11 @@ En el laboratorio usamos `grid_regular()` para crear la grilla de búsqueda. Aho
 
 **Respuesta:**
 
-### Pregunta 8: Más folds de validación cruzada
+### Pregunta 8: ¿La validación cruzada predice el desempeño real?
 
-Repitan el tuning de Random Forest del laboratorio pero con 20 folds en vez de 10. ¿El mejor modelo tiene los mismos hiperparámetros? ¿El error estándar (`std_err`) de las métricas es menor con más folds?
+La validación cruzada estima el desempeño usando [sólo los datos de entrenamiento]{.alert}. Tomen la mejor combinación de hiperparámetros de la grilla regular (pregunta 7), finalicen el workflow, ajústenlo sobre todo el conjunto de entrenamiento y calculen el AUC sobre el conjunto de prueba. Comparen ese AUC con la estimación de la validación cruzada (media ± 2 errores estándar de `show_best()`). ¿La validación cruzada fue optimista, pesimista o acertada? ¿Por qué es importante que el conjunto de prueba no participe del tuning?
+
+*Pista:* el flujo es el mismo del final del laboratorio: `finalize_workflow()`, ajustar sobre los datos de entrenamiento, predecir sobre los de prueba.
 
 ```{r p8}
 # Escriban su código aquí

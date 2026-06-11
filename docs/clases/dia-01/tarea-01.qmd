@@ -15,11 +15,11 @@ engine: knitr
 
 ## Instrucciones
 
-Esta tarea usa el mismo dataset del Laboratorio 1 (`indicadores_mundiales.csv`). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
+Esta tarea usa un dataset [nuevo]{.alert}, distinto del que vimos en el Laboratorio 1: `desarrollo_municipios.csv`, con 300 municipios latinoamericanos simulados. El flujo de trabajo es el mismo del laboratorio (explorar, dividir, ajustar, evaluar), pero los datos son otros, así que las respuestas también lo serán. La variable de resultado es `desarrollo_alto` (si/no) y hay 8 predictores numéricos. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
 
 **Para trabajar en esta tarea:**
 
-1. Descarguen este archivo `.qmd` y el dataset `indicadores_mundiales.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+1. Descarguen este archivo `.qmd` y el dataset `desarrollo_municipios.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`. Mantengan el CSV en una subcarpeta `datos/` junto al `.qmd`
 2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <https://quarto.org/docs/get-started/>
 3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)
 4. Cuando terminen, pueden renderizar el documento completo con el botón "Render" en RStudio
@@ -30,17 +30,19 @@ Esta tarea usa el mismo dataset del Laboratorio 1 (`indicadores_mundiales.csv`).
 library(tidymodels)
 library(tidyverse)
 
-datos <- read_csv("datos/indicadores_mundiales.csv")
+datos <- read_csv("datos/desarrollo_municipios.csv", show_col_types = FALSE)
 
 datos <- datos |>
-  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si")))
+  mutate(desarrollo_alto = factor(desarrollo_alto, levels = c("no", "si")))
 ```
+
+Las columnas `municipio` (el identificador) y `pais` no entran en los modelos: cuando llegue el momento de modelar, sáquenlas con `select()`.
 
 ## Exploración y preprocesamiento
 
-### Pregunta 1: Resumen por continente
+### Pregunta 1: Resumen por país
 
-Calculen la media de `acceso_internet` y `inflacion` por continente. ¿Qué continente tiene el mayor acceso promedio a internet? ¿Cuál tiene la inflación más alta?
+Calculen la media de `ingreso_promedio` y `acceso_agua` por país. ¿Qué país tiene los municipios más ricos en promedio? ¿El ranking de agua coincide con el de ingreso?
 
 ```{r p1}
 # Escriban su código aquí
@@ -51,7 +53,7 @@ Calculen la media de `acceso_internet` y `inflacion` por continente. ¿Qué cont
 
 ### Pregunta 2: Visualización de distribuciones
 
-Creen un histograma de `indice_gobierno_digital` usando `ggplot2`. Agreguen una línea vertical en la mediana con `geom_vline()`. ¿La distribución es simétrica o sesgada?
+Creen un histograma de `escolaridad_media` usando `ggplot2`. Agreguen una línea vertical en la mediana con `geom_vline()`. ¿La distribución es simétrica o sesgada? Hagan lo mismo con `poblacion`: ¿qué diferencia notan entre las dos distribuciones?
 
 ```{r p2}
 # Escriban su código aquí
@@ -62,7 +64,7 @@ Creen un histograma de `indice_gobierno_digital` usando `ggplot2`. Agreguen una 
 
 ### Pregunta 3: Correlaciones
 
-Calculen la matriz de correlaciones entre las 8 variables numéricas. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)? ¿Tiene sentido teórico?
+Calculen la matriz de correlaciones entre los 8 predictores numéricos. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)? ¿Tiene sentido teórico?
 
 ```{r p3}
 # Escriban su código aquí
@@ -75,7 +77,7 @@ Calculen la matriz de correlaciones entre las 8 variables numéricas. ¿Cuáles 
 
 ### Pregunta 4: División estratificada
 
-Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `crecimiento_alto`. Usen `set.seed(42)`. ¿Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de `"si"` y `"no"` son similares en ambos.
+Saquen `municipio` y `pais`, y dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `desarrollo_alto`. Usen `set.seed(42)`. ¿Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de `"si"` y `"no"` son similares en ambos.
 
 ```{r p4}
 # Escriban su código aquí
@@ -86,9 +88,9 @@ Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `c
 
 ### Pregunta 5: La línea base
 
-Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba de la pregunta anterior, calculen la accuracy de un "modelo" que siempre predice la clase mayoritaria de `crecimiento_alto` (sin usar ningún predictor). ¿Cuál es esa accuracy?
+Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba de la pregunta anterior, calculen la accuracy de un "modelo" que siempre predice la clase mayoritaria de `desarrollo_alto` (sin usar ningún predictor). ¿Cuál es esa accuracy?
 
-*Pista:* la respuesta sale de las proporciones de `crecimiento_alto` en el conjunto de prueba.
+*Pista:* la respuesta sale de las proporciones de `desarrollo_alto` en el conjunto de prueba.
 
 ```{r p5}
 # Escriban su código aquí
@@ -99,7 +101,7 @@ Antes de entrenar nada, un modelo útil tiene que superar a una predicción triv
 
 ### Pregunta 6: ¿Cuánto mejora el modelo completo?
 
-Ajusten el modelo logístico completo con los 8 predictores (como en el laboratorio). Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente "adivinar" la clase mayoritaria?
+Ajusten el modelo logístico completo con los 8 predictores. Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente "adivinar" la clase mayoritaria?
 
 ```{r p6}
 # Escriban su código aquí
@@ -123,7 +125,7 @@ Usando el modelo completo, generen predicciones sobre el conjunto de prueba y co
 
 ### Pregunta 8: Precisión vs. recall
 
-Calculen precisión y recall (con `event_level = "second"`) para el modelo completo. Si este modelo se usara para decidir en qué países invertir (donde un falso positivo significa invertir en un país que no crece), ¿qué métrica priorizarían? Justifiquen.
+Calculen precisión y recall (con `event_level = "second"`) para el modelo completo. Contexto: una agencia de cooperación usa el modelo para decidir qué municipios "se gradúan" de un programa de subsidios (si el modelo predice `desarrollo_alto = "si"`, el municipio deja de recibir fondos). Un falso positivo significa cortarle los fondos a un municipio que todavía los necesita. ¿Qué métrica priorizarían en este escenario? Justifiquen.
 
 ```{r p8}
 # Escriban su código aquí
@@ -134,7 +136,7 @@ Calculen precisión y recall (con `event_level = "second"`) para el modelo compl
 
 ### Pregunta 9: Efecto del umbral
 
-Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de inversión de la pregunta anterior?
+Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de los subsidios de la pregunta anterior?
 
 Para no copiar y pegar el mismo cálculo cinco veces, usamos `map_df()` del paquete `purrr` (parte de `tidyverse`). `map_df()` toma una lista de valores, aplica la misma función a cada uno y junta todos los resultados en una sola tabla. Acá la lista son los cinco umbrales; por cada umbral `u` recalculamos la clase predicha y medimos precisión y recall. Usen esta estructura y completen las dos líneas marcadas con `___`:
 
@@ -148,7 +150,7 @@ tabla_umbrales <- map_df(umbrales, function(u) {
                             levels = c("no", "si"))) |>
     summarise(
       umbral    = u,
-      precision = ___,   # precision_vec() sobre crecimiento_alto y .pred_u, con event_level = "second"
+      precision = ___,   # precision_vec() sobre desarrollo_alto y .pred_u, con event_level = "second"
       recall    = ___    # lo mismo con recall_vec()
     )
 })
@@ -178,7 +180,7 @@ Grafiquen la curva ROC y calculen el AUC del modelo completo. Recuerden usar `ev
 
 ### Pregunta 11: Validación cruzada con 10 folds
 
-Realicen validación cruzada con **10 folds** (en vez de 5) sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. ¿Cómo se compara con los resultados de 5 folds del laboratorio?
+Realicen validación cruzada con **10 folds** sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. ¿La accuracy que obtuvieron en el conjunto de prueba (Pregunta 6) cae dentro del rango que sugiere la validación cruzada (media ± 2 errores estándar)?
 
 ```{r p11}
 # Escriban su código aquí
@@ -204,13 +206,12 @@ Ajusten un modelo que use solo los 4 predictores con p-valor más bajo en el mod
 
 ### Pregunta 13: Variables sin efecto
 
-En el modelo completo, `urbanizacion` y `gasto_salud` no son significativas (p > 0.05). Sin embargo, ambas se correlacionan positivamente con `crecimiento_alto` en un análisis bivariado simple. Expliquen por qué una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotético de la vida real.
+En el modelo completo, `acceso_electricidad` y `poblacion` no son significativas (p > 0.05). Sin embargo, ambas se correlacionan positivamente con `desarrollo_alto` en un análisis bivariado simple (verifíquenlo si quieren). Expliquen por qué una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotético de la vida real.
 
 **Respuesta:**
 
 ### Pregunta 14: ¿Recomendarían este modelo?
 
-Sin escribir código nuevo, junten lo que ya calcularon (línea base, accuracy, precisión, recall, AUC, validación cruzada). Imaginen que un organismo les pide una recomendación: ¿usarían este modelo para decidir en qué países invertir? Argumenten a favor o en contra citando al menos una métrica con su valor, y digan qué error les preocuparía más (un falso positivo o un falso negativo) y por qué.
+Sin escribir código nuevo, junten lo que ya calcularon (línea base, accuracy, precisión, recall, AUC, validación cruzada). Imaginen que la agencia de cooperación les pide una recomendación: ¿usarían este modelo para decidir qué municipios se gradúan del programa de subsidios? Argumenten a favor o en contra citando al menos una métrica con su valor, y digan qué error les preocuparía más (un falso positivo o un falso negativo) y por qué.
 
 **Respuesta:**
-

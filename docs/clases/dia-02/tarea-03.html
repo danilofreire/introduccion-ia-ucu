@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -161,6 +161,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
   </li>  
     </ul>
   </li>
@@ -317,7 +321,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-5-coeficientes-e-interpretación" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-coeficientes-e-interpretación"><span class="header-section-number">3.2</span> Pregunta 5: Coeficientes e interpretación</h3>
-<p>Usando el modelo logístico completo (con todos los predictores del laboratorio), extraigan los coeficientes con <code>tidy()</code> y calculen los odds ratios (<code>exp(estimate)</code>). ¿Cuál variable tiene el efecto más fuerte sobre la probabilidad de votar? ¿Cuál tiene un efecto negativo?</p>
+<p>Usando el <span class="alert">modelo reducido de la pregunta 4</span> (edad, educación e interés político), extraigan los coeficientes con <code>tidy()</code> y calculen los odds ratios (<code>exp(estimate)</code>). ¿Cuál de los tres predictores tiene el efecto más fuerte sobre la probabilidad de votar? ¿Los signos van en la dirección que esperarían teóricamente?</p>
 <p><em>Pista:</em> presten atención a cómo definimos los niveles de <code>voto</code> en la configuración (<code>c("si", "no")</code>). R modela la probabilidad del segundo nivel, así que verifiquen en qué dirección apunta cada coeficiente antes de interpretarlo: un signo puede significar lo contrario de lo que parece a primera vista.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -344,9 +348,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-8-más-folds-de-validación-cruzada" class="level3" data-number="4.3">
-<h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-8-más-folds-de-validación-cruzada"><span class="header-section-number">4.3</span> Pregunta 8: Más folds de validación cruzada</h3>
-<p>Repitan el tuning de Random Forest del laboratorio pero con 20 folds en vez de 10. ¿El mejor modelo tiene los mismos hiperparámetros? ¿El error estándar (<code>std_err</code>) de las métricas es menor con más folds?</p>
+<section id="pregunta-8-la-validación-cruzada-predice-el-desempeño-real" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-8-la-validación-cruzada-predice-el-desempeño-real"><span class="header-section-number">4.3</span> Pregunta 8: ¿La validación cruzada predice el desempeño real?</h3>
+<p>La validación cruzada estima el desempeño usando <span class="alert">sólo los datos de entrenamiento</span>. Tomen la mejor combinación de hiperparámetros de la grilla regular (pregunta 7), finalicen el workflow, ajústenlo sobre todo el conjunto de entrenamiento y calculen el AUC sobre el conjunto de prueba. Comparen ese AUC con la estimación de la validación cruzada (media ± 2 errores estándar de <code>show_best()</code>). ¿La validación cruzada fue optimista, pesimista o acertada? ¿Por qué es importante que el conjunto de prueba no participe del tuning?</p>
+<p><em>Pista:</em> el flujo es el mismo del final del laboratorio: <code>finalize_workflow()</code>, ajustar sobre los datos de entrenamiento, predecir sobre los de prueba.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>

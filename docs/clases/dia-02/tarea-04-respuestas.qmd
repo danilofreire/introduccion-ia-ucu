@@ -25,14 +25,13 @@ library(tidyverse)
 library(glmnet)
 library(ranger)
 
-datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+datos <- read_csv("datos/desempeno_escuelas.csv", show_col_types = FALSE)
 
 datos <- datos |>
   mutate(
-    pais = factor(pais),
-    zona = factor(zona),
-    genero = factor(genero),
-    uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario"))
+    departamento = factor(departamento),
+    sector = factor(sector),
+    zona = factor(zona)
   )
 
 set.seed(2026)
@@ -42,215 +41,200 @@ set.seed(2026)
 
 ### Pregunta 1: Resumen del dataset
 
-Calculen la media y desviación estándar de `satisfaccion_vida` por país.
+Calculen la media y desviación estándar de `puntaje_prueba` por departamento. ¿Las diferencias entre departamentos son grandes comparadas con la variación dentro de cada uno?
 
 ```{r p1}
-resumen_pais <- datos |>
-  group_by(pais) |>
+datos |>
+  group_by(departamento) |>
   summarise(
-    media = round(mean(satisfaccion_vida), 2),
-    sd = round(sd(satisfaccion_vida), 2),
-    n = n()
+    escuelas = n(),
+    media = round(mean(puntaje_prueba), 1),
+    sd = round(sd(puntaje_prueba), 1)
   ) |>
   arrange(desc(media))
-
-resumen_pais
 ```
 
-**Respuesta:** En esta muestra, México tiene la mayor satisfacción promedio (≈ 7.07) y El Salvador la menor (≈ 6.20), aunque la diferencia entre el primero y el último es de menos de un punto en una escala de 1 a 10 y cada país tiene pocas observaciones (entre 15 y 38), así que conviene no sobreinterpretar el ranking. La satisfacción con la vida varía entre países, lo cual es esperable dado que refleja diferencias en condiciones socioeconómicas, confianza institucional y otras variables contextuales. Estas diferencias son en parte producto de la simulación, pero representan patrones que se observan en datos reales de Latinobarómetro: países con mejores indicadores económicos y mayor confianza institucional tienden a reportar mayor satisfacción.
+**Respuesta:** Colonia y Montevideo encabezan el ranking (~529 puntos) y Tacuarembó queda último (~510). Pero la diferencia entre el mejor y el peor departamento (~19 puntos) es **menos de la mitad** de la desviación estándar dentro de cualquier departamento (~38-49 puntos). La variación importante está *dentro* de los departamentos, entre escuelas, no entre departamentos. Esto anticipa que las dummies de departamento van a aportar poco al modelo (y de hecho LASSO las elimina casi todas en la Pregunta 9).
 
 ### Pregunta 2: Correlaciones con la variable objetivo
 
-Calculen la correlación entre `satisfaccion_vida` y todas las variables numéricas.
+Calculen la correlación entre `puntaje_prueba` y todas las variables numéricas. ¿Cuáles dos tienen la mayor correlación? ¿Algún signo sorprende?
 
 ```{r p2}
-cors <- datos |>
-  select(satisfaccion_vida, edad, educacion_anios, ingreso_hogar,
-         confianza_gobierno, confianza_justicia, satisfaccion_democracia,
-         percepcion_economia, interes_politica) |>
+datos |>
+  select(where(is.numeric)) |>
   cor() |>
   as.data.frame() |>
-  select(satisfaccion_vida) |>
-  arrange(desc(abs(satisfaccion_vida)))
-
-cors
+  select(cor_con_puntaje = puntaje_prueba) |>
+  rownames_to_column("variable") |>
+  filter(variable != "puntaje_prueba") |>
+  arrange(desc(abs(cor_con_puntaje))) |>
+  mutate(cor_con_puntaje = round(cor_con_puntaje, 3))
 ```
 
-**Respuesta:** Las variables con mayor correlación con la satisfacción son `educacion_anios` (≈ 0.36) e `ingreso_hogar` (≈ 0.33), ambas positivas: las personas con más educación e ingresos reportan mayor satisfacción con la vida. Les siguen, con correlaciones moderadas y también positivas, `confianza_gobierno` (≈ 0.24) y `satisfaccion_democracia` (≈ 0.21). Es interesante que `percepcion_economia` tenga una correlación más bien débil (≈ 0.14): en este dataset, las condiciones materiales (educación e ingreso) pesan más que las percepciones subjetivas sobre la economía. La variable con menor relación es `confianza_justicia` (≈ 0.01), prácticamente nula.
+**Respuesta:** Las dos correlaciones más fuertes son **`nivel_socioeconomico`** (~0,72) y **`presupuesto_alumno`** (~0,55), seguidas de `asistencia_pct` (~0,47). Ningún signo sorprende demasiado: `tamano_clase` es negativa (clases más grandes, peores puntajes) y `horas_semanales` es prácticamente cero, un primer indicio de que esa variable no aporta nada. Vale la pena notar que `computadoras_alumno` correlaciona ~0,29 con el puntaje: parece un predictor razonable, y sin embargo LASSO la va a eliminar (Pregunta 9). La correlación bivariada y la utilidad dentro de un modelo multivariado son cosas distintas.
 
-### Pregunta 3: Distribución por zona
+### Pregunta 3: Distribución por sector
 
-Creen un boxplot de `satisfaccion_vida` por `zona`.
+Creen un boxplot de `puntaje_prueba` por `sector`. ¿La diferencia bruta prueba que las privadas "enseñan mejor"?
 
 ```{r p3}
-ggplot(datos, aes(x = zona, y = satisfaccion_vida, fill = zona)) +
-  geom_boxplot(alpha = 0.7) +
-  scale_fill_manual(values = c("#2d4563", "#e74c3c")) +
-  labs(
-    title = "Satisfacción con la vida por zona",
-    x = "Zona",
-    y = "Satisfacción (1-10)"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "none")
+#| fig-width: 6
+#| fig-height: 4
+ggplot(datos, aes(x = sector, y = puntaje_prueba, fill = sector)) +
+  geom_boxplot(show.legend = FALSE) +
+  labs(title = "Puntaje en la prueba por sector",
+       x = "Sector", y = "Puntaje promedio de la escuela") +
+  theme_minimal()
+
+datos |>
+  group_by(sector) |>
+  summarise(media = round(mean(puntaje_prueba), 1))
 ```
 
-**Respuesta:** La diferencia entre zonas urbana y rural puede ser pequeña en este dataset simulado. En datos reales de Latinoamérica, la relación entre zona y satisfacción es ambigua: las zonas urbanas suelen tener mayor acceso a servicios, pero también más desigualdad y costos de vida. El boxplot permite ver si hay diferencias en la mediana y la dispersión.
+**Respuesta:** Las escuelas privadas promedian ~545 puntos y las públicas ~512: una brecha bruta de ~33 puntos. Pero esa diferencia **no** prueba que las privadas enseñen mejor: las privadas también tienen alumnos de mayor nivel socioeconómico, más presupuesto por alumno y clases más chicas. La comparación bruta mezcla el "efecto escuela" con el efecto de a quién recibe cada escuela (sesgo de selección). De hecho, cuando el modelo multivariado controla por esas variables (Pregunta 5), la dummy de sector pierde casi toda su importancia. Volvemos sobre esto en la Pregunta 13.
 
 ## Modelo baseline
 
 ### Pregunta 4: División de datos y receta
 
-```{r p4}
-division <- initial_split(datos, prop = 0.75)
-datos_train <- training(division)
-datos_test <- testing(division)
+Dividan 80/20 con `set.seed(2026)` y creen la receta (sin `escuela`, dummies, normalización, varianza cero). ¿Cuántos predictores quedan?
 
-receta <- recipe(satisfaccion_vida ~ edad + educacion_anios + ingreso_hogar +
-                 zona + genero + confianza_gobierno + confianza_justicia +
-                 satisfaccion_democracia + percepcion_economia +
-                 uso_internet + interes_politica,
-                 data = datos_train) |>
+```{r p4}
+set.seed(2026)
+division <- initial_split(datos, prop = 0.8)
+datos_train <- training(division)
+datos_test  <- testing(division)
+
+receta <- recipe(puntaje_prueba ~ ., data = datos_train) |>
+  step_rm(escuela) |>
   step_dummy(all_nominal_predictors()) |>
   step_normalize(all_numeric_predictors()) |>
   step_zv(all_predictors())
 
-# Verificar
-receta_prep <- receta |> prep() |> juice()
-cat("Predictores:", ncol(receta_prep) - 1, "\n")
-glimpse(receta_prep)
+cat("Predictores en la receta preparada:",
+    ncol(juice(prep(receta))) - 1, "\n")
+cat("Entrenamiento:", nrow(datos_train), "| Prueba:", nrow(datos_test), "\n")
 ```
 
-**Respuesta:** La receta preparada tiene más predictores que las variables originales porque `step_dummy()` convierte las categóricas en variables binarias. Por ejemplo, `uso_internet` con 3 niveles genera 2 dummies (el nivel de referencia se omite). La normalización con `step_normalize()` centra y escala cada predictor numérico para que tenga media 0 y desviación 1. Esto es necesario para que la regularización trate todas las variables de forma equitativa: sin normalizar, variables con escalas grandes dominarían la penalización.
+**Respuesta:** Quedan **17 predictores**: los 8 numéricos originales más las dummies de `departamento` (7), `sector` (1) y `zona` (1). El identificador `escuela` sale con `step_rm()`: dejarlo entrar como predictor sería un error clásico (400 valores únicos sin ninguna información generalizable). La normalización es necesaria porque LASSO y Ridge penalizan el tamaño de los coeficientes: sin escalar, una variable medida en pesos (presupuesto) recibiría una penalización injustamente distinta que una medida en porcentaje.
 
 ### Pregunta 5: Modelo OLS
 
+Ajusten OLS con la receta de la pregunta 4. ¿Cuál es el predictor más importante? ¿El signo de `tamano_clase` va en la dirección esperada?
+
 ```{r p5}
 modelo_ols <- linear_reg() |>
-  set_engine("lm") |>
-  set_mode("regression")
+  set_engine("lm")
 
 ajuste_ols <- workflow() |>
   add_recipe(receta) |>
   add_model(modelo_ols) |>
   fit(data = datos_train)
 
-coef_ols <- tidy(ajuste_ols) |>
+tidy(ajuste_ols) |>
   filter(term != "(Intercept)") |>
-  arrange(desc(abs(estimate)))
-
-coef_ols
+  arrange(desc(abs(estimate))) |>
+  mutate(across(where(is.numeric), \(x) round(x, 2)))
 ```
 
-**Respuesta:** Los coeficientes normalizados permiten comparar directamente la importancia de cada variable. El predictor más importante (mayor coeficiente en valor absoluto) es `educacion_anios` (≈ 0.38), seguido de `satisfaccion_democracia` (≈ 0.26), `confianza_gobierno` (≈ 0.25) e `ingreso_hogar` (≈ 0.22). Es decir, pesan tanto las condiciones socioeconómicas (educación, ingreso) como la relación con las instituciones (confianza en el gobierno, satisfacción con la democracia). Los predictores menos importantes, con coeficientes cercanos a cero, son `zona` y `confianza_justicia`: aportan poca información una vez que las demás variables están en el modelo.
+**Respuesta:** Como los predictores están normalizados, los coeficientes son comparables: el más importante por lejos es **`nivel_socioeconomico`** (~+21 puntos por desviación estándar), seguido por `presupuesto_alumno` (~+12) y `asistencia_pct` (~+11). `tamano_clase` tiene coeficiente **negativo** (~-7,5), exactamente la dirección esperada: clases más grandes se asocian con peores puntajes, manteniendo lo demás constante. Noten que las dummies de departamento y la de sector quedan al fondo de la tabla, con coeficientes chicos y no significativos: una vez que controlamos por la composición de la escuela, ni el departamento ni el sector agregan mucho.
 
 ### Pregunta 6: Evaluar OLS
+
+Calculen RMSE, R² y MAE en el conjunto de prueba. ¿El RMSE es grande o chico en la escala de la prueba?
 
 ```{r p6}
 pred_ols <- augment(ajuste_ols, datos_test)
 
 metricas_ols <- pred_ols |>
-  metrics(truth = satisfaccion_vida, estimate = .pred)
+  metrics(truth = puntaje_prueba, estimate = .pred)
 
-metricas_ols
+metricas_ols |>
+  mutate(.estimate = round(.estimate, 3))
 ```
 
-**Respuesta:** El R² indica el porcentaje de la variación en satisfacción que el modelo explica. Aquí el R² es ≈ 0.26, es decir, el modelo explica alrededor del 26% de la variación, algo razonable para datos de encuestas sociales, donde la satisfacción con la vida depende de muchos factores difíciles de medir (personalidad, relaciones familiares, salud). El RMSE es ≈ 1.19: el modelo se equivoca en promedio en algo más de un punto de la escala de 1 a 10. El MAE (≈ 0.95) cuenta una historia parecida con una métrica menos sensible a los errores grandes.
+**Respuesta:** El modelo explica **~68% de la variación** en los puntajes (R² ≈ 0,68), con un RMSE de **~27 puntos**. En una escala tipo PISA (media ~520, desviación estándar ~43), errar por 27 puntos en promedio es un error moderado: suficiente para distinguir escuelas muy buenas de muy malas, pero no para rankear con precisión escuelas parecidas. Es una buena referencia para juzgar los modelos regularizados que vienen: ya sabemos que el techo predictivo de estos datos anda cerca de R² ≈ 0,7.
 
 ## LASSO
 
 ### Pregunta 7: Tuning de LASSO
 
+Definan LASSO con `penalty = tune()`, grilla de 40 lambdas entre 10^-3 y 10^0.5, y CV con 5 folds. ¿Cuál es el mejor lambda?
+
 ```{r p7}
-modelo_lasso <- linear_reg(
-  penalty = tune(),
-  mixture = 1
-) |>
-  set_engine("glmnet") |>
-  set_mode("regression")
+modelo_lasso <- linear_reg(penalty = tune(), mixture = 1) |>
+  set_engine("glmnet")
 
 wf_lasso <- workflow() |>
   add_recipe(receta) |>
   add_model(modelo_lasso)
 
-grilla_lambda <- grid_regular(
-  penalty(range = c(-4, 0)),
-  levels = 30
-)
+grilla_lambda <- grid_regular(penalty(range = c(-3, 0.5)), levels = 40)
 
-folds <- vfold_cv(datos_train, v = 10)
+set.seed(2026)
+folds <- vfold_cv(datos_train, v = 5)
 
 resultados_lasso <- tune_grid(
   wf_lasso,
   resamples = folds,
-  grid = grilla_lambda,
-  metrics = metric_set(rmse, rsq, mae)
+  grid = grilla_lambda
 )
 
-lambda_min <- select_best(resultados_lasso, metric = "rmse")
-cat("Mejor lambda:\n")
-print(lambda_min)
-
-autoplot(resultados_lasso) +
-  scale_x_log10() +
-  theme_minimal() +
-  labs(title = "Tuning de LASSO: RMSE vs. penalty")
+show_best(resultados_lasso, metric = "rmse", n = 5) |>
+  mutate(across(where(is.numeric), \(x) round(x, 4)))
 ```
 
-**Respuesta:** El lambda óptimo es el valor que minimiza el RMSE en la validación cruzada (≈ 0.03 en nuestra corrida). Valores de lambda muy pequeños (cercanos a 0) producen un modelo similar a OLS, mientras que valores muy grandes eliminan todas las variables. El gráfico de autoplot muestra la curva típica en U: el RMSE baja al principio (la regularización reduce el sobreajuste) y luego sube (demasiada penalización elimina señal útil).
+**Respuesta:** El mejor lambda según RMSE es **~1,1**. Vale la pena mirar la tabla: hay varios lambdas vecinos con RMSE casi idéntico, lo que es típico. La curva de RMSE contra lambda suele ser plana cerca del mínimo, así que la elección exacta importa menos que el orden de magnitud. Lo que sí castiga fuerte el RMSE son los lambdas muy grandes, que aplastan todos los coeficientes hacia cero.
 
 ### Pregunta 8: Lambda mínimo vs. 1SE
 
-```{r p8}
-lambda_1se <- select_by_one_std_err(
-  resultados_lasso,
-  metric = "rmse",
-  desc(penalty)
-)
+Comparen `select_best()` con `select_by_one_std_err()`. ¿Cuál lambda es más grande? ¿Qué implica para la complejidad del modelo?
 
-cat("Lambda mínimo:\n")
-print(lambda_min)
-cat("\nLambda 1SE:\n")
-print(lambda_1se)
-cat("\nDiferencia:", round(lambda_1se$penalty / lambda_min$penalty, 1), "veces más grande")
+```{r p8}
+lambda_min <- select_best(resultados_lasso, metric = "rmse")
+lambda_1se <- select_by_one_std_err(resultados_lasso, metric = "rmse",
+                                    desc(penalty))
+
+cat("Lambda mínimo:", round(lambda_min$penalty, 4), "\n")
+cat("Lambda 1SE:", round(lambda_1se$penalty, 4), "\n")
+cat("Razón 1SE / mínimo:",
+    round(lambda_1se$penalty / lambda_min$penalty, 1), "\n")
 ```
 
-**Respuesta:** El lambda 1SE (≈ 0.15) es alrededor de 5 veces más grande que el lambda mínimo (≈ 0.03), lo que produce un modelo más simple (más coeficientes eliminados). La regla 1SE dice: "elijamos el modelo más simple cuyo error esté dentro de un error estándar del mínimo". La lógica es que si dos modelos tienen rendimiento estadísticamente similar, preferimos el más simple (principio de parsimonia). Esto es útil cuando queremos un modelo más interpretable o cuando sospechamos que el lambda mínimo podría sobreajustar ligeramente.
+**Respuesta:** El lambda 1SE (~3,2) es casi **3 veces más grande** que el lambda mínimo (~1,1). La lógica de la regla 1SE: si varios lambdas rinden estadísticamente igual (dentro de un error estándar del mínimo), conviene elegir el más grande, porque penaliza más y produce un modelo **más simple**, con más coeficientes en cero. Es la versión regularizada del principio de parsimonia: ante igual desempeño, el modelo con menos variables. El costo es aceptar un RMSE nominalmente un poco peor a cambio de un modelo más interpretable y robusto.
 
 ### Pregunta 9: Variables eliminadas por LASSO
 
+Ajusten el LASSO final con el lambda mínimo. ¿Cuántos predictores quedan en cero? ¿Por qué caen `computadoras_alumno` y `horas_semanales`?
+
 ```{r p9}
-ajuste_lasso <- wf_lasso |>
-  finalize_workflow(lambda_min) |>
+ajuste_lasso <- finalize_workflow(wf_lasso, lambda_min) |>
   fit(data = datos_train)
 
-coef_lasso <- tidy(ajuste_lasso) |>
-  filter(term != "(Intercept)") |>
-  arrange(desc(abs(estimate)))
+coefs_lasso <- tidy(ajuste_lasso) |>
+  filter(term != "(Intercept)")
 
-coef_lasso
+# Variables eliminadas (coeficiente exactamente cero)
+coefs_lasso |>
+  filter(estimate == 0) |>
+  pull(term)
 
-# Variables eliminadas
-eliminadas <- coef_lasso |> filter(estimate == 0)
-cat("\nVariables eliminadas:", nrow(eliminadas), "de", nrow(coef_lasso), "\n")
-if (nrow(eliminadas) > 0) {
-  cat("Son:", paste(eliminadas$term, collapse = ", "), "\n")
-}
+cat("\nEliminadas:", sum(coefs_lasso$estimate == 0), "de",
+    nrow(coefs_lasso), "predictores\n")
 ```
 
-**Respuesta:** Con el lambda mínimo, LASSO elimina 3 de las 12 variables (las deja exactamente en cero): `confianza_justicia`, `zona` y el nivel "semanal" de `uso_internet`. No es casualidad: son justamente las variables con menor correlación con la satisfacción (recordemos que `confianza_justicia` tenía correlación ≈ 0.01). LASSO elimina variables cuyo efecto es demasiado pequeño para justificar su inclusión, dado el nivel de penalización. Esto es una forma de selección automática de variables: en vez de decidir manualmente qué predictores incluir, dejamos que el algoritmo lo haga basándose en los datos.
+**Respuesta:** Con el lambda mínimo, LASSO elimina **10 de los 17 predictores**: `computadoras_alumno`, `horas_semanales`, `formacion_docente_pct` y casi todas las dummies de departamento, sector y zona. El caso de `computadoras_alumno` es el más instructivo: correlaciona ~0,29 con el puntaje (Pregunta 2), pero esa correlación existe sólo porque las computadoras van donde va el presupuesto. Una vez que `presupuesto_alumno` está en el modelo, las computadoras no agregan información independiente y LASSO las pone en cero. `horas_semanales` cae por la razón opuesta: nunca tuvo relación con el puntaje. LASSO no distingue entre "redundante" e "irrelevante": descarta lo que no ayuda a predecir, por dos caminos distintos.
 
 ## Ridge y Elastic Net
 
 ### Pregunta 10: Comparar coeficientes Ridge vs. LASSO
 
+Ajusten Ridge con la misma grilla y folds. ¿Cuántos coeficientes deja en cero cada método?
+
 ```{r p10}
-modelo_ridge <- linear_reg(
-  penalty = tune(),
-  mixture = 0
-) |>
-  set_engine("glmnet") |>
-  set_mode("regression")
+modelo_ridge <- linear_reg(penalty = tune(), mixture = 0) |>
+  set_engine("glmnet")
 
 wf_ridge <- workflow() |>
   add_recipe(receta) |>
@@ -259,81 +243,74 @@ wf_ridge <- workflow() |>
 resultados_ridge <- tune_grid(
   wf_ridge,
   resamples = folds,
-  grid = grilla_lambda,
-  metrics = metric_set(rmse)
+  grid = grilla_lambda
 )
 
-lambda_ridge <- select_best(resultados_ridge, metric = "rmse")
-ajuste_ridge <- finalize_workflow(wf_ridge, lambda_ridge) |>
+ajuste_ridge <- finalize_workflow(
+  wf_ridge,
+  select_best(resultados_ridge, metric = "rmse")
+) |>
   fit(data = datos_train)
 
-# Comparar coeficientes
-coef_ridge <- tidy(ajuste_ridge) |>
-  filter(term != "(Intercept)") |>
-  select(term, ridge = estimate)
+coefs_ridge <- tidy(ajuste_ridge) |>
+  filter(term != "(Intercept)")
 
-coef_lasso_comp <- tidy(ajuste_lasso) |>
-  filter(term != "(Intercept)") |>
-  select(term, lasso = estimate)
+cat("Coeficientes en cero - LASSO:", sum(coefs_lasso$estimate == 0), "\n")
+cat("Coeficientes en cero - Ridge:", sum(coefs_ridge$estimate == 0), "\n")
 
-comparacion <- left_join(coef_ridge, coef_lasso_comp, by = "term")
-comparacion
-
-cat("\nMedia |coef| Ridge:", round(mean(abs(comparacion$ridge)), 4))
-cat("\nMedia |coef| LASSO:", round(mean(abs(comparacion$lasso)), 4))
+# Qué hace Ridge con las variables que LASSO eliminó
+coefs_lasso |>
+  select(term, lasso = estimate) |>
+  left_join(coefs_ridge |> select(term, ridge = estimate), by = "term") |>
+  filter(lasso == 0) |>
+  mutate(across(where(is.numeric), \(x) round(x, 2)))
 ```
 
-**Respuesta:** En nuestra corrida, el promedio de |coeficiente| es ≈ 0.137 en Ridge y ≈ 0.129 en LASSO: Ridge tiende a tener coeficientes algo más grandes en promedio porque reduce todos los coeficientes de forma proporcional, sin eliminar ninguno. LASSO, en cambio, pone algunos en exactamente cero, lo que baja el promedio. Ridge usa la penalización L2 (suma de cuadrados), que "encoge" pero no elimina. LASSO usa la penalización L1 (suma de valores absolutos), que produce soluciones "sparse" donde algunos coeficientes son exactamente cero. La diferencia se debe a la geometría de cada tipo de penalización.
+**Respuesta:** LASSO deja **10 coeficientes exactamente en cero**; Ridge, **ninguno**. Es la diferencia de diseño entre las dos penalizaciones: la L1 de LASSO puede llevar coeficientes hasta el cero exacto (selección de variables), mientras que la L2 de Ridge los encoge hacia cero pero nunca los anula. En la tabla se ve bien: las variables que LASSO eliminó sobreviven en Ridge con coeficientes chicos (en general menores que ±2). Ridge "reparte" la señal entre predictores correlacionados; LASSO elige uno y descarta el resto.
 
 ### Pregunta 11: Elastic Net con dos hiperparámetros
 
+Tuneen `penalty` y `mixture` (15 × 5). ¿La mejor combinación se acerca a LASSO o a Ridge?
+
 ```{r p11}
-modelo_enet <- linear_reg(
-  penalty = tune(),
-  mixture = tune()
-) |>
-  set_engine("glmnet") |>
-  set_mode("regression")
+modelo_en <- linear_reg(penalty = tune(), mixture = tune()) |>
+  set_engine("glmnet")
 
-wf_enet <- workflow() |>
+wf_en <- workflow() |>
   add_recipe(receta) |>
-  add_model(modelo_enet)
+  add_model(modelo_en)
 
-grilla_enet <- grid_regular(
-  penalty(range = c(-4, 0)),
-  mixture(range = c(0, 1)),
-  levels = c(15, 5)
+grilla_en <- grid_regular(
+  penalty(range = c(-3, 0.5)),
+  mixture(),
+  levels = c(penalty = 15, mixture = 5)
 )
 
-resultados_enet <- tune_grid(
-  wf_enet,
+resultados_en <- tune_grid(
+  wf_en,
   resamples = folds,
-  grid = grilla_enet,
-  metrics = metric_set(rmse)
+  grid = grilla_en
 )
 
-mejor_enet <- select_best(resultados_enet, metric = "rmse")
-cat("Mejor combinación:\n")
-print(mejor_enet)
-
-autoplot(resultados_enet) +
-  scale_x_log10() +
-  theme_minimal() +
-  labs(title = "Tuning de Elastic Net")
+select_best(resultados_en, metric = "rmse") |>
+  mutate(across(where(is.numeric), \(x) round(x, 4)))
 ```
 
-**Respuesta:** En esta corrida la mejor combinación tiene `mixture = 0`, es decir, el Elastic Net se inclina por Ridge puro. Esto sugiere que, en este dataset, conviene encoger todos los coeficientes de forma proporcional en lugar de eliminar variables: casi todos los predictores aportan algo y ninguno es claramente prescindible. Cuando el mixture óptimo es intermedio (por ejemplo, 0.5), el Elastic Net combina ambos enfoques, lo cual es útil cuando hay grupos de predictores correlacionados. Como las variables aquí son relativamente independientes, la diferencia entre las tres formas de regularización es pequeña, algo que confirmamos en la tabla comparativa.
+**Respuesta:** La mejor combinación es `mixture = 1`, es decir, **LASSO puro**. Elastic Net tenía permitido elegir cualquier mezcla entre Ridge (0) y LASSO (1), y la validación cruzada concluyó que la penalización L1 sola es lo mejor para estos datos. Tiene sentido dada la estructura del dataset: hay un grupo claro de predictores irrelevantes o redundantes (los de la Pregunta 9) que conviene eliminar del todo, y pocos predictores fuertes que no necesitan el "reparto" de Ridge. La lección general: Elastic Net es un buen punto de partida porque contiene a los otros dos como casos particulares y deja que los datos decidan.
 
 ## Comparación
 
 ### Pregunta 12: Tabla comparativa
 
+Comparen OLS, LASSO, Ridge, Elastic Net y Random Forest en el conjunto de prueba.
+
 ```{r p12}
-# Ajustar Elastic Net final
-ajuste_enet <- finalize_workflow(wf_enet, mejor_enet) |>
+ajuste_en <- finalize_workflow(
+  wf_en,
+  select_best(resultados_en, metric = "rmse")
+) |>
   fit(data = datos_train)
 
-# Random Forest
 modelo_rf <- rand_forest(trees = 500, mtry = tune(), min_n = tune()) |>
   set_engine("ranger") |>
   set_mode("regression")
@@ -342,50 +319,45 @@ wf_rf <- workflow() |>
   add_recipe(receta) |>
   add_model(modelo_rf)
 
-grilla_rf <- grid_regular(
-  mtry(range = c(2, 8)),
-  min_n(range = c(5, 20)),
-  levels = c(4, 4)
+set.seed(2026)
+resultados_rf <- tune_grid(
+  wf_rf,
+  resamples = folds,
+  grid = grid_regular(mtry(range = c(2, 10)), min_n(range = c(5, 30)),
+                      levels = c(4, 4))
 )
 
-resultados_rf <- tune_grid(wf_rf, resamples = folds, grid = grilla_rf, metrics = metric_set(rmse))
-mejor_rf <- select_best(resultados_rf, metric = "rmse")
-ajuste_rf <- finalize_workflow(wf_rf, mejor_rf) |>
+ajuste_rf <- finalize_workflow(
+  wf_rf,
+  select_best(resultados_rf, metric = "rmse")
+) |>
   fit(data = datos_train)
 
-# Predicciones para todos los modelos
-pred_lasso <- augment(ajuste_lasso, datos_test)
-pred_ridge <- augment(ajuste_ridge, datos_test)
-pred_enet  <- augment(ajuste_enet,  datos_test)
-pred_rf    <- augment(ajuste_rf,    datos_test)
+evaluar <- function(ajuste, nombre) {
+  augment(ajuste, datos_test) |>
+    metrics(truth = puntaje_prueba, estimate = .pred) |>
+    mutate(modelo = nombre)
+}
 
-metricas_lasso <- pred_lasso |> metrics(truth = satisfaccion_vida, estimate = .pred)
-metricas_ridge <- pred_ridge |> metrics(truth = satisfaccion_vida, estimate = .pred)
-metricas_enet <- pred_enet |> metrics(truth = satisfaccion_vida, estimate = .pred)
-metricas_rf <- pred_rf |> metrics(truth = satisfaccion_vida, estimate = .pred)
-
-tabla <- bind_rows(
-  metricas_ols |> mutate(modelo = "OLS"),
-  metricas_lasso |> mutate(modelo = "LASSO"),
-  metricas_ridge |> mutate(modelo = "Ridge"),
-  metricas_enet |> mutate(modelo = "Elastic Net"),
-  metricas_rf |> mutate(modelo = "Random Forest")
+bind_rows(
+  evaluar(ajuste_ols, "OLS"),
+  evaluar(ajuste_lasso, "LASSO"),
+  evaluar(ajuste_ridge, "Ridge"),
+  evaluar(ajuste_en, "Elastic Net"),
+  evaluar(ajuste_rf, "Random Forest")
 ) |>
   select(modelo, .metric, .estimate) |>
   pivot_wider(names_from = .metric, values_from = .estimate) |>
-  arrange(rmse)
-
-tabla
+  arrange(rmse) |>
+  mutate(across(where(is.numeric), \(x) round(x, 2)))
 ```
 
-**Respuesta:** Random Forest tiene el RMSE más bajo (≈ 1.17) y el mejor R² (≈ 0.30), pero la ventaja es minúscula: los cuatro modelos lineales (OLS, LASSO, Ridge, Elastic Net) se agrupan en RMSE ≈ 1.18-1.19, a menos de dos centésimas de Random Forest. La razón es que la relación entre los predictores y la satisfacción es aproximadamente lineal (la diseñamos así), de modo que no hay no-linealidades que Random Forest pueda aprovechar, y con p = 11 y n ≈ 375 los modelos lineales ya estiman bien. La mejora de regularización sobre OLS es marginal. En la práctica, los cinco modelos rinden casi igual: la diferencia está dentro del margen de ruido.
+**Respuesta:** La tabla queda apretadísima: el mejor RMSE es el de **OLS** (~26,7), con LASSO, Elastic Net y Ridge a apenas 0,3-0,5 puntos, y Random Forest levemente detrás (~28). En términos prácticos, **la diferencia es irrelevante**: medio punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y sólo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar, y Random Forest no encuentra no-linealidades que explotar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).
 
 ### Pregunta 13: Reflexión
 
 **Respuesta:**
 
-1. La regularización no mejora mucho respecto a OLS en este dataset. Esto se debe a que el número de predictores es bajo (11) comparado con las observaciones (~375), las variables son razonablemente independientes, y no hay mucho sobreajuste que corregir. La regularización es más útil cuando hay muchos predictores (p >> n), multicolinealidad fuerte, o variables irrelevantes que necesitan ser eliminadas automáticamente.
-
-2. LASSO es preferible cuando queremos selección automática de variables, por ejemplo si tenemos docenas de predictores y sospechamos que solo unos pocos son relevantes. Ridge es preferible cuando creemos que todos los predictores contribuyen algo (no queremos eliminar ninguno) y hay multicolinealidad: Ridge reduce los coeficientes de variables correlacionadas de forma proporcional en vez de eliminar arbitrariamente una.
-
-3. Para un tomador de decisiones, probablemente elegiría OLS o LASSO. Aunque Random Forest tiene mejor rendimiento predictivo, la diferencia es pequeña, y OLS/LASSO producen coeficientes que se pueden interpretar directamente: "un punto más en percepción económica se asocia con X puntos más de satisfacción". Un modelo de Random Forest solo dice "esta variable es importante", sin indicar la dirección o magnitud del efecto. En ciencias sociales, la interpretabilidad suele ser tan valiosa como la precisión predictiva.
+1. No, en este dataset la regularización casi no mejora a OLS (Pregunta 12), porque hay muchas más observaciones que predictores y la relación es básicamente lineal. Lo que sí aporta LASSO es **parsimonia**: el mismo desempeño con menos de la mitad de las variables. La regularización no es magia predictiva, es un seguro contra el sobreajuste, y acá había poco sobreajuste que asegurar
+2. LASSO conviene cuando se sospecha que muchos predictores son irrelevantes y se quiere un modelo interpretable con selección automática de variables (como acá). Ridge conviene cuando hay muchos predictores correlacionados que aportan señal de a poco (por ejemplo, miles de píxeles o de genes), donde anular variables de a una destruiría información; Ridge la reparte en vez de elegir
+3. El problema es confundir **predicción con causalidad**. El modelo dice qué escuelas tendrán puntajes bajos, no qué pasaría si les mandamos presupuesto. La Pregunta 3 lo ilustra: el sector privado "predice" buen puntaje, pero no porque enseñe mejor sino por a quién recibe. Si el ministerio asigna presupuesto según las predicciones, premia o castiga a las escuelas por la composición de su alumnado, no por su trabajo. Para decidir intervenciones hace falta un diseño causal (experimentos, regresión discontinua), no un buen R²

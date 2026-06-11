@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -162,6 +162,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -243,10 +247,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="instrucciones" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="instrucciones"><span class="header-section-number">1</span> Instrucciones</h2>
-<p>Esta tarea usa el mismo dataset del Laboratorio 1 (<code>indicadores_mundiales.csv</code>). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
+<p>Esta tarea usa un dataset <span class="alert">nuevo</span>, distinto del que vimos en el Laboratorio 1: <code>desarrollo_municipios.csv</code>, con 300 municipios latinoamericanos simulados. El flujo de trabajo es el mismo del laboratorio (explorar, dividir, ajustar, evaluar), pero los datos son otros, así que las respuestas también lo serán. La variable de resultado es <code>desarrollo_alto</code> (si/no) y hay 8 predictores numéricos. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
 <p><strong>Para trabajar en esta tarea:</strong></p>
 <ol type="1">
-<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>indicadores_mundiales.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code></li>
+<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>desarrollo_municipios.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code>. Mantengan el CSV en una subcarpeta <code>datos/</code> junto al <code>.qmd</code></li>
 <li>Necesitan <a href="https://quarto.org/docs/get-started/">Quarto</a> instalado junto con RStudio. Las versiones recientes de RStudio (&gt;= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <a href="https://quarto.org/docs/get-started/" class="uri">https://quarto.org/docs/get-started/</a></li>
 <li>Abran este archivo <code>.qmd</code> en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)</li>
 <li>Cuando terminen, pueden renderizar el documento completo con el botón “Render” en RStudio</li>
@@ -257,18 +261,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/indicadores_mundiales.csv"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/desarrollo_municipios.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">crecimiento_alto =</span> <span class="fu">factor</span>(crecimiento_alto, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">desarrollo_alto =</span> <span class="fu">factor</span>(desarrollo_alto, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Las columnas <code>municipio</code> (el identificador) y <code>pais</code> no entran en los modelos: cuando llegue el momento de modelar, sáquenlas con <code>select()</code>.</p>
 </section>
 </section>
 <section id="exploración-y-preprocesamiento" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="exploración-y-preprocesamiento"><span class="header-section-number">2</span> Exploración y preprocesamiento</h2>
-<section id="pregunta-1-resumen-por-continente" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-por-continente"><span class="header-section-number">2.1</span> Pregunta 1: Resumen por continente</h3>
-<p>Calculen la media de <code>acceso_internet</code> y <code>inflacion</code> por continente. ¿Qué continente tiene el mayor acceso promedio a internet? ¿Cuál tiene la inflación más alta?</p>
+<section id="pregunta-1-resumen-por-país" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-por-país"><span class="header-section-number">2.1</span> Pregunta 1: Resumen por país</h3>
+<p>Calculen la media de <code>ingreso_promedio</code> y <code>acceso_agua</code> por país. ¿Qué país tiene los municipios más ricos en promedio? ¿El ranking de agua coincide con el de ingreso?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -276,7 +281,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-2-visualización-de-distribuciones" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-visualización-de-distribuciones"><span class="header-section-number">2.2</span> Pregunta 2: Visualización de distribuciones</h3>
-<p>Creen un histograma de <code>indice_gobierno_digital</code> usando <code>ggplot2</code>. Agreguen una línea vertical en la mediana con <code>geom_vline()</code>. ¿La distribución es simétrica o sesgada?</p>
+<p>Creen un histograma de <code>escolaridad_media</code> usando <code>ggplot2</code>. Agreguen una línea vertical en la mediana con <code>geom_vline()</code>. ¿La distribución es simétrica o sesgada? Hagan lo mismo con <code>poblacion</code>: ¿qué diferencia notan entre las dos distribuciones?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -284,7 +289,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-3-correlaciones" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
-<p>Calculen la matriz de correlaciones entre las 8 variables numéricas. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)? ¿Tiene sentido teórico?</p>
+<p>Calculen la matriz de correlaciones entre los 8 predictores numéricos. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)? ¿Tiene sentido teórico?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -295,7 +300,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="3" class="anchored" data-anchor-id="división-y-entrenamiento"><span class="header-section-number">3</span> División y entrenamiento</h2>
 <section id="pregunta-4-división-estratificada" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-división-estratificada"><span class="header-section-number">3.1</span> Pregunta 4: División estratificada</h3>
-<p>Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por <code>crecimiento_alto</code>. Usen <code>set.seed(42)</code>. ¿Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de <code>"si"</code> y <code>"no"</code> son similares en ambos.</p>
+<p>Saquen <code>municipio</code> y <code>pais</code>, y dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por <code>desarrollo_alto</code>. Usen <code>set.seed(42)</code>. ¿Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de <code>"si"</code> y <code>"no"</code> son similares en ambos.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -303,8 +308,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-5-la-línea-base" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-la-línea-base"><span class="header-section-number">3.2</span> Pregunta 5: La línea base</h3>
-<p>Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba de la pregunta anterior, calculen la accuracy de un “modelo” que siempre predice la clase mayoritaria de <code>crecimiento_alto</code> (sin usar ningún predictor). ¿Cuál es esa accuracy?</p>
-<p><em>Pista:</em> la respuesta sale de las proporciones de <code>crecimiento_alto</code> en el conjunto de prueba.</p>
+<p>Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba de la pregunta anterior, calculen la accuracy de un “modelo” que siempre predice la clase mayoritaria de <code>desarrollo_alto</code> (sin usar ningún predictor). ¿Cuál es esa accuracy?</p>
+<p><em>Pista:</em> la respuesta sale de las proporciones de <code>desarrollo_alto</code> en el conjunto de prueba.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -312,7 +317,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-6-cuánto-mejora-el-modelo-completo" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-cuánto-mejora-el-modelo-completo"><span class="header-section-number">3.3</span> Pregunta 6: ¿Cuánto mejora el modelo completo?</h3>
-<p>Ajusten el modelo logístico completo con los 8 predictores (como en el laboratorio). Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente “adivinar” la clase mayoritaria?</p>
+<p>Ajusten el modelo logístico completo con los 8 predictores. Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente “adivinar” la clase mayoritaria?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -331,7 +336,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-8-precisión-vs.-recall" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-precisión-vs.-recall"><span class="header-section-number">4.2</span> Pregunta 8: Precisión vs.&nbsp;recall</h3>
-<p>Calculen precisión y recall (con <code>event_level = "second"</code>) para el modelo completo. Si este modelo se usara para decidir en qué países invertir (donde un falso positivo significa invertir en un país que no crece), ¿qué métrica priorizarían? Justifiquen.</p>
+<p>Calculen precisión y recall (con <code>event_level = "second"</code>) para el modelo completo. Contexto: una agencia de cooperación usa el modelo para decidir qué municipios “se gradúan” de un programa de subsidios (si el modelo predice <code>desarrollo_alto = "si"</code>, el municipio deja de recibir fondos). Un falso positivo significa cortarle los fondos a un municipio que todavía los necesita. ¿Qué métrica priorizarían en este escenario? Justifiquen.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -339,7 +344,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-9-efecto-del-umbral" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-9-efecto-del-umbral"><span class="header-section-number">4.3</span> Pregunta 9: Efecto del umbral</h3>
-<p>Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de inversión de la pregunta anterior?</p>
+<p>Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de los subsidios de la pregunta anterior?</p>
 <p>Para no copiar y pegar el mismo cálculo cinco veces, usamos <code>map_df()</code> del paquete <code>purrr</code> (parte de <code>tidyverse</code>). <code>map_df()</code> toma una lista de valores, aplica la misma función a cada uno y junta todos los resultados en una sola tabla. Acá la lista son los cinco umbrales; por cada umbral <code>u</code> recalculamos la clase predicha y medimos precisión y recall. Usen esta estructura y completen las dos líneas marcadas con <code>___</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>umbrales <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.35</span>, <span class="fl">0.5</span>, <span class="fl">0.65</span>, <span class="fl">0.8</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -350,7 +355,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>))) <span class="sc">|&gt;</span></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">umbral    =</span> u,</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">precision =</span> ___,   <span class="co"># precision_vec() sobre crecimiento_alto y .pred_u, con event_level = "second"</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">precision =</span> ___,   <span class="co"># precision_vec() sobre desarrollo_alto y .pred_u, con event_level = "second"</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">recall    =</span> ___    <span class="co"># lo mismo con recall_vec()</span></span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>})</span>
@@ -374,7 +379,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="5" class="anchored" data-anchor-id="validación-cruzada"><span class="header-section-number">5</span> Validación cruzada</h2>
 <section id="pregunta-11-validación-cruzada-con-10-folds" class="level3" data-number="5.1">
 <h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-11-validación-cruzada-con-10-folds"><span class="header-section-number">5.1</span> Pregunta 11: Validación cruzada con 10 folds</h3>
-<p>Realicen validación cruzada con <strong>10 folds</strong> (en vez de 5) sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. ¿Cómo se compara con los resultados de 5 folds del laboratorio?</p>
+<p>Realicen validación cruzada con <strong>10 folds</strong> sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. ¿La accuracy que obtuvieron en el conjunto de prueba (Pregunta 6) cae dentro del rango que sugiere la validación cruzada (media ± 2 errores estándar)?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -394,12 +399,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="6" class="anchored" data-anchor-id="reflexión"><span class="header-section-number">6</span> Reflexión</h2>
 <section id="pregunta-13-variables-sin-efecto" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-13-variables-sin-efecto"><span class="header-section-number">6.1</span> Pregunta 13: Variables sin efecto</h3>
-<p>En el modelo completo, <code>urbanizacion</code> y <code>gasto_salud</code> no son significativas (p &gt; 0.05). Sin embargo, ambas se correlacionan positivamente con <code>crecimiento_alto</code> en un análisis bivariado simple. Expliquen por qué una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotético de la vida real.</p>
+<p>En el modelo completo, <code>acceso_electricidad</code> y <code>poblacion</code> no son significativas (p &gt; 0.05). Sin embargo, ambas se correlacionan positivamente con <code>desarrollo_alto</code> en un análisis bivariado simple (verifíquenlo si quieren). Expliquen por qué una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotético de la vida real.</p>
 <p><strong>Respuesta:</strong></p>
 </section>
 <section id="pregunta-14-recomendarían-este-modelo" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-14-recomendarían-este-modelo"><span class="header-section-number">6.2</span> Pregunta 14: ¿Recomendarían este modelo?</h3>
-<p>Sin escribir código nuevo, junten lo que ya calcularon (línea base, accuracy, precisión, recall, AUC, validación cruzada). Imaginen que un organismo les pide una recomendación: ¿usarían este modelo para decidir en qué países invertir? Argumenten a favor o en contra citando al menos una métrica con su valor, y digan qué error les preocuparía más (un falso positivo o un falso negativo) y por qué.</p>
+<p>Sin escribir código nuevo, junten lo que ya calcularon (línea base, accuracy, precisión, recall, AUC, validación cruzada). Imaginen que la agencia de cooperación les pide una recomendación: ¿usarían este modelo para decidir qué municipios se gradúan del programa de subsidios? Argumenten a favor o en contra citando al menos una métrica con su valor, y digan qué error les preocuparía más (un falso positivo o un falso negativo) y por qué.</p>
 <p><strong>Respuesta:</strong></p>
 
 

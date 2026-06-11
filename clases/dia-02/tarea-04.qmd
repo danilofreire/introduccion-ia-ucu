@@ -15,11 +15,11 @@ engine: knitr
 
 ## Instrucciones
 
-Esta tarea usa el mismo dataset del Laboratorio 4 (`latinobarometro_sim.csv`). Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
+Esta tarea usa un dataset [nuevo]{.alert}, distinto del que vimos en el Laboratorio 4: `desempeno_escuelas.csv`, con 400 escuelas simuladas. La variable de resultado es `puntaje_prueba` (el puntaje promedio de cada escuela en una prueba estandarizada, escala tipo PISA) y hay predictores numéricos y categóricos. Las técnicas son las del laboratorio (OLS, LASSO, Ridge, Elastic Net), pero los datos son otros, así que las respuestas también lo serán. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
 
 **Para trabajar en esta tarea:**
 
-1. Descarguen este archivo `.qmd` y el dataset `latinobarometro_sim.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+1. Descarguen este archivo `.qmd` y el dataset `desempeno_escuelas.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`. Mantengan el CSV en una subcarpeta `datos/` junto al `.qmd`
 2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <https://quarto.org/docs/get-started/>
 3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)
 4. Cuando terminen, pueden renderizar el documento completo con el botón "Render" en RStudio
@@ -31,14 +31,13 @@ library(tidymodels)
 library(tidyverse)
 library(glmnet)
 
-datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+datos <- read_csv("datos/desempeno_escuelas.csv", show_col_types = FALSE)
 
 datos <- datos |>
   mutate(
-    pais = factor(pais),
-    zona = factor(zona),
-    genero = factor(genero),
-    uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario"))
+    departamento = factor(departamento),
+    sector = factor(sector),
+    zona = factor(zona)
   )
 
 set.seed(2026)
@@ -48,7 +47,7 @@ set.seed(2026)
 
 ### Pregunta 1: Resumen del dataset
 
-Calculen la media y desviación estándar de `satisfaccion_vida` por país. Ordenen los resultados de mayor a menor media. ¿Cuál país tiene la mayor satisfacción promedio? ¿Cuál tiene la menor?
+Calculen la media y desviación estándar de `puntaje_prueba` por departamento. Ordenen los resultados de mayor a menor media. ¿Cuál departamento tiene el mejor puntaje promedio? ¿Las diferencias entre departamentos son grandes comparadas con la desviación estándar dentro de cada uno?
 
 ```{r p1}
 # Escriban su código aquí
@@ -59,7 +58,7 @@ Calculen la media y desviación estándar de `satisfaccion_vida` por país. Orde
 
 ### Pregunta 2: Correlaciones con la variable objetivo
 
-Calculen la correlación entre `satisfaccion_vida` y todas las variables numéricas del dataset (`edad`, `educacion_anios`, `ingreso_hogar`, `confianza_gobierno`, `confianza_justicia`, `satisfaccion_democracia`, `percepcion_economia`, `interes_politica`). ¿Cuáles dos variables tienen la mayor correlación con la satisfacción? ¿Son positivas o negativas?
+Calculen la correlación entre `puntaje_prueba` y todas las variables numéricas del dataset. ¿Cuáles dos variables tienen la mayor correlación con el puntaje? ¿Alguna correlación tiene un signo que les sorprenda?
 
 ```{r p2}
 # Escriban su código aquí
@@ -68,9 +67,9 @@ Calculen la correlación entre `satisfaccion_vida` y todas las variables numéri
 
 **Respuesta:**
 
-### Pregunta 3: Distribución por zona
+### Pregunta 3: Distribución por sector
 
-Creen un boxplot que muestre la distribución de `satisfaccion_vida` separada por `zona` (urbana/rural). Agreguen `labs()` con título y etiquetas claras. ¿Hay diferencia entre zonas?
+Creen un boxplot que muestre la distribución de `puntaje_prueba` separada por `sector` (público/privado). Agreguen `labs()` con título y etiquetas claras. ¿Hay diferencia entre sectores? ¿Esa diferencia bruta prueba que las escuelas privadas "enseñan mejor"?
 
 ```{r p3}
 # Escriban su código aquí
@@ -83,7 +82,9 @@ Creen un boxplot que muestre la distribución de `satisfaccion_vida` separada po
 
 ### Pregunta 4: División de datos y receta
 
-Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(2026)`. Creen una receta que: (a) excluya `voto` y `pais`, (b) convierta las variables categóricas en dummies, (c) normalice los predictores numéricos, y (d) elimine predictores con varianza cero. ¿Cuántos predictores tiene la receta preparada?
+Dividan los datos en 80% entrenamiento y 20% prueba con `set.seed(2026)`. Creen una receta que: (a) excluya `escuela` (es un identificador, no un predictor), (b) convierta las variables categóricas en dummies, (c) normalice los predictores numéricos, y (d) elimine predictores con varianza cero. ¿Cuántos predictores tiene la receta preparada?
+
+*Pista:* para excluir el identificador pueden usar `step_rm()` dentro de la receta.
 
 ```{r p4}
 # Escriban su código aquí
@@ -94,7 +95,7 @@ Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(2026)`. Creen 
 
 ### Pregunta 5: Modelo OLS
 
-Ajusten un modelo de regresión lineal (OLS) con `linear_reg()` usando la receta de la pregunta 4. Extraigan los coeficientes con `tidy()` y ordénenlos por valor absoluto. ¿Cuál es el predictor más importante? ¿Cuál es el menos importante?
+Ajusten un modelo de regresión lineal (OLS) con `linear_reg()` usando la receta de la pregunta 4. Extraigan los coeficientes con `tidy()` y ordénenlos por valor absoluto. ¿Cuál es el predictor más importante? ¿El signo de `tamano_clase` va en la dirección esperada?
 
 ```{r p5}
 # Escriban su código aquí
@@ -105,7 +106,7 @@ Ajusten un modelo de regresión lineal (OLS) con `linear_reg()` usando la receta
 
 ### Pregunta 6: Evaluar OLS
 
-Generen predicciones del modelo OLS en el conjunto de prueba y calculen RMSE, R² y MAE con `metrics()`. ¿Qué porcentaje de la variación en satisfacción explica el modelo (R²)?
+Generen predicciones del modelo OLS en el conjunto de prueba y calculen RMSE, R² y MAE con `metrics()`. ¿Qué porcentaje de la variación en los puntajes explica el modelo (R²)? ¿Un RMSE de esa magnitud es grande o chico en la escala de la prueba?
 
 ```{r p6}
 # Escriban su código aquí
@@ -118,7 +119,9 @@ Generen predicciones del modelo OLS en el conjunto de prueba y calculen RMSE, R�
 
 ### Pregunta 7: Tuning de LASSO
 
-Definan un modelo LASSO (`mixture = 1`) con `penalty = tune()`. Creen una grilla de 30 valores de lambda entre 10^-4 y 10^0. Usen validación cruzada con 10 folds para encontrar el lambda óptimo. ¿Cuál es el mejor lambda según RMSE?
+Definan un modelo LASSO (`mixture = 1`) con `penalty = tune()`. Creen una grilla de 40 valores de lambda entre 10^-3 y 10^0.5, y usen validación cruzada con [5 folds]{.alert} para encontrar el lambda óptimo. ¿Cuál es el mejor lambda según RMSE?
+
+*Pista:* el rango de `penalty()` se da en exponentes de base 10: `range = c(-3, 0.5)`.
 
 ```{r p7}
 # Escriban su código aquí
@@ -131,7 +134,7 @@ Definan un modelo LASSO (`mixture = 1`) con `penalty = tune()`. Creen una grilla
 
 Comparen el lambda que minimiza el RMSE (`select_best()`) con el lambda 1SE (`select_by_one_std_err()`). ¿Cuál es más grande? ¿Cuántas veces más grande? ¿Qué implica usar el lambda 1SE para la complejidad del modelo?
 
-*Pista:* usen `select_by_one_std_err()` sobre los resultados del tuning. Necesita la métrica (`"rmse"`) y la dirección en la que ordenar el `penalty`: piensen si quieren el lambda más grande o más pequeño dentro de un error estándar del mínimo.
+*Pista:* `select_by_one_std_err()` necesita la métrica (`"rmse"`) y la dirección en la que ordenar el `penalty`: piensen si quieren el lambda más grande o más pequeño dentro de un error estándar del mínimo.
 
 ```{r p8}
 # Escriban su código aquí
@@ -142,7 +145,7 @@ Comparen el lambda que minimiza el RMSE (`select_best()`) con el lambda 1SE (`se
 
 ### Pregunta 9: Variables eliminadas por LASSO
 
-Ajusten el modelo LASSO final con el lambda mínimo. ¿Cuántas variables elimina LASSO (coeficiente = 0)? ¿Cuáles son? ¿Por qué creen que LASSO las considera poco útiles?
+Ajusten el modelo LASSO final con el lambda mínimo. ¿Cuántos predictores elimina LASSO (coeficiente = 0)? ¿Cuáles? Miren en particular `computadoras_alumno` y `horas_semanales`: ¿por qué creen que LASSO las considera poco útiles, si las computadoras "suenan" importantes para el aprendizaje?
 
 ```{r p9}
 # Escriban su código aquí
@@ -155,7 +158,7 @@ Ajusten el modelo LASSO final con el lambda mínimo. ¿Cuántas variables elimin
 
 ### Pregunta 10: Comparar coeficientes Ridge vs. LASSO
 
-Ajusten un modelo Ridge (`mixture = 0`) con tuning de lambda usando la misma grilla y los mismos folds. Comparen los coeficientes de Ridge con los de LASSO. ¿Cuál de los dos tiene coeficientes más grandes en promedio? ¿Por qué?
+Ajusten un modelo Ridge (`mixture = 0`) con tuning de lambda usando la misma grilla y los mismos folds. Comparen los coeficientes de Ridge con los de LASSO. ¿Cuántos coeficientes deja exactamente en cero cada método? ¿Qué hace Ridge con los predictores que LASSO elimina?
 
 ```{r p10}
 # Escriban su código aquí
@@ -166,7 +169,7 @@ Ajusten un modelo Ridge (`mixture = 0`) con tuning de lambda usando la misma gri
 
 ### Pregunta 11: Elastic Net con dos hiperparámetros
 
-Ajusten un Elastic Net con tuning de `penalty` y `mixture`. Usen una grilla de 15 lambdas y 5 valores de mixture. ¿Cuál es la mejor combinación? ¿El mixture óptimo se acerca más a LASSO (1) o a Ridge (0)?
+Ajusten un Elastic Net con tuning de `penalty` y `mixture`. Usen una grilla de 15 lambdas y 5 valores de mixture. ¿Cuál es la mejor combinación? ¿El mixture óptimo se acerca más a LASSO (1) o a Ridge (0)? ¿Qué les dice eso sobre la estructura de este dataset?
 
 ```{r p11}
 # Escriban su código aquí
@@ -179,7 +182,7 @@ Ajusten un Elastic Net con tuning de `penalty` y `mixture`. Usen una grilla de 1
 
 ### Pregunta 12: Tabla comparativa
 
-Generen predicciones en el conjunto de prueba para OLS, LASSO, Ridge, Elastic Net y Random Forest (con `trees = 500`, `mtry = tune()`, `min_n = tune()`). Combinen las métricas en una tabla y ordénenla por RMSE. ¿Cuál modelo tiene el mejor RMSE? ¿Cuál tiene el mejor R²?
+Generen predicciones en el conjunto de prueba para OLS, LASSO, Ridge, Elastic Net y Random Forest (con `trees = 500`, `mtry = tune()`, `min_n = tune()`). Combinen las métricas en una tabla y ordénenla por RMSE. ¿Cuál modelo tiene el mejor RMSE? ¿La diferencia entre el mejor y el peor es grande en términos prácticos?
 
 *Pista:* Random Forest para regresión usa la misma `rand_forest()` del Laboratorio 3, pero con `set_mode("regression")` en lugar de clasificación. Los hiperparámetros a tunear son `mtry` y `min_n` (con `trees` fijo).
 
@@ -196,6 +199,6 @@ Basándose en los resultados de esta tarea, respondan:
 
 1. ¿En este dataset, la regularización mejora mucho respecto a OLS? ¿Por qué sí o por qué no?
 2. ¿En qué situaciones sería más útil LASSO que Ridge? ¿Y viceversa?
-3. Si tuvieran que presentar resultados a un tomador de decisiones que no sabe estadística, ¿cuál modelo elegirían y por qué?
+3. El ministerio de educación quiere usar el modelo para decidir a qué escuelas mandar más presupuesto. ¿Qué problema tiene usar un modelo predictivo para esa decisión causal? Piensen en la Pregunta 3
 
 **Respuesta:**

@@ -1,5 +1,5 @@
 ---
-title: "Tarea 1: Clasificación con tidymodels -- Respuestas"
+title: "Tarea 1: Clasificación con tidymodels — Respuestas"
 subtitle: "IA para Científicos Sociales - UCU"
 author: "Danilo Freire"
 date: "2026-04-12"
@@ -23,92 +23,89 @@ Esta es la clave de respuestas de la Tarea 1. Cada pregunta incluye el código R
 library(tidymodels)
 library(tidyverse)
 
-datos <- read_csv("datos/indicadores_mundiales.csv")
+datos <- read_csv("datos/desarrollo_municipios.csv", show_col_types = FALSE)
 
 datos <- datos |>
-  mutate(crecimiento_alto = factor(crecimiento_alto, levels = c("no", "si")))
+  mutate(desarrollo_alto = factor(desarrollo_alto, levels = c("no", "si")))
 ```
 
 ## Exploración y preprocesamiento
 
-### Pregunta 1: Resumen por continente
+### Pregunta 1: Resumen por país
 
-Calculen la media de `acceso_internet` e `inflacion` por continente. ¿Qué continente tiene el mayor acceso promedio a internet? ¿Cuál tiene la inflación más alta?
+Calculen la media de `ingreso_promedio` y `acceso_agua` por país. ¿Qué país tiene los municipios más ricos en promedio? ¿El ranking de agua coincide con el de ingreso?
 
 ```{r p1}
-resumen_continente <- datos |>
-  group_by(continente) |>
+datos |>
+  group_by(pais) |>
   summarise(
-    media_internet  = round(mean(acceso_internet), 1),
-    media_inflacion = round(mean(inflacion), 1),
-    n = n()
+    municipios = n(),
+    ingreso_medio = round(mean(ingreso_promedio)),
+    agua_media = round(mean(acceso_agua), 1)
   ) |>
-  arrange(desc(media_internet))
-
-resumen_continente
+  arrange(desc(ingreso_medio))
 ```
 
-**Respuesta:** Europa tiene el mayor acceso promedio a internet (≈65%) y, a la vez, la inflación más baja (≈10%). África tiene el menor acceso (≈50%). La inflación más alta se reparte entre Oceanía, África y América, todas alrededor del 14%. El patrón general es coherente: las regiones con mayor conectividad tienden a tener menor inflación, con Europa en un extremo y África y América en el otro.
+**Respuesta:** Los municipios de **Brasil** tienen el ingreso promedio más alto (~986 USD), seguidos de cerca por Uruguay y Colombia; México queda último (~864 USD). El ranking de acceso a agua **no coincide exactamente**: Uruguay encabeza el agua (~80%) aunque es segundo en ingreso. Las diferencias entre países son chicas comparadas con la variación entre municipios dentro de cada país, lo que anticipa que `pais` no sería un gran predictor: la acción está a nivel municipal.
 
 ### Pregunta 2: Visualización de distribuciones
 
-Creen un histograma de `indice_gobierno_digital` usando `ggplot2`. Agreguen una línea vertical en la mediana con `geom_vline()`. ¿La distribución es simétrica o sesgada?
+Creen un histograma de `escolaridad_media` con una línea vertical en la mediana, y otro de `poblacion`. ¿Qué diferencia notan entre las dos distribuciones?
 
 ```{r p2}
-mediana_igd <- median(datos$indice_gobierno_digital)
+#| fig-width: 7
+#| fig-height: 4
+ggplot(datos, aes(x = escolaridad_media)) +
+  geom_histogram(bins = 25, fill = "#2d4563", color = "white") +
+  geom_vline(xintercept = median(datos$escolaridad_media),
+             color = "#c0392b", linewidth = 1, linetype = "dashed") +
+  labs(title = "Escolaridad media por municipio",
+       x = "Años de escolaridad", y = "Municipios") +
+  theme_minimal()
 
-ggplot(datos, aes(x = indice_gobierno_digital)) +
-  geom_histogram(bins = 20, fill = "steelblue", color = "white") +
-  geom_vline(xintercept = mediana_igd, color = "red",
-             linetype = "dashed", linewidth = 1) +
-  labs(
-    title = "Distribucion del indice de gobierno digital",
-    subtitle = paste("Mediana =", round(mediana_igd, 2)),
-    x = "Indice de gobierno digital",
-    y = "Frecuencia"
-  ) +
+ggplot(datos, aes(x = poblacion)) +
+  geom_histogram(bins = 25, fill = "#2d4563", color = "white") +
+  geom_vline(xintercept = median(datos$poblacion),
+             color = "#c0392b", linewidth = 1, linetype = "dashed") +
+  labs(title = "Población por municipio",
+       x = "Población (miles)", y = "Municipios") +
   theme_minimal()
 ```
 
-**Respuesta:** La distribución del índice de gobierno digital es aproximadamente simétrica (o ligeramente sesgada a la izquierda), con la mediana cerca de 0.50. Esto indica que hay una distribución relativamente pareja de países con gobiernos más y menos digitalizados, sin una concentración extrema en ningún extremo.
+**Respuesta:** La escolaridad media es aproximadamente **simétrica** alrededor de su mediana (~8,6 años), con forma de campana. La población, en cambio, está **fuertemente sesgada a la derecha**: la mayoría de los municipios son chicos y unos pocos son muy grandes, así que la media queda bastante por encima de la mediana. Es el patrón típico de variables de tamaño (población, ingreso bruto), y la razón por la que muchas veces se las transforma con logaritmo antes de modelar.
 
 ### Pregunta 3: Correlaciones
 
-Calculen la matriz de correlaciones entre las 8 variables numéricas. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)? ¿Tiene sentido teórico?
+Calculen la matriz de correlaciones entre los 8 predictores numéricos. ¿Cuáles dos variables tienen la correlación más alta (en valor absoluto)?
 
 ```{r p3}
-vars_numericas <- datos |>
-  select(gasto_educacion, acceso_internet, urbanizacion,
-         gasto_salud, inflacion, desempleo,
-         inversion_extranjera, indice_gobierno_digital)
+mat_cor <- datos |>
+  select(where(is.numeric)) |>
+  cor()
 
-mat_cor <- cor(vars_numericas)
 round(mat_cor, 2)
 
-# Encontrar el par con mayor correlacion (excluyendo la diagonal)
-mat_cor_abs <- abs(mat_cor)
-diag(mat_cor_abs) <- 0
-max_idx <- which(mat_cor_abs == max(mat_cor_abs), arr.ind = TRUE)[1, ]
-cat("Par con mayor correlacion:",
-    names(vars_numericas)[max_idx[1]], "y",
-    names(vars_numericas)[max_idx[2]], "\n")
-cat("Correlacion:", round(mat_cor[max_idx[1], max_idx[2]], 3), "\n")
+# Buscar el par con mayor correlación absoluta
+as.data.frame(as.table(mat_cor)) |>
+  filter(as.character(Var1) < as.character(Var2)) |>
+  arrange(desc(abs(Freq))) |>
+  head(3)
 ```
 
-**Respuesta:** El par con la correlación más alta es `indice_gobierno_digital` e `inversion_extranjera` (≈0.39). Tiene sentido teórico: los países con mejor gobierno digital suelen atraer más inversión extranjera. Aun así, todas las correlaciones son débiles o moderadas (la mayoría con valor absoluto por debajo de 0.3), lo cual es realista para datos de desarrollo a nivel de países: ningún par de predictores es redundante.
+**Respuesta:** El par con la correlación más alta es **`empleo_formal` e `ingreso_promedio`** (~0,68), seguido de cerca por escolaridad e ingreso (~0,63). Tiene todo el sentido teórico: donde hay más empleo formal, los hogares declaran más ingreso, y la escolaridad acompaña a ambos. Estas correlaciones moderadas-altas entre predictores anticipan el fenómeno de la Pregunta 13: cuando varios predictores comparten información, algunos van a quedar "opacados" en el modelo multivariado.
 
 ## División y entrenamiento
 
 ### Pregunta 4: División estratificada
 
-Dividan los datos en 80% entrenamiento y 20% prueba, con estratificación por `crecimiento_alto`. Usen `set.seed(42)`. ¿Cuántas observaciones hay en cada conjunto? Verifiquen que las proporciones de `"si"` y `"no"` son similares en ambos.
+Saquen `municipio` y `pais`, dividan 80/20 con estratificación por `desarrollo_alto` y `set.seed(42)`. Verifiquen las proporciones.
 
 ```{r p4}
 datos_modelo <- datos |>
-  select(-pais, -continente)
+  select(-municipio, -pais)
 
 set.seed(42)
-split <- initial_split(datos_modelo, prop = 0.80, strata = crecimiento_alto)
+split <- initial_split(datos_modelo, prop = 0.80, strata = desarrollo_alto)
 
 train <- training(split)
 test  <- testing(split)
@@ -117,33 +114,29 @@ cat("Entrenamiento:", nrow(train), "observaciones\n")
 cat("Prueba:", nrow(test), "observaciones\n")
 
 # Proporciones en entrenamiento
-cat("\nProporciones en entrenamiento:\n")
 train |>
-  count(crecimiento_alto) |>
+  count(desarrollo_alto) |>
   mutate(prop = round(n / sum(n), 3))
 
 # Proporciones en prueba
-cat("\nProporciones en prueba:\n")
 test |>
-  count(crecimiento_alto) |>
+  count(desarrollo_alto) |>
   mutate(prop = round(n / sum(n), 3))
 ```
 
-**Respuesta:** El conjunto de entrenamiento tiene aproximadamente 143 observaciones y el de prueba 36 (los números exactos dependen de la semilla y el redondeo). Las proporciones de `"si"` y `"no"` son similares en ambos conjuntos gracias a la estratificación, lo que asegura que el modelo se entrene y se evalúa con una representación equilibrada del outcome.
+**Respuesta:** El conjunto de entrenamiento tiene 240 observaciones y el de prueba 60. Gracias a la estratificación, las proporciones de `"si"` y `"no"` son casi idénticas en ambos conjuntos (~47% de municipios con desarrollo alto). Sin estratificar, con una muestra de prueba de solo 60 municipios, el azar podría dejar un conjunto de prueba bastante desbalanceado.
 
 ### Pregunta 5: La línea base
 
-Antes de entrenar nada, un modelo útil tiene que superar a una predicción trivial. Usando el conjunto de prueba, calculen la accuracy de un "modelo" que siempre predice la clase mayoritaria de `crecimiento_alto`. ¿Cuál es esa accuracy?
+Calculen la accuracy de un "modelo" que siempre predice la clase mayoritaria de `desarrollo_alto` en el conjunto de prueba.
 
 ```{r p5}
-# Proporción de cada clase en el conjunto de prueba
 test |>
-  count(crecimiento_alto) |>
+  count(desarrollo_alto) |>
   mutate(prop = round(n / sum(n), 3))
 
-# La línea base: accuracy de predecir siempre la clase mayoritaria
 baseline_acc <- test |>
-  count(crecimiento_alto) |>
+  count(desarrollo_alto) |>
   mutate(prop = n / sum(n)) |>
   summarise(baseline = max(prop)) |>
   pull(baseline)
@@ -151,51 +144,48 @@ baseline_acc <- test |>
 cat("Accuracy de la línea base (clase mayoritaria):", round(baseline_acc, 3), "\n")
 ```
 
-**Respuesta:** La línea base es la proporción de la clase mayoritaria de `crecimiento_alto`: si esa clase representa, por ejemplo, el 51% de las observaciones de prueba, entonces predecir siempre esa clase acierta el 51% de las veces sin usar ningún predictor. Esa es la "tasa de no-información", el piso que cualquier modelo útil debe superar. Es la misma idea de "La paradoja de la precisión" de la clase teórica: una accuracy alta no dice nada por sí sola, solo importa en relación con esta referencia.
+**Respuesta:** La clase mayoritaria en el conjunto de prueba es `"no"` con ~53%: predecir siempre `"no"` acierta el **53,3%** de las veces sin usar ningún predictor. Esa es la "tasa de no-información", el piso que cualquier modelo útil debe superar. Una accuracy del 70% suena bien en abstracto, pero solo significa algo en relación con este piso.
 
 ### Pregunta 6: ¿Cuánto mejora el modelo completo?
 
-Ajusten el modelo logístico completo con los 8 predictores. Comparen su accuracy en el conjunto de prueba con la línea base de la pregunta anterior. ¿Cuánto mejora el modelo sobre simplemente "adivinar" la clase mayoritaria?
+Ajusten el modelo logístico completo con los 8 predictores y comparen su accuracy con la línea base.
 
 ```{r p6}
-# Especificar y ajustar el modelo completo
 modelo_log <- logistic_reg() |>
   set_engine("glm") |>
   set_mode("classification")
 
 ajuste_completo <- modelo_log |>
-  fit(crecimiento_alto ~ ., data = train)
+  fit(desarrollo_alto ~ ., data = train)
 
-# Accuracy del modelo completo en el conjunto de prueba
 pred_completo <- ajuste_completo |>
   predict(test) |>
   bind_cols(test)
 
 acc_completo <- pred_completo |>
-  accuracy(truth = crecimiento_alto, estimate = .pred_class)
+  accuracy(truth = desarrollo_alto, estimate = .pred_class)
 
 cat("Línea base (clase mayoritaria):", round(baseline_acc, 3), "\n")
 cat("Accuracy modelo completo:", round(acc_completo$.estimate, 3), "\n")
-cat("Mejora sobre la línea base:", round(acc_completo$.estimate - baseline_acc, 3), "\n")
+cat("Mejora sobre la línea base:",
+    round(acc_completo$.estimate - baseline_acc, 3), "\n")
 ```
 
-**Respuesta:** El modelo completo supera a la línea base, lo que confirma que los predictores aportan información real sobre el crecimiento del PIB. La magnitud de la mejora depende de la muestra, pero lo importante es el razonamiento: una accuracy solo es buena en relación con la línea base. Si el modelo apenas superara la proporción de la clase mayoritaria, no estaría aprendiendo nada útil, por más alto que pareciera el número.
+**Respuesta:** El modelo completo alcanza una accuracy de **0,85** en el conjunto de prueba, unos **32 puntos porcentuales** por encima de la línea base (0,53). Los predictores aportan información real sobre el nivel de desarrollo. Esta es la comparación que importa: el mismo 85% sería decepcionante si la clase mayoritaria ya representara el 84% de los casos.
 
 ## Evaluación
 
 ### Pregunta 7: Matriz de confusión
 
-Usando el modelo completo, generen predicciones sobre el conjunto de prueba y construyan la matriz de confusión. ¿Cuántos falsos positivos y falsos negativos hay? ¿Cuál tipo de error es más frecuente?
+Construyan la matriz de confusión sobre el conjunto de prueba. ¿Cuántos falsos positivos y falsos negativos hay?
 
 ```{r p7}
-mc <- conf_mat(pred_completo, truth = crecimiento_alto, estimate = .pred_class)
+mc <- conf_mat(pred_completo, truth = desarrollo_alto, estimate = .pred_class)
 mc
 
-# Visualizar
 autoplot(mc, type = "heatmap") +
-  labs(title = "Matriz de confusion - modelo completo")
+  labs(title = "Matriz de confusión - modelo completo")
 
-# Extraer valores
 tabla <- mc$table
 fp <- tabla["si", "no"]  # predicho si, real no
 fn <- tabla["no", "si"]  # predicho no, real si
@@ -203,183 +193,139 @@ cat("Falsos positivos (predicho si, real no):", fp, "\n")
 cat("Falsos negativos (predicho no, real si):", fn, "\n")
 ```
 
-**Respuesta:** La matriz de confusión muestra los aciertos y errores del modelo. Los falsos positivos son países que el modelo predijo con crecimiento alto pero que en realidad no lo tuvieron. Los falsos negativos son países con crecimiento alto que el modelo no identificó. En general, con datos simulados equilibrados, ambos tipos de error suelen ser similares en frecuencia, aunque el número exacto depende de la muestra particular.
+**Respuesta:** El modelo comete **5 falsos positivos** (municipios que predijo como desarrollados pero no lo son) y **4 falsos negativos** (municipios desarrollados que no identificó). Los dos tipos de error son igual de frecuentes en términos prácticos; con 60 casos de prueba, una diferencia de un error no es interpretable. Lo que importa para la decisión de política no es cuál error es más frecuente sino cuál es más costoso, y eso lo discutimos en la pregunta siguiente.
 
 ### Pregunta 8: Precisión vs. recall
 
-Calculen precisión y recall (con `event_level = "second"`) para el modelo completo. Si este modelo se usara para decidir en qué países invertir (donde un falso positivo significa invertir en un país que no crece), ¿qué métrica priorizarían?
+Calculen precisión y recall (`event_level = "second"`). En el escenario de los subsidios (un falso positivo = cortarle los fondos a un municipio que los necesita), ¿qué métrica priorizarían?
 
 ```{r p8}
 prec <- pred_completo |>
-  precision(truth = crecimiento_alto, estimate = .pred_class,
+  precision(truth = desarrollo_alto, estimate = .pred_class,
             event_level = "second")
-
 rec <- pred_completo |>
-  recall(truth = crecimiento_alto, estimate = .pred_class,
+  recall(truth = desarrollo_alto, estimate = .pred_class,
          event_level = "second")
 
-cat("Precision:", round(prec$.estimate, 3), "\n")
+cat("Precisión:", round(prec$.estimate, 3), "\n")
 cat("Recall:", round(rec$.estimate, 3), "\n")
 ```
 
-**Respuesta:** En un escenario de inversión, un falso positivo (invertir en un país que no crece) tiene un costo económico directo: se pierden recursos. Por lo tanto, priorizaríamos la **precisión**, que mide la proporción de predicciones positivas que son correctas. Una precisión alta significa que cuando el modelo dice "este país va a crecer", es muy probable que así sea. El recall (capturar todos los países que crecen) es menos crítico porque perder una oportunidad de inversión tiene menor costo que invertir mal.
+**Respuesta:** La precisión es **~0,83** y el recall **~0,86**. En este escenario el error caro es el falso positivo: declarar "desarrollado" a un municipio que no lo es significa cortarle los subsidios a una población que todavía los necesita. Por eso priorizaríamos la [precisión]{.alert}: queremos que, cuando el modelo dice "si", casi siempre sea verdad. Un falso negativo (mantener fondos en un municipio que ya se desarrolló) también cuesta dinero, pero su consecuencia social es mucho menos grave.
 
 ### Pregunta 9: Efecto del umbral
 
-Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de inversión de la pregunta anterior?
+Calculen precisión y recall para los umbrales 0.2, 0.35, 0.5, 0.65 y 0.8. ¿Qué umbral elegirían para el escenario de los subsidios?
 
 ```{r p9}
-# Obtener probabilidades
 pred_probs <- ajuste_completo |>
   predict(test, type = "prob") |>
   bind_cols(test)
 
-# Calcular metricas para cada umbral
 umbrales <- c(0.2, 0.35, 0.5, 0.65, 0.8)
 
-tabla_umbrales <- purrr::map_df(umbrales, function(u) {
+tabla_umbrales <- map_df(umbrales, function(u) {
   pred_probs |>
-    mutate(.pred_u = factor(
-      if_else(.pred_si >= u, "si", "no"),
-      levels = c("no", "si")
-    )) |>
+    mutate(.pred_u = factor(if_else(.pred_si >= u, "si", "no"),
+                            levels = c("no", "si"))) |>
     summarise(
       umbral    = u,
-      precision = precision_vec(crecimiento_alto, .pred_u,
+      precision = precision_vec(desarrollo_alto, .pred_u,
                                 event_level = "second"),
-      recall    = recall_vec(crecimiento_alto, .pred_u,
+      recall    = recall_vec(desarrollo_alto, .pred_u,
                              event_level = "second")
     )
 })
 
-tabla_umbrales
+tabla_umbrales |>
+  mutate(across(c(precision, recall), \(x) round(x, 3)))
 ```
 
-**Respuesta:** A medida que el umbral sube, la precisión aumenta (menos falsos positivos) pero el recall baja (se pierden más positivos reales). Para el escenario de inversión, donde priorizamos precisión, un umbral de 0.65 o 0.8 sería más apropiado. El umbral de 0.65 ofrece un buen equilibrio: precisión alta sin sacrificar demasiado recall. El umbral de 0.8 da la mayor precisión pero podría dejar fuera demasiados países con crecimiento real.
+**Respuesta:** La tabla muestra el intercambio clásico: con umbral 0,2 el recall es altísimo (~0,93) pero la precisión cae a ~0,62; con umbral 0,8 la precisión sube a ~0,87 pero el recall se desploma a ~0,46. Para el escenario de los subsidios conviene un umbral **alto (0,65 o incluso 0,8)**: sólo "graduamos" a un municipio cuando el modelo está muy seguro, minimizando los falsos positivos que son el error socialmente caro. El precio es revisar a mano (o seguir financiando) municipios desarrollados que el modelo no detectó.
 
 ### Pregunta 10: Curva ROC y AUC
 
-Grafiquen la curva ROC y calculen el AUC del modelo completo. Recuerden usar `event_level = "second"`. ¿Consideran que el AUC indica un buen modelo?
+Grafiquen la curva ROC y calculen el AUC (`event_level = "second"`).
 
 ```{r p10}
-# Curva ROC
-roc_data <- pred_probs |>
-  roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second")
-
-autoplot(roc_data) +
+pred_probs |>
+  roc_curve(truth = desarrollo_alto, .pred_si, event_level = "second") |>
+  autoplot() +
   labs(title = "Curva ROC - modelo completo")
 
-# AUC
-auc_valor <- pred_probs |>
-  roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
-
-cat("AUC:", round(auc_valor$.estimate, 3), "\n")
+pred_probs |>
+  roc_auc(truth = desarrollo_alto, .pred_si, event_level = "second")
 ```
 
-**Respuesta:** Según la tabla de referencia del laboratorio:
-
-- 0.5: no mejor que el azar
-- 0.7-0.8: aceptable
-- 0.8-0.9: bueno
-- > 0.9: excelente (conviene verificar que no haya data leakage)
-
-El AUC obtenido indica que el modelo tiene una capacidad discriminativa buena para distinguir entre países con crecimiento alto y bajo del PIB. La curva ROC se aleja de la diagonal (que representaría clasificación aleatoria), confirmando que el modelo captura patrones reales en los datos.
+**Respuesta:** El AUC es **~0,89**. Según la tabla de referencia del laboratorio (0,5 = azar; 0,7-0,8 = aceptable; 0,8-0,9 = bueno; >0,9 = excelente), es un modelo **bueno**, cerca de excelente: si tomamos al azar un municipio desarrollado y uno no desarrollado, el modelo le asigna mayor probabilidad al desarrollado el 89% de las veces. La ventaja del AUC sobre la accuracy es que resume el desempeño en todos los umbrales a la vez, lo cual conecta directamente con la Pregunta 9.
 
 ## Validación cruzada
 
 ### Pregunta 11: Validación cruzada con 10 folds
 
-Realicen validación cruzada con **10 folds** sobre los datos de entrenamiento. Reporten la accuracy media y su error estándar. ¿Cómo se compara con los resultados de 5 folds del laboratorio?
+Realicen validación cruzada con 10 folds. ¿La accuracy del conjunto de prueba (Pregunta 6) cae dentro de media ± 2 errores estándar?
 
 ```{r p11}
-set.seed(42)
-folds_10 <- vfold_cv(train, v = 10, strata = crecimiento_alto)
+wf_completo <- workflow() |>
+  add_model(modelo_log) |>
+  add_formula(desarrollo_alto ~ .)
 
-cv_10 <- fit_resamples(
-  modelo_log,
-  crecimiento_alto ~ .,
-  resamples = folds_10,
-  metrics   = metric_set(accuracy, precision, recall, roc_auc),
-  control   = control_resamples(event_level = "second")
-)
+set.seed(123)
+folds10 <- vfold_cv(train, v = 10, strata = desarrollo_alto)
 
-collect_metrics(cv_10)
+res_cv10 <- fit_resamples(wf_completo, folds10)
+collect_metrics(res_cv10)
+
+acc_cv <- collect_metrics(res_cv10) |> filter(.metric == "accuracy")
+cat("Rango (media ± 2 SE): [",
+    round(acc_cv$mean - 2 * acc_cv$std_err, 3), ",",
+    round(acc_cv$mean + 2 * acc_cv$std_err, 3), "]\n")
+cat("Accuracy en test (Pregunta 6):", round(acc_completo$.estimate, 3), "\n")
 ```
 
-**Respuesta:** La accuracy media con 10 folds es similar a la obtenida con 5 folds en el laboratorio. Con más folds, cada fold de entrenamiento es más grande (90% vs. 80% de los datos), lo que produce estimaciones ligeramente más estables. El error estándar puede ser algo menor con 10 folds. En la práctica, la diferencia entre 5 y 10 folds suele ser pequeña para datasets de este tamaño, pero 10 folds es la opción más común en la literatura.
+**Respuesta:** La validación cruzada estima una accuracy promedio cercana a **0,78** con un error estándar de ~0,04, es decir un rango de aproximadamente [0,71; 0,86]. La accuracy del conjunto de prueba (0,85) queda en la parte alta de ese rango: es consistente, aunque sugiere que esta partición de prueba en particular fue algo "fácil". Es un buen recordatorio de que una única partición train/test da una estimación ruidosa, y la validación cruzada da una idea más honesta de la variabilidad.
 
 ### Pregunta 12: Modelo reducido
 
-Ajusten un modelo que use solo los 4 predictores con p-valor más bajo en el modelo completo. Comparen su accuracy (validación cruzada, 5 folds) con la del modelo completo. ¿Vale la pena usar los 8 predictores o el modelo reducido es suficiente?
+Ajusten un modelo con los 4 predictores de menor p-valor y comparen su accuracy (CV, 5 folds) con la del modelo completo.
 
 ```{r p12}
-# Ver p-valores del modelo completo
-coefs <- tidy(ajuste_completo) |>
+# Identificar los 4 predictores con menor p-valor
+tidy(ajuste_completo) |>
   filter(term != "(Intercept)") |>
-  arrange(p.value)
+  arrange(p.value) |>
+  mutate(across(where(is.numeric), \(x) round(x, 4)))
 
-cat("Predictores ordenados por p-valor:\n")
-coefs |> select(term, estimate, p.value)
+wf_reducido <- workflow() |>
+  add_model(modelo_log) |>
+  add_formula(desarrollo_alto ~ ingreso_promedio + acceso_agua +
+                presupuesto_per_capita + distancia_capital)
 
-# Los 4 con menor p-valor
-top4 <- coefs |> slice_head(n = 4) |> pull(term)
-cat("\n4 mejores predictores:", paste(top4, collapse = ", "), "\n")
+set.seed(123)
+folds5 <- vfold_cv(train, v = 5, strata = desarrollo_alto)
 
-# Modelo reducido con validacion cruzada
-formula_reducida <- as.formula(
-  paste("crecimiento_alto ~", paste(top4, collapse = " + "))
-)
+res_completo <- fit_resamples(wf_completo, folds5)
+res_reducido <- fit_resamples(wf_reducido, folds5)
 
-set.seed(42)
-folds_5 <- vfold_cv(train, v = 5, strata = crecimiento_alto)
-
-# CV del modelo completo
-cv_completo <- fit_resamples(
-  modelo_log,
-  crecimiento_alto ~ .,
-  resamples = folds_5,
-  metrics   = metric_set(accuracy),
-  control   = control_resamples(event_level = "second")
-)
-
-# CV del modelo reducido
-cv_reducido <- fit_resamples(
-  modelo_log,
-  formula_reducida,
-  resamples = folds_5,
-  metrics   = metric_set(accuracy),
-  control   = control_resamples(event_level = "second")
-)
-
-cat("\nAccuracy modelo completo (8 predictores):\n")
-collect_metrics(cv_completo)
-
-cat("\nAccuracy modelo reducido (4 predictores):\n")
-collect_metrics(cv_reducido)
+bind_rows(
+  collect_metrics(res_completo) |> mutate(modelo = "completo (8)"),
+  collect_metrics(res_reducido) |> mutate(modelo = "reducido (4)")
+) |>
+  filter(.metric == "accuracy") |>
+  select(modelo, mean, std_err) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
 ```
 
-**Respuesta:** El modelo reducido con 4 predictores tiene una accuracy similar a la del modelo completo con 8. Esto sugiere que los 4 predictores más significativos capturan la mayor parte de la información relevante para predecir el crecimiento del PIB. En la práctica, un modelo más simple tiene ventajas: es más fácil de interpretar, menos propenso a sobreajuste, y requiere menos datos para estimar. Si la diferencia de accuracy es menor a 2-3 puntos porcentuales, el modelo reducido es preferible por parsimonia.
-
-**Nota técnica:** seleccionar variables por p-valor del mismo modelo es una técnica introductoria con limitaciones conocidas (sesgo de inferencia post-selección, p-valores inflados). En el Día 2 veremos métodos más principiados como [LASSO](https://es.wikipedia.org/wiki/LASSO_(estad%C3%ADstica)) y [Ridge](https://en.wikipedia.org/wiki/Ridge_regression), que realizan selección y regularización de forma más rigurosa.
+**Respuesta:** Los 4 predictores con menor p-valor son `ingreso_promedio`, `acceso_agua`, `presupuesto_per_capita` y `distancia_capital`. En validación cruzada, el modelo reducido rinde **igual o levemente mejor** que el completo (~0,79 vs ~0,76), y con menor error estándar. Vale la pena el modelo reducido: misma capacidad predictiva, la mitad de las variables, y más fácil de explicar a un tomador de decisiones. Los cuatro predictores descartados aportan poca información que los otros no tengan ya (recuerden las correlaciones de la Pregunta 3).
 
 ## Reflexión
 
 ### Pregunta 13: Variables sin efecto
 
-En el modelo completo, `urbanizacion` y `gasto_salud` no son significativas (p > 0.05). Sin embargo, ambas se correlacionan positivamente con `crecimiento_alto` en un análisis bivariado simple. Expliquen por qué una variable puede correlacionar con el outcome sin tener un efecto directo en el modelo multivariado. Den un ejemplo hipotético de la vida real.
+¿Por qué `acceso_electricidad` y `poblacion` correlacionan con el outcome pero no son significativas en el modelo multivariado?
 
-**Respuesta:** Una variable puede correlacionar con el outcome sin tener un efecto directo cuando existe **confundimiento** (confounding). Esto ocurre cuando ambas variables (el predictor y el outcome) son influidas por una tercera variable común.
-
-En este caso, `urbanizacion` y `gasto_salud` se correlacionan con `crecimiento_alto` porque todas están asociadas con el nivel de desarrollo general de un país. Países más desarrollados tienden a ser más urbanizados, gastar más en salud, y tener mayor crecimiento económico. Pero cuando incluimos en el modelo otras variables que capturan ese nivel de desarrollo (como `indice_gobierno_digital`, `acceso_internet`, o `gasto_educacion`), el efecto "indirecto" de urbanización y gasto en salud desaparece. No tienen un efecto propio sobre el crecimiento más allá de lo que ya explican los otros predictores.
-
-**Ejemplo hipotético:** Imaginemos que queremos predecir si un estudiante aprueba un examen. La cantidad de café que toma el estudiante se correlaciona positivamente con aprobar (los que toman más café tienden a aprobar más). Pero si incluimos "horas de estudio" en el modelo, el efecto del café desaparece. La explicación es que los estudiantes que estudian más horas también toman más café para mantenerse despiertos. El café no causa aprobar; es un indicador indirecto de horas de estudio, que es la variable con efecto causal real.
-
-Este es un concepto central en la inferencia causal y una razón por la que los modelos multivariados son más informativos que las correlaciones simples.
+**Respuesta:** Porque la correlación bivariada y el efecto multivariado responden preguntas distintas. `acceso_electricidad` correlaciona con `desarrollo_alto` (~0,4) porque ambos comparten causas: los municipios con más ingreso y mejor infraestructura general también tienen más electricidad. Pero una vez que el modelo ya conoce el ingreso, el agua y el empleo formal, saber además la electricidad casi no agrega información: su coeficiente queda cerca de cero y no significativo. El modelo multivariado estima el efecto de cada variable [manteniendo las demás constantes]{.alert}, y ahí la electricidad no tiene nada propio que decir. Ejemplo de la vida real: el número de libros en el hogar correlaciona con el rendimiento escolar de los hijos, pero al controlar por educación e ingreso de los padres el "efecto libros" casi desaparece: los libros eran un síntoma del entorno, no la causa.
 
 ### Pregunta 14: ¿Recomendarían este modelo?
 
-Sin escribir código nuevo, junten lo que ya calcularon (línea base, accuracy, precisión, recall, AUC, validación cruzada). Imaginen que un organismo les pide una recomendación: ¿usarían este modelo para decidir en qué países invertir? Argumenten a favor o en contra citando al menos una métrica con su valor, y digan qué error les preocuparía más (un falso positivo o un falso negativo) y por qué.
-
-**Respuesta:** No hay una única respuesta correcta; lo que se evalúa es el razonamiento. Una respuesta sólida reconoce que el modelo sí aporta valor (supera la línea base de ≈0.51 con una accuracy de ≈0.76 y un AUC de ≈0.86, un nivel "bueno"), pero también que no es perfecto: con un recall de ≈0.72 se le escapa cerca de un tercio de los países que sí crecen.
-
-Para un escenario de inversión, un falso positivo (invertir en un país que no crece) cuesta dinero directo, así que conviene priorizar la **precisión** y, si hace falta, subir el umbral de decisión (como vieron en la Pregunta 9) para reducir falsos positivos a costa de algo de recall. Una recomendación honesta sería: el modelo es un punto de partida razonable para ordenar prioridades, pero no para decidir de forma automática; las decisiones de inversión deberían combinar su salida con juicio experto, sobre todo en los países donde la probabilidad predicha queda cerca de 0.5.
+**Respuesta:** Recomendación: **sí, pero como filtro inicial, no como decisión automática**. A favor: el modelo supera con claridad la línea base (0,85 vs 0,53 de accuracy), tiene un AUC de ~0,89 (bueno) y la validación cruzada confirma que el desempeño no es producto de una partición afortunada (~0,79 ± 0,03). En contra: con umbral 0,5 la precisión es ~0,83, es decir que aproximadamente 1 de cada 6 municipios "graduados" perdería subsidios sin estar realmente desarrollado, un costo social inaceptable si la decisión es automática. El error que más preocupa es el **falso positivo** (cortar fondos a quien los necesita). Propuesta concreta: usar el modelo con umbral alto (0,65-0,8) para armar la lista de candidatos a graduación, y que un equipo humano verifique cada caso antes de cortar fondos. El modelo ahorra trabajo de revisión; no reemplaza la decisión.
