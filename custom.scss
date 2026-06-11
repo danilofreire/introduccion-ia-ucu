@@ -231,6 +231,23 @@ blockquote {
   border-radius: 0 $border-radius $border-radius 0;
 }
 
+// ── Inline emphasis (.alert) ────────────────────
+// `[text]{.alert}` carries over from the reveal.js slide theme, where
+// .alert is a bright accent. In Bootstrap HTML, `.alert` is a component
+// class for notification boxes, so an inline span inherits a near-white
+// alert colour and disappears on the ivory page. Reset the component
+// styling and render the term as readable, on-brand navy emphasis.
+span.alert {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  border-radius: 0;
+  color: $navy;
+  font-weight: 600;
+}
+
 // ── Footer ──────────────────────────────────────
 .nav-footer {
   border-top: 3px solid $gold;
