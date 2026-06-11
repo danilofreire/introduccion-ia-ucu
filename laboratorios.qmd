@@ -1,5 +1,5 @@
 ---
-title: "Laboratorios"
+title: "Laboratorios y Tareas"
 ---
 
 ## Ejercicios prácticos
@@ -157,6 +157,17 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Tarea 9 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-05/tarea-09.qmd) |
 [Respuestas Tarea 9 (.html)](clases/dia-05/tarea-09-respuestas.html) |
 [Respuestas Tarea 9 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-05/tarea-09-respuestas.qmd)
+:::
+:::
+
+::: {.resource-card}
+[Lab 10: Mini-propuestas de investigación y cierre]{.resource-title}
+
+[Día 5. Taller de cierre: cada estudiante (individual o en parejas) diseña una mini-propuesta de investigación que integre los métodos del curso (pregunta, datos, técnica, evaluación y consideraciones éticas), seguida de una discusión final. No tiene tarea ni datos asociados.]{.resource-meta}
+
+::: {.resource-links}
+[Diapositivas (.html)](clases/dia-05/20-propuestas-cierre.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-05/20-propuestas-cierre.qmd)
 :::
 :::
 

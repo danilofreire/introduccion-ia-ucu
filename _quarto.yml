@@ -31,7 +31,7 @@ website:
       - href: programa.qmd
         text: Programa
       - href: laboratorios.qmd
-        text: Laboratorios
+        text: Laboratorios y Tareas
       - href: lecturas.qmd
         text: Lecturas
       - text: Referencia R

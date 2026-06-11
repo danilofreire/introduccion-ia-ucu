@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Danilo Freire">
+
+<title>Tarea 9: Modelos locales y auditoría de equidad – Respuestas – IA para Científicos Sociales</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c82d23df098fe35fa8fa698ecfe1c56e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">IA para Científicos Sociales</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../programa.html"> 
+<span class="menu-text">Programa</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../laboratorios.html"> 
+<span class="menu-text">Laboratorios y Tareas</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../lecturas.html"> 
+<span class="menu-text">Lecturas</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-referencia-r" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Referencia R</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
+        <li>
+    <a class="dropdown-item" href="../../referencia-tidymodels.html">
+ <span class="dropdown-text">Supervisado (tidymodels)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-no-supervisado.html">
+ <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-texto.html">
+ <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:danilofreire@gmail.com"> <i class="bi bi-envelope" role="img" aria-label="Email">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/danilofreire/introduccion-ia-ucu"> <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Alternar modo lector">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul class="collapse">
+  <li><a href="#instrucciones" id="toc-instrucciones" class="nav-link active" data-scroll-target="#instrucciones"><span class="header-section-number">1</span> Instrucciones</a></li>
+  <li><a href="#codificación-con-un-modelo-local" id="toc-codificación-con-un-modelo-local" class="nav-link" data-scroll-target="#codificación-con-un-modelo-local"><span class="header-section-number">2</span> Codificación con un modelo local</a></li>
+  <li><a href="#auditoría-de-equidad" id="toc-auditoría-de-equidad" class="nav-link" data-scroll-target="#auditoría-de-equidad"><span class="header-section-number">3</span> Auditoría de equidad</a></li>
+  <li><a href="#reflexión" id="toc-reflexión" class="nav-link" data-scroll-target="#reflexión"><span class="header-section-number">4</span> Reflexión</a></li>
+  </ul>
+<div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-05/tarea-09-respuestas.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tarea 9: Modelos locales y auditoría de equidad – Respuestas</h1>
+<p class="subtitle lead">IA para Científicos Sociales - UCU</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor/a</div>
+    <div class="quarto-title-meta-contents">
+             <p>Danilo Freire </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">16 de abril de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="instrucciones" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="instrucciones"><span class="header-section-number">1</span> Instrucciones</h2>
+<p>Esta es la clave de respuestas de la Tarea 9. A diferencia de las tareas del Día 4, acá <span class="alert">todos los bloques corren de verdad al renderizar</span>: el modelo es local y no gasta peticiones de ninguna API. Hace falta Ollama corriendo con <code>granite4.1:3b</code> descargado, y los paquetes <code>quallmer</code>, <code>fairmodels</code> y <code>DALEX</code>. Los bloques con el LLM usan caché de knitr para que los renders siguientes sean rápidos. Las codificaciones a mano son ejemplos: cada estudiante puede tener juicios distintos.</p>
+<section id="configuración" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="configuración"><span class="header-section-number">1.1</span> Configuración</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quallmer)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">cache =</span> <span class="cn">TRUE</span>, <span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">cli.progress_show_after =</span> <span class="cn">Inf</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>consultas <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/consultas_salud_mental.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>MODELO_LOCAL <span class="ot">&lt;-</span> <span class="st">"ollama/granite4.1:3b"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="codificación-con-un-modelo-local" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="codificación-con-un-modelo-local"><span class="header-section-number">2</span> Codificación con un modelo local</h2>
+<section id="pregunta-1-diseñar-un-codebook-nominal" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-diseñar-un-codebook-nominal"><span class="header-section-number">2.1</span> Pregunta 1: Diseñar un codebook nominal</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>codebook_motivos <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"motivos_no_consulta"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">"Leé la respuesta de una encuesta sobre salud mental. La persona explica</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">  por qué no consultó (o abandonó la consulta) con un profesional. Clasificá el MOTIVO</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">  PRINCIPAL en una de estas categorías:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">  - costo: no puede pagar las sesiones, la cobertura no alcanza o el dinero es el obstáculo central</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="st">  - estigma: teme el juicio de otros (familia, trabajo, vecinos) o siente vergüenza de estar en tratamiento</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">  - desconfianza: no cree que la terapia o los profesionales sirvan, por experiencia propia o ajena</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="st">  - falta_tiempo: el horario o la carga de trabajo y cuidados le impiden asistir</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">  - autosuficiencia: considera que puede manejar o que ya manejó el problema por su cuenta</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">  Reglas de decisión:</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="st">  1. Si menciona dinero Y tiempo, elegí el que la persona presenta como el obstáculo decisivo.</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="st">  2. Si dice que resolvió o que maneja el problema por su cuenta, es 'autosuficiencia',</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="st">     aunque también mencione el costo o la desconfianza.</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="st">  Elegí UNA sola categoría."</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">schema =</span> <span class="fu">type_object</span>(</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">motivo =</span> <span class="fu">type_enum</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(<span class="st">"costo"</span>, <span class="st">"estigma"</span>, <span class="st">"desconfianza"</span>, <span class="st">"falta_tiempo"</span>, <span class="st">"autosuficiencia"</span>),</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      <span class="st">"El motivo principal por el que no consultó"</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">justificacion =</span> <span class="fu">type_string</span>(<span class="st">"Una oración que justifique la categoría elegida"</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">role =</span> <span class="st">"Sos un investigador experto en salud pública y encuestas de salud mental."</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">motivo =</span> <span class="st">"nominal"</span>, <span class="at">justificacion =</span> <span class="st">"nominal"</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Respuesta:</strong> las definiciones tienen que ser operacionales (qué cuenta y qué no cuenta como cada categoría), y las reglas de decisión resuelven por anticipado los casos límite, igual que en un codebook para asistentes humanos. La regla 2, por ejemplo, decide qué hacer con relatos como el S18, que menciona el costo pero termina contando que manejó el problema solo. Marcar <code>motivo</code> como <code>"nominal"</code> le dice a <code>quallmer</code> que valide con accuracy y kappa, no con correlaciones.</p>
+</section>
+<section id="pregunta-2-humano-contra-humano" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-humano-contra-humano"><span class="header-section-number">2.2</span> Pregunta 2: Humano contra humano</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>filas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">12</span>, <span class="dv">15</span>, <span class="dv">18</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Codificación propia, hecha leyendo los textos SIN mirar motivo_humano</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># (estos códigos son un ejemplo; los suyos pueden diferir)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>mis_codigos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"estigma"</span>, <span class="st">"desconfianza"</span>, <span class="st">"costo"</span>, <span class="st">"costo"</span>, <span class="st">"falta_tiempo"</span>, <span class="st">"costo"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>comparacion_humana <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> consultas<span class="sc">$</span>id[filas],</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">mio =</span> mis_codigos,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">equipo =</span> consultas<span class="sc">$</span>motivo_humano[filas]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>comparacion_humana</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  id    mio          equipo         
+  &lt;chr&gt; &lt;chr&gt;        &lt;chr&gt;          
+1 S02   estigma      estigma        
+2 S04   desconfianza desconfianza   
+3 S07   costo        costo          
+4 S12   costo        costo          
+5 S15   falta_tiempo falta_tiempo   
+6 S18   costo        autosuficiencia</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(comparacion_humana<span class="sc">$</span>mio <span class="sc">==</span> comparacion_humana<span class="sc">$</span>equipo)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8333333</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> en nuestro ejemplo coincidimos en cinco de seis: el desacuerdo es el S18, que nosotros codificamos <code>costo</code> y el equipo <code>autosuficiencia</code>. No es un error de nadie: el relato menciona los dos motivos y la frontera es genuinamente ambigua. Ese es el punto de la pregunta: si dos humanos entrenados no logran acuerdo perfecto, no tiene sentido exigírselo a un LLM. El acuerdo entre humanos marca el techo realista contra el que se evalúa al modelo, y es la razón por la que los proyectos serios reportan confiabilidad entre codificadores antes de automatizar nada.</p>
+</section>
+<section id="pregunta-3-codificar-con-el-modelo-local-y-validar" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-codificar-con-el-modelo-local-y-validar"><span class="header-section-number">2.3</span> Pregunta 3: Codificar con el modelo local y validar</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>codificado <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  consultas<span class="sc">$</span>texto,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  codebook_motivos,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO_LOCAL,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_active =</span> <span class="dv">1</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">params =</span> <span class="fu">params</span>(<span class="at">temperature =</span> <span class="dv">0</span>),</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"granite_local"</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>gold <span class="ot">&lt;-</span> <span class="fu">qlm_humancoded</span>(</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">.id =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(consultas)), <span class="at">motivo =</span> consultas<span class="sc">$</span>motivo_humano),</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"humano"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">codebook =</span> codebook_motivos</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>validacion <span class="ot">&lt;-</span> <span class="fu">qlm_validate</span>(codificado, <span class="at">gold =</span> gold, <span class="at">by =</span> <span class="st">"motivo"</span>, <span class="at">level =</span> <span class="st">"nominal"</span>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(validacion) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  measure   value
+  &lt;chr&gt;     &lt;dbl&gt;
+1 accuracy  0.833
+2 precision 0.843
+3 recall    0.833
+4 f1        0.825
+5 kappa     0.792</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> los datos nunca salieron de la máquina: cada texto viajó al servidor local de Ollama y volvió con su categoría. Con cinco categorías, adivinar al azar daría un 20% de aciertos, así que el kappa (acuerdo corregido por azar) es la métrica honesta. Si supera el umbral de 0,7 del curso, el modelo local es un codificador utilizable; conviene además mirar la pregunta 4 antes de declararlo confiable, porque la accuracy global puede esconder errores concentrados en una frontera.</p>
+</section>
+<section id="pregunta-4-la-tabla-de-confusión" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="pregunta-4-la-tabla-de-confusión"><span class="header-section-number">2.4</span> Pregunta 4: La tabla de confusión</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>tabla_confusion <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(codificado) <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gold =</span> consultas<span class="sc">$</span>motivo_humano) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(motivo, gold)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>tabla_confusion <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(n))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 3
+  motivo          gold                n
+  &lt;fct&gt;           &lt;chr&gt;           &lt;int&gt;
+1 costo           costo               4
+2 estigma         estigma             3
+3 falta_tiempo    falta_tiempo        3
+4 autosuficiencia autosuficiencia     3
+5 desconfianza    desconfianza        2
+6 costo           autosuficiencia     1
+7 desconfianza    estigma             1
+8 falta_tiempo    desconfianza        1</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sólo los desacuerdos</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>tabla_confusion <span class="sc">|&gt;</span> <span class="fu">filter</span>(motivo <span class="sc">!=</span> gold)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  motivo       gold                n
+  &lt;fct&gt;        &lt;chr&gt;           &lt;int&gt;
+1 costo        autosuficiencia     1
+2 desconfianza estigma             1
+3 falta_tiempo desconfianza        1</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>codebook_motivos_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"motivos_no_consulta_v2"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">"Leé la respuesta de una encuesta sobre salud mental. La persona explica</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="st">  por qué no consultó (o abandonó la consulta) con un profesional. Clasificá el MOTIVO</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="st">  PRINCIPAL en una de estas categorías:</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="st">  - costo: no puede pagar las sesiones, la cobertura no alcanza o el dinero es el obstáculo central</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="st">  - estigma: teme el juicio de otros (familia, trabajo, vecinos) o siente vergüenza de estar en tratamiento</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="st">  - desconfianza: no cree que la terapia o los profesionales sirvan, por experiencia propia o ajena</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="st">  - falta_tiempo: el horario o la carga de trabajo y cuidados le impiden asistir</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="st">  - autosuficiencia: considera que puede manejar o que ya manejó el problema por su cuenta</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="st">  Reglas de decisión:</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="st">  1. Si menciona dinero Y tiempo, elegí el que la persona presenta como el obstáculo decisivo.</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="st">  2. Si dice que resolvió o que maneja el problema por su cuenta, es 'autosuficiencia',</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="st">     aunque también mencione el costo o la desconfianza.</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="st">  3. 'desconfianza' requiere un juicio sobre la utilidad de la terapia o de los profesionales;</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="st">     si el problema es el juicio de OTRAS personas (familia, trabajo, vecinos), es 'estigma'.</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="st">  Elegí UNA sola categoría."</span>,</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">schema =</span> <span class="fu">type_object</span>(</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">motivo =</span> <span class="fu">type_enum</span>(</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">c</span>(<span class="st">"costo"</span>, <span class="st">"estigma"</span>, <span class="st">"desconfianza"</span>, <span class="st">"falta_tiempo"</span>, <span class="st">"autosuficiencia"</span>),</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>      <span class="st">"El motivo principal por el que no consultó"</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">justificacion =</span> <span class="fu">type_string</span>(<span class="st">"Una oración que justifique la categoría elegida"</span>)</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">role =</span> <span class="st">"Sos un investigador experto en salud pública y encuestas de salud mental."</span>,</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">motivo =</span> <span class="st">"nominal"</span>, <span class="at">justificacion =</span> <span class="st">"nominal"</span>)</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>codificado_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  consultas<span class="sc">$</span>texto,</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  codebook_motivos_v2,</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO_LOCAL,</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_active =</span> <span class="dv">1</span>,</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">params =</span> <span class="fu">params</span>(<span class="at">temperature =</span> <span class="dv">0</span>),</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"granite_local_v2"</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>validacion_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_validate</span>(codificado_v2, <span class="at">gold =</span> gold, <span class="at">by =</span> <span class="st">"motivo"</span>, <span class="at">level =</span> <span class="st">"nominal"</span>)</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(validacion_v2) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  measure   value
+  &lt;chr&gt;     &lt;dbl&gt;
+1 accuracy  0.889
+2 precision 0.92 
+3 recall    0.883
+4 f1        0.887
+5 kappa     0.860</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> la tabla de confusión convierte una lista de errores en un diagnóstico: si el modelo confunde de forma repetida un mismo par de categorías, el problema casi siempre está en el codebook, no en el modelo. La regla nueva debe atacar ese par concreto (acá usamos como ejemplo la frontera entre <code>desconfianza</code> y <code>estigma</code>: ambas hablan de razones para no ir, pero una mira a los profesionales y la otra al entorno social). Sobre la mejora, la advertencia de la pista es seria: con 18 textos cada caso vale 5,6 puntos de accuracy, así que pasar de una corrida a otra con un acierto más o menos puede ser ruido. La forma correcta de evaluar una regla es con más datos o con varias corridas, mirando también si las justificaciones citan la regla.</p>
+</section>
+<section id="pregunta-5-el-modelo-local-es-determinista" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="pregunta-5-el-modelo-local-es-determinista"><span class="header-section-number">2.5</span> Pregunta 5: ¿El modelo local es determinista?</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>corrida_b <span class="ot">&lt;-</span> <span class="fu">qlm_replicate</span>(codificado, <span class="at">name =</span> <span class="st">"corrida_b"</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>confiabilidad <span class="ot">&lt;-</span> <span class="fu">qlm_compare</span>(codificado, corrida_b, <span class="at">by =</span> <span class="st">"motivo"</span>, <span class="at">level =</span> <span class="st">"nominal"</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(confiabilidad) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  measure           value
+  &lt;chr&gt;             &lt;dbl&gt;
+1 percent_agreement     1
+2 alpha_nominal         1
+3 kappa                 1</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> con <code>temperature = 0</code> el modelo elige siempre el token más probable, así que el acuerdo entre corridas suele ser perfecto o casi perfecto, mucho más alto que con los modelos de la nube del Día 4 (donde además el proveedor puede cambiar el modelo sin avisar). Pero no es una garantía matemática: la aritmética de punto flotante en la GPU puede producir empates que se resuelven distinto, y actualizar Ollama o el archivo del modelo puede cambiar los resultados. Por eso la sesión 5.1 insiste en congelar y reportar la versión exacta del modelo (el digest de <code>ollama list</code>): la reproducibilidad viene del paquete completo (modelo fijo + temperatura 0 + codebook documentado), no de un solo parámetro.</p>
+</section>
+</section>
+<section id="auditoría-de-equidad" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="auditoría-de-equidad"><span class="header-section-number">3</span> Auditoría de equidad</h2>
+<section id="pregunta-6-regresión-logística-y-fairness_check" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-6-regresión-logística-y-fairness_check"><span class="header-section-number">3.1</span> Pregunta 6: Regresión logística y fairness_check()</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fairmodels)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DALEX)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"german"</span>, <span class="at">package =</span> <span class="st">"fairmodels"</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>german <span class="ot">&lt;-</span> german <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Risk_binary =</span> <span class="fu">ifelse</span>(Risk <span class="sc">==</span> <span class="st">"good"</span>, <span class="dv">1</span>, <span class="dv">0</span>))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Regresión logística sin Sex como predictor.</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Quitamos Risk y Sex de los datos antes de ajustar: así la fórmula no las</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># menciona y predict() funciona también sobre datos que no incluyen esas columnas.</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>german_glm <span class="ot">&lt;-</span> german <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>Risk, <span class="sc">-</span>Sex)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>glm_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(Risk_binary <span class="sc">~</span> ., <span class="at">data =</span> german_glm, <span class="at">family =</span> binomial)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>explainer_glm <span class="ot">&lt;-</span> DALEX<span class="sc">::</span><span class="fu">explain</span>(</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  glm_model,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> german_glm <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="sc">-</span>Risk_binary),</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> german_glm<span class="sc">$</span>Risk_binary,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">label =</span> <span class="st">"Regresión logística"</span>,</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>fobject <span class="ot">&lt;-</span> <span class="fu">fairness_check</span>(</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  explainer_glm,</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">protected =</span> german<span class="sc">$</span>Sex,</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">privileged =</span> <span class="st">"male"</span>,</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">cutoff =</span> <span class="fl">0.5</span>,</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>fobject</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Fairness check for models: Regresión logística 
+
+[32mRegresión logística passes 5/5 metrics
+[39mTotal loss :  0.160018 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fobject)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tarea-09-respuestas_files/figure-html/p6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Respuesta:</strong> igual que en el laboratorio, la regresión logística no usa <code>Sex</code> y aun así puede tratar distinto a los grupos, porque otras variables (monto, historial, vivienda) funcionan como proxies. La lectura es la del laboratorio: cada barra es el ratio mujer/hombre de una métrica, y la zona verde (0,8 a 1,25) es la regla del 80%. El <code>print()</code> del objeto dice cuántas métricas pasan; típicamente alguna queda fuera, y el teorema de imposibilidad nos recuerda que no podríamos arreglarlas todas a la vez aunque quisiéramos.</p>
+</section>
+<section id="pregunta-7-auditoría-interseccional" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-7-auditoría-interseccional"><span class="header-section-number">3.2</span> Pregunta 7: Auditoría interseccional</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>german <span class="ot">&lt;-</span> german <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">grupo =</span> <span class="fu">paste</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(Sex <span class="sc">==</span> <span class="st">"male"</span>, <span class="st">"hombre"</span>, <span class="st">"mujer"</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(Age <span class="sc">&lt;</span> <span class="dv">35</span>, <span class="st">"joven"</span>, <span class="st">"mayor"</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">"_"</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>german <span class="sc">|&gt;</span> <span class="fu">count</span>(grupo)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>         grupo   n
+1 hombre_joven 335
+2 hombre_mayor 355
+3  mujer_joven 213
+4  mujer_mayor  97</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>fobject_int <span class="ot">&lt;-</span> <span class="fu">fairness_check</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  explainer_glm,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">protected =</span> german<span class="sc">$</span>grupo,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">privileged =</span> <span class="st">"hombre_mayor"</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cutoff =</span> <span class="fl">0.5</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>fobject_int</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Fairness check for models: Regresión logística 
+
+[33mRegresión logística passes 4/5 metrics
+[39mTotal loss :  1.576736 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fobject_int)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tarea-09-respuestas_files/figure-html/p7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Respuesta:</strong> ahora cada métrica se calcula para tres grupos contra el de referencia (<code>hombre_mayor</code>), y el gráfico muestra lo que la auditoría por sexo solo no podía mostrar: las disparidades más grandes suelen concentrarse en una intersección (en general, las mujeres jóvenes quedan peor que lo que sugiere el promedio de “las mujeres”). La lección metodológica es general: auditar por un atributo a la vez puede dar un falso aprobado, porque los promedios de cada grupo esconden a los subgrupos. El costo de la interseccionalidad es estadístico: cuantos más grupos, menos casos por celda y más ruidosas las métricas, así que conviene elegir las intersecciones con teoría y no probar todas las combinaciones posibles.</p>
+</section>
+</section>
+<section id="reflexión" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="reflexión"><span class="header-section-number">4</span> Reflexión</h2>
+<section id="pregunta-8-el-párrafo-para-el-comité-de-ética" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-8-el-párrafo-para-el-comité-de-ética"><span class="header-section-number">4.1</span> Pregunta 8: El párrafo para el comité de ética</h3>
+<p><strong>Respuesta (ejemplo):</strong> Las respuestas que analizamos describen estados de salud mental y decisiones de tratamiento, por lo que constituyen datos sensibles en el sentido del artículo 4 de la Ley 18.331, sujetos a un régimen de protección reforzado. Por esa razón proponemos procesarlas exclusivamente en equipos del proyecto, con un modelo de lenguaje ejecutado de forma local mediante Ollama. A diferencia de una API en la nube, este diseño evita el riesgo concreto de transferir los relatos a un tercero fuera de nuestro control, donde podrían almacenarse, usarse para entrenar otros modelos o quedar expuestos en un incidente de seguridad, todo ello fuera del alcance del consentimiento que firmaron las personas participantes. Como controles adicionales, los archivos se guardarán cifrados en un equipo sin sincronización automática con servicios en la nube, los fragmentos serán seudonimizados antes de la codificación (reemplazando nombres, barrios y lugares de trabajo), y el acceso quedará limitado al equipo de investigación autorizado en este protocolo. El modelo y su versión exacta quedarán documentados para garantizar la reproducibilidad del análisis sin necesidad de volver a circular los datos. (≈170 palabras.)</p>
+</section>
+<section id="pregunta-9-recomendación-al-regulador" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-9-recomendación-al-regulador"><span class="header-section-number">4.2</span> Pregunta 9: Recomendación al regulador</h3>
+<p><strong>Respuesta (ejemplo):</strong> Recomendamos exigir igualdad de oportunidades: que la tasa de verdaderos positivos sea comparable entre grupos, de modo que un buen pagador tenga la misma probabilidad de obtener crédito sea cual sea su grupo. Es la métrica que mejor captura el daño regulatorio relevante (negarle crédito a quien sí iba a pagar) y la que da incentivos correctos: el banco puede cumplirla mejorando su modelo, no repartiendo cupos. El teorema de imposibilidad obliga a ser honestos sobre lo que se pierde. Si las tasas base de buen pago difieren entre grupos, un modelo con igualdad de oportunidades no tendrá paridad demográfica (aprobará proporciones distintas por grupo) y su calibración perfecta será inalcanzable al mismo tiempo. Eso significa aceptar que las proporciones globales de aprobación puedan diferir, lo que puede perpetuar brechas históricas de acceso al crédito; un regulador que priorice cerrar esas brechas preferiría paridad demográfica, al costo de aprobar más créditos que no se pagarán en algunos grupos. La elección entre esas dos pérdidas es política y debería hacerse explícita en la norma, junto con la obligación de publicar las métricas por grupo. (≈180 palabras.)</p>
+
+
+</section>
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 <a href="https://danilofreire.github.io">Danilo Freire</a>. Contenido bajo licencia <a href="https://opensource.org/licenses/MIT">MIT</a>.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-05/tarea-09-respuestas.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>Hecho con <a href="https://quarto.org">Quarto</a></p>
+</div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

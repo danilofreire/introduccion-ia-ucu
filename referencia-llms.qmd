@@ -494,7 +494,7 @@ trail
 - **Reportar el modelo y la fecha**: los modelos cambian. `nvidia/nemotron-3-...` de hoy puede no existir en un año. Documenten el nombre exacto y cuándo lo usaron.
 - **Temperatura baja (0)** para favorecer la reproducibilidad, y aun así esperar variación entre corridas.
 - **Auditar antes de publicar**: enviar entradas que sólo difieren en una etiqueta sensible y revisar si el trato cambia.
-- **El prefijo del modelo**: sin `openrouter/` para `chat_openrouter()`, con `openrouter/` para `qlm_code()`. Lo mismo con Ollama: `chat_ollama(model = "frob/...")` pero `qlm_code(model = "ollama/frob/...")`.
+- **El prefijo del modelo**: sin `openrouter/` para `chat_openrouter()`, con `openrouter/` para `qlm_code()`. Lo mismo con Ollama: `chat_ollama(model = "granite4.1:3b")` pero `qlm_code(model = "ollama/granite4.1:3b")`.
 - **Con Ollama, `max_active = 1`**: el servidor local no maneja pedidos en paralelo como una API en la nube.
 - **Mostrar las métricas con `as_tibble() |> select(measure, value)`**: el `print()` de `quallmer` usa `cli` y a veces no aparece en HTML.
 

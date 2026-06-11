@@ -15,7 +15,7 @@ engine: knitr
 
 ## Instrucciones
 
-Esta es la clave de respuestas de la Tarea 9. A diferencia de las tareas del Día 4, acá [todos los bloques corren de verdad al renderizar]{.alert}: el modelo es local y no gasta peticiones de ninguna API. Hace falta Ollama corriendo con `frob/qwen3.5-instruct:4b` descargado, y los paquetes `quallmer`, `fairmodels` y `DALEX`. Los bloques con el LLM usan caché de knitr para que los renders siguientes sean rápidos. Las codificaciones a mano son ejemplos: cada estudiante puede tener juicios distintos.
+Esta es la clave de respuestas de la Tarea 9. A diferencia de las tareas del Día 4, acá [todos los bloques corren de verdad al renderizar]{.alert}: el modelo es local y no gasta peticiones de ninguna API. Hace falta Ollama corriendo con `granite4.1:3b` descargado, y los paquetes `quallmer`, `fairmodels` y `DALEX`. Los bloques con el LLM usan caché de knitr para que los renders siguientes sean rápidos. Las codificaciones a mano son ejemplos: cada estudiante puede tener juicios distintos.
 
 ### Configuración
 
@@ -31,7 +31,7 @@ options(cli.progress_show_after = Inf)
 
 consultas <- read_csv("datos/consultas_salud_mental.csv", show_col_types = FALSE)
 
-MODELO_LOCAL <- "ollama/frob/qwen3.5-instruct:4b"
+MODELO_LOCAL <- "ollama/granite4.1:3b"
 ```
 
 ## Codificación con un modelo local
@@ -98,7 +98,7 @@ codificado <- qlm_code(
   model = MODELO_LOCAL,
   max_active = 1,
   params = params(temperature = 0),
-  name = "qwen_local"
+  name = "granite_local"
 )
 
 gold <- qlm_humancoded(
@@ -161,7 +161,7 @@ codificado_v2 <- qlm_code(
   model = MODELO_LOCAL,
   max_active = 1,
   params = params(temperature = 0),
-  name = "qwen_local_v2"
+  name = "granite_local_v2"
 )
 
 validacion_v2 <- qlm_validate(codificado_v2, gold = gold, by = "motivo", level = "nominal")
@@ -192,13 +192,16 @@ library(DALEX)
 data("german", package = "fairmodels")
 german <- german |> mutate(Risk_binary = ifelse(Risk == "good", 1, 0))
 
-# Regresión logística sin Sex como predictor
-glm_model <- glm(Risk_binary ~ . - Risk - Sex, data = german, family = binomial)
+# Regresión logística sin Sex como predictor.
+# Quitamos Risk y Sex de los datos antes de ajustar: así la fórmula no las
+# menciona y predict() funciona también sobre datos que no incluyen esas columnas.
+german_glm <- german |> select(-Risk, -Sex)
+glm_model <- glm(Risk_binary ~ ., data = german_glm, family = binomial)
 
 explainer_glm <- DALEX::explain(
   glm_model,
-  data = german |> select(-Risk, -Risk_binary),
-  y = german$Risk_binary,
+  data = german_glm |> select(-Risk_binary),
+  y = german_glm$Risk_binary,
   label = "Regresión logística",
   verbose = FALSE
 )
@@ -216,7 +219,7 @@ fobject
 plot(fobject)
 ```
 
-**Respuesta:** igual que el random forest del laboratorio, la regresión logística no usa `Sex` y aun así puede tratar distinto a los grupos, porque otras variables (monto, historial, vivienda) funcionan como proxies. La lectura es la del laboratorio: cada barra es el ratio mujer/hombre de una métrica, y la zona verde (0,8 a 1,25) es la regla del 80%. El `print()` del objeto dice cuántas métricas pasan; típicamente alguna queda fuera, y el teorema de imposibilidad nos recuerda que no podríamos arreglarlas todas a la vez aunque quisiéramos.
+**Respuesta:** igual que en el laboratorio, la regresión logística no usa `Sex` y aun así puede tratar distinto a los grupos, porque otras variables (monto, historial, vivienda) funcionan como proxies. La lectura es la del laboratorio: cada barra es el ratio mujer/hombre de una métrica, y la zona verde (0,8 a 1,25) es la regla del 80%. El `print()` del objeto dice cuántas métricas pasan; típicamente alguna queda fuera, y el teorema de imposibilidad nos recuerda que no podríamos arreglarlas todas a la vez aunque quisiéramos.
 
 ### Pregunta 7: Auditoría interseccional
 

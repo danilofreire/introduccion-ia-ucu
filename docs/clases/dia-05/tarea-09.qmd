@@ -21,7 +21,7 @@ Esta tarea aplica los conceptos del Laboratorio 9 a un caso [nuevo]{.alert}: res
 
 1. Descarguen este archivo `.qmd` y `consultas_salud_mental.csv` (en `clases/dia-05/datos/`) de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`. Mantengan el CSV en una subcarpeta `datos/` junto al `.qmd`
 2. Necesitan Quarto y RStudio (>= 2022.07)
-3. Necesitan [Ollama](https://ollama.com/) corriendo y el modelo del laboratorio: `ollama pull frob/qwen3.5-instruct:4b` (~3,4 GB). [No hace falta ninguna API key]{.alert}: todo corre en su computadora
+3. Necesitan [Ollama](https://ollama.com/) corriendo y el modelo del laboratorio: `ollama pull granite4.1:3b` (~2,1 GB). [No hace falta ninguna API key]{.alert}: todo corre en su computadora
 4. Instalar `quallmer` desde GitHub si aún no lo hicieron: `install.packages("pak"); pak::pak("quallmer/quallmer")`. Para la Parte B: `install.packages(c("fairmodels", "DALEX"))`
 5. Abrir este archivo en RStudio y ejecutar los bloques con Ctrl+Enter
 
@@ -37,7 +37,7 @@ set.seed(2026)
 # Ollama tiene que estar corriendo (abran la aplicación o `ollama serve`)
 consultas <- read_csv("datos/consultas_salud_mental.csv", show_col_types = FALSE)
 
-MODELO_LOCAL <- "ollama/frob/qwen3.5-instruct:4b"
+MODELO_LOCAL <- "ollama/granite4.1:3b"
 ```
 
 ## Codificación con un modelo local
@@ -111,9 +111,9 @@ La sesión 5.1 promete reproducibilidad. Pónganla a prueba: vuelvan a codificar
 
 ### Pregunta 6: Regresión logística y fairness_check()
 
-En el laboratorio auditamos un random forest; acá van a auditar el modelo más clásico del curso. Entrenen una [regresión logística]{.alert} sobre German Credit ([sin usar]{.alert} `Sex` como predictor), creen el explicador de DALEX y corran `fairness_check()` con `Sex` como atributo protegido. Para simplificar, entrenen y auditen sobre el dataset completo (en una auditoría real usarían datos de test, como en el laboratorio). ¿El modelo pasa la regla del 80%? ¿En qué métricas falla?
+En el laboratorio auditaron un clasificador de crédito con `fairmodels`; acá repiten esa auditoría y, en la pregunta 7, la llevan un paso más allá con un análisis [interseccional]{.alert}. Entrenen una [regresión logística]{.alert} sobre German Credit ([sin usar]{.alert} `Sex` como predictor), creen el explicador de DALEX y corran `fairness_check()` con `Sex` como atributo protegido. Para simplificar, entrenen y auditen sobre el dataset completo (en una auditoría real usarían datos de test, como en el laboratorio). ¿El modelo pasa la regla del 80%? ¿En qué métricas falla?
 
-*Pista:* `glm(..., family = binomial)` con la variable binaria como respuesta. `DALEX::explain()` sabe predecir un `glm` solo: alcanza con el modelo, los datos (sin las columnas de `Risk`) y la `y` binaria.
+*Pista:* quiten `Risk` y `Sex` del data frame antes de ajustar y usen `glm(Risk_binary ~ ., ..., family = binomial)`; así la fórmula no menciona esas columnas y `DALEX::explain()` puede predecir sobre los mismos datos sin ellas. `explain()` necesita el modelo, los datos (sin `Risk_binary`) y la `y` binaria.
 
 ```{r p6}
 # Escriban su código aquí

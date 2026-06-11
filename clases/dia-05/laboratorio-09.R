@@ -13,7 +13,7 @@
 #
 # Antes de empezar, instalar Ollama (https://ollama.com/) y
 # descargar el modelo del laboratorio en la terminal:
-#   ollama pull frob/qwen3.5-instruct:4b
+#   ollama pull granite4.1:3b
 # Ollama tiene que estar corriendo mientras se ejecuta este script.
 #
 # Requiere el dataset datos/entrevistas_confianza.csv
@@ -57,7 +57,7 @@ library(ellmer)
 library(quallmer)
 
 chat <- chat_ollama(
-  model = "frob/qwen3.5-instruct:4b",
+  model = "granite4.1:3b",
   system_prompt = "Sos un asistente de investigación social. Respondé en español, en una sola oración."
 )
 
@@ -100,10 +100,10 @@ codebook_motivos <- qlm_codebook(
 codificado <- qlm_code(
   entrevistas$texto,
   codebook_motivos,
-  model = "ollama/frob/qwen3.5-instruct:4b",
+  model = "ollama/granite4.1:3b",
   max_active = 1,
   params = params(temperature = 0),
-  name = "qwen_local"
+  name = "granite_local"
 )
 
 # --- inspeccionar-los-resultados -------------------------------
@@ -143,13 +143,11 @@ resultados |> filter(motivo != gold)
 # Instalar paquetes si no están disponibles
 if (!require("fairmodels")) install.packages("fairmodels")
 if (!require("DALEX")) install.packages("DALEX")
-if (!require("ranger")) install.packages("ranger")
 
 # Cargar paquetes
 library(tidymodels)
 library(fairmodels)
 library(DALEX)
-library(ranger)
 
 # --- el-dataset-german-credit ----------------------------------
 
@@ -176,14 +174,7 @@ german |>
 
 # --- preparar-los-datos ----------------------------------------
 
-# Crear variable binaria para el modelo
-german <- german |>
-  mutate(
-    Risk_binary = ifelse(Risk == "good", 1, 0),
-    Sex_binary = ifelse(Sex == "male", 1, 0)
-  )
-
-# Dividir en train/test
+# Dividir en train/test (estratificado por el resultado)
 set.seed(123)
 split <- initial_split(german, prop = 0.7, strata = Risk)
 train_data <- training(split)
@@ -192,18 +183,18 @@ test_data <- testing(split)
 cat("Entrenamiento:", nrow(train_data), "filas\n")
 cat("Test:", nrow(test_data), "filas\n")
 
-# --- entrenar-un-modelo-random-forest --------------------------
+# --- entrenar-una-regresion-logistica --------------------------
 
-# Entrenar Random Forest (sin usar Sex como predictor)
-rf_model <- ranger(
-  Risk ~ . - Sex - Sex_binary - Risk_binary,
-  data = train_data,
-  probability = TRUE,
-  seed = 123
-)
+# Resultado binario y datos sin Sex (el atributo protegido)
+datos_modelo <- train_data |>
+  mutate(buen_pagador = ifelse(Risk == "good", 1, 0)) |>
+  select(-Risk, -Sex)
 
-# Obtener predicciones en test
-pred_probs <- predict(rf_model, test_data)$predictions[, "good"]
+# Regresión logística: el clasificador clásico del día 2
+modelo <- glm(buen_pagador ~ ., data = datos_modelo, family = binomial)
+
+# Probabilidad de "good" en test y decisión a 0.5
+pred_probs <- predict(modelo, test_data, type = "response")
 pred_class <- ifelse(pred_probs > 0.5, "good", "bad")
 
 # Accuracy global
@@ -212,18 +203,12 @@ cat("Accuracy global:", round(accuracy, 3), "\n")
 
 # --- crear-el-explicador-dalex ---------------------------------
 
-# Función de predicción personalizada para ranger
-predict_function <- function(model, data) {
-  predict(model, data)$predictions[, "good"]
-}
-
-# Crear explicador DALEX
+# Crear explicador DALEX (para un glm no hace falta función a medida)
 explainer <- DALEX::explain(
-  model = rf_model,
-  data = test_data |> select(-Risk, -Risk_binary, -Sex_binary),
-  y = test_data$Risk_binary,
-  predict_function = predict_function,
-  label = "Random Forest",
+  model = modelo,
+  data = test_data |> select(-Risk, -Sex),
+  y = as.numeric(test_data$Risk == "good"),
+  label = "Regresión logística",
   verbose = FALSE
 )
 
@@ -247,9 +232,8 @@ plot(fobject)
 
 # --- interpretar-las-metricas ----------------------------------
 
-# Extraer métricas numéricas
+# Ratios de cada métrica (1,0 = igualdad perfecta)
 fobject$fairness_check_data |>
-  filter(metric %in% c("TPR", "FPR", "ACC", "STP")) |>
   select(metric, score) |>
   mutate(score = round(score, 3))
 
@@ -350,10 +334,10 @@ codebook_motivos_v2 <- qlm_codebook(
 codificado_v2 <- qlm_code(
   entrevistas$texto,
   codebook_motivos_v2,
-  model = "ollama/frob/qwen3.5-instruct:4b",
+  model = "ollama/granite4.1:3b",
   max_active = 1,
   params = params(temperature = 0),
-  name = "qwen_local_v2"
+  name = "granite_local_v2"
 )
 
 validacion_v2 <- qlm_validate(

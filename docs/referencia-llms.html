@@ -138,7 +138,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./laboratorios.html"> 
-<span class="menu-text">Laboratorios</span></a>
+<span class="menu-text">Laboratorios y Tareas</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./lecturas.html"> 
@@ -792,7 +792,7 @@ Nota
 <li><strong>Reportar el modelo y la fecha</strong>: los modelos cambian. <code>nvidia/nemotron-3-...</code> de hoy puede no existir en un año. Documenten el nombre exacto y cuándo lo usaron.</li>
 <li><strong>Temperatura baja (0)</strong> para favorecer la reproducibilidad, y aun así esperar variación entre corridas.</li>
 <li><strong>Auditar antes de publicar</strong>: enviar entradas que sólo difieren en una etiqueta sensible y revisar si el trato cambia.</li>
-<li><strong>El prefijo del modelo</strong>: sin <code>openrouter/</code> para <code>chat_openrouter()</code>, con <code>openrouter/</code> para <code>qlm_code()</code>. Lo mismo con Ollama: <code>chat_ollama(model = "frob/...")</code> pero <code>qlm_code(model = "ollama/frob/...")</code>.</li>
+<li><strong>El prefijo del modelo</strong>: sin <code>openrouter/</code> para <code>chat_openrouter()</code>, con <code>openrouter/</code> para <code>qlm_code()</code>. Lo mismo con Ollama: <code>chat_ollama(model = "granite4.1:3b")</code> pero <code>qlm_code(model = "ollama/granite4.1:3b")</code>.</li>
 <li><strong>Con Ollama, <code>max_active = 1</code></strong>: el servidor local no maneja pedidos en paralelo como una API en la nube.</li>
 <li><strong>Mostrar las métricas con <code>as_tibble() |&gt; select(measure, value)</code></strong>: el <code>print()</code> de <code>quallmer</code> usa <code>cli</code> y a veces no aparece en HTML.</li>
 </ul>
