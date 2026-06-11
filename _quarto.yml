@@ -7,6 +7,12 @@ project:
     - "clases/**/tarea-*.qmd"
     - "clases/**/*laboratorio-*.qmd"
 
+# Los renders del sitio completo reutilizan los resultados cacheados en
+# _freeze/ (commitear esa carpeta); un documento solo se re-ejecuta si su
+# fuente cambió o si se renderiza individualmente
+execute:
+  freeze: auto
+
 website:
   title: "IA para Científicos Sociales"
   description: "Curso intensivo. Escuela en Métodos, Universidad Católica del Uruguay"
