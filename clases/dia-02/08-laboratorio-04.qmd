@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 2.4: Laboratorio - Regresión y regularización"
+subtitle: "Sesión 2.4: Laboratorio 4 - Regresión y regularización"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810

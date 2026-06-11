@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 2.3: Laboratorio - Clasificación avanzada"
+subtitle: "Sesión 2.3: Laboratorio 3 - Clasificación avanzada"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810

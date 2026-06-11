@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 1.4: Laboratorio - Validación cruzada y comparación de modelos"
+subtitle: "Sesión 1.4: Laboratorio 2 - Validación cruzada y comparación de modelos"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810

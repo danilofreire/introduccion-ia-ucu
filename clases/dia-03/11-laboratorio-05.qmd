@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 3.3: Laboratorio - Clustering y PCA"
+subtitle: "Sesión 3.3: Laboratorio 5 - Clustering y PCA"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810

@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 1.3: Laboratorio - Primer flujo de trabajo con tidymodels"
+subtitle: "Sesión 1.3: Laboratorio 1 - Primer flujo de trabajo con tidymodels"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810

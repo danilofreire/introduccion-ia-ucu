@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 3.4: Laboratorio - Análisis de texto"
+subtitle: "Sesión 3.4: Laboratorio 6 - Análisis de texto"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
