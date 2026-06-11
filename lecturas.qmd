@@ -167,3 +167,5 @@ Estas lecturas no son obligatorias, pero ofrecen perspectivas valiosas para prof
 - Blei, D. M., Ng, A. Y. & Jordan, M. I. (2003). Latent Dirichlet Allocation. *Journal of Machine Learning Research*, 3, 993-1022.
 - Hastie, T., Tibshirani, R. & Friedman, J. (2009). *The Elements of Statistical Learning* (2da edicion). Springer.
 - Knox, D. & Lucas, C. (2021). A dynamic model of speech for the social sciences. *American Political Science Review*, 115(2), 649-666.
+- Russell, S. (2019). *Human Compatible: Artificial Intelligence and the Problem of Control*. Viking.
+- Christian, B. (2020). *The Alignment Problem: Machine Learning and Human Values*. W. W. Norton & Company.

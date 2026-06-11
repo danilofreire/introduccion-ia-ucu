@@ -1,0 +1,827 @@
+---
+title: "IA para Científicos Sociales"
+subtitle: "Sesión 5.1: Modelos de lenguaje locales"
+author:
+  - name: Danilo Freire
+    orcid: 0000-0002-4712-6810
+    email: danilofreire@gmail.com
+    affiliations: "Department of Data and Decision Sciences <br> Emory University"
+format:
+  clean-revealjs:
+    self-contained: true
+    footer: "[Sesión 5.1](https://danilofreire.github.io/introduccion-ia-ucu/clases/dia-05/17-modelos-locales.html)"
+    transition: slide
+    transition-speed: default
+    scrollable: true
+revealjs-plugins:
+  - multimodal
+engine: knitr
+editor:
+  render-on-save: true
+lang: es
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(knitr)
+opts_chunk$set(
+  prompt = T,
+  fig.align = "center",
+  dpi = 300,
+  cache = T,
+  message = FALSE,
+  warning = FALSE,
+  engine.opts = list(bash = "-l")
+)
+
+knit_hooks$set(
+  prompt = function(before, options, envir) {
+    options(
+      prompt = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "R> ",
+      continue = if (options$engine %in% c("sh", "bash", "zsh")) "$ " else "+ "
+    )
+  }
+)
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+if (!require("fontawesome", character.only = TRUE)) {
+  install.packages("fontawesome", dependencies = TRUE)
+  library(fontawesome, character.only = TRUE)
+}
+```
+
+## Repaso del día 4
+
+:::{style="margin-top: 20px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Cómo funcionan los LLMs**
+
+- Predicen el [próximo token]{.alert} a partir del contexto
+- [Tokens]{.alert}, embeddings, atención, transformers
+- La [escala]{.alert} produce capacidades emergentes
+
+**Cómo usarlos en investigación**
+
+- Las [cuatro defensas]{.alert}: prompts, salida estructurada, RAG, validación
+- [`ellmer`](https://ellmer.tidyverse.org/index.html) como interfaz única desde R
+- [`quallmer`](https://quallmer.github.io/quallmer/index.html) para crear codebooks y mejorar la reproducibilidad y la transparencia de los análisis con LLMs
+:::
+
+:::{.column width=50%}
+**Hasta ahora: la nube**
+
+- Usamos modelos a través de [OpenRouter](https://openrouter.ai) y APIs comerciales
+- Funciona, pero el texto [sale de nuestra computadora]{.alert} hacia un servidor externo
+
+**Hoy: el otro camino**
+
+Correr un LLM [enteramente en nuestra propia máquina]{.alert}, sin internet, sin API, sin que los datos salgan de ahí
+:::
+:::
+:::
+
+## Agenda de la sesión
+
+:::{style="margin-top: 30px; font-size: 25px;"}
+
+- [¿Por qué]{.alert} correr modelos localmente? Privacidad, costo, reproducibilidad
+- [Pesos abiertos]{.alert}: qué son y por qué la ciencia los necesita
+- [Cuantización]{.alert}: cómo entra un LLM en una laptop común
+- Usos en [investigación social]{.alert}: datos sensibles, corpus grandes, replicación
+- [Ollama]{.alert}: correr un LLM desde la terminal y personalizarlo con un [Modelfile]{.alert}
+- Conectar el modelo local con [R]{.alert}: `ellmer` y `quallmer`
+- [Límites]{.alert} de los modelos locales
+
+<br>
+
+:::{style="text-align: center;"}
+[En el laboratorio de hoy lo ponemos en práctica con codificación cualitativa]{.alert}
+:::
+:::
+
+# ¿Por qué correr modelos localmente? {background-color="#2d4563"}
+
+## La nube tiene un costo oculto
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Cuando usamos un LLM en la nube, [nuestro texto viaja a un servidor]{.alert} de OpenAI, Google o un agregador
+- Para muchas tareas, eso está bien. Pero en investigación social a veces el texto es [sensible]{.alert}:
+    - Entrevistas con sujetos humanos
+    - Datos bajo acuerdo de confidencialidad
+    - Archivos restringidos o con información personal
+- Subir esos datos a una API puede [violar el consentimiento]{.alert} o las reglas del comité de ética
+- También dependemos de que la empresa [no cambie ni retire]{.alert} el modelo que usamos
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 24px;"}
+**Correr local resuelve varias cosas a la vez**
+
+- [Privacidad]{.alert}: los datos nunca salen de tu máquina
+- [Costo]{.alert}: cero por uso, sin tarjeta
+- [Reproducibilidad]{.alert}: la versión exacta del modelo queda congelada en tu disco
+- [Autonomía]{.alert}: funciona sin internet y nadie puede quitártelo
+
+:::{.callout-note}
+**Pista**: para datos de sujetos humanos, "local" no es un lujo técnico, es muchas veces un [requisito ético]{.alert}.
+:::
+:::
+:::
+:::
+:::
+
+## ¿Cuándo conviene local y cuándo la nube?
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+
+| Criterio | Modelo local (Ollama) | Modelo en la nube |
+|---|---|---|
+| [Privacidad]{.alert} | Los datos no salen de tu máquina | El texto viaja a un servidor externo |
+| [Costo]{.alert} | Cero por uso | Gratuito limitado o pago por uso |
+| [Reproducibilidad]{.alert} | Versión exacta congelada | Puede cambiar entre versiones |
+| [Calidad]{.alert} | Buena, por debajo de los de frontera | La mejor disponible |
+| [Velocidad]{.alert} | Depende de tu hardware | Rápida y constante |
+| [Requisitos]{.alert} | 8+ GB de RAM, descarga inicial | Sólo una conexión y una API key |
+
+<br>
+
+:::{style="text-align: center; font-size: 24px;"}
+[Regla práctica: datos sensibles o necesidad de reproducibilidad → local. Máxima calidad o prototipo rápido → nube]{.alert}
+:::
+:::
+
+# Modelos de pesos abiertos {background-color="#2d4563"}
+
+## ¿Qué es un modelo de pesos abiertos?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Los [pesos]{.alert} son los miles de millones de parámetros que el modelo aprendió durante el entrenamiento. Son, literalmente, el modelo
+- Un modelo de [pesos abiertos]{.alert} es uno cuya empresa publica ese archivo de números: cualquiera puede descargarlo, correrlo y modificarlo
+- Las familias que vimos ayer: [Llama](https://www.llama.com/) (Meta), [Qwen](https://qwen.ai/) (Alibaba), [DeepSeek](https://www.deepseek.com), [Mistral](https://mistral.ai), [Gemma](https://deepmind.google/models/gemma/) (Google)
+- ¿Dónde viven? En [Hugging Face](https://huggingface.co/) (el "GitHub de los modelos") y en la [biblioteca de Ollama](https://ollama.com/library)
+- ¿Por qué las empresas los liberan? Para crear ecosistema, atraer talento y volverse el estándar que todos usan
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 24px;"}
+**Abierto no siempre es "open source"**
+
+- Casi nunca se publican los [datos de entrenamiento]{.alert} ni el proceso completo
+- Algunas licencias restringen usos comerciales
+- Lo que sí obtenemos: el modelo exacto, congelado, en nuestro disco
+
+:::{.callout-note}
+**Pista**: para investigación, lo decisivo no es la licencia sino el [control]{.alert}: nadie puede cambiar ni retirar un modelo que ya está en tu máquina.
+:::
+:::
+:::
+:::
+:::
+
+## La ciencia necesita modelos abiertos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+Un argumento que gana fuerza en la metodología ([Spirling, 2023](https://www.nature.com/articles/d41586-023-01295-4); [Palmer, Smith y Spirling, 2024](https://www.nature.com/articles/s43588-023-00585-1)):
+
+- Un modelo cerrado puede [cambiar o desaparecer]{.alert} sin aviso. Si tu medición dependía de él, nadie puede repetirla
+- No se puede [auditar]{.alert}: no sabemos con qué datos fue entrenado ni qué sesgos trae
+- El costo por uso crea [desigualdad]{.alert} entre equipos de investigación con y sin presupuesto
+- Con pesos abiertos, el paquete de replicación puede [fijar el modelo exacto]{.alert}, igual que fijamos la versión de un paquete de R
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 22px;"}
+**La recomendación emergente**
+
+Usar modelos abiertos [por defecto]{.alert} en investigación, y justificar explícitamente cuando se usa uno propietario.
+
+Algunas revistas ya piden esa justificación en la sección de métodos.
+
+:::{.callout-note}
+**Pista**: es el mismo principio de la ciencia abierta que ya conocen: datos abiertos, código abierto y ahora [modelos abiertos]{.alert}.
+:::
+:::
+:::
+:::
+:::
+
+## ¿Cómo entra un LLM en tu laptop? Cuantización
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Cada parámetro es un número guardado con cierta [precisión]{.alert} (cantidad de bits)
+- La cuenta para `qwen3.5:4b` (~4 mil millones de parámetros):
+    - A 16 bits (2 bytes) por parámetro: [~8 GB]{.alert} de RAM
+    - [Cuantizado]{.alert} a 4 bits: [~3,4 GB]{.alert}. Eso es lo que baja Ollama por defecto
+- La analogía: como redondear 3,14159265 a 3,14. Se pierde un poco de precisión y se gana muchísimo espacio
+- El costo en calidad es [pequeño]{.alert}: se nota recién en tareas muy finas o razonamiento largo
+
+:::{style="text-align: center;"}
+| Precisión | Bits | RAM aproximada (modelo 4B) |
+|---|---|---|
+| Original (FP16) | 16 | ~8 GB |
+| q8 | 8 | ~4,5 GB |
+| q4 (default de Ollama) | 4 | ~3,4 GB |
+:::
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 23px;"}
+**La regla práctica**
+
+El modelo tiene que entrar [cómodo]{.alert} en tu RAM, dejando espacio para el sistema y para R.
+
+- 8 GB de RAM → modelos de hasta ~3 GB
+- 16 GB de RAM → modelos de hasta ~9 GB
+- 32+ GB → modelos medianos (14B-30B cuantizados)
+
+:::{.callout-note}
+**Pista**: ayer vimos que los modelos MoE activan sólo una parte de sus parámetros por token. Cuantización y MoE son las dos razones por las que hoy corre en tu laptop algo que hace tres años necesitaba un servidor.
+:::
+:::
+:::
+:::
+:::
+
+# Modelos locales en la investigación social {background-color="#2d4563"}
+
+## Datos sensibles: cuando la nube no es una opción
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+Casos típicos en ciencias sociales:
+
+- [Entrevistas]{.alert} con víctimas, activistas o funcionarios bajo confidencialidad
+- Datos de [salud]{.alert} o trayectorias personales
+- [Denuncias y expedientes]{.alert} con información identificable
+- Convenios con instituciones que [prohíben transferir]{.alert} los datos a terceros
+
+Subir ese texto a una API es transferirlo a un tercero, a veces en otro país. Puede violar:
+
+- El [consentimiento informado]{.alert} que firmaron los participantes
+- Las reglas del [comité de ética]{.alert}
+- Leyes de datos personales: [Ley 18.331](https://www.impo.com.uy/bases/leyes/18331-2008) en Uruguay, GDPR en Europa
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 23px;"}
+**Con un modelo local, todo queda en tu máquina**
+
+- [Transcribir]{.alert} las entrevistas (Whisper también corre local)
+- [Codificar]{.alert} y clasificar el material
+- [Resumir]{.alert} y extraer temas
+- [Anonimizar]{.alert}: detectar y reemplazar nombres, lugares y fechas
+
+:::{.callout-note}
+**Pista**: una estrategia híbrida común: anonimizar primero con el modelo local y recién después, si hace falta más calidad, mandar el texto ya anónimo a la nube.
+:::
+:::
+:::
+:::
+:::
+
+## Corpus grandes: el costo marginal es cero
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+En la nube se paga [por token]{.alert}. Una cuenta rápida:
+
+- Clasificar [1 millón de noticias]{.alert} (~400 tokens cada una) ≈ 400 millones de tokens de entrada
+- A USD 1,25 por millón de tokens ≈ [USD 500]{.alert} sólo de entrada, más la salida
+- Y los modelos `:free` tienen límites de velocidad (lo sufrimos en el lab 7)
+
+Con un modelo local: [cero costo por uso]{.alert}, sin límites de requests, y la computadora puede trabajar de noche.
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 24px;"}
+**Dónde aparece esto en la investigación**
+
+- Archivos históricos de [prensa]{.alert}
+- Décadas de [discursos parlamentarios]{.alert}
+- Respuestas abiertas de encuestas grandes (Latinobarómetro tiene cientos de miles)
+- Millones de posteos de redes sociales
+
+:::{.callout-note}
+**Pista**: el flujo del lab 8 sigue valiendo: validar el codificador en una [muestra]{.alert} con gold standard y recién después soltarlo sobre el corpus completo.
+:::
+:::
+:::
+:::
+:::
+
+## Reproducibilidad: congelar el modelo
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Ayer vimos el problema: el GPT-4 de marzo no era el de diciembre, y la API puede cambiar [sin aviso]{.alert}
+- Con un modelo local, la versión queda [congelada en tu disco]{.alert}
+- Ollama identifica cada modelo con un [digest]{.alert}, una huella digital única (`ollama show` la muestra)
+- Un paquete de replicación completo: el Modelfile, el digest del modelo, los prompts y el código
+
+Quien quiera replicar tu medición en 2030 puede correr [exactamente]{.alert} el mismo pipeline.
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 24px;"}
+**La conexión con `quallmer`**
+
+`qlm_trail()` ya documenta el flujo de codificación. Con un modelo local, ese registro pasa de "documentado" a [completamente reproducible]{.alert}: el motor también está versionado.
+
+:::{.callout-note}
+**Pista**: temperatura 0 + modelo local + semilla fija es lo más cerca de un análisis determinista que se puede estar con un LLM.
+:::
+:::
+:::
+:::
+:::
+
+## Un flujo de trabajo realista
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+La pregunta no es "¿nube o local?", es [qué parte del flujo va en cada lado]{.alert}.
+
+:::{style="margin-top: 20px;"}
+1. [Prototipar]{.alert} el codebook en la nube con una muestra chica (labs 7 y 8): los modelos de frontera ayudan a refinar las instrucciones
+2. [Validar]{.alert} el modelo local y el de la nube contra el mismo gold standard (`qlm_validate`)
+3. Si el local rinde parecido → [producción local]{.alert} sobre el corpus completo
+4. [Reportar]{.alert} todo: modelo, versión, métricas de validación
+:::
+
+<br>
+
+:::{.callout-note}
+**Pista**: si el modelo local pierde demasiada precisión en el paso 2, las opciones son: un modelo local más grande, anonimizar y usar la nube, o codificar en la nube sólo los casos difíciles.
+:::
+:::
+
+# Ollama: tu LLM en la terminal {background-color="#2d4563"}
+
+## ¿Qué es Ollama?
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Ollama]{.alert} ([ollama.com](https://ollama.com/)) es una herramienta de línea de comandos para correr LLMs en tu computadora
+- Los modelos vienen [pre-entrenados]{.alert}: se descargan y se usan, sin configurar nada
+- Hay [decenas de modelos]{.alert} en su biblioteca: Llama, Qwen, DeepSeek, Gemma, phi, entre otros
+- Funciona en [Windows, macOS y Linux]{.alert}
+- El único costo real es el [espacio en disco y la RAM]{.alert}: los modelos grandes pesan, pero hay versiones chicas muy capaces
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 22px;"}
+**La idea en una frase**
+
+Ollama es como un gestor de modelos: `pull` para bajar, `run` para conversar, y listo.
+
+<br>
+
+:::{.callout-note}
+**Pista**: el mismo programa que usás para chatear en la terminal expone un servidor local que [R puede consultar]{.alert}. Eso es lo que conecta Ollama con `ellmer`.
+:::
+:::
+:::
+:::
+:::
+
+## Instalar y correr Ollama
+
+:::{style="margin-top: 30px; font-size: 25px;"}
+:::{.columns}
+:::{.column width=52%}
+**Tres pasos, una sola vez**
+
+1. Descargar e instalar desde [ollama.com/download](https://ollama.com/download)
+
+2. Bajar el modelo del curso (~3,4 GB):
+
+```bash
+ollama pull frob/qwen3.5-instruct
+```
+
+3. Conversar con él en la terminal:
+
+```bash
+ollama run frob/qwen3.5-instruct
+```
+
+Para salir de la conversación: `/bye`
+:::
+
+:::{.column width=48%}
+:::{style="font-size: 24px;"}
+**Qué esperar**
+
+- La descarga tarda según tu conexión, hacela [antes de la clase]{.alert}
+- Una vez bajado, el modelo queda en tu disco y [no hay que volver a descargarlo]{.alert}
+- La primera respuesta puede tardar unos segundos mientras el modelo se carga en memoria
+
+:::{.callout-note}
+**Pista**: si tu laptop tiene 8 GB de RAM justos, usá `qwen3.5:2b` (~2,7 GB) en lugar de `:4b`.
+:::
+:::
+:::
+:::
+:::
+
+## Comandos esenciales de Ollama
+
+:::{style="margin-top: 30px; font-size: 25px;"}
+**Manejar modelos**
+
+```bash
+ollama pull <modelo>   # descargar
+ollama run  <modelo>   # conversar
+ollama ls              # listar descargados
+ollama ps              # ver qué corre ahora
+ollama rm   <modelo>   # borrar
+```
+
+**Dentro de la conversación**
+
+```bash
+/bye      # salir
+/?        # ayuda
+```
+
+**Información**
+
+```bash
+ollama show <modelo>   # detalles del modelo
+ollama help            # ayuda general
+```
+
+:::{style="text-align: center; font-size: 24px; margin-top: 20px;"}
+[Con `pull`, `run` y `ls` ya alcanza para todo lo de hoy.]{.alert}
+:::
+:::
+
+## El modelo del curso: `qwen3.5`
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=55%}
+- Usamos [`qwen3.5:4b`]{.alert}, de la familia Qwen (Alibaba)
+- Por qué este modelo para investigación social:
+    - [Chico]{.alert}: ~3,4 GB, corre en una laptop común
+    - [Multilingüe]{.alert}: maneja bien el español (100+ idiomas)
+    - [Estructurado]{.alert}: sabe devolver datos con formato, lo que `ellmer` y `quallmer` necesitan
+    - [Multimodal]{.alert}: además de texto, acepta imágenes
+
+:::{style="text-align: center;"}
+| Versión | Tamaño | Para |
+|---|---|---|
+| `qwen3.5:4b` | 3,4 GB | Default del curso |
+| `qwen3.5:2b` | 2,7 GB | Laptops con poca RAM |
+| `qwen3.5:0.8b` | 1,0 GB | Máquinas muy limitadas |
+:::
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 23px; margin-top: -10px;"}
+**Una cosa importante para investigación**
+
+`qwen3.5` puede "pensar" antes de responder (modo razonamiento). Eso ayuda en tareas difíciles, pero hace las respuestas lentas y variables. La solución es elegir la [variante]{.alert} correcta:
+
+- [Thinking]{.alert} (`qwen3.5:4b`): razona antes de responder. Para chat y problemas difíciles
+- [Instruct]{.alert} (`frob/qwen3.5-instruct:4b`): responde directo. Es la que usamos para [codificar]{.alert}, con [temperatura 0]{.alert}
+
+:::{.callout-note}
+**Pista**: es la misma idea de reproducibilidad de ayer. Variante instruct + temperatura 0 = la misma entrada da casi siempre la misma salida.
+:::
+:::
+:::
+:::
+:::
+
+## ¿Qué tan rápido va a ser? Expectativas de hardware
+
+:::{style="margin-top: 30px; font-size: 25px;"}
+:::{.columns}
+:::{.column width=55%}
+- La velocidad se mide en [tokens por segundo]{.alert}
+- En una laptop moderna (Apple Silicon o con GPU), `qwen3.5:4b` genera decenas de tokens por segundo: un párrafo en pocos segundos
+- En una máquina sin GPU dedicada puede ser [varias veces más lento]{.alert}: ahí conviene `:2b` o `:0.8b`
+- Si el modelo [no entra en la RAM]{.alert}, el sistema usa el disco como memoria y todo se arrastra. Mejor un modelo más chico que uno grande ahogado
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 25px;"}
+**La buena noticia para codificar**
+
+Las tareas del laboratorio piden respuestas [cortas]{.alert} (una categoría, un puntaje). Eso es rápido incluso en máquinas modestas.
+
+:::{.callout-note}
+**Pista**: para un corpus grande no importa tanto la velocidad por texto sino dejar el script corriendo solo. Mil textos a 5 segundos cada uno son menos de una hora y media.
+:::
+:::
+:::
+:::
+:::
+
+# Personalizar: el Modelfile {background-color="#2d4563"}
+
+## ¿Qué es un Modelfile?
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+- Un [Modelfile]{.alert} es un archivo de texto con [instrucciones para crear tu propia versión]{.alert} de un modelo
+- Parte de un modelo base y le agrega configuración fija: un rol, parámetros, ejemplos
+- Los campos más usados:
+    - [`FROM`]{.alert}: el modelo base (por ejemplo, `qwen3.5:4b`)
+    - [`PARAMETER`]{.alert}: ajustes como `temperature`, `num_ctx`, `top_p`
+    - [`SYSTEM`]{.alert}: el rol persistente, el "system prompt" que vimos ayer
+    - [`MESSAGE`]{.alert}: ejemplos de conversación (few-shot incorporado)
+
+<br>
+
+:::{style="text-align: center; font-size: 23px;"}
+[Es como guardar tu mejor prompt dentro del modelo, para no repetirlo cada vez.]{.alert}
+:::
+:::
+
+## Un Modelfile para investigación
+
+:::{style="margin-top: 20px; font-size: 21px;"}
+Un asistente de codificación cualitativa: cauteloso, en español, que no inventa.
+
+```dockerfile
+FROM frob/qwen3.5-instruct:4b
+
+# Para investigación queremos respuestas estables, no creativas
+PARAMETER temperature 0
+
+# Ventana amplia para documentos largos
+PARAMETER num_ctx 8192
+
+SYSTEM """
+Sos un asistente de codificación para investigación social.
+Tu tarea es clasificar y resumir textos políticos en español
+de forma cuidadosa y conservadora.
+
+Reglas:
+- Respondé sólo con lo que el texto dice. No inventes datos,
+  nombres ni cifras.
+- Si el texto no da información suficiente, respondé
+  "no determinado" en vez de adivinar.
+- Cuando se te pida una categoría, elegí una de las opciones
+  dadas y nada más.
+- Sé breve y directo.
+"""
+```
+:::
+
+## Crear y correr tu modelo
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+1. Guardá el texto anterior en un archivo llamado `codificador` (sin extensión)
+
+2. Creá el modelo a partir del Modelfile:
+  - `-f` indica el archivo (file)
+
+```bash
+ollama create codificador -f codificador
+```
+
+3. Usalo como cualquier otro modelo:
+
+```bash
+ollama run codificador
+```
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 24px; margin-top: -15px;"}
+**Qué ganamos**
+
+- El rol y la temperatura quedan [fijos]{.alert}: cada vez que lo llamamos, se comporta igual
+- No hay que pegar el system prompt en cada consulta
+- Si otra persona usa el mismo Modelfile, obtiene el [mismo asistente]{.alert}
+
+:::{.callout-note}
+**Pista**: un Modelfile es texto plano. Subilo a tu repositorio y tu codificador queda [documentado y reproducible]{.alert}.
+:::
+:::
+:::
+:::
+:::
+
+## ¿Para qué sirve un Modelfile?
+
+:::{style="margin-top: 30px; font-size: 26px;"}
+- [A medida]{.alert}: un asistente especializado en tu tema, tu esquema de codificación o tu idioma
+- [Reproducible]{.alert}: el rol y los parámetros quedan escritos y versionados, no dependen de la memoria de quien lo usa
+- [Eficiente]{.alert}: fijás un comportamiento una vez y lo reutilizás en todo el proyecto
+- [Privado]{.alert}: corre en tu máquina, ideal para datos que no pueden salir de ahí
+
+<br>
+
+:::{style="text-align: center; font-size: 24px;"}
+[Para un proyecto de codificación, el Modelfile es tu "libro de códigos" hecho modelo.]{.alert}
+:::
+:::
+
+# Local desde R {background-color="#2d4563"}
+
+## Conectar Ollama con `ellmer`
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=52%}
+- Ollama deja corriendo un [servidor local]{.alert} que `ellmer` consulta igual que a la nube
+- Cambiás `chat_openrouter()` por [`chat_ollama()`]{.alert} y el resto del código no se toca
+- Las mismas [cuatro defensas]{.alert} de ayer siguen aplicando
+
+```r
+library(ellmer)
+
+chat <- chat_ollama(
+  model = "frob/qwen3.5-instruct:4b",
+  system_prompt = "Sos un analista político..."
+)
+
+chat$chat("Clasificá el sentimiento de este texto: ...")
+```
+:::
+
+:::{.column width=48%}
+:::{style="font-size: 21px; margin-top: -15px;"}
+**Extracción estructurada, local**
+
+```r
+chat$extract_data(
+  "La economía está en crisis.",
+  type = type_object(
+    tema        = type_string(),
+    sentimiento = type_string(),
+    confianza   = type_number()
+  )
+)
+```
+
+- `quallmer`, el paquete de codificación cualitativa, usa [`ellmer`]{.alert} por debajo
+- Así que todo esto funciona también con un modelo [local]{.alert}
+
+[En el laboratorio: codificamos un corpus con `qwen3.5` y validamos el resultado.]{.alert}
+:::
+:::
+:::
+:::
+
+## `quallmer` con un modelo local
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=52%}
+- Todo el flujo del lab 8 funciona igual: codebook, codificar, validar, comparar
+- Lo único que cambia es el [string del modelo]{.alert}
+
+```r
+library(quallmer)
+
+codificado_local <- qlm_code(
+  textos,
+  codebook,
+  model = "ollama/frob/qwen3.5-instruct:4b",
+  max_active = 1
+)
+```
+
+- Ayer era `"openrouter/..."`, hoy es [`"ollama/..."`]{.alert}. El prefijo indica el proveedor
+- `max_active = 1`: el servidor local procesa [de a un pedido]{.alert}; en paralelo, los pedidos se acumulan y dan timeout
+:::
+
+:::{.column width=48%}
+:::{style="font-size: 23px; margin-top: -15px;"}
+**Ventajas inmediatas**
+
+- No hay límites de la API ni errores `400`: el servidor es tuyo
+- No hay API key que configurar
+- Se puede correr con la computadora [sin internet]{.alert}
+
+:::{.callout-note}
+**Pista**: `qlm_replicate()` acepta un `model` distinto. Eso permite comparar el codificador local contra uno de la nube con `qlm_compare()`: ¿cuánta calidad cuesta la privacidad?
+:::
+:::
+:::
+:::
+:::
+
+## Lo que hoy no cubrimos: fine-tuning
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Todo lo que hicimos esta semana cambia el [contexto]{.alert} (prompts, ejemplos, Modelfile), nunca los pesos
+- El [fine-tuning]{.alert} va un paso más allá: re-entrena parcialmente los pesos con tus propios ejemplos etiquetados
+- La técnica más común es [LoRA]{.alert} ([Hu et al., 2021](https://arxiv.org/abs/2106.09685)): entrena unos adaptadores chicos en vez de tocar todo el modelo, así que es viable en una sola GPU
+- Con pesos abiertos, el fine-tuning es posible. Con modelos cerrados, dependés de lo que ofrezca la empresa
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 24px; margin-top: -15px;"}
+**¿Cuándo considerarlo?**
+
+- Cuando el prompting con few-shot [no alcanza]{.alert} y tenés miles de ejemplos etiquetados
+- Para tareas muy especializadas (jerga legal, registros históricos)
+
+:::{.callout-note}
+**Pista**: para la mayoría de los proyectos de investigación social, un buen codebook bien validado alcanza. El fine-tuning es la herramienta de último recurso, no la primera.
+:::
+:::
+:::
+:::
+:::
+
+## Los límites de los modelos locales
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- [Calidad]{.alert}: un modelo de 4 mil millones de parámetros codifica peor que uno de frontera en la nube
+- [Velocidad]{.alert}: depende de tu hardware; sin GPU puede ser lento
+- [Memoria]{.alert}: los modelos grandes (30B+) no entran en una laptop
+- [Tareas complejas]{.alert}: razonamiento largo o matices sutiles pueden superarlo
+:::
+
+:::{.column width=45%}
+:::{style="font-size: 24px; margin-top: -15px;"}
+**Por eso siempre validamos**
+
+Un modelo local es un [punto de partida útil]{.alert}, no la última palabra.
+
+La defensa 4 de ayer sigue siendo la regla: [la validación y la reproducibilidad mejoran mucho la calidad de la investigación]{.alert}
+
+:::{.callout-note}
+**Pista**: corré el modelo local sobre una muestra con respuestas conocidas (gold standard) y medí qué tan seguido acierta antes de confiar en él para todo el corpus.
+:::
+:::
+:::
+:::
+:::
+
+## Resumen de la sesión
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=50%}
+**Lo que vimos**
+
+- Correr local da [privacidad, costo cero y reproducibilidad]{.alert}
+- [Pesos abiertos]{.alert}: el modelo congelado en tu disco, auditable y replicable
+- La [cuantización]{.alert} es lo que hace entrar un LLM en una laptop común
+- En investigación social: [datos sensibles]{.alert}, corpus enormes y paquetes de replicación
+- [Ollama]{.alert}: `pull`, `run`, `ls` y poco más; el [Modelfile]{.alert} fija un rol reproducible
+- Desde R, `chat_ollama()` y `model = "ollama/..."` reemplazan a la nube sin reescribir código
+:::
+
+:::{.column width=50%}
+**Cuándo usar cada cosa**
+
+- [Datos sensibles]{.alert} o reproducibilidad → local
+- [Máxima calidad]{.alert} o prototipo rápido → nube
+- Lo habitual: [combinar]{.alert}. Prototipar en la nube, validar ambos, producir en local
+
+**Regla de oro**
+
+:::{.callout-note}
+**Pista**: local o nube, ningún LLM es fuente de verdad. Siempre validar contra un estándar conocido.
+:::
+:::
+:::
+:::
+
+## Próximos pasos
+
+:::{style="margin-top: 40px; font-size: 25px;"}
+
+- [Sesión 5.2]{.alert}: ética, sesgo, privacidad y regulación de la IA
+
+- [Laboratorio 9]{.alert}, en dos partes:
+    - Codificar datos sensibles (simulados) con `quallmer` y el modelo local, y validar contra un gold standard
+    - Auditar la equidad de un modelo de crédito con `fairmodels`
+
+- [Laboratorio 10]{.alert}: discusión de proyectos y preguntas y respuestas
+
+<br>
+
+:::{style="text-align: center;"}
+[Antes del laboratorio: `ollama pull frob/qwen3.5-instruct:4b` (~3,4 GB)]{.alert}
+:::
+:::
+
+# Nos vemos en unos minutos 😉 {background-color="#2d4563"}

@@ -187,4 +187,12 @@ El paquete `quallmer` (Día 4) no está en CRAN, así que se instala desde GitHu
 pak::pak("quallmer/quallmer")
 ```
 
+Para los Días 4 y 5 también necesitan [Ollama](https://ollama.com/download) instalado y el modelo local descargado. Desde una terminal, ejecutar:
+
+```bash
+ollama pull frob/qwen3.5-instruct:4b
+```
+
+Consulten la pestaña [Programa](programa.qmd) para las instrucciones de instalación paso a paso.
+
 Se enviarán instrucciones detalladas de instalación por correo electrónico antes del inicio del curso.

@@ -154,8 +154,9 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 **[Sesión 5.4: Mini-propuestas de investigación](clases/dia-05/20-propuestas-cierre.html)**
 
 - Integración de IA en el flujo de investigación
-- Taller: cada estudiante diseña una mini-propuesta aplicando una técnica del curso a una pregunta de ciencias sociales relevante para América Latina
-- Presentaciones breves (5 minutos) y discusión
+- Estructura de una mini-propuesta: pregunta, datos, técnica, evaluación y consideraciones éticas
+- Taller: cada estudiante (individual o en parejas) diseña una mini-propuesta aplicando una técnica del curso a una pregunta de ciencias sociales relevante para América Latina
+- Discusión y cierre del curso
 
 ## Software necesario
 
