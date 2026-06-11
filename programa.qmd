@@ -129,15 +129,29 @@ Presencial. El curso se dicta en un formato intensivo de 20 horas totales (5 dí
 - Validar contra códigos humanos (`qlm_validate`) y medir confiabilidad (`qlm_replicate`, `qlm_compare`)
 - Auditoría de sesgo con un LLM como codificador y generación de datos sintéticos de encuesta
 
-### Día 5: Ética, sesgo algorítmico y cierre
+### Día 5: Modelos locales, ética y cierre
 
-**[Sesión 5.1: Ética y sesgo algorítmico](clases/dia-05/09-etica-sesgo.html)**
+**[Sesión 5.1: Modelos locales](clases/dia-05/17-modelos-locales.html)**
 
-- Tipos de sesgo y cómo surgen
-- Métricas de equidad
-- Regulación: EU AI Act, legislación latinoamericana, Ley 18.331 (Uruguay)
+- Modelos de pesos abiertos y por qué la ciencia los necesita
+- Cuantización: cómo entra un LLM en una laptop
+- Ollama desde la terminal y desde R
+- Modelos locales en la investigación: datos sensibles, corpus grandes, reproducibilidad
 
-**[Sesión 5.2: Mini-propuestas de investigación](clases/dia-05/12-propuestas-cierre.html)**
+**[Sesión 5.2: Ética y regulación](clases/dia-05/18-etica-regulacion.html)**
+
+- Tipos de sesgo y casos en América Latina
+- Métricas de equidad y el teorema de imposibilidad
+- Privacidad y datos sensibles: Ley 18.331 (Uruguay) y GDPR
+- Regulación: EU AI Act y legislación latinoamericana
+
+**[Laboratorio 9: Modelos locales y auditoría de equidad](clases/dia-05/19-laboratorio-09.html)**
+
+- Codificar entrevistas sensibles (simuladas) con `quallmer` y un modelo local
+- Validar contra un gold standard humano y mejorar el codebook
+- Auditar un modelo de crédito con `fairmodels`: regla del 80%, métricas por grupo y mitigación
+
+**[Sesión 5.4: Mini-propuestas de investigación](clases/dia-05/20-propuestas-cierre.html)**
 
 - Integración de IA en el flujo de investigación
 - Taller: cada estudiante diseña una mini-propuesta aplicando una técnica del curso a una pregunta de ciencias sociales relevante para América Latina
@@ -195,20 +209,18 @@ cat("Todo listo para el curso!")
 
 Si ambos paquetes se cargan sin errores, la instalación fue exitosa.
 
-**Paso 5:** Instalar Ollama y descargar un modelo local. En el Día 4 vamos a ejecutar modelos de lenguaje directamente en la computadora, sin enviar datos a internet.
+**Paso 5:** Instalar Ollama y descargar el modelo local. En los Días 4 y 5 vamos a ejecutar modelos de lenguaje directamente en la computadora, sin enviar datos a internet.
 
 1. Descargar Ollama desde <https://ollama.com/download> e instalarlo siguiendo las instrucciones para su sistema operativo
 2. Abrir una terminal y descargar el modelo que usaremos en clase. En Windows, buscar "Símbolo del sistema" o "PowerShell" en el menú de inicio; en macOS, abrir "Terminal" (está en Aplicaciones → Utilidades, o buscándola con Spotlight con `Cmd + Espacio`); en Linux, abrir la aplicación "Terminal" (en muchas distribuciones, con `Ctrl + Alt + T`). Una vez en la terminal, ejecutar:
 
 ```bash
-ollama pull qwen3.5:4b
+ollama pull frob/qwen3.5-instruct:4b
 ```
 
-3. Si la computadora tiene menos de 8 GB de RAM, descargar la versión más liviana, que funciona igual pero ocupa menos memoria:
+Es la variante *instruct* (sin razonamiento) de `qwen3.5`, la que usamos para codificar texto en los laboratorios y las tareas. Ocupa unos 3,4 GB.
 
-```bash
-ollama pull qwen3.5:0.8b
-```
+3. Opcional: las diapositivas también muestran la variante con razonamiento, `qwen3.5:4b`, para chatear desde la terminal. No hace falta para los laboratorios, pero si quieren probarla, `ollama pull qwen3.5:4b` (o la versión liviana `qwen3.5:0.8b` si la computadora tiene menos de 8 GB de RAM)
 
 4. Para verificar que el modelo quedó descargado, ejecutar `ollama list`. Debería aparecer en la lista de modelos instalados:
 
@@ -219,7 +231,7 @@ ollama list
 5. Para comprobar que el modelo responde, ejecutar en la terminal:
 
 ```bash
-ollama run qwen3.5:4b
+ollama run frob/qwen3.5-instruct:4b
 ```
 
 Escribir una pregunta cualquiera y, para salir, escribir `/bye`. Mientras Ollama esté instalado y abierto, R podrá conectarse al modelo durante el laboratorio.

@@ -67,22 +67,28 @@ Las diapositivas de cada día se publicarán aquí a medida que avance el curso.
 [Sesión 4.2: LLMs como herramientas de investigación. Anotación, datos sintéticos, APIs.]{.day-topics}
 
 ::: {.resource-links}
-[Sesión 4.1: Entendiendo los LLMs](clases/dia-04/07-entendiendo-llms.html) |
-[Sesión 4.2: LLMs como herramientas](clases/dia-04/08-llms-investigacion.html)
+[Sesión 4.1: Entendiendo los LLMs](clases/dia-04/13-entendiendo-llms.html) |
+[Sesión 4.2: LLMs como herramientas](clases/dia-04/14-llms-investigacion.html) |
+[Lab 7: Primeros pasos con ellmer](clases/dia-04/15-laboratorio-07.html) |
+[Lab 8: Codificación y confiabilidad](clases/dia-04/16-laboratorio-08.html)
 :::
 :::
 
 ::: {.day-card}
 [Día 5]{.day-number}
 
-[Ética, sesgo algorítmico y cierre]{.day-title}
+[Modelos locales, ética y cierre]{.day-title}
 
-[Sesión 5.1: Ética y sesgo. Métricas de equidad, regulación.]{.day-topics}
+[Sesión 5.1: Modelos locales. Pesos abiertos, cuantización, Ollama, datos sensibles.]{.day-topics}
 
-[Sesión 5.2: Mini-propuestas de investigación y presentaciones.]{.day-topics}
+[Sesión 5.2: Ética y regulación. Sesgo algorítmico, equidad, privacidad.]{.day-topics}
+
+[Sesión 5.4: Mini-propuestas de investigación y presentaciones.]{.day-topics}
 
 ::: {.resource-links}
-[Sesión 5.1: Ética y sesgo](clases/dia-05/09-etica-sesgo.html) |
-[Sesión 5.2: Propuestas y cierre](clases/dia-05/10-propuestas-cierre.html)
+[Sesión 5.1: Modelos locales](clases/dia-05/17-modelos-locales.html) |
+[Sesión 5.2: Ética y regulación](clases/dia-05/18-etica-regulacion.html) |
+[Lab 9: Modelos locales y equidad](clases/dia-05/19-laboratorio-09.html) |
+[Sesión 5.4: Propuestas y cierre](clases/dia-05/20-propuestas-cierre.html)
 :::
 :::

@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c82d23df098fe35fa8fa698ecfe1c56e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -271,7 +271,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Esta página es una referencia rápida de las funciones que usamos en el Día 4 para trabajar con modelos de lenguaje (LLMs) desde R: la Sesión 4.1 (entender los LLMs), la Sesión 4.2 (LLMs como herramientas de investigación) y los Laboratorios 7 y 8.</p>
+<p>Esta página es una referencia rápida de las funciones que usamos en el Día 4 para trabajar con modelos de lenguaje (LLMs) desde R: la Sesión 4.1 (entender los LLMs), la Sesión 4.2 (LLMs como herramientas de investigación) y los Laboratorios 7 y 8. En el Día 5 (Sesión 5.1 y Laboratorio 9) usamos las mismas funciones con un modelo local vía Ollama; las diferencias están marcadas a lo largo de la página.</p>
 <p>A diferencia de las otras páginas de referencia, <strong>aquí el código no se ejecuta al construir el sitio</strong>: cada llamada a un modelo consume una petición a una API, así que los bloques se muestran con una salida de ejemplo comentada (<code>#&gt;</code>). Para correrlos de verdad, copien el código en RStudio con una clave de API configurada (ver más abajo). Las salidas que muestra el modelo varían entre corridas, ese es justamente uno de los temas del Día 4.</p>
 <p>Usamos dos paquetes que se complementan:</p>
 <ul>
@@ -352,10 +352,26 @@ Importante
 </section>
 <section id="alternativa-local-ollama" class="level3" data-number="1.4">
 <h3 data-number="1.4" class="anchored" data-anchor-id="alternativa-local-ollama"><span class="header-section-number">1.4</span> Alternativa local: Ollama</h3>
-<p>Si no quieren depender de una API en la nube (por privacidad o por costo), <code>ellmer</code> también habla con un modelo corriendo en su computadora vía <a href="https://ollama.com/">Ollama</a>. El resto del código es idéntico.</p>
+<p>Si no quieren depender de una API en la nube (por privacidad o por costo), <code>ellmer</code> también habla con un modelo corriendo en su computadora vía <a href="https://ollama.com/">Ollama</a>. El resto del código es idéntico. Este es el flujo del Día 5, donde los datos no pueden salir de la máquina.</p>
+<p>En el curso usamos dos variantes del mismo modelo, y la elección importa:</p>
+<ul>
+<li><code>qwen3.5:4b</code>: la variante con razonamiento. Buena para chatear y para problemas difíciles, pero “piensa” uno o dos minutos por cada texto</li>
+<li><code>frob/qwen3.5-instruct:4b</code>: la variante <em>instruct</em>, sin razonamiento. Es la que usamos para codificar con <code>quallmer</code>: rápida y estable con salida estructurada</li>
+</ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_ollama</span>(<span class="at">model =</span> <span class="st">"qwen3.5:4b"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"Hola, ¿funcionás de manera local?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># En la terminal, una sola vez: ollama pull frob/qwen3.5-instruct:4b</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_ollama</span>(<span class="at">model =</span> <span class="st">"frob/qwen3.5-instruct:4b"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"Hola, ¿funcionás de manera local?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Para <code>qlm_code()</code> vale la misma regla del prefijo: el modelo lleva <code>"ollama/"</code> adelante. Y conviene <code>max_active = 1</code>: el servidor local procesa de a un pedido por vez, así que el paralelismo que usamos con la nube acá da timeouts.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>codificado_local <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  textos<span class="sc">$</span>texto,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  codebook,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">"ollama/frob/qwen3.5-instruct:4b"</span>,   <span class="co"># CON el prefijo "ollama/"</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_active =</span> <span class="dv">1</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">params =</span> <span class="fu">params</span>(<span class="at">temperature =</span> <span class="dv">0</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -365,51 +381,51 @@ Importante
 <h3 data-number="2.1" class="anchored" data-anchor-id="el-primer-chat"><span class="header-section-number">2.1</span> El primer chat</h3>
 <p><code>chat_openrouter()</code> crea un objeto de conversación. El método <code>$chat()</code> envía un mensaje y devuelve la respuesta como texto.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué es la democracia representativa? Respondé en dos oraciones."</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "La democracia representativa es un sistema en el que la ciudadanía</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      elige a representantes para que tomen decisiones políticas en su</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      nombre. Combina la soberanía popular con la delegación..."</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué es la democracia representativa? Respondé en dos oraciones."</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "La democracia representativa es un sistema en el que la ciudadanía</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      elige a representantes para que tomen decisiones políticas en su</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      nombre. Combina la soberanía popular con la delegación..."</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="system-prompt-fijar-un-rol" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="system-prompt-fijar-un-rol"><span class="header-section-number">2.2</span> System prompt: fijar un rol</h3>
 <p>El <em>system prompt</em> define el papel del modelo y permanece activo durante toda la sesión del chat. Es la palanca principal para controlar el tono y el formato de las respuestas.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un investigador en ciencia política latinoamericana.</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Respondés en dos oraciones, en español, con vocabulario académico claro."</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué desafíos enfrenta la democracia en América Latina?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un investigador en ciencia política latinoamericana.</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Respondés en dos oraciones, en español, con vocabulario académico claro."</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué desafíos enfrenta la democracia en América Latina?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="el-historial-se-acumula" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="el-historial-se-acumula"><span class="header-section-number">2.3</span> El historial se acumula</h3>
 <p>El objeto <code>chat</code> guarda toda la conversación y la reenvía al modelo en cada llamada. Eso permite hacer preguntas de seguimiento sin repetir el contexto, pero también hace crecer el costo en tokens.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esta segunda pregunta "recuerda" la anterior sin que repitamos el tema</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Y cuál de esos desafíos es el más urgente?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esta segunda pregunta "recuerda" la anterior sin que repitamos el tema</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Y cuál de esos desafíos es el más urgente?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="el-system-prompt-como-variable-de-control" class="level3" data-number="2.4">
 <h3 data-number="2.4" class="anchored" data-anchor-id="el-system-prompt-como-variable-de-control"><span class="header-section-number">2.4</span> El system prompt como variable de control</h3>
 <p>Cambiar el rol cambia las respuestas, aunque el modelo y la pregunta sean los mismos. Por eso el <em>system prompt</em> es una decisión metodológica, no un detalle cosmético: puede inducir sesgo.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mercado <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un economista ortodoxo. Defendés la disciplina fiscal</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="st">  y los mercados libres. Respondés en tres oraciones."</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>social <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un economista heterodoxo. Defendés la redistribución</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="st">  y la intervención pública. Respondés en tres oraciones."</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>pregunta <span class="ot">&lt;-</span> <span class="st">"¿Cómo responder a una crisis de inflación?"</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Mercado ---</span><span class="sc">\n</span><span class="st">"</span>, mercado<span class="sc">$</span><span class="fu">chat</span>(pregunta), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Social ---</span><span class="sc">\n</span><span class="st">"</span>,  social<span class="sc">$</span><span class="fu">chat</span>(pregunta), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mercado <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un economista ortodoxo. Defendés la disciplina fiscal</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="st">  y los mercados libres. Respondés en tres oraciones."</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>social <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un economista heterodoxo. Defendés la redistribución</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">  y la intervención pública. Respondés en tres oraciones."</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>pregunta <span class="ot">&lt;-</span> <span class="st">"¿Cómo responder a una crisis de inflación?"</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Mercado ---</span><span class="sc">\n</span><span class="st">"</span>, mercado<span class="sc">$</span><span class="fu">chat</span>(pregunta), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Social ---</span><span class="sc">\n</span><span class="st">"</span>,  social<span class="sc">$</span><span class="fu">chat</span>(pregunta), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -419,53 +435,53 @@ Importante
 <h3 data-number="3.1" class="anchored" data-anchor-id="zero-shot-clasificar-sin-ejemplos"><span class="header-section-number">3.1</span> Zero-shot: clasificar sin ejemplos</h3>
 <p>El patrón básico de anotación: una función que crea un chat nuevo por cada texto (para que un texto no contamine al siguiente) y devuelve sólo la categoría.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>clasificar <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> MODELO,</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá el texto político en EXACTAMENTE una categoría:</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="st">    economia, educacion, seguridad, salud, medioambiente.</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="st">    Respondé SOLO con la categoría, en minúsculas y sin tildes."</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar</span>(<span class="st">"La inflación volvió a subir este mes"</span>)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "economia"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>clasificar <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> MODELO,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá el texto político en EXACTAMENTE una categoría:</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">    economia, educacion, seguridad, salud, medioambiente.</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">    Respondé SOLO con la categoría, en minúsculas y sin tildes."</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar</span>(<span class="st">"La inflación volvió a subir este mes"</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "economia"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="few-shot-mejorar-con-ejemplos" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="few-shot-mejorar-con-ejemplos"><span class="header-section-number">3.2</span> Few-shot: mejorar con ejemplos</h3>
 <p>Incluir un puñado de ejemplos en el prompt (“few-shot”) suele subir la accuracy, sobre todo en casos ambiguos. Los ejemplos son una decisión de diseño: cambian los resultados y hay que documentarlos.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>clasificar_fewshot <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> MODELO,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá en: economia, educacion, seguridad, salud, medioambiente.</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">    Ejemplos:</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'La inflación volvió a subir' -&gt; economia</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Los docentes piden mejores salarios' -&gt; educacion</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Aumentaron los robos en la capital' -&gt; seguridad</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Se inauguró un nuevo hospital' -&gt; salud</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Los incendios forestales se extienden' -&gt; medioambiente</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="st">    Respondé SOLO con la categoría."</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>clasificar_fewshot <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> MODELO,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá en: economia, educacion, seguridad, salud, medioambiente.</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="st">    Ejemplos:</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'La inflación volvió a subir' -&gt; economia</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Los docentes piden mejores salarios' -&gt; educacion</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Aumentaron los robos en la capital' -&gt; seguridad</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Se inauguró un nuevo hospital' -&gt; salud</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'Los incendios forestales se extienden' -&gt; medioambiente</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="st">    Respondé SOLO con la categoría."</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="el-modelo-da-siempre-lo-mismo" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="el-modelo-da-siempre-lo-mismo"><span class="header-section-number">3.3</span> ¿El modelo da siempre lo mismo?</h3>
 <p>Un LLM no es determinista: la misma entrada puede dar salidas distintas. Repetir la clasificación y mirar la dispersión es una forma barata de detectar casos frontera.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>texto_ambiguo <span class="ot">&lt;-</span> <span class="st">"El presupuesto de las escuelas creció ocho puntos"</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>repeticiones <span class="ot">&lt;-</span> <span class="fu">map_chr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, \(i) <span class="fu">clasificar</span>(texto_ambiguo))</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(repeticiones)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; repeticiones</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; economia educacion</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        2         3</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>texto_ambiguo <span class="ot">&lt;-</span> <span class="st">"El presupuesto de las escuelas creció ocho puntos"</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>repeticiones <span class="ot">&lt;-</span> <span class="fu">map_chr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, \(i) <span class="fu">clasificar</span>(texto_ambiguo))</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(repeticiones)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; repeticiones</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; economia educacion</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        2         3</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -476,13 +492,13 @@ Importante
 <h3 data-number="4.1" class="anchored" data-anchor-id="definir-un-esquema-con-type_"><span class="header-section-number">4.1</span> Definir un esquema con <code>type_*()</code></h3>
 <p><code>type_object()</code> arma un registro con campos de distinto tipo. Cada campo lleva una descripción que el modelo usa como instrucción.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>tipo_registro <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">tema =</span> <span class="fu">type_enum</span>(<span class="fu">c</span>(<span class="st">"economia"</span>, <span class="st">"educacion"</span>, <span class="st">"seguridad"</span>, <span class="st">"salud"</span>),</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"El tema principal del texto"</span>),</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">menciona_gobierno =</span> <span class="fu">type_boolean</span>(<span class="st">"¿Menciona al gobierno o al Estado?"</span>),</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">urgencia =</span> <span class="fu">type_enum</span>(<span class="fu">c</span>(<span class="st">"baja"</span>, <span class="st">"media"</span>, <span class="st">"alta"</span>), <span class="st">"Urgencia que transmite"</span>),</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_actores =</span> <span class="fu">type_integer</span>(<span class="st">"Cantidad de actores políticos nombrados"</span>)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>tipo_registro <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">tema =</span> <span class="fu">type_enum</span>(<span class="fu">c</span>(<span class="st">"economia"</span>, <span class="st">"educacion"</span>, <span class="st">"seguridad"</span>, <span class="st">"salud"</span>),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"El tema principal del texto"</span>),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">menciona_gobierno =</span> <span class="fu">type_boolean</span>(<span class="st">"¿Menciona al gobierno o al Estado?"</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">urgencia =</span> <span class="fu">type_enum</span>(<span class="fu">c</span>(<span class="st">"baja"</span>, <span class="st">"media"</span>, <span class="st">"alta"</span>), <span class="st">"Urgencia que transmite"</span>),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_actores =</span> <span class="fu">type_integer</span>(<span class="st">"Cantidad de actores políticos nombrados"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Los tipos disponibles más usados:</p>
 <table class="caption-top table">
@@ -527,45 +543,45 @@ Importante
 <section id="extraer-datos-estructurados-con-chat_structured" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="extraer-datos-estructurados-con-chat_structured"><span class="header-section-number">4.2</span> Extraer datos estructurados con <code>$chat_structured()</code></h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>extraer <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Extraés información estructurada de textos políticos."</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  chat<span class="sc">$</span><span class="fu">chat_structured</span>(texto, <span class="at">type =</span> tipo_registro)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># De un texto a una fila tipada, lista para análisis</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>textos <span class="sc">|&gt;</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">registro =</span> <span class="fu">map</span>(texto, extraer)) <span class="sc">|&gt;</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_wider</span>(registro)</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 x 5</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   texto                tema      menciona_gobierno urgencia n_actores</span></span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                &lt;chr&gt;     &lt;lgl&gt;             &lt;chr&gt;        &lt;int&gt;</span></span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 "La inflación..."    economia  TRUE              alta             1</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 "Las escuelas..."    educacion FALSE             media            0</span></span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 "Los robos..."       seguridad TRUE              alta             2</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>extraer <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Extraés información estructurada de textos políticos."</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  chat<span class="sc">$</span><span class="fu">chat_structured</span>(texto, <span class="at">type =</span> tipo_registro)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># De un texto a una fila tipada, lista para análisis</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>textos <span class="sc">|&gt;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">registro =</span> <span class="fu">map</span>(texto, extraer)) <span class="sc">|&gt;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_wider</span>(registro)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 x 5</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   texto                tema      menciona_gobierno urgencia n_actores</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                &lt;chr&gt;     &lt;lgl&gt;             &lt;chr&gt;        &lt;int&gt;</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 "La inflación..."    economia  TRUE              alta             1</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 "Las escuelas..."    educacion FALSE             media            0</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 "Los robos..."       seguridad TRUE              alta             2</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="listas-de-longitud-variable-con-type_array" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="listas-de-longitud-variable-con-type_array"><span class="header-section-number">4.3</span> Listas de longitud variable con <code>type_array()</code></h3>
 <p>Útil para extracción de entidades (NER): un texto puede tener cero, una o muchas personas.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>tipo_entidades <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">personas       =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"nombres de personas"</span>),</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">organizaciones =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"organizaciones e instituciones"</span>),</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lugares        =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"lugares geográficos"</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Extraés entidades nombradas de un texto."</span>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"El presidente Lacalle Pou se reunió en Montevideo con el Mercosur."</span>,</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> tipo_entidades</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $personas       "Lacalle Pou"</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $organizaciones "Mercosur"</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $lugares        "Montevideo"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>tipo_entidades <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">personas       =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"nombres de personas"</span>),</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">organizaciones =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"organizaciones e instituciones"</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">lugares        =</span> <span class="fu">type_array</span>(<span class="fu">type_string</span>(), <span class="st">"lugares geográficos"</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Extraés entidades nombradas de un texto."</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat_structured</span>(</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"El presidente Lacalle Pou se reunió en Montevideo con el Mercosur."</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> tipo_entidades</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $personas       "Lacalle Pou"</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $organizaciones "Mercosur"</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $lugares        "Montevideo"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -576,42 +592,42 @@ Importante
 <h3 data-number="5.1" class="anchored" data-anchor-id="definir-un-codebook-con-qlm_codebook"><span class="header-section-number">5.1</span> Definir un codebook con <code>qlm_codebook()</code></h3>
 <p>El <em>codebook</em> es el corazón del método: nombra la construcción que se mide, fija la escala y describe los polos. Cuanto más operacionales las <code>instructions</code>, más confiable y replicable la codificación.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>codebook <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"ideologia"</span>,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="fu">paste</span>(</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Medí la retórica del fragmento en una escala de -10 a +10."</span>,</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-10 = muy iliberal (ataca instituciones, prensa o minorías);"</span>,</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"+10 = muy liberal (defiende derechos, división de poderes, pluralismo);"</span>,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"0 = neutral o ambiguo."</span>,</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">schema =</span> <span class="fu">type_object</span>(</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">score       =</span> <span class="fu">type_integer</span>(<span class="st">"Puntaje de -10 a +10"</span>),</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">explicacion =</span> <span class="fu">type_string</span>(<span class="st">"Breve justificación del puntaje"</span>)</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">role =</span> <span class="st">"Sos un cientista político experto en discurso democrático."</span>,</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">score =</span> <span class="st">"interval"</span>, <span class="at">explicacion =</span> <span class="st">"nominal"</span>)</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>codebook <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"ideologia"</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="fu">paste</span>(</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Medí la retórica del fragmento en una escala de -10 a +10."</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"-10 = muy iliberal (ataca instituciones, prensa o minorías);"</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"+10 = muy liberal (defiende derechos, división de poderes, pluralismo);"</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"0 = neutral o ambiguo."</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">schema =</span> <span class="fu">type_object</span>(</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">score       =</span> <span class="fu">type_integer</span>(<span class="st">"Puntaje de -10 a +10"</span>),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">explicacion =</span> <span class="fu">type_string</span>(<span class="st">"Breve justificación del puntaje"</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">role =</span> <span class="st">"Sos un cientista político experto en discurso democrático."</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">score =</span> <span class="st">"interval"</span>, <span class="at">explicacion =</span> <span class="st">"nominal"</span>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>El argumento <code>levels</code> le dice a <code>quallmer</code> cómo tratar cada campo al validar: <code>"interval"</code> (correlación y error), <code>"nominal"</code> (accuracy y kappa) u <code>"ordinal"</code>.</p>
 </section>
 <section id="codificar-el-corpus-con-qlm_code" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="codificar-el-corpus-con-qlm_code"><span class="header-section-number">5.2</span> Codificar el corpus con <code>qlm_code()</code></h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>codificado <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  discursos<span class="sc">$</span>texto,        <span class="co"># vector de textos</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  codebook,</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO_QLM,     <span class="co"># ¡con el prefijo "openrouter/"!</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_active =</span> <span class="dv">2</span>          <span class="co"># peticiones en paralelo (bajo para modelos :free)</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>codificado</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 15 x 3</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    score explicacion                                   .error</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;                                         &lt;list&gt;</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1     8 "Defiende la independencia judicial y..."     &lt;NULL&gt;</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  2    -7 "Ataca a la prensa y concentra poder..."      &lt;NULL&gt;</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3     2 "Apela al pueblo pero respeta las..."         &lt;NULL&gt;</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ...</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>codificado <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  discursos<span class="sc">$</span>texto,        <span class="co"># vector de textos</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  codebook,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO_QLM,     <span class="co"># ¡con el prefijo "openrouter/"!</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">max_active =</span> <span class="dv">2</span>          <span class="co"># peticiones en paralelo (bajo para modelos :free)</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>codificado</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 15 x 3</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    score explicacion                                   .error</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;                                         &lt;list&gt;</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1     8 "Defiende la independencia judicial y..."     &lt;NULL&gt;</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  2    -7 "Ataca a la prensa y concentra poder..."      &lt;NULL&gt;</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3     2 "Apela al pueblo pero respeta las..."         &lt;NULL&gt;</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ...</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -634,31 +650,32 @@ Tip
 <section id="construir-el-gold-standard-con-qlm_humancoded" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="construir-el-gold-standard-con-qlm_humancoded"><span class="header-section-number">6.1</span> Construir el gold standard con <code>qlm_humancoded()</code></h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tus propios puntajes para una submuestra (sin llamar a ninguna API)</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>gold <span class="ot">&lt;-</span> <span class="fu">qlm_humancoded</span>(</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">.id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">score =</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="sc">-</span><span class="dv">7</span>, <span class="dv">2</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">5</span>, <span class="sc">-</span><span class="dv">9</span>)),</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"humano"</span>,</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">codebook =</span> codebook</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tus propios puntajes para una submuestra (sin llamar a ninguna API)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>gold <span class="ot">&lt;-</span> <span class="fu">qlm_humancoded</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">.id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="at">score =</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="sc">-</span><span class="dv">7</span>, <span class="dv">2</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="dv">5</span>, <span class="sc">-</span><span class="dv">9</span>)),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"humano"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">codebook =</span> codebook</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="comparar-llm-y-humano-con-qlm_validate" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="comparar-llm-y-humano-con-qlm_validate"><span class="header-section-number">6.2</span> Comparar LLM y humano con <code>qlm_validate()</code></h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>validacion <span class="ot">&lt;-</span> <span class="fu">qlm_validate</span>(codificado, <span class="at">gold =</span> gold,</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">by =</span> <span class="st">"score"</span>, <span class="at">level =</span> <span class="st">"interval"</span>)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># El print() de quallmer usa cli y no siempre se ve en HTML;</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># mostralo como tabla:</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(validacion) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble (salida ilustrativa)</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   measure   value</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt;</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 n         6</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 pearson   0.91   # ordena los discursos como vos</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 icc       0.78   # coincide en el orden, menos en el nivel exacto</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>validacion <span class="ot">&lt;-</span> <span class="fu">qlm_validate</span>(codificado, <span class="at">gold =</span> gold,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">by =</span> <span class="st">"score"</span>, <span class="at">level =</span> <span class="st">"interval"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># El print() de quallmer usa cli y no siempre se ve en HTML;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># mostralo como tabla:</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(validacion) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble (salida ilustrativa)</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   measure   value</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt;</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 n         6</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 pearson   0.91   # ordena los discursos como vos</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 icc       0.78   # coincide en el orden, menos en el nivel exacto</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Una correlación de Pearson alta significa que el modelo <strong>ordena</strong> los casos como el humano. Un ICC alto significa que además coincide en el <strong>nivel</strong> exacto, no sólo en el orden. Las filas exactas dependen del <code>level</code> (intervalo, nominal u ordinal).</p>
+<p>Con variables nominales (categorías, como en el Laboratorio 9), <code>level = "nominal"</code> devuelve otras métricas: accuracy, precision, recall, F1 y kappa. El kappa es el acuerdo corregido por azar; la referencia usual es kappa ≥ 0,7 para confiar en el codificador.</p>
 </section>
 </section>
 <section id="confiabilidad" class="level2" data-number="7">
@@ -668,25 +685,25 @@ Tip
 <h3 data-number="7.1" class="anchored" data-anchor-id="test-retest-con-qlm_replicate"><span class="header-section-number">7.1</span> Test-retest con <code>qlm_replicate()</code></h3>
 <p>Volver a codificar con el <strong>mismo</strong> modelo mide cuánto varía el LLM entre corridas. Con un modelo <strong>distinto</strong>, mide acuerdo entre modelos.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Misma codificación, segunda corrida (test-retest)</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>codificado_b <span class="ot">&lt;-</span> <span class="fu">qlm_replicate</span>(codificado, <span class="at">name =</span> <span class="st">"corrida_b"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Misma codificación, segunda corrida (test-retest)</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>codificado_b <span class="ot">&lt;-</span> <span class="fu">qlm_replicate</span>(codificado, <span class="at">name =</span> <span class="st">"corrida_b"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="comparar-dos-codificaciones-con-qlm_compare" class="level3" data-number="7.2">
 <h3 data-number="7.2" class="anchored" data-anchor-id="comparar-dos-codificaciones-con-qlm_compare"><span class="header-section-number">7.2</span> Comparar dos codificaciones con <code>qlm_compare()</code></h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>confiabilidad <span class="ot">&lt;-</span> <span class="fu">qlm_compare</span>(codificado, codificado_b,</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">by =</span> <span class="st">"score"</span>, <span class="at">level =</span> <span class="st">"interval"</span>,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">tolerance =</span> <span class="dv">2</span>)   <span class="co"># diferencias &lt;= 2 cuentan como acuerdo</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(confiabilidad) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble (salida ilustrativa)</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   measure              value</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                &lt;dbl&gt;</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 percent_agreement    0.87</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 krippendorff_alpha   0.82   # &gt; 0.80 suele tomarse como confiable</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 icc                  0.85</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 pearson              0.90</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>confiabilidad <span class="ot">&lt;-</span> <span class="fu">qlm_compare</span>(codificado, codificado_b,</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">by =</span> <span class="st">"score"</span>, <span class="at">level =</span> <span class="st">"interval"</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">tolerance =</span> <span class="dv">2</span>)   <span class="co"># diferencias &lt;= 2 cuentan como acuerdo</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(confiabilidad) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble (salida ilustrativa)</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   measure              value</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                &lt;dbl&gt;</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 percent_agreement    0.87</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 krippendorff_alpha   0.82   # &gt; 0.80 suele tomarse como confiable</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 icc                  0.85</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 pearson              0.90</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -707,64 +724,64 @@ Nota
 <h2 data-number="8" class="anchored" data-anchor-id="datos-sintéticos"><span class="header-section-number">8</span> Datos sintéticos</h2>
 <p>Un LLM puede generar estímulos para experimentos (viñetas de encuesta, descripciones de candidatos) variando un atributo y manteniendo el resto constante. Hay que leerlos a mano: heredan los sesgos del modelo.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>tipo_vineta <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">postura =</span> <span class="fu">type_enum</span>(<span class="fu">c</span>(<span class="st">"restrictiva"</span>, <span class="st">"abierta"</span>), <span class="st">"postura migratoria"</span>),</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">texto   =</span> <span class="fu">type_string</span>(<span class="st">"viñeta de 2-3 oraciones sobre el candidato"</span>)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>tipo_vinetas <span class="ot">&lt;-</span> <span class="fu">type_array</span>(tipo_vineta, <span class="st">"lista de viñetas"</span>)</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>generador <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Generás viñetas para un experimento de encuesta. Deben ser</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="st">  realistas, comparables y diferir SÓLO en la postura migratoria."</span>)</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>vinetas <span class="ot">&lt;-</span> generador<span class="sc">$</span><span class="fu">chat_structured</span>(</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Generá 4 viñetas: 2 restrictivas y 2 abiertas."</span>,</span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> tipo_vinetas</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(vinetas)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>tipo_vineta <span class="ot">&lt;-</span> <span class="fu">type_object</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">postura =</span> <span class="fu">type_enum</span>(<span class="fu">c</span>(<span class="st">"restrictiva"</span>, <span class="st">"abierta"</span>), <span class="st">"postura migratoria"</span>),</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">texto   =</span> <span class="fu">type_string</span>(<span class="st">"viñeta de 2-3 oraciones sobre el candidato"</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>tipo_vinetas <span class="ot">&lt;-</span> <span class="fu">type_array</span>(tipo_vineta, <span class="st">"lista de viñetas"</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>generador <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Generás viñetas para un experimento de encuesta. Deben ser</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="st">  realistas, comparables y diferir SÓLO en la postura migratoria."</span>)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>vinetas <span class="ot">&lt;-</span> generador<span class="sc">$</span><span class="fu">chat_structured</span>(</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Generá 4 viñetas: 2 restrictivas y 2 abiertas."</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> tipo_vinetas</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="fu">as_tibble</span>(vinetas)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="auditar-sesgos" class="level2" data-number="9">
 <h2 data-number="9" class="anchored" data-anchor-id="auditar-sesgos"><span class="header-section-number">9</span> Auditar sesgos</h2>
 <p>Antes de confiar en un modelo, conviene auditarlo: enviar entradas que sólo difieren en una etiqueta (género, ideología, nacionalidad) y ver si el trato cambia de forma sistemática. La auditoría no elimina el sesgo, pero lo vuelve visible y reportable.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>etiquetas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"un político de izquierda"</span>, <span class="st">"un político de derecha"</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>describir <span class="ot">&lt;-</span> <span class="cf">function</span>(etiqueta) {</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Sos un analista político. Respondés en tres oraciones."</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  chat<span class="sc">$</span><span class="fu">chat</span>(<span class="fu">sprintf</span>(<span class="st">"Describí las propuestas económicas de %s."</span>, etiqueta))</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Codificamos el TONO de cada descripción con un codebook, y comparamos</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>codebook_tono <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"tono"</span>,</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">"Puntuá el tono de -5 (muy crítico) a +5 (muy favorable)."</span>,</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">schema =</span> <span class="fu">type_object</span>(<span class="at">tono =</span> <span class="fu">type_integer</span>(<span class="st">"de -5 a +5"</span>)),</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">role =</span> <span class="st">"Analizás el tono de descripciones políticas."</span>,</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">tono =</span> <span class="st">"interval"</span>)</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>respuestas <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">etiqueta =</span> etiquetas,</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">respuesta =</span> <span class="fu">map_chr</span>(etiquetas, describir))</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>tono <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(respuestas<span class="sc">$</span>respuesta, codebook_tono, <span class="at">model =</span> MODELO_QLM)</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>respuestas <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">tono =</span> tono<span class="sc">$</span>tono) <span class="sc">|&gt;</span> <span class="fu">select</span>(etiqueta, tono)</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 x 2 (salida ilustrativa)</span></span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   etiqueta                    tono</span></span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                      &lt;int&gt;</span></span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 un político de izquierda       1</span></span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 un político de derecha        -1   # un trato distinto = señal de sesgo</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>etiquetas <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"un político de izquierda"</span>, <span class="st">"un político de derecha"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>describir <span class="ot">&lt;-</span> <span class="cf">function</span>(etiqueta) {</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Sos un analista político. Respondés en tres oraciones."</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  chat<span class="sc">$</span><span class="fu">chat</span>(<span class="fu">sprintf</span>(<span class="st">"Describí las propuestas económicas de %s."</span>, etiqueta))</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Codificamos el TONO de cada descripción con un codebook, y comparamos</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>codebook_tono <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"tono"</span>,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">"Puntuá el tono de -5 (muy crítico) a +5 (muy favorable)."</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">schema =</span> <span class="fu">type_object</span>(<span class="at">tono =</span> <span class="fu">type_integer</span>(<span class="st">"de -5 a +5"</span>)),</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">role =</span> <span class="st">"Analizás el tono de descripciones políticas."</span>,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">tono =</span> <span class="st">"interval"</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>respuestas <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">etiqueta =</span> etiquetas,</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">respuesta =</span> <span class="fu">map_chr</span>(etiquetas, describir))</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>tono <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(respuestas<span class="sc">$</span>respuesta, codebook_tono, <span class="at">model =</span> MODELO_QLM)</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>respuestas <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">tono =</span> tono<span class="sc">$</span>tono) <span class="sc">|&gt;</span> <span class="fu">select</span>(etiqueta, tono)</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 x 2 (salida ilustrativa)</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   etiqueta                    tono</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                      &lt;int&gt;</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 un político de izquierda       1</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 un político de derecha        -1   # un trato distinto = señal de sesgo</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="trazabilidad" class="level2" data-number="10">
 <h2 data-number="10" class="anchored" data-anchor-id="trazabilidad"><span class="header-section-number">10</span> Trazabilidad</h2>
 <p><code>qlm_trail()</code> guarda un registro reproducible de todo el proceso (codebook, codificaciones, métricas) en un archivo <code>.rds</code>. Sirve como material suplementario de un paper.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OJO: qlm_trail() devuelve de forma INVISIBLE. Para verlo, asignar y nombrar:</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>trail <span class="ot">&lt;-</span> <span class="fu">qlm_trail</span>(codificado, codificado_b, confiabilidad,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">path =</span> <span class="st">"trail_ideologia"</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>trail</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># OJO: qlm_trail() devuelve de forma INVISIBLE. Para verlo, asignar y nombrar:</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>trail <span class="ot">&lt;-</span> <span class="fu">qlm_trail</span>(codificado, codificado_b, confiabilidad,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">path =</span> <span class="st">"trail_ideologia"</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>trail</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="recomendaciones-prácticas" class="level2" data-number="11">
@@ -776,7 +793,8 @@ Nota
 <li><strong>Reportar el modelo y la fecha</strong>: los modelos cambian. <code>nvidia/nemotron-3-...</code> de hoy puede no existir en un año. Documenten el nombre exacto y cuándo lo usaron.</li>
 <li><strong>Temperatura baja (0)</strong> para favorecer la reproducibilidad, y aun así esperar variación entre corridas.</li>
 <li><strong>Auditar antes de publicar</strong>: enviar entradas que sólo difieren en una etiqueta sensible y revisar si el trato cambia.</li>
-<li><strong>El prefijo del modelo</strong>: sin <code>openrouter/</code> para <code>chat_openrouter()</code>, con <code>openrouter/</code> para <code>qlm_code()</code>.</li>
+<li><strong>El prefijo del modelo</strong>: sin <code>openrouter/</code> para <code>chat_openrouter()</code>, con <code>openrouter/</code> para <code>qlm_code()</code>. Lo mismo con Ollama: <code>chat_ollama(model = "frob/...")</code> pero <code>qlm_code(model = "ollama/frob/...")</code>.</li>
+<li><strong>Con Ollama, <code>max_active = 1</code></strong>: el servidor local no maneja pedidos en paralelo como una API en la nube.</li>
 <li><strong>Mostrar las métricas con <code>as_tibble() |&gt; select(measure, value)</code></strong>: el <code>print()</code> de <code>quallmer</code> usa <code>cli</code> y a veces no aparece en HTML.</li>
 </ul>
 </section>

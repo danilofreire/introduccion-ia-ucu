@@ -1,0 +1,150 @@
+---
+title: "Tarea 9: Modelos locales y auditoría de equidad"
+subtitle: "IA para Científicos Sociales - UCU"
+author: "Danilo Freire"
+date: "2026-04-16"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+lang: es
+engine: knitr
+---
+
+## Instrucciones
+
+Esta tarea aplica los conceptos del Laboratorio 9 a un caso [nuevo]{.alert}: respuestas abiertas de una encuesta sobre salud mental. Una encuesta preguntó a personas que dejaron de ir (o nunca fueron) a una consulta psicológica por qué no lo hicieron. Los relatos hablan de salud, así que son [datos sensibles]{.alert} según la Ley 18.331: no pueden salir de su máquina, y por eso toda la Parte A usa el modelo local. En la Parte B auditan la equidad de un modelo de crédito, como en el laboratorio, pero con otro modelo y otra pregunta.
+
+**Para trabajar en esta tarea:**
+
+1. Descarguen este archivo `.qmd` y `consultas_salud_mental.csv` (en `clases/dia-05/datos/`) de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`. Mantengan el CSV en una subcarpeta `datos/` junto al `.qmd`
+2. Necesitan Quarto y RStudio (>= 2022.07)
+3. Necesitan [Ollama](https://ollama.com/) corriendo y el modelo del laboratorio: `ollama pull frob/qwen3.5-instruct:4b` (~3,4 GB). [No hace falta ninguna API key]{.alert}: todo corre en su computadora
+4. Instalar `quallmer` desde GitHub si aún no lo hicieron: `install.packages("pak"); pak::pak("quallmer/quallmer")`. Para la Parte B: `install.packages(c("fairmodels", "DALEX"))`
+5. Abrir este archivo en RStudio y ejecutar los bloques con Ctrl+Enter
+
+### Configuración
+
+```{r setup, message=FALSE, warning=FALSE}
+library(ellmer)
+library(quallmer)
+library(tidyverse)
+
+set.seed(2026)
+
+# Ollama tiene que estar corriendo (abran la aplicación o `ollama serve`)
+consultas <- read_csv("datos/consultas_salud_mental.csv", show_col_types = FALSE)
+
+MODELO_LOCAL <- "ollama/frob/qwen3.5-instruct:4b"
+```
+
+## Codificación con un modelo local
+
+### Pregunta 1: Diseñar un codebook nominal
+
+Diseñá desde cero un codebook para clasificar el [motivo principal]{.alert} por el que cada persona no consultó, con las cinco categorías del CSV: `costo`, `estigma`, `desconfianza`, `falta_tiempo` y `autosuficiencia`. Definí cada categoría en las `instructions` e incluí al menos [dos reglas de decisión]{.alert} para casos límite (por ejemplo: ¿qué hacer cuando un relato menciona la plata y la falta de tiempo a la vez?). Nombrá el campo del schema `motivo`.
+
+*Pista:* el codebook del laboratorio es el molde, pero las definiciones y las reglas son de ustedes. Para categorías cerradas, `type_enum()`; el nivel es `"nominal"`.
+
+```{r p1}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 2: Humano contra humano
+
+Antes de mirar al LLM: codificá vos. Elegí seis respuestas del corpus, leelas y asignales una categoría [sin mirar la columna]{.alert} `motivo_humano`. Recién después compará tus códigos con los del equipo: ¿en cuántas coinciden? ¿Dónde no, y por qué? El desacuerdo entre codificadores humanos también existe, y conviene conocerlo antes de exigirle perfección a un modelo.
+
+*Pista:* guardá tus códigos en un vector y compará con `consultas$motivo_humano` en esas filas; `mean(tus_codigos == ...)` da la proporción de acuerdo.
+
+```{r p2}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 3: Codificar con el modelo local y validar
+
+Codificá las 18 respuestas con el modelo local y validá contra el gold del equipo (`motivo_humano`) a nivel nominal. Reportá la accuracy y el kappa. Con la referencia del curso (kappa ≥ 0,7), ¿confiarían en este codificador?
+
+*Pista:* `max_active = 1` y `params(temperature = 0)`, como en el laboratorio. El gold se construye con `qlm_humancoded()` y necesita una columna `.id` y una columna con el mismo nombre que el campo del schema.
+
+```{r p3}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 4: La tabla de confusión
+
+Una lista de desacuerdos dice dónde falló el modelo; una [tabla de confusión]{.alert} dice si los errores tienen un patrón. Crucen la categoría del modelo con la del gold y cuenten: ¿qué par de categorías se confunde más? Agreguen [una regla de decisión nueva]{.alert} al codebook para ese par, re-codifiquen y re-validen. ¿Mejoró?
+
+*Pista:* armen un tibble con las dos columnas y usen `count()`. Ojo con la interpretación: con 18 textos cada caso vale unos 5,6 puntos de accuracy, así que una mejora chica puede ser ruido.
+
+```{r p4}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 5: ¿El modelo local es determinista?
+
+La sesión 5.1 promete reproducibilidad. Pónganla a prueba: vuelvan a codificar las 18 respuestas con el mismo modelo y comparen las dos corridas a nivel nominal. ¿El acuerdo es perfecto? Expliquen por qué `temperature = 0` ayuda pero no es una garantía absoluta.
+
+*Pista:* `qlm_replicate()` repite una codificación existente (la Tarea 8 hizo lo mismo en la nube); `qlm_compare()` mide el acuerdo entre las dos corridas.
+
+```{r p5}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Auditoría de equidad
+
+### Pregunta 6: Regresión logística y fairness_check()
+
+En el laboratorio auditamos un random forest; acá van a auditar el modelo más clásico del curso. Entrenen una [regresión logística]{.alert} sobre German Credit ([sin usar]{.alert} `Sex` como predictor), creen el explicador de DALEX y corran `fairness_check()` con `Sex` como atributo protegido. Para simplificar, entrenen y auditen sobre el dataset completo (en una auditoría real usarían datos de test, como en el laboratorio). ¿El modelo pasa la regla del 80%? ¿En qué métricas falla?
+
+*Pista:* `glm(..., family = binomial)` con la variable binaria como respuesta. `DALEX::explain()` sabe predecir un `glm` solo: alcanza con el modelo, los datos (sin las columnas de `Risk`) y la `y` binaria.
+
+```{r p6}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+### Pregunta 7: Auditoría interseccional
+
+El sesgo puede esconderse en las [intersecciones]{.alert}: un modelo puede tratar bien a "las mujeres" y a "los jóvenes" en promedio, y aun así tratar mal a las mujeres jóvenes. Creen una variable que combine sexo y edad en cuatro grupos (`hombre_joven`, `hombre_mayor`, `mujer_joven`, `mujer_mayor`, con corte en 35 años), corran `fairness_check()` con esos cuatro grupos e identifiquen el más perjudicado. ¿Ese resultado se veía en la auditoría por sexo de la pregunta 6?
+
+*Pista:* `paste()` combina las dos variables; `privileged` puede ser `"hombre_mayor"`. El gráfico de `plot()` ayuda a ver qué grupo queda fuera de la zona verde.
+
+```{r p7}
+# Escriban su código aquí
+
+```
+
+**Respuesta:**
+
+## Reflexión
+
+### Pregunta 8: El párrafo para el comité de ética
+
+El equipo de la Parte A quiere procesar las respuestas en su propia máquina en lugar de enviarlas a una API en la nube. Escriban el párrafo (máximo doscientas palabras) que presentarían al comité de ética para justificar esa decisión. Incluir: por qué los relatos sobre salud mental son datos sensibles según la Ley 18.331, qué riesgo concreto evita el procesamiento local y qué control adicional implementarían de todos modos.
+
+**Respuesta:**
+
+### Pregunta 9: Recomendación al regulador
+
+Imaginen que asesoran a un regulador financiero que va a exigir una métrica de equidad para los modelos de scoring crediticio. Recomendar [una]{.alert} (paridad demográfica, igualdad de oportunidades o calibración), justificar por qué y explicar qué se pierde al elegirla, citando el teorema de imposibilidad. Máximo doscientas palabras.
+
+**Respuesta:**

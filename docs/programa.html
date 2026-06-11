@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c82d23df098fe35fa8fa698ecfe1c56e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -210,7 +210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#día-2-aprendizaje-supervisado" id="toc-día-2-aprendizaje-supervisado" class="nav-link" data-scroll-target="#día-2-aprendizaje-supervisado">Día 2: Aprendizaje supervisado</a></li>
   <li><a href="#día-3-aprendizaje-no-supervisado-y-análisis-de-texto" id="toc-día-3-aprendizaje-no-supervisado-y-análisis-de-texto" class="nav-link" data-scroll-target="#día-3-aprendizaje-no-supervisado-y-análisis-de-texto">Día 3: Aprendizaje no supervisado y análisis de texto</a></li>
   <li><a href="#día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones" id="toc-día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones" class="nav-link" data-scroll-target="#día-4-modelos-de-lenguaje-extensos-llms-y-aplicaciones">Día 4: Modelos de lenguaje extensos (LLMs) y aplicaciones</a></li>
-  <li><a href="#día-5-ética-sesgo-algorítmico-y-cierre" id="toc-día-5-ética-sesgo-algorítmico-y-cierre" class="nav-link" data-scroll-target="#día-5-ética-sesgo-algorítmico-y-cierre">Día 5: Ética, sesgo algorítmico y cierre</a></li>
+  <li><a href="#día-5-modelos-locales-ética-y-cierre" id="toc-día-5-modelos-locales-ética-y-cierre" class="nav-link" data-scroll-target="#día-5-modelos-locales-ética-y-cierre">Día 5: Modelos locales, ética y cierre</a></li>
   </ul></li>
   <li><a href="#software-necesario" id="toc-software-necesario" class="nav-link" data-scroll-target="#software-necesario">Software necesario</a>
   <ul class="collapse">
@@ -374,15 +374,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Auditoría de sesgo con un LLM como codificador y generación de datos sintéticos de encuesta</li>
 </ul>
 </section>
-<section id="día-5-ética-sesgo-algorítmico-y-cierre" class="level3">
-<h3 class="anchored" data-anchor-id="día-5-ética-sesgo-algorítmico-y-cierre">Día 5: Ética, sesgo algorítmico y cierre</h3>
-<p><strong><a href="clases/dia-05/09-etica-sesgo.html">Sesión 5.1: Ética y sesgo algorítmico</a></strong></p>
+<section id="día-5-modelos-locales-ética-y-cierre" class="level3">
+<h3 class="anchored" data-anchor-id="día-5-modelos-locales-ética-y-cierre">Día 5: Modelos locales, ética y cierre</h3>
+<p><strong><a href="clases/dia-05/17-modelos-locales.html">Sesión 5.1: Modelos locales</a></strong></p>
 <ul>
-<li>Tipos de sesgo y cómo surgen</li>
-<li>Métricas de equidad</li>
-<li>Regulación: EU AI Act, legislación latinoamericana, Ley 18.331 (Uruguay)</li>
+<li>Modelos de pesos abiertos y por qué la ciencia los necesita</li>
+<li>Cuantización: cómo entra un LLM en una laptop</li>
+<li>Ollama desde la terminal y desde R</li>
+<li>Modelos locales en la investigación: datos sensibles, corpus grandes, reproducibilidad</li>
 </ul>
-<p><strong><a href="clases/dia-05/12-propuestas-cierre.html">Sesión 5.2: Mini-propuestas de investigación</a></strong></p>
+<p><strong><a href="clases/dia-05/18-etica-regulacion.html">Sesión 5.2: Ética y regulación</a></strong></p>
+<ul>
+<li>Tipos de sesgo y casos en América Latina</li>
+<li>Métricas de equidad y el teorema de imposibilidad</li>
+<li>Privacidad y datos sensibles: Ley 18.331 (Uruguay) y GDPR</li>
+<li>Regulación: EU AI Act y legislación latinoamericana</li>
+</ul>
+<p><strong><a href="clases/dia-05/19-laboratorio-09.html">Laboratorio 9: Modelos locales y auditoría de equidad</a></strong></p>
+<ul>
+<li>Codificar entrevistas sensibles (simuladas) con <code>quallmer</code> y un modelo local</li>
+<li>Validar contra un gold standard humano y mejorar el codebook</li>
+<li>Auditar un modelo de crédito con <code>fairmodels</code>: regla del 80%, métricas por grupo y mitigación</li>
+</ul>
+<p><strong><a href="clases/dia-05/20-propuestas-cierre.html">Sesión 5.4: Mini-propuestas de investigación</a></strong></p>
 <ul>
 <li>Integración de IA en el flujo de investigación</li>
 <li>Taller: cada estudiante diseña una mini-propuesta aplicando una técnica del curso a una pregunta de ciencias sociales relevante para América Latina</li>
@@ -426,24 +440,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Todo listo para el curso!"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Si ambos paquetes se cargan sin errores, la instalación fue exitosa.</p>
-<p><strong>Paso 5:</strong> Instalar Ollama y descargar un modelo local. En el Día 4 vamos a ejecutar modelos de lenguaje directamente en la computadora, sin enviar datos a internet.</p>
+<p><strong>Paso 5:</strong> Instalar Ollama y descargar el modelo local. En los Días 4 y 5 vamos a ejecutar modelos de lenguaje directamente en la computadora, sin enviar datos a internet.</p>
 <ol type="1">
 <li>Descargar Ollama desde <a href="https://ollama.com/download" class="uri">https://ollama.com/download</a> e instalarlo siguiendo las instrucciones para su sistema operativo</li>
 <li>Abrir una terminal y descargar el modelo que usaremos en clase. En Windows, buscar “Símbolo del sistema” o “PowerShell” en el menú de inicio; en macOS, abrir “Terminal” (está en Aplicaciones → Utilidades, o buscándola con Spotlight con <code>Cmd + Espacio</code>); en Linux, abrir la aplicación “Terminal” (en muchas distribuciones, con <code>Ctrl + Alt + T</code>). Una vez en la terminal, ejecutar:</li>
 </ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull qwen3.5:4b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull frob/qwen3.5-instruct:4b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Es la variante <em>instruct</em> (sin razonamiento) de <code>qwen3.5</code>, la que usamos para codificar texto en los laboratorios y las tareas. Ocupa unos 3,4 GB.</p>
 <ol start="3" type="1">
-<li>Si la computadora tiene menos de 8 GB de RAM, descargar la versión más liviana, que funciona igual pero ocupa menos memoria:</li>
+<li><p>Opcional: las diapositivas también muestran la variante con razonamiento, <code>qwen3.5:4b</code>, para chatear desde la terminal. No hace falta para los laboratorios, pero si quieren probarla, <code>ollama pull qwen3.5:4b</code> (o la versión liviana <code>qwen3.5:0.8b</code> si la computadora tiene menos de 8 GB de RAM)</p></li>
+<li><p>Para verificar que el modelo quedó descargado, ejecutar <code>ollama list</code>. Debería aparecer en la lista de modelos instalados:</p></li>
 </ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> pull qwen3.5:0.8b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<ol start="4" type="1">
-<li>Para verificar que el modelo quedó descargado, ejecutar <code>ollama list</code>. Debería aparecer en la lista de modelos instalados:</li>
-</ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> list</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> list</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <ol start="5" type="1">
 <li>Para comprobar que el modelo responde, ejecutar en la terminal:</li>
 </ol>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> run qwen3.5:4b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ollama</span> run frob/qwen3.5-instruct:4b</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Escribir una pregunta cualquiera y, para salir, escribir <code>/bye</code>. Mientras Ollama esté instalado y abierto, R podrá conectarse al modelo durante el laboratorio.</p>
 </section>
 <section id="clave-de-api-de-openrouter" class="level3">
@@ -453,11 +465,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Paso 2:</strong> Ir a <a href="https://openrouter.ai/keys">openrouter.ai/keys</a> y generar una clave nueva (“Create Key”). Ponerle un nombre (por ejemplo, “Curso IA”) y dejar el límite de gasto en $0.00.</p>
 <p><strong>Paso 3:</strong> Copiar la clave y guardarla en un lugar seguro. Empieza con <code>sk-or-...</code> y se muestra una sola vez.</p>
 <p><strong>Paso 4:</strong> Guardar la clave en R como variable de entorno, para no tener que escribirla en cada script. En la consola de RStudio, ejecutar:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">edit_r_environ</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">edit_r_environ</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Esto abre un archivo personal llamado <code>.Renviron</code>. Agregar esta línea (sin comillas), reemplazando el ejemplo por la clave propia:</p>
 <pre><code>OPENROUTER_API_KEY=sk-or-...</code></pre>
 <p>Guardar el archivo y reiniciar R (menú “Session” → “Restart R”). Para comprobar que quedó bien configurada, ejecutar:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.getenv</span>(<span class="st">"OPENROUTER_API_KEY"</span>) <span class="sc">!=</span> <span class="st">""</span>   <span class="co"># TRUE si está bien</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.getenv</span>(<span class="st">"OPENROUTER_API_KEY"</span>) <span class="sc">!=</span> <span class="st">""</span>   <span class="co"># TRUE si está bien</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">

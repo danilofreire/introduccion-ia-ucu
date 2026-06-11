@@ -1,0 +1,17 @@
+id,texto,motivo_humano
+E01,"Me robaron la moto en la puerta de casa, en el Cerro. No fui a la comisaría porque la última vez que denuncié algo me tuvieron tres horas y al final me dijeron que no podían hacer nada. Para mí la policía no investiga nada de lo que pasa en el barrio.",desconfianza
+E02,"Mi vecina vio quién fue y todo, pero ¿para qué voy a denunciar? Acá todos sabemos que algunos policías están arreglados con los que venden. Hacer la denuncia sería como avisarles que los vi.",desconfianza
+E03,"A mi hijo le sacaron el celular a la salida del liceo. No hicimos la denuncia porque conozco gente que denunció lo mismo y nunca pasó nada. No confío en que el caso avance, son papeles que quedan en un cajón.",desconfianza
+E04,"Después de lo que salió en la prensa sobre los policías de la seccional de acá, ni loco piso esa comisaría. No les creo nada, ni que me vayan a tratar bien ni que vayan a investigar.",desconfianza
+E05,"Sé perfectamente quiénes entraron a casa, viven a dos cuadras. Pero tengo dos hijas chicas y no quiero problemas. Si denuncio, mañana me prenden fuego el auto.",miedo
+E06,"El que me amenazó es conocido en el barrio, ya estuvo preso. Prefiero perder la plata antes que arriesgarme a que me espere a la salida del trabajo.",miedo
+E07,"Vi todo desde el balcón, pero no voy a declarar nada. Esa gente sabe dónde vivo. Una denuncia no me protege a mí ni a mi familia las veinticuatro horas.",miedo
+E08,"Trabajo de ocho a ocho en una fiambrería y la comisaría me queda a cuarenta minutos. Entre el viaje y la espera pierdo medio día de trabajo por un celular que ya no voy a recuperar. No me dan los números.",costo
+E09,"Empecé a hacer la denuncia por internet y el sistema se caía todo el tiempo. Fui en persona y me pidieron que volviera con más papeles. A la tercera vez desistí, no tengo tiempo para eso.",costo
+E10,"Por una bicicleta usada no vale la pena el trámite. Son horas de espera, declaración, y después te llaman para ratificar. Lo dejé ahí.",costo
+E11,"Me sacaron unos pesos del bolso en el ómnibus, habrán sido doscientos pesos. No me pareció algo grave como para ir a denunciar, son cosas que pasan.",poca_gravedad
+E12,"Fue un rayón en el auto en el estacionamiento del súper. Molesto, sí, pero no es algo serio. No iba a mover toda la maquinaria del Estado por eso.",poca_gravedad
+E13,"Me rompieron una maceta y se llevaron unas plantas del frente. Lo comenté con los vecinos y quedó ahí, no era para tanto.",poca_gravedad
+E14,"Al final lo arreglamos entre nosotros. El padre del muchacho que rompió el vidrio vino a casa, pidió disculpas y pagó el arreglo. No hizo falta meter a la policía.",resolucion_propia
+E15,"Supe quién tenía mi bicicleta porque la publicó para vender. Le escribí, le dije que era mía y me la devolvió. Lo resolví yo en dos días, la policía no hubiera hecho nada tan rápido.",resolucion_propia
+E16,"En el edificio tenemos un grupo y entre todos identificamos al que se llevaba las encomiendas. Hablamos con la administración, le sacaron el acceso y devolvió las cosas. Lo manejamos internamente.",resolucion_propia

@@ -143,12 +143,20 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 :::
 
 ::: {.resource-card}
-[Lab 9: Auditoría de sesgo algorítmico]{.resource-title}
+[Lab 9: Modelos locales y auditoría de equidad]{.resource-title}
 
-[Día 5. Métricas de equidad, detección de sesgo en modelos de ML y propuestas de investigación.]{.resource-meta}
+[Día 5. Codificación de entrevistas sensibles (simuladas) con `quallmer` y un modelo local vía Ollama: codebook nominal, validación contra un gold standard humano y reglas de decisión para casos límite. Auditoría de equidad de un modelo de crédito con `fairmodels`: regla del 80%, métricas por grupo y mitigación con umbrales diferenciados.]{.resource-meta}
 
 ::: {.resource-links}
-Código (próximamente)
+[Diapositivas (.html)](clases/dia-05/19-laboratorio-09.html) |
+[Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-05/19-laboratorio-09.qmd) |
+[Código (.R)](clases/dia-05/laboratorio-09.R) |
+[Datos Lab 9 (.csv)](clases/dia-05/datos/entrevistas_confianza.csv) |
+[Datos Tarea 9 (.csv)](clases/dia-05/datos/consultas_salud_mental.csv) |
+[Tarea 9 (.html)](clases/dia-05/tarea-09.html) |
+[Tarea 9 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-05/tarea-09.qmd) |
+[Respuestas Tarea 9 (.html)](clases/dia-05/tarea-09-respuestas.html) |
+[Respuestas Tarea 9 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-05/tarea-09-respuestas.qmd)
 :::
 :::
 

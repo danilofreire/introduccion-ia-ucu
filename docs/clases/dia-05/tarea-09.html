@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Danilo Freire">
 
-<title>Clases – IA para Científicos Sociales</title>
+<title>Tarea 9: Modelos locales y auditoría de equidad – IA para Científicos Sociales</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -23,25 +24,60 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-c82d23df098fe35fa8fa698ecfe1c56e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-c82d23df098fe35fa8fa698ecfe1c56e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -83,7 +119,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">IA para Científicos Sociales</span>
     </a>
   </div>
@@ -94,19 +130,19 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Inicio</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./programa.html"> 
+    <a class="nav-link" href="../../programa.html"> 
 <span class="menu-text">Programa</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./laboratorios.html"> 
+    <a class="nav-link" href="../../laboratorios.html"> 
 <span class="menu-text">Laboratorios</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./lecturas.html"> 
+    <a class="nav-link" href="../../lecturas.html"> 
 <span class="menu-text">Lecturas</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -115,19 +151,19 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-referencia-r">    
         <li>
-    <a class="dropdown-item" href="./referencia-tidymodels.html">
+    <a class="dropdown-item" href="../../referencia-tidymodels.html">
  <span class="dropdown-text">Supervisado (tidymodels)</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./referencia-no-supervisado.html">
+    <a class="dropdown-item" href="../../referencia-no-supervisado.html">
  <span class="dropdown-text">No supervisado (clustering y PCA)</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./referencia-texto.html">
+    <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./referencia-llms.html">
+    <a class="dropdown-item" href="../../referencia-llms.html">
  <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
   </li>  
     </ul>
@@ -164,24 +200,40 @@ ul.task-list li input[type="checkbox"] {
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">En esta página</h2>
    
-  <ul>
-  <li><a href="#diapositivas-y-materiales" id="toc-diapositivas-y-materiales" class="nav-link active" data-scroll-target="#diapositivas-y-materiales">Diapositivas y materiales</a></li>
+  <ul class="collapse">
+  <li><a href="#instrucciones" id="toc-instrucciones" class="nav-link active" data-scroll-target="#instrucciones"><span class="header-section-number">1</span> Instrucciones</a></li>
+  <li><a href="#codificación-con-un-modelo-local" id="toc-codificación-con-un-modelo-local" class="nav-link" data-scroll-target="#codificación-con-un-modelo-local"><span class="header-section-number">2</span> Codificación con un modelo local</a></li>
+  <li><a href="#auditoría-de-equidad" id="toc-auditoría-de-equidad" class="nav-link" data-scroll-target="#auditoría-de-equidad"><span class="header-section-number">3</span> Auditoría de equidad</a></li>
+  <li><a href="#reflexión" id="toc-reflexión" class="nav-link" data-scroll-target="#reflexión"><span class="header-section-number">4</span> Reflexión</a></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
+<div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-05/tarea-09.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Clases</h1>
+<h1 class="title">Tarea 9: Modelos locales y auditoría de equidad</h1>
+<p class="subtitle lead">IA para Científicos Sociales - UCU</p>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Autor/a</div>
+    <div class="quarto-title-meta-contents">
+             <p>Danilo Freire </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">16 de abril de 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -191,57 +243,116 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="diapositivas-y-materiales" class="level2">
-<h2 class="anchored" data-anchor-id="diapositivas-y-materiales">Diapositivas y materiales</h2>
-<p>Las diapositivas de cada día se publicarán aquí a medida que avance el curso. Cada sesión incluye una parte teórica y un laboratorio práctico en R.</p>
-<div class="day-card">
-<p><span class="day-number">Día 1</span></p>
-<p><span class="day-title">Fundamentos de IA y Machine Learning</span></p>
-<p><span class="day-topics">Sesión 1.1: ¿Qué es la Inteligencia Artificial? Historia, tipos de aprendizaje, ética básica.</span></p>
-<p><span class="day-topics">Sesión 1.2: Fundamentos de ML. Flujo de trabajo, train/test, sesgo-varianza, métricas.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-01/01-que-es-ia.html">Sesión 1.1: ¿Qué es la IA?</a> | <a href="clases/dia-01/02-fundamentos-ml.html">Sesión 1.2: Fundamentos de ML</a> | <a href="clases/dia-01/03-laboratorio-01.html">Lab 1: tidymodels</a> | <a href="clases/dia-01/04-laboratorio-02.html">Lab 2: Exploración y modelos</a></p>
+<section id="instrucciones" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="instrucciones"><span class="header-section-number">1</span> Instrucciones</h2>
+<p>Esta tarea aplica los conceptos del Laboratorio 9 a un caso <span class="alert">nuevo</span>: respuestas abiertas de una encuesta sobre salud mental. Una encuesta preguntó a personas que dejaron de ir (o nunca fueron) a una consulta psicológica por qué no lo hicieron. Los relatos hablan de salud, así que son <span class="alert">datos sensibles</span> según la Ley 18.331: no pueden salir de su máquina, y por eso toda la Parte A usa el modelo local. En la Parte B auditan la equidad de un modelo de crédito, como en el laboratorio, pero con otro modelo y otra pregunta.</p>
+<p><strong>Para trabajar en esta tarea:</strong></p>
+<ol type="1">
+<li>Descarguen este archivo <code>.qmd</code> y <code>consultas_salud_mental.csv</code> (en <code>clases/dia-05/datos/</code>) de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code>. Mantengan el CSV en una subcarpeta <code>datos/</code> junto al <code>.qmd</code></li>
+<li>Necesitan Quarto y RStudio (&gt;= 2022.07)</li>
+<li>Necesitan <a href="https://ollama.com/">Ollama</a> corriendo y el modelo del laboratorio: <code>ollama pull frob/qwen3.5-instruct:4b</code> (~3,4 GB). <span class="alert">No hace falta ninguna API key</span>: todo corre en su computadora</li>
+<li>Instalar <code>quallmer</code> desde GitHub si aún no lo hicieron: <code>install.packages("pak"); pak::pak("quallmer/quallmer")</code>. Para la Parte B: <code>install.packages(c("fairmodels", "DALEX"))</code></li>
+<li>Abrir este archivo en RStudio y ejecutar los bloques con Ctrl+Enter</li>
+</ol>
+<section id="configuración" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="configuración"><span class="header-section-number">1.1</span> Configuración</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(quallmer)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Ollama tiene que estar corriendo (abran la aplicación o `ollama serve`)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>consultas <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/consultas_salud_mental.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>MODELO_LOCAL <span class="ot">&lt;-</span> <span class="st">"ollama/frob/qwen3.5-instruct:4b"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+</section>
+</section>
+<section id="codificación-con-un-modelo-local" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="codificación-con-un-modelo-local"><span class="header-section-number">2</span> Codificación con un modelo local</h2>
+<section id="pregunta-1-diseñar-un-codebook-nominal" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-diseñar-un-codebook-nominal"><span class="header-section-number">2.1</span> Pregunta 1: Diseñar un codebook nominal</h3>
+<p>Diseñá desde cero un codebook para clasificar el <span class="alert">motivo principal</span> por el que cada persona no consultó, con las cinco categorías del CSV: <code>costo</code>, <code>estigma</code>, <code>desconfianza</code>, <code>falta_tiempo</code> y <code>autosuficiencia</code>. Definí cada categoría en las <code>instructions</code> e incluí al menos <span class="alert">dos reglas de decisión</span> para casos límite (por ejemplo: ¿qué hacer cuando un relato menciona la plata y la falta de tiempo a la vez?). Nombrá el campo del schema <code>motivo</code>.</p>
+<p><em>Pista:</em> el codebook del laboratorio es el molde, pero las definiciones y las reglas son de ustedes. Para categorías cerradas, <code>type_enum()</code>; el nivel es <code>"nominal"</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="day-card">
-<p><span class="day-number">Día 2</span></p>
-<p><span class="day-title">Aprendizaje supervisado</span></p>
-<p><span class="day-topics">Sesión 2.1: Clasificación. Regresión logística, árboles de decisión, Random Forest.</span></p>
-<p><span class="day-topics">Sesión 2.2: Regresión y predicción. LASSO, Ridge, Elastic Net.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-02/05-clasificacion.html">Sesión 2.1: Clasificación</a> | <a href="clases/dia-02/06-regresion-prediccion.html">Sesión 2.2: Regresión y predicción</a> | <a href="clases/dia-02/07-laboratorio-03.html">Lab 3: Clasificación avanzada</a> | <a href="clases/dia-02/08-laboratorio-04.html">Lab 4: Regresión y regularización</a></p>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-2-humano-contra-humano" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-humano-contra-humano"><span class="header-section-number">2.2</span> Pregunta 2: Humano contra humano</h3>
+<p>Antes de mirar al LLM: codificá vos. Elegí seis respuestas del corpus, leelas y asignales una categoría <span class="alert">sin mirar la columna</span> <code>motivo_humano</code>. Recién después compará tus códigos con los del equipo: ¿en cuántas coinciden? ¿Dónde no, y por qué? El desacuerdo entre codificadores humanos también existe, y conviene conocerlo antes de exigirle perfección a un modelo.</p>
+<p><em>Pista:</em> guardá tus códigos en un vector y compará con <code>consultas$motivo_humano</code> en esas filas; <code>mean(tus_codigos == ...)</code> da la proporción de acuerdo.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-3-codificar-con-el-modelo-local-y-validar" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-codificar-con-el-modelo-local-y-validar"><span class="header-section-number">2.3</span> Pregunta 3: Codificar con el modelo local y validar</h3>
+<p>Codificá las 18 respuestas con el modelo local y validá contra el gold del equipo (<code>motivo_humano</code>) a nivel nominal. Reportá la accuracy y el kappa. Con la referencia del curso (kappa ≥ 0,7), ¿confiarían en este codificador?</p>
+<p><em>Pista:</em> <code>max_active = 1</code> y <code>params(temperature = 0)</code>, como en el laboratorio. El gold se construye con <code>qlm_humancoded()</code> y necesita una columna <code>.id</code> y una columna con el mismo nombre que el campo del schema.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="day-card">
-<p><span class="day-number">Día 3</span></p>
-<p><span class="day-title">Texto y aprendizaje no supervisado</span></p>
-<p><span class="day-topics">Sesión 3.1: Clustering y PCA. K-means, jerárquico, PCA.</span></p>
-<p><span class="day-topics">Sesión 3.2: Análisis de texto. Tokenización, TF-IDF, sentimiento.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-03/09-clustering-pca.html">Sesión 3.1: Clustering y PCA</a> | <a href="clases/dia-03/10-analisis-texto.html">Sesión 3.2: Análisis de texto</a> | <a href="clases/dia-03/11-laboratorio-05.html">Lab 5: Clustering y PCA</a> | <a href="clases/dia-03/12-laboratorio-06.html">Lab 6: Análisis de texto</a></p>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-4-la-tabla-de-confusión" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="pregunta-4-la-tabla-de-confusión"><span class="header-section-number">2.4</span> Pregunta 4: La tabla de confusión</h3>
+<p>Una lista de desacuerdos dice dónde falló el modelo; una <span class="alert">tabla de confusión</span> dice si los errores tienen un patrón. Crucen la categoría del modelo con la del gold y cuenten: ¿qué par de categorías se confunde más? Agreguen <span class="alert">una regla de decisión nueva</span> al codebook para ese par, re-codifiquen y re-validen. ¿Mejoró?</p>
+<p><em>Pista:</em> armen un tibble con las dos columnas y usen <code>count()</code>. Ojo con la interpretación: con 18 textos cada caso vale unos 5,6 puntos de accuracy, así que una mejora chica puede ser ruido.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-5-el-modelo-local-es-determinista" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="pregunta-5-el-modelo-local-es-determinista"><span class="header-section-number">2.5</span> Pregunta 5: ¿El modelo local es determinista?</h3>
+<p>La sesión 5.1 promete reproducibilidad. Pónganla a prueba: vuelvan a codificar las 18 respuestas con el mismo modelo y comparen las dos corridas a nivel nominal. ¿El acuerdo es perfecto? Expliquen por qué <code>temperature = 0</code> ayuda pero no es una garantía absoluta.</p>
+<p><em>Pista:</em> <code>qlm_replicate()</code> repite una codificación existente (la Tarea 8 hizo lo mismo en la nube); <code>qlm_compare()</code> mide el acuerdo entre las dos corridas.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="day-card">
-<p><span class="day-number">Día 4</span></p>
-<p><span class="day-title">LLMs y aplicaciones</span></p>
-<p><span class="day-topics">Sesión 4.1: Entendiendo los LLMs. Transformers, prompting, capacidades.</span></p>
-<p><span class="day-topics">Sesión 4.2: LLMs como herramientas de investigación. Anotación, datos sintéticos, APIs.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-04/13-entendiendo-llms.html">Sesión 4.1: Entendiendo los LLMs</a> | <a href="clases/dia-04/14-llms-investigacion.html">Sesión 4.2: LLMs como herramientas</a> | <a href="clases/dia-04/15-laboratorio-07.html">Lab 7: Primeros pasos con ellmer</a> | <a href="clases/dia-04/16-laboratorio-08.html">Lab 8: Codificación y confiabilidad</a></p>
+<p><strong>Respuesta:</strong></p>
+</section>
+</section>
+<section id="auditoría-de-equidad" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="auditoría-de-equidad"><span class="header-section-number">3</span> Auditoría de equidad</h2>
+<section id="pregunta-6-regresión-logística-y-fairness_check" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-6-regresión-logística-y-fairness_check"><span class="header-section-number">3.1</span> Pregunta 6: Regresión logística y fairness_check()</h3>
+<p>En el laboratorio auditamos un random forest; acá van a auditar el modelo más clásico del curso. Entrenen una <span class="alert">regresión logística</span> sobre German Credit (<span class="alert">sin usar</span> <code>Sex</code> como predictor), creen el explicador de DALEX y corran <code>fairness_check()</code> con <code>Sex</code> como atributo protegido. Para simplificar, entrenen y auditen sobre el dataset completo (en una auditoría real usarían datos de test, como en el laboratorio). ¿El modelo pasa la regla del 80%? ¿En qué métricas falla?</p>
+<p><em>Pista:</em> <code>glm(..., family = binomial)</code> con la variable binaria como respuesta. <code>DALEX::explain()</code> sabe predecir un <code>glm</code> solo: alcanza con el modelo, los datos (sin las columnas de <code>Risk</code>) y la <code>y</code> binaria.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-7-auditoría-interseccional" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-7-auditoría-interseccional"><span class="header-section-number">3.2</span> Pregunta 7: Auditoría interseccional</h3>
+<p>El sesgo puede esconderse en las <span class="alert">intersecciones</span>: un modelo puede tratar bien a “las mujeres” y a “los jóvenes” en promedio, y aun así tratar mal a las mujeres jóvenes. Creen una variable que combine sexo y edad en cuatro grupos (<code>hombre_joven</code>, <code>hombre_mayor</code>, <code>mujer_joven</code>, <code>mujer_mayor</code>, con corte en 35 años), corran <code>fairness_check()</code> con esos cuatro grupos e identifiquen el más perjudicado. ¿Ese resultado se veía en la auditoría por sexo de la pregunta 6?</p>
+<p><em>Pista:</em> <code>paste()</code> combina las dos variables; <code>privileged</code> puede ser <code>"hombre_mayor"</code>. El gráfico de <code>plot()</code> ayuda a ver qué grupo queda fuera de la zona verde.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="day-card">
-<p><span class="day-number">Día 5</span></p>
-<p><span class="day-title">Modelos locales, ética y cierre</span></p>
-<p><span class="day-topics">Sesión 5.1: Modelos locales. Pesos abiertos, cuantización, Ollama, datos sensibles.</span></p>
-<p><span class="day-topics">Sesión 5.2: Ética y regulación. Sesgo algorítmico, equidad, privacidad.</span></p>
-<p><span class="day-topics">Sesión 5.4: Mini-propuestas de investigación y presentaciones.</span></p>
-<div class="resource-links">
-<p><a href="clases/dia-05/17-modelos-locales.html">Sesión 5.1: Modelos locales</a> | <a href="clases/dia-05/18-etica-regulacion.html">Sesión 5.2: Ética y regulación</a> | <a href="clases/dia-05/19-laboratorio-09.html">Lab 9: Modelos locales y equidad</a> | <a href="clases/dia-05/20-propuestas-cierre.html">Sesión 5.4: Propuestas y cierre</a></p>
-</div>
-</div>
+<p><strong>Respuesta:</strong></p>
+</section>
+</section>
+<section id="reflexión" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="reflexión"><span class="header-section-number">4</span> Reflexión</h2>
+<section id="pregunta-8-el-párrafo-para-el-comité-de-ética" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-8-el-párrafo-para-el-comité-de-ética"><span class="header-section-number">4.1</span> Pregunta 8: El párrafo para el comité de ética</h3>
+<p>El equipo de la Parte A quiere procesar las respuestas en su propia máquina en lugar de enviarlas a una API en la nube. Escriban el párrafo (máximo doscientas palabras) que presentarían al comité de ética para justificar esa decisión. Incluir: por qué los relatos sobre salud mental son datos sensibles según la Ley 18.331, qué riesgo concreto evita el procesamiento local y qué control adicional implementarían de todos modos.</p>
+<p><strong>Respuesta:</strong></p>
+</section>
+<section id="pregunta-9-recomendación-al-regulador" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-9-recomendación-al-regulador"><span class="header-section-number">4.2</span> Pregunta 9: Recomendación al regulador</h3>
+<p>Imaginen que asesoran a un regulador financiero que va a exigir una métrica de equidad para los modelos de scoring crediticio. Recomendar <span class="alert">una</span> (paridad demográfica, igualdad de oportunidades o calibración), justificar por qué y explicar qué se pierde al elegirla, citando el teorema de imposibilidad. Máximo doscientas palabras.</p>
+<p><strong>Respuesta:</strong></p>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Volver arriba</a></main> <!-- /main -->
@@ -653,7 +764,7 @@ ul.task-list li input[type="checkbox"] {
 </div>   
     <div class="nav-footer-center">
       &nbsp;
-    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-05/tarea-09.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></div>
     <div class="nav-footer-right">
 <p>Hecho con <a href="https://quarto.org">Quarto</a></p>
 </div>

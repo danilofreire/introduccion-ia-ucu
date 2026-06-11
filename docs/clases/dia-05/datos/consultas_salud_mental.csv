@@ -1,0 +1,19 @@
+id,texto,motivo_humano
+S01,"Empecé terapia el año pasado pero la tuve que dejar. Entre la sesión y el viaje se me iban casi dos mil pesos por semana, y con el alquiler no me daban los números.",costo
+S02,"En mi familia ir al psicólogo es de locos. Si mi viejo se entera de que estoy en tratamiento, me lo va a sacar en cara toda la vida. Mejor no.",estigma
+S03,"Trabajo doce horas y llego a casa a bañar a los gurises y hacer la cena. ¿En qué momento querés que vaya al psicólogo? No me dan las horas del día.",falta_tiempo
+S04,"Fui dos veces a salud mental en la policlínica. El psicólogo miraba el reloj y me daba turnos cada dos meses. Sentí que no le importaba a nadie, no volví más.",desconfianza
+S05,"Pasé una época muy oscura después de la separación, pero la fui sacando solo, con ejercicio y charlando con amigos. No sentí que necesitara un profesional.",autosuficiencia
+S06,"Soy maestra en un pueblo chico. Acá nos conocemos todos, y no quiero que me vean entrando al consultorio y empiecen los comentarios. Eso acá no se perdona.",estigma
+S07,"En la mutualista me cubrían unas pocas sesiones por año y después había que pagar todo particular. No me alcanzaba, así que no volví.",costo
+S08,"Una amiga estuvo años en terapia y la veo igual o peor que antes. No digo que no le sirva a nadie, pero no creo que a mí me vaya a cambiar nada.",desconfianza
+S09,"Los turnos que me ofrecían eran siempre en horario de oficina, y yo no puedo faltar al trabajo cada quince días. Lo fui postergando hasta que lo dejé.",falta_tiempo
+S10,"Yo mis problemas los arreglo yo. Siempre fue así en mi casa: te caés, te levantás y seguís. Hasta ahora me funcionó.",autosuficiencia
+S11,"Los hombres de mi generación no hablamos de estas cosas. Me criaron con la idea de que pedir ayuda es mostrarse débil, y eso no se borra fácil.",estigma
+S12,"Averigüé con una psicóloga que me habían recomendado, pero cobraba la sesión en dólares. Te soy sincera: prefiero gastar esa plata en mis hijos.",costo
+S13,"Con la jubilación me agarró un bajón grande, pero me anoté en el club de abuelos y me armé una rutina nueva. Me las arreglé sin ir a ningún médico.",autosuficiencia
+S14,"Probé con un psiquiatra y en diez minutos ya me estaba recetando pastillas, casi sin preguntarme nada. Si eso es el tratamiento, no me interesa.",desconfianza
+S15,"Entre la facultad y el trabajo no tengo ni un hueco libre en la semana. Sé que lo necesito, pero es un tema de agenda, no de ganas.",falta_tiempo
+S16,"Una compañera de trabajo contó que tomaba medicación psiquiátrica y le hicieron la vida imposible. Después de ver eso, no pienso contar nada en ningún lado.",estigma
+S17,"Cuando me quedé sin trabajo pensé en pedir ayuda, pero justo cuando más la necesitaba era cuando menos podía pagarla. Quedó ahí.",costo
+S18,"Estuve bastante mal de ansiedad un tiempo. Pensé en hacer terapia, pero entre que es cara y que al final con meditación y caminatas lo fui manejando, nunca fui.",autosuficiencia

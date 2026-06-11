@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Esta página es una referencia rápida de las funciones que usamos en el Día 4 para trabajar con modelos de lenguaje (LLMs) desde R: la Sesión 4.1 (entender los LLMs), la Sesión 4.2 (LLMs como herramientas de investigación) y los Laboratorios 7 y 8.
+Esta página es una referencia rápida de las funciones que usamos en el Día 4 para trabajar con modelos de lenguaje (LLMs) desde R: la Sesión 4.1 (entender los LLMs), la Sesión 4.2 (LLMs como herramientas de investigación) y los Laboratorios 7 y 8. En el Día 5 (Sesión 5.1 y Laboratorio 9) usamos las mismas funciones con un modelo local vía Ollama; las diferencias están marcadas a lo largo de la página.
 
 A diferencia de las otras páginas de referencia, **aquí el código no se ejecuta al construir el sitio**: cada llamada a un modelo consume una petición a una API, así que los bloques se muestran con una salida de ejemplo comentada (`#>`). Para correrlos de verdad, copien el código en RStudio con una clave de API configurada (ver más abajo). Las salidas que muestra el modelo varían entre corridas, ese es justamente uno de los temas del Día 4.
 
@@ -83,11 +83,29 @@ Esta es la trampa más común del Día 4. `chat_openrouter()` quiere el nombre d
 
 ### Alternativa local: Ollama
 
-Si no quieren depender de una API en la nube (por privacidad o por costo), `ellmer` también habla con un modelo corriendo en su computadora vía [Ollama](https://ollama.com/). El resto del código es idéntico.
+Si no quieren depender de una API en la nube (por privacidad o por costo), `ellmer` también habla con un modelo corriendo en su computadora vía [Ollama](https://ollama.com/). El resto del código es idéntico. Este es el flujo del Día 5, donde los datos no pueden salir de la máquina.
+
+En el curso usamos dos variantes del mismo modelo, y la elección importa:
+
+- `qwen3.5:4b`: la variante con razonamiento. Buena para chatear y para problemas difíciles, pero "piensa" uno o dos minutos por cada texto
+- `frob/qwen3.5-instruct:4b`: la variante *instruct*, sin razonamiento. Es la que usamos para codificar con `quallmer`: rápida y estable con salida estructurada
 
 ```{r ollama}
-chat <- chat_ollama(model = "qwen3.5:4b")
+# En la terminal, una sola vez: ollama pull frob/qwen3.5-instruct:4b
+chat <- chat_ollama(model = "frob/qwen3.5-instruct:4b")
 chat$chat("Hola, ¿funcionás de manera local?")
+```
+
+Para `qlm_code()` vale la misma regla del prefijo: el modelo lleva `"ollama/"` adelante. Y conviene `max_active = 1`: el servidor local procesa de a un pedido por vez, así que el paralelismo que usamos con la nube acá da timeouts.
+
+```{r ollama-qlm}
+codificado_local <- qlm_code(
+  textos$texto,
+  codebook,
+  model = "ollama/frob/qwen3.5-instruct:4b",   # CON el prefijo "ollama/"
+  max_active = 1,
+  params = params(temperature = 0)
+)
 ```
 
 ## Chat básico con ellmer
@@ -366,6 +384,8 @@ as_tibble(validacion) |> select(measure, value)
 
 Una correlación de Pearson alta significa que el modelo **ordena** los casos como el humano. Un ICC alto significa que además coincide en el **nivel** exacto, no sólo en el orden. Las filas exactas dependen del `level` (intervalo, nominal u ordinal).
 
+Con variables nominales (categorías, como en el Laboratorio 9), `level = "nominal"` devuelve otras métricas: accuracy, precision, recall, F1 y kappa. El kappa es el acuerdo corregido por azar; la referencia usual es kappa ≥ 0,7 para confiar en el codificador.
+
 ## Confiabilidad
 
 La validez pregunta "¿coincide con un experto?". La confiabilidad pregunta "¿el resultado es estable?". Son cosas distintas y las dos importan.
@@ -475,7 +495,8 @@ trail
 - **Reportar el modelo y la fecha**: los modelos cambian. `nvidia/nemotron-3-...` de hoy puede no existir en un año. Documenten el nombre exacto y cuándo lo usaron.
 - **Temperatura baja (0)** para favorecer la reproducibilidad, y aun así esperar variación entre corridas.
 - **Auditar antes de publicar**: enviar entradas que sólo difieren en una etiqueta sensible y revisar si el trato cambia.
-- **El prefijo del modelo**: sin `openrouter/` para `chat_openrouter()`, con `openrouter/` para `qlm_code()`.
+- **El prefijo del modelo**: sin `openrouter/` para `chat_openrouter()`, con `openrouter/` para `qlm_code()`. Lo mismo con Ollama: `chat_ollama(model = "frob/...")` pero `qlm_code(model = "ollama/frob/...")`.
+- **Con Ollama, `max_active = 1`**: el servidor local no maneja pedidos en paralelo como una API en la nube.
 - **Mostrar las métricas con `as_tibble() |> select(measure, value)`**: el `print()` de `quallmer` usa `cli` y a veces no aparece en HTML.
 
 ## Resumen de funciones
