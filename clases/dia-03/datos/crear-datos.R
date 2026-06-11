@@ -137,3 +137,103 @@ textos <- tibble(
 
 write.csv(textos, "datos/textos_politicos.csv", row.names = FALSE)
 cat("Dataset 2 guardado: textos_politicos.csv (", nrow(textos), "textos)\n")
+
+# --- Dataset 3: Indicadores por país, muestra mundial (Tarea 5) ---
+
+# Seed propio: re-ejecutar el script completo no altera los datasets 1 y 2
+set.seed(2027)
+
+paises_mundo <- c(
+  "Noruega", "Alemania", "España", "Polonia",
+  "Estados Unidos", "Canadá",
+  "México", "Brasil", "Chile",
+  "Japón", "Corea del Sur", "China", "India",
+  "Indonesia", "Vietnam", "Bangladés",
+  "Turquía", "Arabia Saudita",
+  "Sudáfrica", "Nigeria", "Kenia", "Egipto", "Etiopía",
+  "Australia"
+)
+
+regiones <- c(
+  rep("Europa", 4),
+  rep("América del Norte", 2),
+  rep("América Latina", 3),
+  rep("Asia", 7),
+  rep("Medio Oriente", 2),
+  rep("África", 5),
+  "Oceanía"
+)
+
+m <- length(paises_mundo)
+
+indicadores_mundo <- tibble(
+  pais = paises_mundo,
+  region = regiones,
+  pib_per_capita = round(c(87000, 51000, 32000, 22000,
+                           76000, 55000,
+                           11000, 9500, 15500,
+                           34000, 33000, 12700, 2400,
+                           4800, 4200, 2700,
+                           10700, 30400,
+                           6800, 2200, 2100, 4300, 1000,
+                           65000) + rnorm(m, 0, 400)),
+  esperanza_vida = round(c(83.2, 80.9, 83.3, 76.5,
+                           76.4, 81.8,
+                           75.1, 75.9, 80.7,
+                           84.5, 83.6, 78.2, 70.2,
+                           71.9, 73.7, 72.4,
+                           76.0, 77.9,
+                           62.3, 52.7, 61.4, 70.2, 65.0,
+                           83.3) + rnorm(m, 0, 0.3), 1),
+  mortalidad_infantil = round(c(1.8, 3.0, 2.6, 3.6,
+                                5.4, 4.3,
+                                12.2, 12.9, 5.6,
+                                1.8, 2.5, 5.0, 25.5,
+                                18.8, 16.0, 24.0,
+                                8.6, 5.8,
+                                26.4, 70.6, 28.4, 16.7, 34.4,
+                                3.1) + rnorm(m, 0, 0.4), 1),
+  anios_educacion = round(c(13.0, 14.1, 10.6, 13.2,
+                            13.7, 13.9,
+                            9.2, 8.3, 10.9,
+                            13.4, 12.5, 7.6, 6.6,
+                            8.6, 8.5, 7.4,
+                            8.6, 11.3,
+                            11.4, 7.2, 6.7, 9.6, 3.2,
+                            12.7) + rnorm(m, 0, 0.2), 1),
+  acceso_internet = round(c(99.0, 91.4, 94.5, 85.4,
+                            91.8, 92.8,
+                            75.6, 80.7, 90.2,
+                            82.9, 97.2, 75.6, 46.3,
+                            66.5, 78.6, 38.9,
+                            83.4, 98.6,
+                            72.3, 35.5, 28.8, 71.9, 16.7,
+                            96.2) + rnorm(m, 0, 1), 1),
+  indice_gini = round(c(27.7, 31.7, 34.3, 28.5,
+                        39.8, 33.3,
+                        45.4, 52.9, 44.9,
+                        32.9, 31.4, 38.2, 35.7,
+                        37.9, 36.8, 33.4,
+                        41.9, 45.9,
+                        63.0, 35.1, 40.8, 31.5, 35.0,
+                        34.3) + rnorm(m, 0, 0.5), 1),
+  emisiones_co2 = round(c(7.5, 8.0, 5.2, 8.1,
+                          14.9, 14.3,
+                          3.7, 2.2, 4.3,
+                          8.5, 11.9, 8.0, 1.9,
+                          2.3, 3.5, 0.6,
+                          5.0, 18.0,
+                          6.7, 0.6, 0.4, 2.3, 0.1,
+                          15.0) + rnorm(m, 0, 0.15), 1),
+  indice_democracia = round(c(9.8, 8.8, 8.1, 7.0,
+                              7.8, 8.7,
+                              5.1, 6.8, 8.0,
+                              8.4, 8.0, 2.1, 7.2,
+                              6.7, 2.6, 6.0,
+                              4.3, 2.1,
+                              7.1, 4.2, 5.1, 2.9, 3.2,
+                              8.7) + rnorm(m, 0, 0.1), 1)
+)
+
+write.csv(indicadores_mundo, "datos/indicadores_mundo.csv", row.names = FALSE)
+cat("Dataset 3 guardado: indicadores_mundo.csv (", nrow(indicadores_mundo), "países)\n")

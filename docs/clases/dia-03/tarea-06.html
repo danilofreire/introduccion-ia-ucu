@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -161,6 +161,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
   </li>  
     </ul>
   </li>
@@ -322,9 +326,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-6-tf-idf-por-tema-vs.-por-país" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-tf-idf-por-tema-vs.-por-país"><span class="header-section-number">3.3</span> Pregunta 6: TF-IDF por tema vs.&nbsp;por país</h3>
-<p>Comparen las 5 palabras más distintivas del tema “salud” con las 5 más distintivas del país con más textos (probablemente Brasil). ¿Las palabras se solapan? ¿Qué nos dice eso?</p>
+<section id="pregunta-6-tf-idf-de-bigramas" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-tf-idf-de-bigramas"><span class="header-section-number">3.3</span> Pregunta 6: TF-IDF de bigramas</h3>
+<p>Combinen las técnicas de las Preguntas 3 y 4: calculen el TF-IDF de los <span class="alert">bigramas</span> (ya filtrados de stopwords) agrupando por tema, y muestren los 3 bigramas más distintivos de cada tema. Comparen con las palabras sueltas de la Pregunta 4: ¿los bigramas son más fáciles de interpretar? ¿Qué limitación aparece al usar bigramas en un corpus tan chico?</p>
+<p><em>Pista:</em> es el mismo <code>bind_tf_idf()</code> de siempre, pero la unidad ahora es el bigrama, no la palabra. <code>slice_max(..., with_ties = FALSE)</code> evita que los empates llenen la tabla.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>

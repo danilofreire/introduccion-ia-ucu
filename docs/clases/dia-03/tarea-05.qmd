@@ -15,11 +15,11 @@ engine: knitr
 
 ## Instrucciones
 
-Esta tarea usa el mismo dataset del Laboratorio 5 (`indicadores_paises.csv`): 18 países latinoamericanos con 8 indicadores socioeconómicos. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
+Esta tarea usa un dataset [nuevo]{.alert}, distinto del que vimos en el Laboratorio 5: `indicadores_mundo.csv`, con 24 países de todas las regiones del mundo y 8 indicadores socioeconómicos. Las técnicas son las mismas del laboratorio (K-means, clustering jerárquico y PCA), pero los datos son otros, así que las respuestas también lo serán. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.
 
 **Para trabajar en esta tarea:**
 
-1. Descarguen este archivo `.qmd` y el dataset `indicadores_paises.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+1. Descarguen este archivo `.qmd` y el dataset `indicadores_mundo.csv` de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`. Mantengan el CSV en una subcarpeta `datos/` junto al `.qmd`
 2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto
 3. Abran este archivo `.qmd` en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)
 4. Cuando terminen, pueden renderizar el documento completo con el botón "Render" en RStudio
@@ -34,14 +34,18 @@ library(corrplot)
 
 set.seed(2026)
 
-paises <- read_csv("datos/indicadores_paises.csv", show_col_types = FALSE)
+mundo <- read_csv("datos/indicadores_mundo.csv", show_col_types = FALSE)
 ```
+
+A diferencia del dataset del laboratorio, este tiene una columna de texto extra: `region`. Tenganla presente, porque va a aparecer varias veces en la tarea.
 
 ## Exploración
 
-### Pregunta 1: Resumen del dataset
+### Pregunta 1: Indicadores por región
 
-Muestren el rango (mínimo y máximo) y la mediana de cada variable numérica del dataset. ¿Cuál variable tiene la mayor dispersión relativa (rango dividido por mediana)?
+Calculen la [mediana]{.alert} del PIB per cápita, la esperanza de vida y la mortalidad infantil para cada región. Ordenen el resultado por PIB per cápita. ¿Qué región está mejor en los tres indicadores? ¿Alguna región está bien en un indicador pero mal en otro?
+
+*Pista:* `group_by()` + `summarise()`. Ojo: algunas regiones tienen un solo país.
 
 ```{r p1}
 # Escriban su código aquí
@@ -50,9 +54,9 @@ Muestren el rango (mínimo y máximo) y la mediana de cada variable numérica de
 
 **Respuesta:**
 
-### Pregunta 2: Países con valores extremos
+### Pregunta 2: ¿El PIB lo explica todo?
 
-Identifiquen los países con el [PIB per cápita más alto y más bajo]{.alert}, la [esperanza de vida más alta y más baja]{.alert}, y la [desigualdad (Gini) más alta y más baja]{.alert}. Muestren los resultados en una tabla. ¿Algún país aparece varias veces?
+Identifiquen los 5 países con [mayor PIB per cápita]{.alert} y los 5 con [menor mortalidad infantil]{.alert}. ¿Son los mismos? Busquen al menos un país que esté entre los más ricos pero no entre los de menor mortalidad (o al revés). ¿Qué sugiere eso sobre la relación entre ingreso y salud?
 
 ```{r p2}
 # Escriban su código aquí
@@ -63,7 +67,9 @@ Identifiquen los países con el [PIB per cápita más alto y más bajo]{.alert},
 
 ### Pregunta 3: Correlaciones
 
-Calculen la matriz de correlaciones de las variables numéricas. ¿Cuál par de variables tiene la correlación positiva más fuerte? ¿Cuál tiene la correlación negativa más fuerte? ¿Tiene sentido teóricamente?
+Calculen la matriz de correlaciones de las variables numéricas y visualícenla con `corrplot()`. ¿Cuál par de variables tiene la correlación positiva más fuerte? ¿Cuál tiene la negativa más fuerte? Hagan además un scatterplot de PIB per cápita contra esperanza de vida: ¿la relación parece lineal o se "aplana" en los países ricos?
+
+*Pista:* para la matriz hay que quedarse sólo con las columnas numéricas (`select()` ayuda a sacar `pais` y `region`).
 
 ```{r p3}
 # Escriban su código aquí
@@ -74,9 +80,11 @@ Calculen la matriz de correlaciones de las variables numéricas. ¿Cuál par de 
 
 ## K-means
 
-### Pregunta 4: K-means con K=4
+### Pregunta 4: Elegir K con codo y silueta
 
-Escalen las variables numéricas (usando `column_to_rownames("pais") |> scale()`) y ajusten K-means con K=4 y `nstart = 25`. ¿Qué países quedan en cada cluster?
+Preparen los datos: saquen la columna `region`, muevan `pais` a los nombres de fila y escalen con `scale()`. Después calculen, para K=2 a K=6, la suma de cuadrados intra-cluster (WSS) y la silueta promedio. Muestren las dos curvas. ¿Qué K elegirían y por qué? Si el codo y la silueta no coinciden exactamente, expliquen cómo deciden.
+
+*Pista:* el laboratorio tiene el patrón para las dos curvas; acá la diferencia está en justificar la decisión cuando los criterios no gritan un único ganador.
 
 ```{r p4}
 # Escriban su código aquí
@@ -85,11 +93,9 @@ Escalen las variables numéricas (usando `column_to_rownames("pais") |> scale()`
 
 **Respuesta:**
 
-### Pregunta 5: Comparar K=2, 3, 4 con silueta
+### Pregunta 5: ¿Geografía o nivel de ingreso?
 
-Para K=2, 3 y 4, calculen la silueta promedio de cada solución. ¿Qué K maximiza la silueta? ¿Es la solución que más sentido tiene políticamente?
-
-*Pista:* `silhouette(km$cluster, dist(datos_scaled))` devuelve una matriz; la columna `"sil_width"` (tercera) tiene los valores que se promedian.
+Ajusten K-means con [K=3]{.alert} y `nstart = 25` (aunque en la pregunta anterior hayan preferido otro K; así todos seguimos comparables). Crucen el cluster de cada país con su `region` usando `table()`. ¿Los clusters agrupan países de la misma región, o agrupan países de distinto continente pero nivel de desarrollo parecido? Den dos ejemplos concretos.
 
 ```{r p5}
 # Escriban su código aquí
@@ -100,7 +106,7 @@ Para K=2, 3 y 4, calculen la silueta promedio de cada solución. ¿Qué K maximi
 
 ### Pregunta 6: Perfil de los clusters
 
-Para la solución K=4 de la pregunta 4, calculen la media de PIB, esperanza de vida, índice de democracia y Gini dentro de cada cluster. Asignen una etiqueta sustantiva a cada cluster (p. ej. "alto desarrollo", "ingreso medio").
+Para la solución K=3, calculen la media de PIB per cápita, esperanza de vida, mortalidad infantil e índice de democracia dentro de cada cluster (con los datos originales, no los escalados). Asignen una etiqueta sustantiva a cada cluster.
 
 ```{r p6}
 # Escriban su código aquí
@@ -111,11 +117,9 @@ Para la solución K=4 de la pregunta 4, calculen la media de PIB, esperanza de v
 
 ## Clustering jerárquico
 
-### Pregunta 7: Dendrograma con método "complete"
+### Pregunta 7: Dendrograma con Ward
 
-Ajusten un clustering jerárquico con `method = "complete"` (en lugar del Ward del laboratorio). Visualicen el dendrograma con los cortes para K=3 resaltados.
-
-*Pista:* `hclust(dist(datos_scaled), method = "complete")` y luego `rect.hclust(hc, k = 3, border = ...)`.
+Ajusten un clustering jerárquico con `method = "ward.D2"` y visualicen el dendrograma. Mirando la altura de las uniones: ¿cuáles son los dos grandes bloques que se unen al final? ¿Qué país parece más "solitario" (se une a su grupo más tarde que el resto)?
 
 ```{r p7}
 # Escriban su código aquí
@@ -124,9 +128,9 @@ Ajusten un clustering jerárquico con `method = "complete"` (en lugar del Ward d
 
 **Respuesta:**
 
-### Pregunta 8: Ward vs complete
+### Pregunta 8: ¿K-means y jerárquico cuentan la misma historia?
 
-Comparen las soluciones K=3 obtenidas con Ward y con complete usando `table()`. ¿Coinciden? ¿Cuál parece más balanceada?
+Corten el dendrograma en 3 grupos con `cutree()` y comparen con los clusters de K-means de la pregunta 5 usando `table()`. ¿Cuántos países cambian de grupo entre los dos métodos? ¿Cuáles? ¿Les preocupa esa diferencia?
 
 ```{r p8}
 # Escriban su código aquí
@@ -137,9 +141,9 @@ Comparen las soluciones K=3 obtenidas con Ward y con complete usando `table()`. 
 
 ## PCA
 
-### Pregunta 9: Primeros 3 componentes
+### Pregunta 9: ¿Cuántos componentes necesitamos?
 
-Ajusten `prcomp()` sobre los datos escalados. ¿Qué porcentaje de la varianza acumulada explican los primeros 3 componentes? ¿Es suficiente para resumir el dataset?
+Ajusten `prcomp()` sobre los datos escalados y miren la varianza explicada. ¿Cuánta varianza captura PC1 solo? ¿Cuántos componentes hacen falta para superar el [80%]{.alert} de la varianza acumulada?
 
 ```{r p9}
 # Escriban su código aquí
@@ -148,9 +152,9 @@ Ajusten `prcomp()` sobre los datos escalados. ¿Qué porcentaje de la varianza a
 
 **Respuesta:**
 
-### Pregunta 10: Interpretar PC3
+### Pregunta 10: Interpretar PC1 y PC2
 
-Vean los loadings del tercer componente (`pca$rotation[, 3]`). ¿Qué variables pesan más? ¿Qué dimensión sustantiva captura PC3?
+Vean los loadings de los dos primeros componentes (`pca$rotation[, 1:2]`). ¿Qué variables dominan PC1 y con qué signos? ¿Y PC2? Propongan un nombre sustantivo para cada componente (por ejemplo, "desarrollo", "desigualdad", "apertura"). Justifiquen con los loadings.
 
 ```{r p10}
 # Escriban su código aquí
@@ -159,9 +163,9 @@ Vean los loadings del tercer componente (`pca$rotation[, 3]`). ¿Qué variables 
 
 **Respuesta:**
 
-### Pregunta 11: Países extremos en PC2
+### Pregunta 11: Países extremos
 
-Ordenen los países por su valor en PC2. ¿Cuáles están en los extremos? ¿Tiene sentido dado el significado de PC2 (vimos en el laboratorio que captura "desigualdad alta vs. urbanización/educación alta")?
+Ordenen los países por su valor en PC1 y luego por PC2. ¿Qué países están en los extremos de cada componente? ¿Los extremos de PC2 confirman la interpretación que propusieron en la pregunta 10?
 
 ```{r p11}
 # Escriban su código aquí
@@ -172,9 +176,11 @@ Ordenen los países por su valor en PC2. ¿Cuáles están en los extremos? ¿Tie
 
 ## Síntesis
 
-### Pregunta 12: Excluir un país extremo
+### Pregunta 12: ¿Qué pasa si no escalamos?
 
-Excluyan a Uruguay (el país más "desarrollado" según PC1) y re-corran PCA con los 17 países restantes. ¿Cambian los loadings de PC1 y PC2? ¿Aparece algún país nuevo en los extremos?
+Repitan K-means con K=3 pero sobre los datos [sin escalar]{.alert} (sólo saquen `region` y muevan `pais` a rownames). Comparen los clusters con los de la pregunta 5. ¿Qué variable domina ahora la solución? Busquen un país que quede agrupado con países muy distintos en democracia o desigualdad, y expliquen por qué terminó ahí.
+
+*Pista:* miren las unidades de cada variable. ¿Cuál tiene la varianza más grande, por lejos, cuando no escalamos?
 
 ```{r p12}
 # Escriban su código aquí
@@ -187,8 +193,8 @@ Excluyan a Uruguay (el país más "desarrollado" según PC1) y re-corran PCA con
 
 Basándose en los resultados de esta tarea, respondan:
 
-1. ¿Cuántos clusters cree que describen mejor a los 18 países? Justifique con evidencia (silueta + interpretación sustantiva)
-2. ¿Las técnicas de clustering y PCA llegan a la misma conclusión sobre quiénes son los países "similares"?
-3. Si tuvieran que presentar estos resultados a un ministro de planificación, ¿qué visualización elegirían y por qué?
+1. Si tuvieran que explicarle los resultados a un periodista con una sola visualización, ¿usarían el dendrograma, el gráfico de clusters o el biplot del PCA? ¿Por qué?
+2. Los clusters agrupan países por promedios nacionales. Nombren al menos una limitación de usar indicadores a nivel de país para hablar de desarrollo (piensen en la desigualdad interna)
+3. ¿Qué indicador agregarían al dataset para distinguir mejor a los países de ingreso medio entre sí? Justifiquen
 
 **Respuesta:**

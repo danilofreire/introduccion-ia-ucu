@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -161,6 +161,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
   </li>  
     </ul>
   </li>
@@ -254,373 +258,413 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>paises <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/indicadores_paises.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mundo <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/indicadores_mundo.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Escalado reutilizado a lo largo de la tarea</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>datos_scaled <span class="ot">&lt;-</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">"pais"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Escalado reutilizado a lo largo de la tarea: sin region, pais como rownames</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>datos_scaled <span class="ot">&lt;-</span> mundo <span class="sc">|&gt;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>region) <span class="sc">|&gt;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">"pais"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
 <section id="exploración" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="exploración"><span class="header-section-number">2</span> Exploración</h2>
-<section id="pregunta-1-resumen-del-dataset" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-del-dataset"><span class="header-section-number">2.1</span> Pregunta 1: Resumen del dataset</h3>
+<section id="pregunta-1-indicadores-por-región" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-indicadores-por-región"><span class="header-section-number">2.1</span> Pregunta 1: Indicadores por región</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>resumen <span class="ot">&lt;-</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>pais) <span class="sc">|&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(),</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">list</span>(<span class="at">min =</span> min, <span class="at">mediana =</span> median, <span class="at">max =</span> max),</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">.names =</span> <span class="st">"{.col}__{.fn}"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(),</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="fu">c</span>(<span class="st">"variable"</span>, <span class="st">"stat"</span>),</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_sep =</span> <span class="st">"__"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> stat, <span class="at">values_from =</span> value) <span class="sc">|&gt;</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rango_rel =</span> <span class="fu">round</span>((max <span class="sc">-</span> min) <span class="sc">/</span> mediana, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(rango_rel))</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>resumen</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mundo <span class="sc">|&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(region) <span class="sc">|&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">paises =</span> <span class="fu">n</span>(),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">pib_mediano =</span> <span class="fu">median</span>(pib_per_capita),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">esperanza_mediana =</span> <span class="fu">median</span>(esperanza_vida),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mortalidad_mediana =</span> <span class="fu">median</span>(mortalidad_infantil)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(pib_mediano))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 8 × 5
-  variable             min mediana     max rango_rel
-  &lt;chr&gt;              &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;
-1 pib_per_capita    1881   6108.   17185        2.51
-2 indice_democracia    2.1    6.35     8.7      1.04
-3 acceso_internet     30.3   71       88.2      0.82
-4 gasto_salud_pib      4.2    7.55    10.3      0.81
-5 anios_educacion      5.4    8.3     10.7      0.64
-6 urbanizacion        51.7   79.7     95        0.54
-7 indice_gini         38.6   45.5     52.3      0.3 
-8 esperanza_vida      71.7   75.6     80.7      0.12</code></pre>
+<pre><code># A tibble: 7 × 5
+  region            paises pib_mediano esperanza_mediana mortalidad_mediana
+  &lt;chr&gt;              &lt;int&gt;       &lt;dbl&gt;             &lt;dbl&gt;              &lt;dbl&gt;
+1 América del Norte      2      66022.              79.2                4.7
+2 Oceanía                1      64512               84.1                2.8
+3 Europa                 4      41252.              82.1                2.6
+4 Medio Oriente          2      20774.              77                  7.1
+5 América Latina         3      10566               76.3               11.7
+6 Asia                   7       5295               73.8               15.6
+7 África                 5       3086               62.2               29.1</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La variable con mayor dispersión relativa es el <span class="alert">PIB per cápita</span> (Uruguay ~17,200 vs.&nbsp;Nicaragua ~1,900, con mediana ~6,100 → rango_rel ≈ 2.5). La desigualdad (Gini, ≈ 0.30) y la esperanza de vida (≈ 0.12) tienen los rangos relativos más bajos. Esto justifica usar <code>scale()</code> antes de aplicar K-means o PCA: si no escalamos, el PIB dominaría las distancias.</p>
+<p><strong>Respuesta:</strong> Ninguna región domina los tres indicadores a la vez. <span class="alert">América del Norte</span> tiene el PIB mediano más alto (~USD 66.000), pero su mortalidad infantil mediana (~4,7) es casi el doble que la de Europa (~2,6), arrastrada por Estados Unidos. Oceanía (que acá es sólo Australia) combina PIB alto con la mejor esperanza de vida. En el otro extremo, África queda última en los tres indicadores. El caso interesante es <span class="alert">Medio Oriente</span>: un PIB mediano alto (~USD 21.000, por el peso de Arabia Saudita) pero salud apenas intermedia. El ingreso y el bienestar van juntos en general, pero no son lo mismo.</p>
 </section>
-<section id="pregunta-2-países-con-valores-extremos" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-países-con-valores-extremos"><span class="header-section-number">2.2</span> Pregunta 2: Países con valores extremos</h3>
+<section id="pregunta-2-el-pib-lo-explica-todo" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-el-pib-lo-explica-todo"><span class="header-section-number">2.2</span> Pregunta 2: ¿El PIB lo explica todo?</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>extremos <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  paises <span class="sc">|&gt;</span> <span class="fu">slice_max</span>(pib_per_capita, <span class="at">n =</span> <span class="dv">1</span>)   <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">var =</span> <span class="st">"PIB max"</span>),</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  paises <span class="sc">|&gt;</span> <span class="fu">slice_min</span>(pib_per_capita, <span class="at">n =</span> <span class="dv">1</span>)   <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">var =</span> <span class="st">"PIB min"</span>),</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  paises <span class="sc">|&gt;</span> <span class="fu">slice_max</span>(esperanza_vida, <span class="at">n =</span> <span class="dv">1</span>)   <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">var =</span> <span class="st">"Vida max"</span>),</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  paises <span class="sc">|&gt;</span> <span class="fu">slice_min</span>(esperanza_vida, <span class="at">n =</span> <span class="dv">1</span>)   <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">var =</span> <span class="st">"Vida min"</span>),</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  paises <span class="sc">|&gt;</span> <span class="fu">slice_max</span>(indice_gini, <span class="at">n =</span> <span class="dv">1</span>)      <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">var =</span> <span class="st">"Gini max"</span>),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  paises <span class="sc">|&gt;</span> <span class="fu">slice_min</span>(indice_gini, <span class="at">n =</span> <span class="dv">1</span>)      <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">var =</span> <span class="st">"Gini min"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(var, pais, pib_per_capita, esperanza_vida, indice_gini)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>extremos</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mundo <span class="sc">|&gt;</span> <span class="fu">slice_max</span>(pib_per_capita, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(pais, pib_per_capita)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 5
-  var      pais        pib_per_capita esperanza_vida indice_gini
-  &lt;chr&gt;    &lt;chr&gt;                &lt;dbl&gt;          &lt;dbl&gt;       &lt;dbl&gt;
-1 PIB max  Uruguay              17185           78.1        38.9
-2 PIB min  Nicaragua             1881           75          46  
-3 Vida max Costa Rica           11745           80.7        48.1
-4 Vida min Bolivia               3276           71.7        44.3
-5 Gini max Honduras              2658           75.1        52.3
-6 Gini min El Salvador           4094           73.7        38.6</code></pre>
+<pre><code># A tibble: 5 × 2
+  pais           pib_per_capita
+  &lt;chr&gt;                   &lt;dbl&gt;
+1 Noruega                 86626
+2 Estados Unidos          76741
+3 Australia               64512
+4 Canadá                  55302
+5 Alemania                50722</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>mundo <span class="sc">|&gt;</span> <span class="fu">slice_min</span>(mortalidad_infantil, <span class="at">n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> <span class="fu">select</span>(pais, mortalidad_infantil)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  pais          mortalidad_infantil
+  &lt;chr&gt;                       &lt;dbl&gt;
+1 Japón                         1.1
+2 Noruega                       2.1
+3 España                        2.1
+4 Corea del Sur                 2.3
+5 Australia                     2.8</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los extremos son: PIB máximo <strong>Uruguay</strong> (17,185) y mínimo <strong>Nicaragua</strong> (1,881); esperanza de vida máxima <strong>Costa Rica</strong> (80.7) y mínima <strong>Bolivia</strong> (71.7); desigualdad (Gini) máxima <strong>Honduras</strong> (52.3) y mínima <strong>El Salvador</strong> (38.6). Algunos países aparecen en más de un extremo: Uruguay combina el PIB más alto con uno de los Gini más bajos (38.9), y Honduras junta un PIB bajo con la mayor desigualdad. Que un país aparezca varias veces en los extremos confirma que es un caso atípico, y los métodos de clustering lo tratarán como tal.</p>
+<p><strong>Respuesta:</strong> Las dos listas se solapan pero no coinciden. Entre los cinco más ricos están Noruega, Estados Unidos, Australia, Canadá y Alemania; entre los cinco con menor mortalidad infantil aparecen <span class="alert">Japón, España y Corea del Sur</span>, que no están en el top de PIB. El caso más llamativo es <span class="alert">Estados Unidos</span>: segundo en PIB per cápita pero con una mortalidad infantil (~5,7 por mil) más alta que la de España o Polonia, países con la mitad o menos de su ingreso. La relación ingreso-salud es fuerte pero no determinista: la organización del sistema de salud importa, no sólo el dinero disponible.</p>
 </section>
 <section id="pregunta-3-correlaciones" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>pais) <span class="sc">|&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>()</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertir a formato largo para encontrar los extremos</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>cor_long <span class="ot">&lt;-</span> cor_matrix <span class="sc">|&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"v1"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>v1, <span class="at">names_to =</span> <span class="st">"v2"</span>, <span class="at">values_to =</span> <span class="st">"cor"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(v1 <span class="sc">&lt;</span> v2)  <span class="co"># quitar duplicados y diagonal</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Correlación positiva más fuerte</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>cor_long <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(cor)) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  v1                v2                  cor
-  &lt;chr&gt;             &lt;chr&gt;             &lt;dbl&gt;
-1 acceso_internet   urbanizacion      0.857
-2 esperanza_vida    indice_democracia 0.773
-3 indice_democracia pib_per_capita    0.757</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>cor_matrix <span class="ot">&lt;-</span> mundo <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>pais, <span class="sc">-</span>region) <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cor</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot</span>(cor_matrix, <span class="at">method =</span> <span class="st">"color"</span>, <span class="at">type =</span> <span class="st">"upper"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">addCoef.col =</span> <span class="st">"black"</span>, <span class="at">number.cex =</span> <span class="fl">0.7</span>, <span class="at">tl.cex =</span> <span class="fl">0.8</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tarea-05-respuestas_files/figure-html/p3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Correlación negativa más fuerte</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>cor_long <span class="sc">|&gt;</span> <span class="fu">arrange</span>(cor) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pares extremos</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>cor_long <span class="ot">&lt;-</span> cor_matrix <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"v1"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>v1, <span class="at">names_to =</span> <span class="st">"v2"</span>, <span class="at">values_to =</span> <span class="st">"cor"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(v1 <span class="sc">&lt;</span> v2)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>cor_long <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(cor)) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
   v1              v2                cor
   &lt;chr&gt;           &lt;chr&gt;           &lt;dbl&gt;
-1 indice_gini     urbanizacion   -0.407
-2 acceso_internet indice_gini    -0.263
-3 indice_gini     pib_per_capita -0.153</code></pre>
+1 acceso_internet anios_educacion 0.817
+2 acceso_internet esperanza_vida  0.807
+3 anios_educacion pib_per_capita  0.763</code></pre>
 </div>
-</div>
-<p><strong>Respuesta:</strong> La correlación positiva más fuerte suele ser entre <strong>internet y urbanización</strong> (~0.86), o entre PIB y esperanza de vida (~0.74). La correlación negativa más fuerte es entre <strong>Gini y urbanización</strong> (~-0.41). Tiene sentido teórico: la urbanización va de la mano con infraestructura digital y servicios; en zonas rurales la desigualdad puede ser más persistente.</p>
-</section>
-</section>
-<section id="k-means" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="k-means"><span class="header-section-number">3</span> K-means</h2>
-<section id="pregunta-4-k-means-con-k4" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-k-means-con-k4"><span class="header-section-number">3.1</span> Pregunta 4: K-means con K=4</h3>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>km4 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">4</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Países por cluster</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">pais =</span> <span class="fu">rownames</span>(datos_scaled), <span class="at">cluster =</span> km4<span class="sc">$</span>cluster) <span class="sc">|&gt;</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(cluster, pais)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cor_long <span class="sc">|&gt;</span> <span class="fu">arrange</span>(cor) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                                     pais cluster
-Guatemala                       Guatemala       1
-Honduras                         Honduras       1
-Nicaragua                       Nicaragua       1
-Argentina                       Argentina       2
-Chile                               Chile       2
-Uruguay                           Uruguay       2
-Bolivia                           Bolivia       3
-Ecuador                           Ecuador       3
-El Salvador                   El Salvador       3
-México                             México       3
-Paraguay                         Paraguay       3
-Perú                                 Perú       3
-República Dominicana República Dominicana       3
-Venezuela                       Venezuela       3
-Brasil                             Brasil       4
-Colombia                         Colombia       4
-Costa Rica                     Costa Rica       4
-Panamá                             Panamá       4</code></pre>
+<pre><code># A tibble: 3 × 3
+  v1              v2                     cor
+  &lt;chr&gt;           &lt;chr&gt;                &lt;dbl&gt;
+1 esperanza_vida  mortalidad_infantil -0.928
+2 acceso_internet mortalidad_infantil -0.807
+3 anios_educacion mortalidad_infantil -0.654</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatterplot PIB vs esperanza de vida</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mundo, <span class="fu">aes</span>(pib_per_capita, esperanza_vida)) <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> region), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"loess"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">"gray40"</span>) <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"PIB per cápita (USD)"</span>, <span class="at">y =</span> <span class="st">"Esperanza de vida (años)"</span>) <span class="sc">+</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'</code></pre>
 </div>
-<p><strong>Respuesta:</strong> Los 4 clusters tienden a separar: (a) Uruguay/Chile/Argentina (más desarrollados), (b) Costa Rica/Panamá/México (ingreso medio-alto), (c) Bolivia/Ecuador/Perú/Paraguay/RepDom (ingreso medio), (d) Guatemala/Honduras/Nicaragua/Venezuela (menos desarrollados o con crisis institucional). Algunos países pueden moverse según la semilla.</p>
-</section>
-<section id="pregunta-5-comparar-k2-3-4-con-silueta" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-comparar-k2-3-4-con-silueta"><span class="header-section-number">3.2</span> Pregunta 5: Comparar K=2, 3, 4 con silueta</h3>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>siluetas <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="cf">function</span>(k) {</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> k, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  sil <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mean</span>(sil[, <span class="st">"sil_width"</span>])</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">K =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">silueta_promedio =</span> <span class="fu">round</span>(siluetas, <span class="dv">3</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(silueta_promedio))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 2
-      K silueta_promedio
-  &lt;int&gt;            &lt;dbl&gt;
-1     2            0.289
-2     3            0.272
-3     4            0.235</code></pre>
-</div>
-</div>
-<p><strong>Respuesta:</strong> <strong>K=2 maximiza la silueta</strong> (~0.29), seguido de K=3 (~0.27) y K=4 (~0.24). Sin embargo, K=2 colapsa toda la región en “desarrollados” vs.&nbsp;“menos desarrollados”, lo cual es demasiado grueso para análisis políticos finos. <strong>K=3 ofrece un buen compromiso entre estructura estadística y sentido sustantivo</strong>: añade un grupo intermedio interpretable.</p>
-</section>
-<section id="pregunta-6-perfil-de-los-clusters" class="level3" data-number="3.3">
-<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-perfil-de-los-clusters"><span class="header-section-number">3.3</span> Pregunta 6: Perfil de los clusters</h3>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>paises<span class="sc">$</span>cluster_km4 <span class="ot">&lt;-</span> <span class="fu">factor</span>(km4<span class="sc">$</span>cluster)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>paises <span class="sc">|&gt;</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster_km4) <span class="sc">|&gt;</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">pib_mean  =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pib_per_capita)),</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">vida_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(esperanza_vida), <span class="dv">1</span>),</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">demo_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(indice_democracia), <span class="dv">1</span>),</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">gini_mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(indice_gini), <span class="dv">1</span>),</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 6
-  cluster_km4     n pib_mean vida_mean demo_mean gini_mean
-  &lt;fct&gt;       &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-1 1               3     3191      74.9       4.6      48.7
-2 2               3    14439      78.2       7.8      41.9
-3 3               8     6033      74.3       5.4      43.3
-4 4               4    10580      77.9       7.2      49.2</code></pre>
-</div>
-</div>
-<p><strong>Respuesta:</strong> Etiquetas razonables (variarán según semilla):</p>
-<ul>
-<li>Cluster con PIB más alto y democracia alta: <strong>“alto desarrollo”</strong> (Uruguay, Chile, etc.)</li>
-<li>Cluster con PIB medio-alto: <strong>“ingreso medio-alto”</strong></li>
-<li>Cluster con PIB intermedio: <strong>“ingreso medio”</strong></li>
-<li>Cluster con PIB más bajo: <strong>“bajo desarrollo”</strong> o <strong>“vulnerabilidad estructural”</strong></li>
-</ul>
-</section>
-</section>
-<section id="clustering-jerárquico" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="clustering-jerárquico"><span class="header-section-number">4</span> Clustering jerárquico</h2>
-<section id="pregunta-7-dendrograma-con-complete" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-dendrograma-con-complete"><span class="header-section-number">4.1</span> Pregunta 7: Dendrograma con “complete”</h3>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">dist</span>(datos_scaled, <span class="at">method =</span> <span class="st">"euclidean"</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>hc_complete <span class="ot">&lt;-</span> <span class="fu">hclust</span>(d, <span class="at">method =</span> <span class="st">"complete"</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hc_complete, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">cex =</span> <span class="fl">0.9</span>,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Dendrograma (método: complete)"</span>,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"País"</span>, <span class="at">ylab =</span> <span class="st">"Altura"</span>)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rect.hclust</span>(hc_complete, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">border =</span> <span class="fu">c</span>(<span class="st">"#2d4563"</span>, <span class="st">"#b85450"</span>, <span class="st">"#27AE60"</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="tarea-05-respuestas_files/figure-html/p7-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="tarea-05-respuestas_files/figure-html/p3-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El método complete tiende a generar clusters más compactos (porque define distancia entre clusters como la <strong>máxima</strong> distancia entre puntos). Eso lo hace sensible a outliers — un país muy extremo puede formar su propio cluster.</p>
+<p><strong>Respuesta:</strong> La correlación negativa más fuerte es entre <span class="alert">mortalidad infantil y esperanza de vida</span> (~-0,93): son dos caras del mismo fenómeno sanitario. La positiva más fuerte es entre <span class="alert">años de educación y acceso a internet</span> (~0,82), seguida de internet y esperanza de vida (~0,81). El scatterplot muestra la curva clásica de Preston: la esperanza de vida sube rápido con el ingreso entre los países pobres y se aplana entre los ricos. Pasar de USD 2.000 a USD 12.000 “compra” muchos años de vida; pasar de USD 50.000 a USD 80.000 casi ninguno. La relación es fuerte pero no lineal.</p>
 </section>
-<section id="pregunta-8-ward-vs-complete" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-ward-vs-complete"><span class="header-section-number">4.2</span> Pregunta 8: Ward vs complete</h3>
+</section>
+<section id="k-means" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="k-means"><span class="header-section-number">3</span> K-means</h2>
+<section id="pregunta-4-elegir-k-con-codo-y-silueta" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-elegir-k-con-codo-y-silueta"><span class="header-section-number">3.1</span> Pregunta 4: Elegir K con codo y silueta</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>hc_ward <span class="ot">&lt;-</span> <span class="fu">hclust</span>(d, <span class="at">method =</span> <span class="st">"ward.D2"</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ward_groups     <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc_ward, <span class="at">k =</span> <span class="dv">3</span>)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>complete_groups <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc_complete, <span class="at">k =</span> <span class="dv">3</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">Ward =</span> ward_groups, <span class="at">Complete =</span> complete_groups)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>metricas_k <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">k =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">km =</span> <span class="fu">map</span>(k, \(k) <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> k, <span class="at">nstart =</span> <span class="dv">25</span>)),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">wss =</span> <span class="fu">map_dbl</span>(km, \(m) m<span class="sc">$</span>tot.withinss),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">silueta =</span> <span class="fu">map_dbl</span>(km, \(m) {</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mean</span>(<span class="fu">silhouette</span>(m<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))[, <span class="dv">3</span>])</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>metricas_k <span class="sc">|&gt;</span> <span class="fu">select</span>(k, wss, silueta)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>    Complete
-Ward 1 2 3
-   1 7 0 0
-   2 0 8 0
-   3 0 0 3</code></pre>
+<pre><code># A tibble: 5 × 3
+      k   wss silueta
+  &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;
+1     2  96.5   0.390
+2     3  66.4   0.368
+3     4  53.8   0.346
+4     5  44.8   0.315
+5     6  35.9   0.323</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>metricas_k <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(k, wss, silueta) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>k) <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(k, value)) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>name, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tarea-05-respuestas_files/figure-html/p4-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Las dos soluciones tienden a coincidir en los extremos (los más desarrollados y los menos desarrollados) pero a diferir en el grupo intermedio. <strong>Ward suele dar clusters más balanceados</strong> (de tamaño similar), mientras que complete puede producir un cluster muy pequeño con outliers.</p>
+</div>
+<p><strong>Respuesta:</strong> Los dos criterios no gritan un único ganador. La silueta es máxima en <span class="alert">K=2</span> (~0,39) pero K=3 queda muy cerca (~0,37); el codo del WSS se ve alrededor de <span class="alert">K=3</span> (la caída de 2 a 3 es grande, después se suaviza). Con una diferencia de silueta tan chica, conviene decidir por interpretabilidad: K=2 sólo separa “desarrollados vs el resto”, mientras que K=3 distingue además a los países de ingreso medio de los de ingreso bajo, una distinción sustantiva real. Elegimos K=3. La lección: los criterios numéricos acotan las opciones razonables, pero la decisión final es del investigador.</p>
+</section>
+<section id="pregunta-5-geografía-o-nivel-de-ingreso" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-geografía-o-nivel-de-ingreso"><span class="header-section-number">3.2</span> Pregunta 5: ¿Geografía o nivel de ingreso?</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>km3 <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">split</span>(<span class="fu">rownames</span>(datos_scaled), km3<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$`1`
+[1] "India"     "Bangladés" "Nigeria"   "Kenia"     "Etiopía"  
+
+$`2`
+[1] "Noruega"        "Alemania"       "España"         "Polonia"       
+[5] "Estados Unidos" "Canadá"         "Japón"          "Corea del Sur" 
+[9] "Australia"     
+
+$`3`
+ [1] "México"         "Brasil"         "Chile"          "China"         
+ [5] "Indonesia"      "Vietnam"        "Turquía"        "Arabia Saudita"
+ [9] "Sudáfrica"      "Egipto"        </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">cluster =</span> km3<span class="sc">$</span>cluster, <span class="at">region =</span> mundo<span class="sc">$</span>region)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       region
+cluster África América del Norte América Latina Asia Europa Medio Oriente
+      1      3                 0              0    2      0             0
+      2      0                 2              0    2      4             0
+      3      2                 0              3    3      0             2
+       region
+cluster Oceanía
+      1       0
+      2       1
+      3       0</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> Los clusters agrupan por <span class="alert">nivel de desarrollo, no por geografía</span>. Asia aparece repartida en los tres clusters: Japón y Corea del Sur caen con Europa y América del Norte; China, Indonesia y Vietnam con los países de ingreso medio; India y Bangladés con los de ingreso bajo. Lo mismo pasa con África: Sudáfrica y Egipto quedan en el cluster intermedio mientras Nigeria, Kenia y Etiopía forman parte del cluster de menor desarrollo. El algoritmo nunca vio la columna <code>region</code> y aun así produce grupos que cruzan continentes: la estructura de los datos es socioeconómica.</p>
+</section>
+<section id="pregunta-6-perfil-de-los-clusters" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-perfil-de-los-clusters"><span class="header-section-number">3.3</span> Pregunta 6: Perfil de los clusters</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mundo <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> km3<span class="sc">$</span>cluster) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">pib =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pib_per_capita)),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">esperanza =</span> <span class="fu">round</span>(<span class="fu">mean</span>(esperanza_vida), <span class="dv">1</span>),</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mortalidad =</span> <span class="fu">round</span>(<span class="fu">mean</span>(mortalidad_infantil), <span class="dv">1</span>),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">democracia =</span> <span class="fu">round</span>(<span class="fu">mean</span>(indice_democracia), <span class="dv">1</span>)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 6
+  cluster     n   pib esperanza mortalidad democracia
+    &lt;int&gt; &lt;int&gt; &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+1       1     5  2317      64.4       36.7        5.2
+2       2     9 50459      81.7        2.9        8.4
+3       3    10 10936      74.3       12.7        4.7</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> Los tres perfiles son nítidos (los números de cluster pueden variar entre corridas, pero los grupos son los mismos). Un cluster de <span class="alert">alto desarrollo</span>: PIB ~USD 50.000, esperanza de vida ~82 años, mortalidad ~3 por mil y democracias consolidadas (~8,4). Un cluster de <span class="alert">ingreso medio</span>: PIB ~USD 11.000, esperanza ~74, mortalidad ~13, regímenes mixtos (~4,7). Y un cluster de <span class="alert">ingreso bajo</span>: PIB ~USD 2.000, esperanza ~64, mortalidad ~35. Etiquetas razonables: “desarrollo alto”, “ingreso medio” y “desarrollo bajo”.</p>
+</section>
+</section>
+<section id="clustering-jerárquico" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="clustering-jerárquico"><span class="header-section-number">4</span> Clustering jerárquico</h2>
+<section id="pregunta-7-dendrograma-con-ward" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-dendrograma-con-ward"><span class="header-section-number">4.1</span> Pregunta 7: Dendrograma con Ward</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>hc_ward <span class="ot">&lt;-</span> <span class="fu">hclust</span>(<span class="fu">dist</span>(datos_scaled), <span class="at">method =</span> <span class="st">"ward.D2"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(hc_ward, <span class="at">hang =</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Dendrograma (Ward)"</span>, <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">sub =</span> <span class="st">""</span>)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rect.hclust</span>(hc_ward, <span class="at">k =</span> <span class="dv">3</span>, <span class="at">border =</span> <span class="fu">c</span>(<span class="st">"#2d4563"</span>, <span class="st">"#c0392b"</span>, <span class="st">"#27ae60"</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="tarea-05-respuestas_files/figure-html/p7-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Respuesta:</strong> Los dos grandes bloques que se unen al final separan a los <span class="alert">países de ingreso alto</span> (de Noruega a Corea del Sur) del resto del mundo: esa es la división más profunda de los datos. Dentro de los bloques, los países más “solitarios” son <span class="alert">Sudáfrica</span> y Arabia Saudita, que se unen a sus grupos bastante tarde. Tiene sentido: Sudáfrica combina indicadores de ingreso medio con la desigualdad más alta del dataset (Gini ~63), y Arabia Saudita combina ingreso alto con un índice de democracia bajísimo. Son los híbridos que ningún grupo describe del todo bien.</p>
+</section>
+<section id="pregunta-8-k-means-y-jerárquico-cuentan-la-misma-historia" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-k-means-y-jerárquico-cuentan-la-misma-historia"><span class="header-section-number">4.2</span> Pregunta 8: ¿K-means y jerárquico cuentan la misma historia?</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>grupos_ward <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc_ward, <span class="at">k =</span> <span class="dv">3</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">ward =</span> grupos_ward, <span class="at">kmeans =</span> km3<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    kmeans
+ward 1 2 3
+   1 0 9 0
+   2 0 0 9
+   3 5 0 1</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ¿Qué países cambian de grupo?</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">pais =</span> <span class="fu">rownames</span>(datos_scaled),</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">ward =</span> grupos_ward,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">kmeans =</span> km3<span class="sc">$</span>cluster) <span class="sc">|&gt;</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(ward, kmeans) <span class="sc">|&gt;</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+   ward kmeans     n
+  &lt;int&gt;  &lt;int&gt; &lt;int&gt;
+1     1      2     9
+2     2      3     9
+3     3      1     5
+4     3      3     1</code></pre>
+</div>
+</div>
+<p><strong>Respuesta:</strong> Las dos soluciones coinciden en <span class="alert">23 de los 24 países</span>. El único que cambia es <span class="alert">Indonesia</span>: K-means lo pone con los países de ingreso medio y Ward con los de ingreso bajo. No es preocupante, al contrario: que dos algoritmos con lógicas distintas (particional vs aglomerativo) produzcan casi la misma partición indica que la estructura de grupos es robusta. E Indonesia es exactamente el tipo de caso fronterizo (ingreso medio-bajo) donde es esperable que los métodos discrepen.</p>
 </section>
 </section>
 <section id="pca" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="pca"><span class="header-section-number">5</span> PCA</h2>
-<section id="pregunta-9-primeros-3-componentes" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-9-primeros-3-componentes"><span class="header-section-number">5.1</span> Pregunta 9: Primeros 3 componentes</h3>
+<section id="pregunta-9-cuántos-componentes-necesitamos" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-9-cuántos-componentes-necesitamos"><span class="header-section-number">5.1</span> Pregunta 9: ¿Cuántos componentes necesitamos?</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(datos_scaled)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca)<span class="sc">$</span>importance[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(datos_scaled)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                           PC1      PC2       PC3
-Standard deviation     2.04415 1.257512 0.9618343
-Proportion of Variance 0.52232 0.197670 0.1156400
-Cumulative Proportion  0.52232 0.719990 0.8356300</code></pre>
+<pre><code>Importance of components:
+                          PC1    PC2    PC3     PC4     PC5     PC6     PC7
+Standard deviation     2.2268 1.0540 0.9005 0.79372 0.48041 0.38454 0.29383
+Proportion of Variance 0.6199 0.1389 0.1013 0.07875 0.02885 0.01848 0.01079
+Cumulative Proportion  0.6199 0.7587 0.8601 0.93881 0.96766 0.98615 0.99694
+                           PC8
+Standard deviation     0.15651
+Proportion of Variance 0.00306
+Cumulative Proportion  1.00000</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los primeros 3 componentes acumulan aproximadamente el <strong>84%</strong> de la varianza (PC1 ~52% + PC2 ~20% + PC3 ~12%). Para fines descriptivos y visualización, <strong>2 componentes ya bastan</strong> (~72%). PC3 agrega información complementaria solo si queremos una representación más fiel del dataset original.</p>
+<p><strong>Respuesta:</strong> <span class="alert">PC1 solo captura ~62%</span> de la varianza total: una sola dimensión resume casi dos tercios de la información de ocho variables. PC2 agrega ~14% (acumulado ~76%) y PC3 ~10% (acumulado <span class="alert">~86%</span>). Hacen falta <span class="alert">tres componentes</span> para superar el 80% de la varianza acumulada. Aun así, para visualizar en dos dimensiones, PC1 y PC2 con tres cuartos de la varianza son una síntesis muy razonable.</p>
 </section>
-<section id="pregunta-10-interpretar-pc3" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-interpretar-pc3"><span class="header-section-number">5.2</span> Pregunta 10: Interpretar PC3</h3>
+<section id="pregunta-10-interpretar-pc1-y-pc2" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-interpretar-pc1-y-pc2"><span class="header-section-number">5.2</span> Pregunta 10: Interpretar PC1 y PC2</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>pca<span class="sc">$</span>rotation[, <span class="dv">3</span>] <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">2</span>) <span class="sc">|&gt;</span> <span class="fu">sort</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(pca<span class="sc">$</span>rotation[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      indice_gini   anios_educacion   acceso_internet    esperanza_vida 
-            -0.72             -0.54             -0.10             -0.09 
-   pib_per_capita      urbanizacion indice_democracia   gasto_salud_pib 
-            -0.03             -0.02              0.28              0.31 </code></pre>
+<pre><code>                      PC1   PC2
+pib_per_capita      -0.38 -0.20
+esperanza_vida      -0.40 -0.04
+mortalidad_infantil  0.38 -0.14
+anios_educacion     -0.40  0.05
+acceso_internet     -0.40  0.29
+indice_gini          0.12  0.83
+emisiones_co2       -0.36  0.25
+indice_democracia   -0.28 -0.31</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> PC3 carga sobre todo en <code>indice_gini</code> (≈ -0.72) y <code>anios_educacion</code> (≈ -0.54), con <code>gasto_salud_pib</code> (≈ +0.31) e <code>indice_democracia</code> (≈ +0.28) en el signo opuesto. Es decir, separa desigualdad y escolaridad (un polo) de gasto en salud y democracia (el otro). Podría leerse como un eje residual de <strong>“desigualdad y rezago educativo vs.&nbsp;inversión institucional”</strong>, pero al capturar solo ~12% de la varianza su interpretación sustantiva es ambigua y conviene no sobreinterpretarla.</p>
+<p><strong>Respuesta:</strong> En <span class="alert">PC1</span>, esperanza de vida, años de educación, acceso a internet, PIB y emisiones cargan todas con el mismo signo (~±0,4), y la mortalidad infantil carga con el signo opuesto. Es el eje clásico de <span class="alert">desarrollo socioeconómico</span> (el signo concreto es arbitrario; lo que importa es la oposición). Noten que las emisiones de CO2 cargan del lado “desarrollado”: los países ricos contaminan más per cápita. En <span class="alert">PC2</span> domina por lejos el índice de Gini (~0,83), con la democracia cargando en sentido contrario: es un eje de <span class="alert">desigualdad</span>, casi independiente del nivel de desarrollo. PC1 = “desarrollo”, PC2 = “desigualdad” son nombres defendibles con estos loadings.</p>
 </section>
-<section id="pregunta-11-países-extremos-en-pc2" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-países-extremos-en-pc2"><span class="header-section-number">5.3</span> Pregunta 11: Países extremos en PC2</h3>
+<section id="pregunta-11-países-extremos" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-países-extremos"><span class="header-section-number">5.3</span> Pregunta 11: Países extremos</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">|&gt;</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"pais"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(PC2) <span class="sc">|&gt;</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PC1 =</span> <span class="fu">round</span>(PC1, <span class="dv">2</span>), <span class="at">PC2 =</span> <span class="fu">round</span>(PC2, <span class="dv">2</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>scores <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="at">rownames =</span> <span class="st">"pais"</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>scores <span class="sc">|&gt;</span> <span class="fu">arrange</span>(PC1) <span class="sc">|&gt;</span> <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">22</span><span class="sc">:</span><span class="dv">24</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   pais   PC1   PC2
-1             Venezuela  1.37 -2.99
-2  República Dominicana -0.02 -1.56
-3               Bolivia  1.97 -1.12
-4                  Perú  0.00 -0.94
-5                México -0.09 -0.92
-6             Argentina -2.52 -0.89
-7           El Salvador  1.33 -0.78
-8               Uruguay -3.45 -0.26
-9              Paraguay  0.83  0.05
-10                Chile -3.35  0.63
-11               Brasil -1.17  0.68
-12              Ecuador  0.45  0.70
-13             Colombia -0.43  0.94
-14               Panamá -1.26  1.03
-15            Nicaragua  3.11  1.05
-16            Guatemala  3.03  1.15
-17           Costa Rica -2.26  1.35
-18             Honduras  2.47  1.87</code></pre>
+<pre><code># A tibble: 6 × 3
+  pais        PC1    PC2
+  &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt;
+1 Noruega   -3.07 -1.57 
+2 Australia -3.00 -0.248
+3 Canadá    -2.78 -0.344
+4 Kenia      3.17 -0.384
+5 Etiopía    3.98 -1.03 
+6 Nigeria    4.46 -1.01 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>scores <span class="sc">|&gt;</span> <span class="fu">arrange</span>(PC2) <span class="sc">|&gt;</span> <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">22</span><span class="sc">:</span><span class="dv">24</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  pais              PC1   PC2
+  &lt;chr&gt;           &lt;dbl&gt; &lt;dbl&gt;
+1 Noruega        -3.07  -1.57
+2 Bangladés       2.01  -1.06
+3 Etiopía         3.98  -1.03
+4 Brasil          0.732  1.44
+5 Arabia Saudita -1.24   2.19
+6 Sudáfrica       1.27   2.59</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los extremos de PC2 son <strong>Venezuela</strong> (≈ -3.0) en un polo y <strong>Honduras</strong>, <strong>Costa Rica</strong> y <strong>Guatemala</strong> (≈ +1.2 a +1.9) en el otro. PC2 carga positivamente en Gini, esperanza de vida y gasto en salud, y negativamente en urbanización y educación, así que el polo positivo reúne países desiguales o poco urbanizados pero con buenos indicadores de salud (Costa Rica destaca por la esperanza de vida más alta del grupo). Es una dimensión secundaria que mezcla desigualdad y salud, menos limpia que PC1, que sí es un eje de desarrollo claro.</p>
+<p><strong>Respuesta:</strong> En PC1 los extremos son <span class="alert">Noruega, Australia y Canadá</span> de un lado y <span class="alert">Nigeria, Etiopía y Kenia</span> del otro: exactamente lo que esperamos de un eje de desarrollo. En PC2 los extremos confirman la lectura de “desigualdad”: en un polo están <span class="alert">Sudáfrica, Arabia Saudita y Brasil</span> (los Gini más altos del dataset, más el caso saudí de baja democracia), y en el otro Noruega, un país rico e igualitario. Que Brasil y Sudáfrica estén lejos de Etiopía en PC2 pero no tanto en PC1 muestra que las dos dimensiones capturan cosas distintas.</p>
 </section>
 </section>
 <section id="síntesis" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="síntesis"><span class="header-section-number">6</span> Síntesis</h2>
-<section id="pregunta-12-excluir-uruguay-y-re-correr-pca" class="level3" data-number="6.1">
-<h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-excluir-uruguay-y-re-correr-pca"><span class="header-section-number">6.1</span> Pregunta 12: Excluir Uruguay y re-correr PCA</h3>
+<section id="pregunta-12-qué-pasa-si-no-escalamos" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-qué-pasa-si-no-escalamos"><span class="header-section-number">6.1</span> Pregunta 12: ¿Qué pasa si no escalamos?</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sin_uruguay <span class="ot">&lt;-</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pais <span class="sc">!=</span> <span class="st">"Uruguay"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>cluster_km4)  <span class="co"># quitar la columna agregada antes</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>datos_sin_uy <span class="ot">&lt;-</span> sin_uruguay <span class="sc">|&gt;</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">"pais"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale</span>()</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>pca_sin_uy <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(datos_sin_uy)</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Comparar varianza explicada</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pca_sin_uy)<span class="sc">$</span>importance[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>datos_raw <span class="ot">&lt;-</span> mundo <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>region) <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">"pais"</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Varianza de cada variable sin escalar</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(<span class="fu">apply</span>(datos_raw, <span class="dv">2</span>, var), <span class="at">decreasing =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                            PC1      PC2
-Standard deviation     1.994135 1.330516
-Proportion of Variance 0.497070 0.221280
-Cumulative Proportion  0.497070 0.718360</code></pre>
+<pre><code>     pib_per_capita     acceso_internet mortalidad_infantil 
+       6.463392e+08        5.537777e+02        2.461872e+02 </code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loadings PC1</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>pca_sin_uy<span class="sc">$</span>rotation[, <span class="dv">1</span>] <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">2</span>) <span class="sc">|&gt;</span> <span class="fu">sort</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>km3_raw <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_raw, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">split</span>(mundo<span class="sc">$</span>pais, km3_raw<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   pib_per_capita   acceso_internet indice_democracia    esperanza_vida 
-            -0.44             -0.44             -0.39             -0.38 
-     urbanizacion   anios_educacion   gasto_salud_pib       indice_gini 
-            -0.37             -0.36             -0.23              0.01 </code></pre>
+<pre><code>$`1`
+ [1] "México"    "Brasil"    "Chile"     "China"     "India"     "Indonesia"
+ [7] "Vietnam"   "Bangladés" "Turquía"   "Sudáfrica" "Nigeria"   "Kenia"    
+[13] "Egipto"    "Etiopía"  
+
+$`2`
+[1] "Noruega"        "Alemania"       "Estados Unidos" "Canadá"        
+[5] "Australia"     
+
+$`3`
+[1] "España"         "Polonia"        "Japón"          "Corea del Sur" 
+[5] "Arabia Saudita"</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Países extremos</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>pca_sin_uy<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">|&gt;</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"pais"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(PC1) <span class="sc">|&gt;</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="at">escalado =</span> km3<span class="sc">$</span>cluster, <span class="at">sin_escalar =</span> km3_raw<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        pais       PC1        PC2
-1      Chile -3.703440  0.4954663
-2  Argentina -2.688381 -1.0524317
-3 Costa Rica -2.628147  1.2670502</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pca_sin_uy<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>] <span class="sc">|&gt;</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"pais"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(PC1)) <span class="sc">|&gt;</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>       pais      PC1      PC2
-1 Nicaragua 3.072884 1.114341
-2 Guatemala 2.874028 1.268499
-3  Honduras 2.220619 2.014196</code></pre>
+<pre><code>        sin_escalar
+escalado 1 2 3
+       1 5 0 0
+       2 0 5 4
+       3 9 0 1</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los loadings de PC1 son muy similares (sigue siendo un “eje de desarrollo”). Lo que cambia es <strong>quién está en el extremo “desarrollado”</strong>: ahora Chile o Argentina lideran. Esto muestra que PCA no es muy sensible a quitar un solo caso — la estructura global del dataset persiste. <strong>Si quitar un caso cambia drásticamente PC1, ese caso es un outlier que distorsiona los resultados</strong>.</p>
+<p><strong>Respuesta:</strong> Sin escalar, la solución la dicta el <span class="alert">PIB per cápita</span>, cuya varianza (del orden de 10<sup>8</sup>) es millones de veces mayor que la de las demás variables. Los “clusters” pasan a ser bandas de ingreso puras: un grupo de PIB altísimo, otro de PIB medio y otro con todo el resto. El caso revelador es <span class="alert">Arabia Saudita</span>, que queda agrupada con España, Polonia, Japón y Corea del Sur sólo porque su PIB es parecido, aunque su índice de democracia (~2) y su perfil social sean completamente distintos. La mortalidad infantil, el Gini y la democracia se vuelven irrelevantes para la distancia. Por eso escalar no es un detalle técnico: define qué pregunta le estamos haciendo a los datos.</p>
 </section>
 <section id="pregunta-13-reflexión" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-13-reflexión"><span class="header-section-number">6.2</span> Pregunta 13: Reflexión</h3>
 <p><strong>Respuesta:</strong></p>
 <ol type="1">
-<li><p><strong>¿Cuántos clusters?</strong> K=3 ofrece el mejor balance entre estabilidad estadística (silueta razonable) e interpretación política (alto, medio, bajo desarrollo). K=2 es demasiado grueso; K=4 fragmenta sin ganar mucho.</p></li>
-<li><p><strong>¿Clustering y PCA coinciden?</strong> Sí, parcialmente. Ambos identifican el eje “desarrollado vs.&nbsp;menos desarrollado” como el más informativo. El biplot de PCA muestra cómo los clusters se separan principalmente a lo largo de PC1. Pero PCA agrega una dimensión adicional (PC2 = desigualdad) que el clustering K-means no captura explícitamente, porque K-means solo asigna etiquetas categóricas.</p></li>
-<li><p><strong>¿Qué visualización?</strong> El <strong>biplot</strong> (PCA + clusters K-means superpuestos) combina lo mejor de ambos métodos: muestra las dimensiones latentes (loadings = ejes interpretables), los grupos sustantivos (clusters como color), y los países individuales (puntos etiquetados). Es la representación más rica y le da al funcionario tanto una visión panorámica como información sobre cada país.</p></li>
+<li>Para un periodista, el <span class="alert">gráfico de clusters sobre los dos primeros componentes</span> (estilo <code>fviz_cluster()</code>) es la mejor opción: muestra los grupos, la posición relativa de cada país y los casos fronterizos en una sola imagen intuitiva (“mapa de países”). El dendrograma exige explicar qué significa la altura de las uniones, y el biplot agrega flechas de loadings que confunden a un público no técnico</li>
+<li>Los promedios nacionales esconden la <span class="alert">desigualdad interna</span>. Brasil o Sudáfrica tienen ingresos medios “intermedios”, pero conviven regiones con indicadores de país rico y otras con indicadores de país pobre; el “país promedio” no describe bien a casi nadie. Lo mismo vale para brechas urbano-rurales o étnicas</li>
+<li>Hay varias respuestas defendibles. Algunos ejemplos: la <span class="alert">informalidad laboral</span> o la calidad institucional (corrupción) distinguirían a los ingresos medios entre sí, porque es donde más varían; una medida de dependencia de materias primas separaría a los exportadores de petróleo (Arabia Saudita) de los manufactureros (Corea del Sur, en su momento). Lo importante es justificar que la variable nueva varíe justamente donde el dataset actual no discrimina</li>
 </ol>
 
 

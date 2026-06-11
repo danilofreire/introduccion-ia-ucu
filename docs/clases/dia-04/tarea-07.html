@@ -162,6 +162,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -274,9 +278,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="configuración-y-chat-básico" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="configuración-y-chat-básico"><span class="header-section-number">2</span> Configuración y chat básico</h2>
-<section id="pregunta-1-primer-chat" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-primer-chat"><span class="header-section-number">2.1</span> Pregunta 1: Primer chat</h3>
-<p>Crear un chat con <code>chat_openrouter()</code> usando <code>MODELO</code> y un system prompt en el que el modelo se presenta como un investigador en ciencia política latinoamericana. Pedirle que explique en dos oraciones qué es la democracia representativa. Mostrar la respuesta.</p>
+<section id="pregunta-1-el-system-prompt-como-formato" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-el-system-prompt-como-formato"><span class="header-section-number">2.1</span> Pregunta 1: El system prompt como formato</h3>
+<p>Crear un chat con <code>chat_openrouter()</code> usando <code>MODELO</code> y un system prompt que obligue al modelo a responder <span class="alert">siempre con exactamente tres viñetas</span>, en lenguaje sencillo y sin jerga técnica. Pedirle que explique qué es el sesgo de selección. ¿Respetó el formato? ¿El lenguaje quedó realmente accesible?</p>
 <p><em>Pista:</em> el system prompt es un argumento del constructor <code>chat_openrouter()</code>, no algo que se envía después. La interfaz devuelve un objeto R6 con un método para enviar mensajes.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -285,15 +289,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-2-historial-de-conversación" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-historial-de-conversación"><span class="header-section-number">2.2</span> Pregunta 2: Historial de conversación</h3>
-<p>Usando el mismo objeto <code>chat</code> de la Pregunta 1, hacer una segunda pregunta que <strong>dependa</strong> de la primera (por ejemplo, “¿Y qué desafíos enfrenta hoy en América Latina?”). Verificar que la respuesta hace referencia al concepto introducido antes. Explicar por qué <code>chat$chat()</code> “recuerda” la conversación.</p>
+<p>Usando el mismo objeto <code>chat</code> de la Pregunta 1, hacer una segunda pregunta que <strong>dependa</strong> de la primera (por ejemplo, “¿Y cómo se puede evitar en una encuesta?”). Verificar que la respuesta hace referencia al concepto introducido antes. Explicar por qué <code>chat$chat()</code> “recuerda” la conversación.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-3-system-prompt-como-variable-de-control" class="level3" data-number="2.3">
-<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-system-prompt-como-variable-de-control"><span class="header-section-number">2.3</span> Pregunta 3: System prompt como variable de control</h3>
-<p>Crear dos chats con system prompts opuestos sobre el mismo tema (por ejemplo, uno con perspectiva de mercado y otro con perspectiva social), y hacer a ambos exactamente la misma pregunta sobre política económica. Mostrar las dos respuestas en formato comparativo. ¿Las respuestas difieren? ¿En qué?</p>
+<section id="pregunta-3-el-system-prompt-como-barrera" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-el-system-prompt-como-barrera"><span class="header-section-number">2.3</span> Pregunta 3: El system prompt como barrera</h3>
+<p>Los asistentes que se usan en investigación suelen estar restringidos a su dominio. Crear un chat cuyo system prompt lo limite a responder <span class="alert">sólo preguntas sobre política latinoamericana</span> y a rechazar amablemente cualquier otro tema. Probarlo con dos preguntas: una sobre política latinoamericana y otra claramente fuera de tema (por ejemplo, una receta de cocina). ¿El modelo respetó la barrera? Propongan además una pregunta “fronteriza” (mitad dentro, mitad fuera del dominio) y comenten qué hizo el modelo con ella.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -302,9 +306,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="clasificación-y-extracción" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="clasificación-y-extracción"><span class="header-section-number">3</span> Clasificación y extracción</h2>
-<section id="pregunta-4-función-de-clasificación" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-función-de-clasificación"><span class="header-section-number">3.1</span> Pregunta 4: Función de clasificación</h3>
-<p>Escribir una función <code>clasificar_zero(texto)</code> que reciba un texto y devuelva una de las cinco categorías de <code>textos_politicos.csv</code>. Probarla con los textos 1, 5 y 10 del dataset.</p>
+<section id="pregunta-4-clasificar-una-dimensión-sin-etiquetas" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-clasificar-una-dimensión-sin-etiquetas"><span class="header-section-number">3.1</span> Pregunta 4: Clasificar una dimensión sin etiquetas</h3>
+<p>El dataset trae la columna <code>tema</code> (que ya clasificamos en el laboratorio), pero no dice nada del <span class="alert">tono</span> de cada texto. Escribir una función <code>clasificar_tono(texto)</code> que devuelva exactamente una de tres etiquetas: “positivo”, “negativo” o “neutral”. Probarla con los textos 2, 21 y 41 del dataset. Como acá no hay etiqueta de referencia, el control de calidad son ustedes: lean cada texto y digan si están de acuerdo con el modelo.</p>
 <p><em>Pista:</em> dentro de la función conviene crear un chat nuevo cada vez para evitar que el historial sesgue la siguiente clasificación.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -325,8 +329,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="4" class="anchored" data-anchor-id="robustez-y-sensibilidad"><span class="header-section-number">4</span> Robustez y sensibilidad</h2>
 <section id="pregunta-6-el-modelo-da-siempre-lo-mismo" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-6-el-modelo-da-siempre-lo-mismo"><span class="header-section-number">4.1</span> Pregunta 6: ¿El modelo da siempre lo mismo?</h3>
-<p>Los LLMs no son deterministas: la misma pregunta puede dar respuestas distintas. Tomar UN texto ambiguo del dataset y clasificarlo cinco veces (creando un chat nuevo cada vez). Contar cuántas veces salió cada categoría. ¿Qué implica esto para la reproducibilidad de una investigación?</p>
-<p><em>Pista:</em> <code>map_chr(1:5, \(i) clasificar_zero(texto))</code> repite la clasificación; <code>table()</code> cuenta las respuestas.</p>
+<p>Los LLMs no son deterministas: la misma pregunta puede dar respuestas distintas. Tomar UN texto del dataset cuyo tono sea ambiguo (que mezcle una buena y una mala noticia) y clasificarlo cinco veces (creando un chat nuevo cada vez). Contar cuántas veces salió cada etiqueta. ¿Qué implica esto para la reproducibilidad de una investigación?</p>
+<p><em>Pista:</em> <code>map_chr(1:5, \(i) clasificar_tono(texto))</code> repite la clasificación; <code>table()</code> cuenta las respuestas.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -334,7 +338,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-7-sensibilidad-al-prompt" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-7-sensibilidad-al-prompt"><span class="header-section-number">4.2</span> Pregunta 7: Sensibilidad al prompt</h3>
-<p>El resultado depende de cómo se escribe el prompt. Escribir dos versiones del system prompt para clasificar: una <strong>breve</strong> (sólo las categorías) y una <strong>detallada</strong> (con una regla extra, por ejemplo “si el texto toca dos temas, elegí el más concreto”). Aplicar ambas a los mismos cinco textos y mostrar en qué textos difieren.</p>
+<p>El resultado depende de cómo se escribe el prompt. Escribir dos versiones del system prompt para clasificar por tema: una <strong>breve</strong> (sólo las cinco categorías de <code>textos_politicos.csv</code>) y una <strong>detallada</strong> (con una regla extra, por ejemplo “si el texto toca dos temas, elegí el más concreto”). Aplicar ambas a los mismos cinco textos y mostrar en qué textos difieren.</p>
 <p><em>Pista:</em> definir dos funciones que sólo cambien en el <code>system_prompt</code>, y <code>filter()</code> las filas donde las dos clasificaciones no coinciden.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>

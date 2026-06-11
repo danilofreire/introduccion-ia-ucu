@@ -162,6 +162,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -264,77 +268,78 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="configuración-y-chat-básico" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="configuración-y-chat-básico"><span class="header-section-number">2</span> Configuración y chat básico</h2>
-<section id="pregunta-1-primer-chat" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-primer-chat"><span class="header-section-number">2.1</span> Pregunta 1: Primer chat</h3>
+<section id="pregunta-1-el-system-prompt-como-formato" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-el-system-prompt-como-formato"><span class="header-section-number">2.1</span> Pregunta 1: El system prompt como formato</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un investigador en ciencia política</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">  latinoamericana. Respondés en dos oraciones, en español, con</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">  vocabulario académico claro."</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Respondé SIEMPRE con exactamente tres viñetas que</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">  empiecen con '- '. Usá lenguaje sencillo, sin jerga técnica, como si</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">  le explicaras el tema a alguien que nunca estudió estadística."</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué es la democracia representativa?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué es el sesgo de selección?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Respuesta:</strong> El system prompt se pasa como argumento del constructor <code>chat_openrouter()</code> y permanece activo durante toda la sesión del chat. Después de crear el objeto, llamamos al método <code>$chat()</code> para enviar un mensaje y recibir la respuesta como texto.</p>
+<p><strong>Respuesta:</strong> El system prompt se pasa como argumento del constructor <code>chat_openrouter()</code> y permanece activo durante toda la sesión del chat. En general el modelo respeta la instrucción de formato (tres viñetas), pero no siempre: a veces agrega una introducción, una viñeta de más, o se le escapa un término técnico (“muestra no aleatoria”). La lección es que una instrucción de formato es una restricción que hay que <span class="alert">verificar</span>, no una garantía. Para salidas que deben tener una estructura exacta, la herramienta correcta es <code>chat_structured()</code> (Pregunta 5), no el system prompt.</p>
 </section>
 <section id="pregunta-2-historial-de-conversación" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-historial-de-conversación"><span class="header-section-number">2.2</span> Pregunta 2: Historial de conversación</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Y qué desafíos enfrenta hoy en América Latina?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>chat<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Y cómo se puede evitar en una encuesta?"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Respuesta:</strong> La segunda respuesta se refiere a la democracia representativa sin que tengamos que repetir el término. <code>ellmer</code> guarda el historial completo dentro del objeto <code>chat</code> y lo reenvía al modelo en cada llamada. Eso permite que el modelo mantenga el hilo, pero también significa que el costo en tokens crece conversación tras conversación.</p>
+<p><strong>Respuesta:</strong> La segunda respuesta se refiere al sesgo de selección sin que tengamos que repetir el término. <code>ellmer</code> guarda el historial completo dentro del objeto <code>chat</code> y lo reenvía al modelo en cada llamada. Eso permite que el modelo mantenga el hilo, pero también significa que el costo en tokens crece conversación tras conversación.</p>
 </section>
-<section id="pregunta-3-system-prompt-como-variable-de-control" class="level3" data-number="2.3">
-<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-system-prompt-como-variable-de-control"><span class="header-section-number">2.3</span> Pregunta 3: System prompt como variable de control</h3>
+<section id="pregunta-3-el-system-prompt-como-barrera" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-el-system-prompt-como-barrera"><span class="header-section-number">2.3</span> Pregunta 3: El system prompt como barrera</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mercado <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>guardia <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un economista ortodoxo. Defendés la disciplina</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">  fiscal, los mercados libres y la apertura comercial. Respondés en</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">  tres oraciones."</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>social <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">model =</span> MODELO,</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos un economista heterodoxo enfocado en</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="st">  desigualdad. Defendés la redistribución y la intervención pública.</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="st">  Respondés en tres oraciones."</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>pregunta <span class="ot">&lt;-</span> <span class="st">"¿Cómo debería responder un país de ingresos medios a</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="st">una crisis de inflación?"</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Mercado ---</span><span class="sc">\n</span><span class="st">"</span>, mercado<span class="sc">$</span><span class="fu">chat</span>(pregunta), <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Social ---</span><span class="sc">\n</span><span class="st">"</span>,   social<span class="sc">$</span><span class="fu">chat</span>(pregunta), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">system_prompt =</span> <span class="st">"Sos el asistente de un curso de política latinoamericana.</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">  Respondé SOLO preguntas sobre política latinoamericana. Si te preguntan</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="st">  sobre cualquier otro tema, rechazá amablemente en una oración y sugerí</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="st">  volver a los temas del curso."</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Dentro del dominio ---</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    guardia<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué fue la tercera ola de democratización en América Latina?"</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Fuera del dominio ---</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    guardia<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Cómo se hace un risotto de hongos?"</span>),</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"--- Fronteriza ---</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    guardia<span class="sc">$</span><span class="fu">chat</span>(<span class="st">"¿Qué países de América Latina producen más arroz?"</span>),</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Respuesta:</strong> Las dos respuestas usan vocabulario y recomendaciones distintas: la “de mercado” enfatiza disciplina fiscal y tasa de interés; la “social” enfatiza salarios reales, transferencias y controles. El mismo modelo produce posiciones distintas según el rol que le asignamos. Esto muestra que el system prompt es una variable de control, no un detalle cosmético: puede inducir sesgo intencional o no intencional en los resultados.</p>
+<p><strong>Respuesta:</strong> El modelo suele respetar la barrera en los casos claros: responde la pregunta sobre democratización y rechaza la receta. Lo interesante es la pregunta fronteriza: la producción de arroz menciona a América Latina pero es un tema agrícola, y según la corrida el modelo la responde (interpretando “política” en sentido amplio, como economía política) o la rechaza. La barrera no es una regla formal sino una interpretación del modelo, y por eso es <span class="alert">blanda</span>: funciona para guiar el uso normal, pero no resiste casos límite ni usuarios insistentes. Una herramienta de investigación seria combina el system prompt con validación de entradas y salidas.</p>
 </section>
 </section>
 <section id="clasificación-y-extracción" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="clasificación-y-extracción"><span class="header-section-number">3</span> Clasificación y extracción</h2>
-<section id="pregunta-4-función-de-clasificación" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-función-de-clasificación"><span class="header-section-number">3.1</span> Pregunta 4: Función de clasificación</h3>
+<section id="pregunta-4-clasificar-una-dimensión-sin-etiquetas" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-clasificar-una-dimensión-sin-etiquetas"><span class="header-section-number">3.1</span> Pregunta 4: Clasificar una dimensión sin etiquetas</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>clasificar_zero <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>clasificar_tono <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> MODELO,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá el siguiente texto político en</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">    EXACTAMENTE una de estas categorías:</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">    economia, educacion, seguridad, salud, medioambiente.</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">    Reglas:</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">    - Responder SOLO con el nombre de la categoría, en minúsculas</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="st">    - Sin tildes, sin puntuación, sin explicación"</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_zero</span>(textos<span class="sc">$</span>texto[<span class="dv">1</span>])</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_zero</span>(textos<span class="sc">$</span>texto[<span class="dv">5</span>])</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_zero</span>(textos<span class="sc">$</span>texto[<span class="dv">10</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá el TONO del siguiente texto político en</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">    EXACTAMENTE una de estas etiquetas: positivo, negativo, neutral.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">    Reglas:</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'positivo' si destaca logros, mejoras u oportunidades</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'negativo' si destaca problemas, riesgos o retrocesos</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="st">    - 'neutral' si describe o anuncia sin valorar</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="st">    - Responder SOLO con la etiqueta, en minúsculas, sin explicación"</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>textos <span class="sc">|&gt;</span> <span class="fu">slice</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">21</span>, <span class="dv">41</span>)) <span class="sc">|&gt;</span> <span class="fu">select</span>(id, texto)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_tono</span>(textos<span class="sc">$</span>texto[<span class="dv">2</span>])</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_tono</span>(textos<span class="sc">$</span>texto[<span class="dv">21</span>])</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="fu">clasificar_tono</span>(textos<span class="sc">$</span>texto[<span class="dv">41</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Respuesta:</strong> La función crea un chat nuevo dentro de cada llamada, de modo que la clasificación del texto N no contamina la del texto N+1. Esto cuesta más tokens (cada llamada envía el system prompt de nuevo) pero protege la independencia entre observaciones, que es lo que necesitamos para evaluar la accuracy con honestidad.</p>
+<p><strong>Respuesta:</strong> Los tres textos tienen tonos bien marcados y el modelo suele acertar: el 2 (la inflación como “problema grave”) es <span class="alert">negativo</span>, el 21 (los programas de alimentación escolar “han mejorado” la asistencia) es <span class="alert">positivo</span> y el 41 (el gasto de bolsillo “empuja a millones de familias a la pobreza”) es <span class="alert">negativo</span>. Igual que en el laboratorio, la función crea un chat nuevo en cada llamada para que una clasificación no contamine la siguiente. La diferencia importante con clasificar por tema es que acá <span class="alert">no hay columna de referencia</span>: el dataset no trae el tono “verdadero”, así que el único control de calidad es leer los textos y juzgar nosotros. Ese es exactamente el problema que el Lab 8 resuelve de forma sistemática con un gold standard codificado a mano.</p>
 </section>
 <section id="pregunta-5-salida-estructurada" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-salida-estructurada"><span class="header-section-number">3.2</span> Pregunta 5: Salida estructurada</h3>
@@ -370,12 +375,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-6-el-modelo-da-siempre-lo-mismo" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-6-el-modelo-da-siempre-lo-mismo"><span class="header-section-number">4.1</span> Pregunta 6: ¿El modelo da siempre lo mismo?</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>texto_ambiguo <span class="ot">&lt;-</span> textos<span class="sc">$</span>texto[<span class="dv">30</span>]</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>repeticiones <span class="ot">&lt;-</span> <span class="fu">map_chr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, \(i) <span class="fu">clasificar_zero</span>(texto_ambiguo))</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(repeticiones)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># El texto 36 mezcla señales: una mejora ("han mejorado la atención")</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># dentro de un tema negativo ("víctimas de delitos")</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>texto_ambiguo <span class="ot">&lt;-</span> textos<span class="sc">$</span>texto[<span class="dv">36</span>]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>repeticiones <span class="ot">&lt;-</span> <span class="fu">map_chr</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, \(i) <span class="fu">clasificar_tono</span>(texto_ambiguo))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(repeticiones)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Respuesta:</strong> con un texto claro, las cinco corridas suelen coincidir; con un texto fronterizo (que toca dos temas) pueden aparecer dos o tres categorías distintas. La consecuencia metodológica es que el resultado de un LLM no es perfectamente reproducible: hay que fijar y reportar el modelo y su versión, considerar una temperatura baja (0), y para los casos límite correr la clasificación varias veces y tomar la mayoría. Esta variabilidad es justamente lo que las medidas de confiabilidad del Lab 8 buscan cuantificar.</p>
+<p><strong>Respuesta:</strong> con un texto de tono claro, las cinco corridas suelen coincidir; con uno que mezcla señales (como el 36, que reporta una mejora en la atención a víctimas de delitos) pueden aparecer dos o tres etiquetas distintas. La consecuencia metodológica es que el resultado de un LLM no es perfectamente reproducible: hay que fijar y reportar el modelo y su versión, considerar una temperatura baja (0), y para los casos límite correr la clasificación varias veces y tomar la mayoría. Esta variabilidad es justamente lo que las medidas de confiabilidad del Lab 8 buscan cuantificar.</p>
 </section>
 <section id="pregunta-7-sensibilidad-al-prompt" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-7-sensibilidad-al-prompt"><span class="header-section-number">4.2</span> Pregunta 7: Sensibilidad al prompt</h3>
@@ -479,8 +486,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>texto_dificil <span class="ot">&lt;-</span> textos<span class="sc">$</span>texto[<span class="dv">33</span>]</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) clasificación directa</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>directa <span class="ot">&lt;-</span> <span class="fu">clasificar_zero</span>(texto_dificil)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (a) clasificación directa (la función breve de la Pregunta 7)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>directa <span class="ot">&lt;-</span> <span class="fu">clasificar_breve</span>(texto_dificil)</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># (b) con razonamiento paso a paso (cadena de pensamiento)</span></span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>

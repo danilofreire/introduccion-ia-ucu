@@ -131,35 +131,28 @@ tokens_limpios |>
 
 **Respuesta:** Las palabras distintivas por año son idiosincráticas (*agrícolas*, *fiscal*, *año*, *agua*, *esenciales*…) y no cuentan una historia temporal: no aparece un "año de la pandemia" con vocabulario sanitario, aunque el corpus sí contenga textos de salud que mencionan "pandemia". El motivo es que los 5 temas están repartidos de forma pareja entre los años, así que el vocabulario casi no correlaciona con el tiempo. TF-IDF solo revela una señal interpretable cuando la variable de agrupamiento influye de verdad en las palabras que se usan, como sí ocurre con `tema`. La lección práctica: antes de confiar en un TF-IDF por grupo, pregúntense si ese grupo debería cambiar el vocabulario; agrupar por una variable arbitraria produce ruido que puede parecer señal.
 
-### Pregunta 6: TF-IDF por tema vs. por país
+### Pregunta 6: TF-IDF de bigramas
 
 ```{r p6}
-# Top 5 salud (por tema)
-top_salud <- tokens_limpios |>
-  count(tema, palabra) |>
-  bind_tf_idf(palabra, tema, n) |>
-  filter(tema == "salud") |>
-  slice_max(tf_idf, n = 5) |>
-  pull(palabra)
+bigramas_tema <- textos |>
+  unnest_tokens(par, texto, token = "ngrams", n = 2) |>
+  separate(par, c("palabra1", "palabra2"), sep = " ") |>
+  filter(!palabra1 %in% stopwords_es$palabra,
+         !palabra2 %in% stopwords_es$palabra,
+         !str_detect(palabra1, "^[0-9]+$"),
+         !str_detect(palabra2, "^[0-9]+$")) |>
+  unite("bigrama", palabra1, palabra2, sep = " ") |>
+  count(tema, bigrama) |>
+  bind_tf_idf(bigrama, tema, n)
 
-# Top 5 del país con más textos
-pais_top <- tokens_limpios |> count(pais, sort = TRUE) |> slice(1) |> pull(pais)
-
-top_pais <- tokens_limpios |>
-  count(pais, palabra) |>
-  bind_tf_idf(palabra, pais, n) |>
-  filter(pais == pais_top) |>
-  slice_max(tf_idf, n = 5) |>
-  pull(palabra)
-
-cat("Top 5 salud:", paste(top_salud, collapse = ", "), "\n")
-cat("Top 5", pais_top, ":", paste(top_pais, collapse = ", "), "\n")
-
-# Solapamiento
-intersect(top_salud, top_pais)
+bigramas_tema |>
+  group_by(tema) |>
+  slice_max(tf_idf, n = 3, with_ties = FALSE) |>
+  arrange(tema, desc(tf_idf)) |>
+  select(tema, bigrama, n, tf_idf)
 ```
 
-**Respuesta:** El solapamiento es **nulo** (ninguna palabra en común). Las palabras distintivas del tema salud son sustantivas y temáticas (*salud, acceso, sistema, internacional*), mientras que las del país con más textos (Brasil) son palabras que solo aparecen en sus textos, sin un patrón temático claro (*agricultura, banco, becas*…). Esto confirma que TF-IDF responde a la pregunta que le hacemos: si agrupamos por tema, encontramos vocabulario temático; si agrupamos por país, encontramos lo que distingue a ese país, que con tan pocos textos suele ser idiosincrático.
+**Respuesta:** Algunos bigramas son más interpretables que las palabras sueltas porque recuperan colocaciones con significado conjunto: **"crecimiento económico"** (economía), **"alimentación escolar"** (educación), **"atención primaria"** (salud), **"agricultura sostenible"** (medioambiente). Pero la limitación del corpus chico salta a la vista en la columna `n`: casi todos los bigramas aparecen [una sola vez]{.alert}, así que casi cualquier bigrama resulta "distintivo" de su tema y el ranking dentro de cada tema es en la práctica un empate roto de forma arbitraria (por eso hizo falta `with_ties = FALSE`, y por eso se cuelan bigramas poco informativos como *"cada año"* o *"asia representan"*). El único bigrama que se repite es "crecimiento económico" (n = 2). La conclusión práctica: los n-gramas ganan interpretabilidad pero fragmentan los conteos; necesitan corpus bastante más grandes que las palabras sueltas para que el TF-IDF discrimine de verdad.
 
 ## Sentimiento
 

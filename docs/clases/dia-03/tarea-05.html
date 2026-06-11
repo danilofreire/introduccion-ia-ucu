@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,7 +74,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../../site_libs/bootstrap/bootstrap-d476e6e447008bf89294253aa6ccc1a4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -162,6 +162,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../referencia-texto.html">
  <span class="dropdown-text">Análisis de texto</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../referencia-llms.html">
+ <span class="dropdown-text">LLMs (ellmer y quallmer)</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -243,10 +247,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="instrucciones" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="instrucciones"><span class="header-section-number">1</span> Instrucciones</h2>
-<p>Esta tarea usa el mismo dataset del Laboratorio 5 (<code>indicadores_paises.csv</code>): 18 países latinoamericanos con 8 indicadores socioeconómicos. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
+<p>Esta tarea usa un dataset <span class="alert">nuevo</span>, distinto del que vimos en el Laboratorio 5: <code>indicadores_mundo.csv</code>, con 24 países de todas las regiones del mundo y 8 indicadores socioeconómicos. Las técnicas son las mismas del laboratorio (K-means, clustering jerárquico y PCA), pero los datos son otros, así que las respuestas también lo serán. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
 <p><strong>Para trabajar en esta tarea:</strong></p>
 <ol type="1">
-<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>indicadores_paises.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code></li>
+<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>indicadores_mundo.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code>. Mantengan el CSV en una subcarpeta <code>datos/</code> junto al <code>.qmd</code></li>
 <li>Necesitan <a href="https://quarto.org/docs/get-started/">Quarto</a> instalado junto con RStudio. Las versiones recientes de RStudio (&gt;= 2022.07) ya incluyen Quarto</li>
 <li>Abran este archivo <code>.qmd</code> en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)</li>
 <li>Cuando terminen, pueden renderizar el documento completo con el botón “Render” en RStudio</li>
@@ -261,23 +265,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>paises <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/indicadores_paises.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mundo <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/indicadores_mundo.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>A diferencia del dataset del laboratorio, este tiene una columna de texto extra: <code>region</code>. Tenganla presente, porque va a aparecer varias veces en la tarea.</p>
 </section>
 </section>
 <section id="exploración" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="exploración"><span class="header-section-number">2</span> Exploración</h2>
-<section id="pregunta-1-resumen-del-dataset" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-del-dataset"><span class="header-section-number">2.1</span> Pregunta 1: Resumen del dataset</h3>
-<p>Muestren el rango (mínimo y máximo) y la mediana de cada variable numérica del dataset. ¿Cuál variable tiene la mayor dispersión relativa (rango dividido por mediana)?</p>
+<section id="pregunta-1-indicadores-por-región" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-indicadores-por-región"><span class="header-section-number">2.1</span> Pregunta 1: Indicadores por región</h3>
+<p>Calculen la <span class="alert">mediana</span> del PIB per cápita, la esperanza de vida y la mortalidad infantil para cada región. Ordenen el resultado por PIB per cápita. ¿Qué región está mejor en los tres indicadores? ¿Alguna región está bien en un indicador pero mal en otro?</p>
+<p><em>Pista:</em> <code>group_by()</code> + <code>summarise()</code>. Ojo: algunas regiones tienen un solo país.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-2-países-con-valores-extremos" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-países-con-valores-extremos"><span class="header-section-number">2.2</span> Pregunta 2: Países con valores extremos</h3>
-<p>Identifiquen los países con el <span class="alert">PIB per cápita más alto y más bajo</span>, la <span class="alert">esperanza de vida más alta y más baja</span>, y la <span class="alert">desigualdad (Gini) más alta y más baja</span>. Muestren los resultados en una tabla. ¿Algún país aparece varias veces?</p>
+<section id="pregunta-2-el-pib-lo-explica-todo" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-el-pib-lo-explica-todo"><span class="header-section-number">2.2</span> Pregunta 2: ¿El PIB lo explica todo?</h3>
+<p>Identifiquen los 5 países con <span class="alert">mayor PIB per cápita</span> y los 5 con <span class="alert">menor mortalidad infantil</span>. ¿Son los mismos? Busquen al menos un país que esté entre los más ricos pero no entre los de menor mortalidad (o al revés). ¿Qué sugiere eso sobre la relación entre ingreso y salud?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -285,7 +291,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-3-correlaciones" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
-<p>Calculen la matriz de correlaciones de las variables numéricas. ¿Cuál par de variables tiene la correlación positiva más fuerte? ¿Cuál tiene la correlación negativa más fuerte? ¿Tiene sentido teóricamente?</p>
+<p>Calculen la matriz de correlaciones de las variables numéricas y visualícenla con <code>corrplot()</code>. ¿Cuál par de variables tiene la correlación positiva más fuerte? ¿Cuál tiene la negativa más fuerte? Hagan además un scatterplot de PIB per cápita contra esperanza de vida: ¿la relación parece lineal o se “aplana” en los países ricos?</p>
+<p><em>Pista:</em> para la matriz hay que quedarse sólo con las columnas numéricas (<code>select()</code> ayuda a sacar <code>pais</code> y <code>region</code>).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -294,18 +301,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="k-means" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="k-means"><span class="header-section-number">3</span> K-means</h2>
-<section id="pregunta-4-k-means-con-k4" class="level3" data-number="3.1">
-<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-k-means-con-k4"><span class="header-section-number">3.1</span> Pregunta 4: K-means con K=4</h3>
-<p>Escalen las variables numéricas (usando <code>column_to_rownames("pais") |&gt; scale()</code>) y ajusten K-means con K=4 y <code>nstart = 25</code>. ¿Qué países quedan en cada cluster?</p>
+<section id="pregunta-4-elegir-k-con-codo-y-silueta" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-elegir-k-con-codo-y-silueta"><span class="header-section-number">3.1</span> Pregunta 4: Elegir K con codo y silueta</h3>
+<p>Preparen los datos: saquen la columna <code>region</code>, muevan <code>pais</code> a los nombres de fila y escalen con <code>scale()</code>. Después calculen, para K=2 a K=6, la suma de cuadrados intra-cluster (WSS) y la silueta promedio. Muestren las dos curvas. ¿Qué K elegirían y por qué? Si el codo y la silueta no coinciden exactamente, expliquen cómo deciden.</p>
+<p><em>Pista:</em> el laboratorio tiene el patrón para las dos curvas; acá la diferencia está en justificar la decisión cuando los criterios no gritan un único ganador.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-5-comparar-k2-3-4-con-silueta" class="level3" data-number="3.2">
-<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-comparar-k2-3-4-con-silueta"><span class="header-section-number">3.2</span> Pregunta 5: Comparar K=2, 3, 4 con silueta</h3>
-<p>Para K=2, 3 y 4, calculen la silueta promedio de cada solución. ¿Qué K maximiza la silueta? ¿Es la solución que más sentido tiene políticamente?</p>
-<p><em>Pista:</em> <code>silhouette(km$cluster, dist(datos_scaled))</code> devuelve una matriz; la columna <code>"sil_width"</code> (tercera) tiene los valores que se promedian.</p>
+<section id="pregunta-5-geografía-o-nivel-de-ingreso" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-geografía-o-nivel-de-ingreso"><span class="header-section-number">3.2</span> Pregunta 5: ¿Geografía o nivel de ingreso?</h3>
+<p>Ajusten K-means con <span class="alert">K=3</span> y <code>nstart = 25</code> (aunque en la pregunta anterior hayan preferido otro K; así todos seguimos comparables). Crucen el cluster de cada país con su <code>region</code> usando <code>table()</code>. ¿Los clusters agrupan países de la misma región, o agrupan países de distinto continente pero nivel de desarrollo parecido? Den dos ejemplos concretos.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -313,7 +320,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-6-perfil-de-los-clusters" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="pregunta-6-perfil-de-los-clusters"><span class="header-section-number">3.3</span> Pregunta 6: Perfil de los clusters</h3>
-<p>Para la solución K=4 de la pregunta 4, calculen la media de PIB, esperanza de vida, índice de democracia y Gini dentro de cada cluster. Asignen una etiqueta sustantiva a cada cluster (p.&nbsp;ej. “alto desarrollo”, “ingreso medio”).</p>
+<p>Para la solución K=3, calculen la media de PIB per cápita, esperanza de vida, mortalidad infantil e índice de democracia dentro de cada cluster (con los datos originales, no los escalados). Asignen una etiqueta sustantiva a cada cluster.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -322,18 +329,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="clustering-jerárquico" class="level2" data-number="4">
 <h2 data-number="4" class="anchored" data-anchor-id="clustering-jerárquico"><span class="header-section-number">4</span> Clustering jerárquico</h2>
-<section id="pregunta-7-dendrograma-con-método-complete" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-dendrograma-con-método-complete"><span class="header-section-number">4.1</span> Pregunta 7: Dendrograma con método “complete”</h3>
-<p>Ajusten un clustering jerárquico con <code>method = "complete"</code> (en lugar del Ward del laboratorio). Visualicen el dendrograma con los cortes para K=3 resaltados.</p>
-<p><em>Pista:</em> <code>hclust(dist(datos_scaled), method = "complete")</code> y luego <code>rect.hclust(hc, k = 3, border = ...)</code>.</p>
+<section id="pregunta-7-dendrograma-con-ward" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-dendrograma-con-ward"><span class="header-section-number">4.1</span> Pregunta 7: Dendrograma con Ward</h3>
+<p>Ajusten un clustering jerárquico con <code>method = "ward.D2"</code> y visualicen el dendrograma. Mirando la altura de las uniones: ¿cuáles son los dos grandes bloques que se unen al final? ¿Qué país parece más “solitario” (se une a su grupo más tarde que el resto)?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-8-ward-vs-complete" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-ward-vs-complete"><span class="header-section-number">4.2</span> Pregunta 8: Ward vs complete</h3>
-<p>Comparen las soluciones K=3 obtenidas con Ward y con complete usando <code>table()</code>. ¿Coinciden? ¿Cuál parece más balanceada?</p>
+<section id="pregunta-8-k-means-y-jerárquico-cuentan-la-misma-historia" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-k-means-y-jerárquico-cuentan-la-misma-historia"><span class="header-section-number">4.2</span> Pregunta 8: ¿K-means y jerárquico cuentan la misma historia?</h3>
+<p>Corten el dendrograma en 3 grupos con <code>cutree()</code> y comparen con los clusters de K-means de la pregunta 5 usando <code>table()</code>. ¿Cuántos países cambian de grupo entre los dos métodos? ¿Cuáles? ¿Les preocupa esa diferencia?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -342,25 +348,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pca" class="level2" data-number="5">
 <h2 data-number="5" class="anchored" data-anchor-id="pca"><span class="header-section-number">5</span> PCA</h2>
-<section id="pregunta-9-primeros-3-componentes" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-9-primeros-3-componentes"><span class="header-section-number">5.1</span> Pregunta 9: Primeros 3 componentes</h3>
-<p>Ajusten <code>prcomp()</code> sobre los datos escalados. ¿Qué porcentaje de la varianza acumulada explican los primeros 3 componentes? ¿Es suficiente para resumir el dataset?</p>
+<section id="pregunta-9-cuántos-componentes-necesitamos" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-9-cuántos-componentes-necesitamos"><span class="header-section-number">5.1</span> Pregunta 9: ¿Cuántos componentes necesitamos?</h3>
+<p>Ajusten <code>prcomp()</code> sobre los datos escalados y miren la varianza explicada. ¿Cuánta varianza captura PC1 solo? ¿Cuántos componentes hacen falta para superar el <span class="alert">80%</span> de la varianza acumulada?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-10-interpretar-pc3" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-interpretar-pc3"><span class="header-section-number">5.2</span> Pregunta 10: Interpretar PC3</h3>
-<p>Vean los loadings del tercer componente (<code>pca$rotation[, 3]</code>). ¿Qué variables pesan más? ¿Qué dimensión sustantiva captura PC3?</p>
+<section id="pregunta-10-interpretar-pc1-y-pc2" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-interpretar-pc1-y-pc2"><span class="header-section-number">5.2</span> Pregunta 10: Interpretar PC1 y PC2</h3>
+<p>Vean los loadings de los dos primeros componentes (<code>pca$rotation[, 1:2]</code>). ¿Qué variables dominan PC1 y con qué signos? ¿Y PC2? Propongan un nombre sustantivo para cada componente (por ejemplo, “desarrollo”, “desigualdad”, “apertura”). Justifiquen con los loadings.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-11-países-extremos-en-pc2" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-países-extremos-en-pc2"><span class="header-section-number">5.3</span> Pregunta 11: Países extremos en PC2</h3>
-<p>Ordenen los países por su valor en PC2. ¿Cuáles están en los extremos? ¿Tiene sentido dado el significado de PC2 (vimos en el laboratorio que captura “desigualdad alta vs.&nbsp;urbanización/educación alta”)?</p>
+<section id="pregunta-11-países-extremos" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-países-extremos"><span class="header-section-number">5.3</span> Pregunta 11: Países extremos</h3>
+<p>Ordenen los países por su valor en PC1 y luego por PC2. ¿Qué países están en los extremos de cada componente? ¿Los extremos de PC2 confirman la interpretación que propusieron en la pregunta 10?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -369,9 +375,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="síntesis" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="síntesis"><span class="header-section-number">6</span> Síntesis</h2>
-<section id="pregunta-12-excluir-un-país-extremo" class="level3" data-number="6.1">
-<h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-excluir-un-país-extremo"><span class="header-section-number">6.1</span> Pregunta 12: Excluir un país extremo</h3>
-<p>Excluyan a Uruguay (el país más “desarrollado” según PC1) y re-corran PCA con los 17 países restantes. ¿Cambian los loadings de PC1 y PC2? ¿Aparece algún país nuevo en los extremos?</p>
+<section id="pregunta-12-qué-pasa-si-no-escalamos" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-qué-pasa-si-no-escalamos"><span class="header-section-number">6.1</span> Pregunta 12: ¿Qué pasa si no escalamos?</h3>
+<p>Repitan K-means con K=3 pero sobre los datos <span class="alert">sin escalar</span> (sólo saquen <code>region</code> y muevan <code>pais</code> a rownames). Comparen los clusters con los de la pregunta 5. ¿Qué variable domina ahora la solución? Busquen un país que quede agrupado con países muy distintos en democracia o desigualdad, y expliquen por qué terminó ahí.</p>
+<p><em>Pista:</em> miren las unidades de cada variable. ¿Cuál tiene la varianza más grande, por lejos, cuando no escalamos?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -381,9 +388,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-13-reflexión"><span class="header-section-number">6.2</span> Pregunta 13: Reflexión</h3>
 <p>Basándose en los resultados de esta tarea, respondan:</p>
 <ol type="1">
-<li>¿Cuántos clusters cree que describen mejor a los 18 países? Justifique con evidencia (silueta + interpretación sustantiva)</li>
-<li>¿Las técnicas de clustering y PCA llegan a la misma conclusión sobre quiénes son los países “similares”?</li>
-<li>Si tuvieran que presentar estos resultados a un ministro de planificación, ¿qué visualización elegirían y por qué?</li>
+<li>Si tuvieran que explicarle los resultados a un periodista con una sola visualización, ¿usarían el dendrograma, el gráfico de clusters o el biplot del PCA? ¿Por qué?</li>
+<li>Los clusters agrupan países por promedios nacionales. Nombren al menos una limitación de usar indicadores a nivel de país para hablar de desarrollo (piensen en la desigualdad interna)</li>
+<li>¿Qué indicador agregarían al dataset para distinguir mejor a los países de ingreso medio entre sí? Justifiquen</li>
 </ol>
 <p><strong>Respuesta:</strong></p>
 

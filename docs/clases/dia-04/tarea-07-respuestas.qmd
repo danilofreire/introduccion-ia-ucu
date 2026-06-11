@@ -36,80 +36,81 @@ MODELO <- "nvidia/nemotron-3-super-120b-a12b:free"
 
 ## Configuración y chat básico
 
-### Pregunta 1: Primer chat
+### Pregunta 1: El system prompt como formato
 
 ```{r p1, eval=FALSE}
 chat <- chat_openrouter(
   model = MODELO,
-  system_prompt = "Sos un investigador en ciencia política
-  latinoamericana. Respondés en dos oraciones, en español, con
-  vocabulario académico claro."
+  system_prompt = "Respondé SIEMPRE con exactamente tres viñetas que
+  empiecen con '- '. Usá lenguaje sencillo, sin jerga técnica, como si
+  le explicaras el tema a alguien que nunca estudió estadística."
 )
 
-chat$chat("¿Qué es la democracia representativa?")
+chat$chat("¿Qué es el sesgo de selección?")
 ```
 
-**Respuesta:** El system prompt se pasa como argumento del constructor `chat_openrouter()` y permanece activo durante toda la sesión del chat. Después de crear el objeto, llamamos al método `$chat()` para enviar un mensaje y recibir la respuesta como texto.
+**Respuesta:** El system prompt se pasa como argumento del constructor `chat_openrouter()` y permanece activo durante toda la sesión del chat. En general el modelo respeta la instrucción de formato (tres viñetas), pero no siempre: a veces agrega una introducción, una viñeta de más, o se le escapa un término técnico ("muestra no aleatoria"). La lección es que una instrucción de formato es una restricción que hay que [verificar]{.alert}, no una garantía. Para salidas que deben tener una estructura exacta, la herramienta correcta es `chat_structured()` (Pregunta 5), no el system prompt.
 
 ### Pregunta 2: Historial de conversación
 
 ```{r p2, eval=FALSE}
-chat$chat("¿Y qué desafíos enfrenta hoy en América Latina?")
+chat$chat("¿Y cómo se puede evitar en una encuesta?")
 ```
 
-**Respuesta:** La segunda respuesta se refiere a la democracia representativa sin que tengamos que repetir el término. `ellmer` guarda el historial completo dentro del objeto `chat` y lo reenvía al modelo en cada llamada. Eso permite que el modelo mantenga el hilo, pero también significa que el costo en tokens crece conversación tras conversación.
+**Respuesta:** La segunda respuesta se refiere al sesgo de selección sin que tengamos que repetir el término. `ellmer` guarda el historial completo dentro del objeto `chat` y lo reenvía al modelo en cada llamada. Eso permite que el modelo mantenga el hilo, pero también significa que el costo en tokens crece conversación tras conversación.
 
-### Pregunta 3: System prompt como variable de control
+### Pregunta 3: El system prompt como barrera
 
 ```{r p3, eval=FALSE}
-mercado <- chat_openrouter(
+guardia <- chat_openrouter(
   model = MODELO,
-  system_prompt = "Sos un economista ortodoxo. Defendés la disciplina
-  fiscal, los mercados libres y la apertura comercial. Respondés en
-  tres oraciones."
+  system_prompt = "Sos el asistente de un curso de política latinoamericana.
+  Respondé SOLO preguntas sobre política latinoamericana. Si te preguntan
+  sobre cualquier otro tema, rechazá amablemente en una oración y sugerí
+  volver a los temas del curso."
 )
 
-social <- chat_openrouter(
-  model = MODELO,
-  system_prompt = "Sos un economista heterodoxo enfocado en
-  desigualdad. Defendés la redistribución y la intervención pública.
-  Respondés en tres oraciones."
-)
-
-pregunta <- "¿Cómo debería responder un país de ingresos medios a
-una crisis de inflación?"
-
-cat("--- Mercado ---\n", mercado$chat(pregunta), "\n\n")
-cat("--- Social ---\n",   social$chat(pregunta), "\n")
+cat("--- Dentro del dominio ---\n",
+    guardia$chat("¿Qué fue la tercera ola de democratización en América Latina?"),
+    "\n\n")
+cat("--- Fuera del dominio ---\n",
+    guardia$chat("¿Cómo se hace un risotto de hongos?"),
+    "\n\n")
+cat("--- Fronteriza ---\n",
+    guardia$chat("¿Qué países de América Latina producen más arroz?"),
+    "\n")
 ```
 
-**Respuesta:** Las dos respuestas usan vocabulario y recomendaciones distintas: la "de mercado" enfatiza disciplina fiscal y tasa de interés; la "social" enfatiza salarios reales, transferencias y controles. El mismo modelo produce posiciones distintas según el rol que le asignamos. Esto muestra que el system prompt es una variable de control, no un detalle cosmético: puede inducir sesgo intencional o no intencional en los resultados.
+**Respuesta:** El modelo suele respetar la barrera en los casos claros: responde la pregunta sobre democratización y rechaza la receta. Lo interesante es la pregunta fronteriza: la producción de arroz menciona a América Latina pero es un tema agrícola, y según la corrida el modelo la responde (interpretando "política" en sentido amplio, como economía política) o la rechaza. La barrera no es una regla formal sino una interpretación del modelo, y por eso es [blanda]{.alert}: funciona para guiar el uso normal, pero no resiste casos límite ni usuarios insistentes. Una herramienta de investigación seria combina el system prompt con validación de entradas y salidas.
 
 ## Clasificación y extracción
 
-### Pregunta 4: Función de clasificación
+### Pregunta 4: Clasificar una dimensión sin etiquetas
 
 ```{r p4, eval=FALSE}
-clasificar_zero <- function(texto) {
+clasificar_tono <- function(texto) {
   chat <- chat_openrouter(
     model = MODELO,
-    system_prompt = "Clasificá el siguiente texto político en
-    EXACTAMENTE una de estas categorías:
-    economia, educacion, seguridad, salud, medioambiente.
+    system_prompt = "Clasificá el TONO del siguiente texto político en
+    EXACTAMENTE una de estas etiquetas: positivo, negativo, neutral.
 
     Reglas:
-    - Responder SOLO con el nombre de la categoría, en minúsculas
-    - Sin tildes, sin puntuación, sin explicación"
+    - 'positivo' si destaca logros, mejoras u oportunidades
+    - 'negativo' si destaca problemas, riesgos o retrocesos
+    - 'neutral' si describe o anuncia sin valorar
+    - Responder SOLO con la etiqueta, en minúsculas, sin explicación"
   )
   trimws(tolower(chat$chat(texto)))
 }
 
-clasificar_zero(textos$texto[1])
-clasificar_zero(textos$texto[5])
-clasificar_zero(textos$texto[10])
+textos |> slice(c(2, 21, 41)) |> select(id, texto)
+
+clasificar_tono(textos$texto[2])
+clasificar_tono(textos$texto[21])
+clasificar_tono(textos$texto[41])
 ```
 
-**Respuesta:** La función crea un chat nuevo dentro de cada llamada, de modo que la clasificación del texto N no contamina la del texto N+1. Esto cuesta más tokens (cada llamada envía el system prompt de nuevo) pero protege la independencia entre observaciones, que es lo que necesitamos para evaluar la accuracy con honestidad.
+**Respuesta:** Los tres textos tienen tonos bien marcados y el modelo suele acertar: el 2 (la inflación como "problema grave") es [negativo]{.alert}, el 21 (los programas de alimentación escolar "han mejorado" la asistencia) es [positivo]{.alert} y el 41 (el gasto de bolsillo "empuja a millones de familias a la pobreza") es [negativo]{.alert}. Igual que en el laboratorio, la función crea un chat nuevo en cada llamada para que una clasificación no contamine la siguiente. La diferencia importante con clasificar por tema es que acá [no hay columna de referencia]{.alert}: el dataset no trae el tono "verdadero", así que el único control de calidad es leer los textos y juzgar nosotros. Ese es exactamente el problema que el Lab 8 resuelve de forma sistemática con un gold standard codificado a mano.
 
 ### Pregunta 5: Salida estructurada
 
@@ -145,13 +146,15 @@ textos |>
 ### Pregunta 6: ¿El modelo da siempre lo mismo?
 
 ```{r p6, eval=FALSE}
-texto_ambiguo <- textos$texto[30]
+# El texto 36 mezcla señales: una mejora ("han mejorado la atención")
+# dentro de un tema negativo ("víctimas de delitos")
+texto_ambiguo <- textos$texto[36]
 
-repeticiones <- map_chr(1:5, \(i) clasificar_zero(texto_ambiguo))
+repeticiones <- map_chr(1:5, \(i) clasificar_tono(texto_ambiguo))
 table(repeticiones)
 ```
 
-**Respuesta:** con un texto claro, las cinco corridas suelen coincidir; con un texto fronterizo (que toca dos temas) pueden aparecer dos o tres categorías distintas. La consecuencia metodológica es que el resultado de un LLM no es perfectamente reproducible: hay que fijar y reportar el modelo y su versión, considerar una temperatura baja (0), y para los casos límite correr la clasificación varias veces y tomar la mayoría. Esta variabilidad es justamente lo que las medidas de confiabilidad del Lab 8 buscan cuantificar.
+**Respuesta:** con un texto de tono claro, las cinco corridas suelen coincidir; con uno que mezcla señales (como el 36, que reporta una mejora en la atención a víctimas de delitos) pueden aparecer dos o tres etiquetas distintas. La consecuencia metodológica es que el resultado de un LLM no es perfectamente reproducible: hay que fijar y reportar el modelo y su versión, considerar una temperatura baja (0), y para los casos límite correr la clasificación varias veces y tomar la mayoría. Esta variabilidad es justamente lo que las medidas de confiabilidad del Lab 8 buscan cuantificar.
 
 ### Pregunta 7: Sensibilidad al prompt
 
@@ -257,8 +260,8 @@ entidades
 ```{r p10, eval=FALSE}
 texto_dificil <- textos$texto[33]
 
-# (a) clasificación directa
-directa <- clasificar_zero(texto_dificil)
+# (a) clasificación directa (la función breve de la Pregunta 7)
+directa <- clasificar_breve(texto_dificil)
 
 # (b) con razonamiento paso a paso (cadena de pensamiento)
 chat <- chat_openrouter(

@@ -112,9 +112,11 @@ Calculen TF-IDF agrupando por `anio` y miren las 3 palabras más distintivas de 
 
 **Respuesta:**
 
-### Pregunta 6: TF-IDF por tema vs. por país
+### Pregunta 6: TF-IDF de bigramas
 
-Comparen las 5 palabras más distintivas del tema "salud" con las 5 más distintivas del país con más textos (probablemente Brasil). ¿Las palabras se solapan? ¿Qué nos dice eso?
+Combinen las técnicas de las Preguntas 3 y 4: calculen el TF-IDF de los [bigramas]{.alert} (ya filtrados de stopwords) agrupando por tema, y muestren los 3 bigramas más distintivos de cada tema. Comparen con las palabras sueltas de la Pregunta 4: ¿los bigramas son más fáciles de interpretar? ¿Qué limitación aparece al usar bigramas en un corpus tan chico?
+
+*Pista:* es el mismo `bind_tf_idf()` de siempre, pero la unidad ahora es el bigrama, no la palabra. `slice_max(..., with_ties = FALSE)` evita que los empates llenen la tabla.
 
 ```{r p6}
 # Escriban su código aquí

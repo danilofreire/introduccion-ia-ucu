@@ -27,233 +27,222 @@ library(corrplot)
 
 set.seed(2026)
 
-paises <- read_csv("datos/indicadores_paises.csv", show_col_types = FALSE)
+mundo <- read_csv("datos/indicadores_mundo.csv", show_col_types = FALSE)
 
-# Escalado reutilizado a lo largo de la tarea
-datos_scaled <- paises |>
+# Escalado reutilizado a lo largo de la tarea: sin region, pais como rownames
+datos_scaled <- mundo |>
+  select(-region) |>
   column_to_rownames("pais") |>
   scale()
 ```
 
 ## Exploración
 
-### Pregunta 1: Resumen del dataset
+### Pregunta 1: Indicadores por región
 
 ```{r p1}
-resumen <- paises |>
-  select(-pais) |>
-  summarise(across(everything(),
-                   list(min = min, mediana = median, max = max),
-                   .names = "{.col}__{.fn}")) |>
-  pivot_longer(everything(),
-               names_to = c("variable", "stat"),
-               names_sep = "__") |>
-  pivot_wider(names_from = stat, values_from = value) |>
-  mutate(rango_rel = round((max - min) / mediana, 2)) |>
-  arrange(desc(rango_rel))
-
-resumen
+mundo |>
+  group_by(region) |>
+  summarise(
+    paises = n(),
+    pib_mediano = median(pib_per_capita),
+    esperanza_mediana = median(esperanza_vida),
+    mortalidad_mediana = median(mortalidad_infantil)
+  ) |>
+  arrange(desc(pib_mediano))
 ```
 
-**Respuesta:** La variable con mayor dispersión relativa es el [PIB per cápita]{.alert} (Uruguay ~17,200 vs. Nicaragua ~1,900, con mediana ~6,100 → rango_rel ≈ 2.5). La desigualdad (Gini, ≈ 0.30) y la esperanza de vida (≈ 0.12) tienen los rangos relativos más bajos. Esto justifica usar `scale()` antes de aplicar K-means o PCA: si no escalamos, el PIB dominaría las distancias.
+**Respuesta:** Ninguna región domina los tres indicadores a la vez. [América del Norte]{.alert} tiene el PIB mediano más alto (~USD 66.000), pero su mortalidad infantil mediana (~4,7) es casi el doble que la de Europa (~2,6), arrastrada por Estados Unidos. Oceanía (que acá es sólo Australia) combina PIB alto con la mejor esperanza de vida. En el otro extremo, África queda última en los tres indicadores. El caso interesante es [Medio Oriente]{.alert}: un PIB mediano alto (~USD 21.000, por el peso de Arabia Saudita) pero salud apenas intermedia. El ingreso y el bienestar van juntos en general, pero no son lo mismo.
 
-### Pregunta 2: Países con valores extremos
+### Pregunta 2: ¿El PIB lo explica todo?
 
 ```{r p2}
-extremos <- bind_rows(
-  paises |> slice_max(pib_per_capita, n = 1)   |> mutate(var = "PIB max"),
-  paises |> slice_min(pib_per_capita, n = 1)   |> mutate(var = "PIB min"),
-  paises |> slice_max(esperanza_vida, n = 1)   |> mutate(var = "Vida max"),
-  paises |> slice_min(esperanza_vida, n = 1)   |> mutate(var = "Vida min"),
-  paises |> slice_max(indice_gini, n = 1)      |> mutate(var = "Gini max"),
-  paises |> slice_min(indice_gini, n = 1)      |> mutate(var = "Gini min")
-) |>
-  select(var, pais, pib_per_capita, esperanza_vida, indice_gini)
-
-extremos
+mundo |> slice_max(pib_per_capita, n = 5) |> select(pais, pib_per_capita)
+mundo |> slice_min(mortalidad_infantil, n = 5) |> select(pais, mortalidad_infantil)
 ```
 
-**Respuesta:** Los extremos son: PIB máximo **Uruguay** (17,185) y mínimo **Nicaragua** (1,881); esperanza de vida máxima **Costa Rica** (80.7) y mínima **Bolivia** (71.7); desigualdad (Gini) máxima **Honduras** (52.3) y mínima **El Salvador** (38.6). Algunos países aparecen en más de un extremo: Uruguay combina el PIB más alto con uno de los Gini más bajos (38.9), y Honduras junta un PIB bajo con la mayor desigualdad. Que un país aparezca varias veces en los extremos confirma que es un caso atípico, y los métodos de clustering lo tratarán como tal.
+**Respuesta:** Las dos listas se solapan pero no coinciden. Entre los cinco más ricos están Noruega, Estados Unidos, Australia, Canadá y Alemania; entre los cinco con menor mortalidad infantil aparecen [Japón, España y Corea del Sur]{.alert}, que no están en el top de PIB. El caso más llamativo es [Estados Unidos]{.alert}: segundo en PIB per cápita pero con una mortalidad infantil (~5,7 por mil) más alta que la de España o Polonia, países con la mitad o menos de su ingreso. La relación ingreso-salud es fuerte pero no determinista: la organización del sistema de salud importa, no sólo el dinero disponible.
 
 ### Pregunta 3: Correlaciones
 
 ```{r p3}
-cor_matrix <- paises |>
-  select(-pais) |>
+#| fig-width: 7
+#| fig-height: 6
+cor_matrix <- mundo |>
+  select(-pais, -region) |>
   cor()
 
-# Convertir a formato largo para encontrar los extremos
+corrplot(cor_matrix, method = "color", type = "upper",
+         addCoef.col = "black", number.cex = 0.7, tl.cex = 0.8)
+
+# Pares extremos
 cor_long <- cor_matrix |>
   as.data.frame() |>
   rownames_to_column("v1") |>
   pivot_longer(-v1, names_to = "v2", values_to = "cor") |>
-  filter(v1 < v2)  # quitar duplicados y diagonal
+  filter(v1 < v2)
 
-# Correlación positiva más fuerte
 cor_long |> arrange(desc(cor)) |> head(3)
-
-# Correlación negativa más fuerte
 cor_long |> arrange(cor) |> head(3)
+
+# Scatterplot PIB vs esperanza de vida
+ggplot(mundo, aes(pib_per_capita, esperanza_vida)) +
+  geom_point(aes(color = region), size = 3) +
+  geom_smooth(method = "loess", se = FALSE, color = "gray40") +
+  labs(x = "PIB per cápita (USD)", y = "Esperanza de vida (años)") +
+  theme_minimal()
 ```
 
-**Respuesta:** La correlación positiva más fuerte suele ser entre **internet y urbanización** (~0.86), o entre PIB y esperanza de vida (~0.74). La correlación negativa más fuerte es entre **Gini y urbanización** (~-0.41). Tiene sentido teórico: la urbanización va de la mano con infraestructura digital y servicios; en zonas rurales la desigualdad puede ser más persistente.
+**Respuesta:** La correlación negativa más fuerte es entre [mortalidad infantil y esperanza de vida]{.alert} (~-0,93): son dos caras del mismo fenómeno sanitario. La positiva más fuerte es entre [años de educación y acceso a internet]{.alert} (~0,82), seguida de internet y esperanza de vida (~0,81). El scatterplot muestra la curva clásica de Preston: la esperanza de vida sube rápido con el ingreso entre los países pobres y se aplana entre los ricos. Pasar de USD 2.000 a USD 12.000 "compra" muchos años de vida; pasar de USD 50.000 a USD 80.000 casi ninguno. La relación es fuerte pero no lineal.
 
 ## K-means
 
-### Pregunta 4: K-means con K=4
+### Pregunta 4: Elegir K con codo y silueta
 
 ```{r p4}
-km4 <- kmeans(datos_scaled, centers = 4, nstart = 25)
+#| fig-width: 8
+#| fig-height: 4
+metricas_k <- tibble(k = 2:6) |>
+  mutate(
+    km = map(k, \(k) kmeans(datos_scaled, centers = k, nstart = 25)),
+    wss = map_dbl(km, \(m) m$tot.withinss),
+    silueta = map_dbl(km, \(m) {
+      mean(silhouette(m$cluster, dist(datos_scaled))[, 3])
+    })
+  )
 
-# Países por cluster
-data.frame(pais = rownames(datos_scaled), cluster = km4$cluster) |>
-  arrange(cluster, pais)
+metricas_k |> select(k, wss, silueta)
+
+metricas_k |>
+  select(k, wss, silueta) |>
+  pivot_longer(-k) |>
+  ggplot(aes(k, value)) +
+  geom_line() +
+  geom_point(size = 2) +
+  facet_wrap(~name, scales = "free_y") +
+  theme_minimal()
 ```
 
-**Respuesta:** Los 4 clusters tienden a separar: (a) Uruguay/Chile/Argentina (más desarrollados), (b) Costa Rica/Panamá/México (ingreso medio-alto), (c) Bolivia/Ecuador/Perú/Paraguay/RepDom (ingreso medio), (d) Guatemala/Honduras/Nicaragua/Venezuela (menos desarrollados o con crisis institucional). Algunos países pueden moverse según la semilla.
+**Respuesta:** Los dos criterios no gritan un único ganador. La silueta es máxima en [K=2]{.alert} (~0,39) pero K=3 queda muy cerca (~0,37); el codo del WSS se ve alrededor de [K=3]{.alert} (la caída de 2 a 3 es grande, después se suaviza). Con una diferencia de silueta tan chica, conviene decidir por interpretabilidad: K=2 sólo separa "desarrollados vs el resto", mientras que K=3 distingue además a los países de ingreso medio de los de ingreso bajo, una distinción sustantiva real. Elegimos K=3. La lección: los criterios numéricos acotan las opciones razonables, pero la decisión final es del investigador.
 
-### Pregunta 5: Comparar K=2, 3, 4 con silueta
+### Pregunta 5: ¿Geografía o nivel de ingreso?
 
 ```{r p5}
-siluetas <- sapply(2:4, function(k) {
-  km <- kmeans(datos_scaled, centers = k, nstart = 25)
-  sil <- silhouette(km$cluster, dist(datos_scaled))
-  mean(sil[, "sil_width"])
-})
+km3 <- kmeans(datos_scaled, centers = 3, nstart = 25)
 
-tibble(K = 2:4, silueta_promedio = round(siluetas, 3)) |>
-  arrange(desc(silueta_promedio))
+split(rownames(datos_scaled), km3$cluster)
+
+table(cluster = km3$cluster, region = mundo$region)
 ```
 
-**Respuesta:** **K=2 maximiza la silueta** (~0.29), seguido de K=3 (~0.27) y K=4 (~0.24). Sin embargo, K=2 colapsa toda la región en "desarrollados" vs. "menos desarrollados", lo cual es demasiado grueso para análisis políticos finos. **K=3 ofrece un buen compromiso entre estructura estadística y sentido sustantivo**: añade un grupo intermedio interpretable.
+**Respuesta:** Los clusters agrupan por [nivel de desarrollo, no por geografía]{.alert}. Asia aparece repartida en los tres clusters: Japón y Corea del Sur caen con Europa y América del Norte; China, Indonesia y Vietnam con los países de ingreso medio; India y Bangladés con los de ingreso bajo. Lo mismo pasa con África: Sudáfrica y Egipto quedan en el cluster intermedio mientras Nigeria, Kenia y Etiopía forman parte del cluster de menor desarrollo. El algoritmo nunca vio la columna `region` y aun así produce grupos que cruzan continentes: la estructura de los datos es socioeconómica.
 
 ### Pregunta 6: Perfil de los clusters
 
 ```{r p6}
-paises$cluster_km4 <- factor(km4$cluster)
-
-paises |>
-  group_by(cluster_km4) |>
+mundo |>
+  mutate(cluster = km3$cluster) |>
+  group_by(cluster) |>
   summarise(
     n = n(),
-    pib_mean  = round(mean(pib_per_capita)),
-    vida_mean = round(mean(esperanza_vida), 1),
-    demo_mean = round(mean(indice_democracia), 1),
-    gini_mean = round(mean(indice_gini), 1),
-    .groups = "drop"
+    pib = round(mean(pib_per_capita)),
+    esperanza = round(mean(esperanza_vida), 1),
+    mortalidad = round(mean(mortalidad_infantil), 1),
+    democracia = round(mean(indice_democracia), 1)
   )
 ```
 
-**Respuesta:** Etiquetas razonables (variarán según semilla):
-
-- Cluster con PIB más alto y democracia alta: **"alto desarrollo"** (Uruguay, Chile, etc.)
-- Cluster con PIB medio-alto: **"ingreso medio-alto"**
-- Cluster con PIB intermedio: **"ingreso medio"**
-- Cluster con PIB más bajo: **"bajo desarrollo"** o **"vulnerabilidad estructural"**
+**Respuesta:** Los tres perfiles son nítidos (los números de cluster pueden variar entre corridas, pero los grupos son los mismos). Un cluster de [alto desarrollo]{.alert}: PIB ~USD 50.000, esperanza de vida ~82 años, mortalidad ~3 por mil y democracias consolidadas (~8,4). Un cluster de [ingreso medio]{.alert}: PIB ~USD 11.000, esperanza ~74, mortalidad ~13, regímenes mixtos (~4,7). Y un cluster de [ingreso bajo]{.alert}: PIB ~USD 2.000, esperanza ~64, mortalidad ~35. Etiquetas razonables: "desarrollo alto", "ingreso medio" y "desarrollo bajo".
 
 ## Clustering jerárquico
 
-### Pregunta 7: Dendrograma con "complete"
+### Pregunta 7: Dendrograma con Ward
 
-```{r p7, fig.width=10, fig.height=5}
-d <- dist(datos_scaled, method = "euclidean")
-hc_complete <- hclust(d, method = "complete")
+```{r p7}
+#| fig-width: 9
+#| fig-height: 6
+hc_ward <- hclust(dist(datos_scaled), method = "ward.D2")
 
-plot(hc_complete, hang = -1, cex = 0.9,
-     main = "Dendrograma (método: complete)",
-     xlab = "País", ylab = "Altura")
-rect.hclust(hc_complete, k = 3, border = c("#2d4563", "#b85450", "#27AE60"))
+plot(hc_ward, hang = -1, cex = 0.8,
+     main = "Dendrograma (Ward)", xlab = "", sub = "")
+rect.hclust(hc_ward, k = 3, border = c("#2d4563", "#c0392b", "#27ae60"))
 ```
 
-**Respuesta:** El método complete tiende a generar clusters más compactos (porque define distancia entre clusters como la **máxima** distancia entre puntos). Eso lo hace sensible a outliers — un país muy extremo puede formar su propio cluster.
+**Respuesta:** Los dos grandes bloques que se unen al final separan a los [países de ingreso alto]{.alert} (de Noruega a Corea del Sur) del resto del mundo: esa es la división más profunda de los datos. Dentro de los bloques, los países más "solitarios" son [Sudáfrica]{.alert} y Arabia Saudita, que se unen a sus grupos bastante tarde. Tiene sentido: Sudáfrica combina indicadores de ingreso medio con la desigualdad más alta del dataset (Gini ~63), y Arabia Saudita combina ingreso alto con un índice de democracia bajísimo. Son los híbridos que ningún grupo describe del todo bien.
 
-### Pregunta 8: Ward vs complete
+### Pregunta 8: ¿K-means y jerárquico cuentan la misma historia?
 
 ```{r p8}
-hc_ward <- hclust(d, method = "ward.D2")
+grupos_ward <- cutree(hc_ward, k = 3)
 
-ward_groups     <- cutree(hc_ward, k = 3)
-complete_groups <- cutree(hc_complete, k = 3)
+table(ward = grupos_ward, kmeans = km3$cluster)
 
-table(Ward = ward_groups, Complete = complete_groups)
+# ¿Qué países cambian de grupo?
+tibble(pais = rownames(datos_scaled),
+       ward = grupos_ward,
+       kmeans = km3$cluster) |>
+  count(ward, kmeans) |>
+  arrange(desc(n))
 ```
 
-**Respuesta:** Las dos soluciones tienden a coincidir en los extremos (los más desarrollados y los menos desarrollados) pero a diferir en el grupo intermedio. **Ward suele dar clusters más balanceados** (de tamaño similar), mientras que complete puede producir un cluster muy pequeño con outliers.
+**Respuesta:** Las dos soluciones coinciden en [23 de los 24 países]{.alert}. El único que cambia es [Indonesia]{.alert}: K-means lo pone con los países de ingreso medio y Ward con los de ingreso bajo. No es preocupante, al contrario: que dos algoritmos con lógicas distintas (particional vs aglomerativo) produzcan casi la misma partición indica que la estructura de grupos es robusta. E Indonesia es exactamente el tipo de caso fronterizo (ingreso medio-bajo) donde es esperable que los métodos discrepen.
 
 ## PCA
 
-### Pregunta 9: Primeros 3 componentes
+### Pregunta 9: ¿Cuántos componentes necesitamos?
 
 ```{r p9}
 pca <- prcomp(datos_scaled)
-summary(pca)$importance[, 1:3]
+
+summary(pca)
 ```
 
-**Respuesta:** Los primeros 3 componentes acumulan aproximadamente el **84%** de la varianza (PC1 ~52% + PC2 ~20% + PC3 ~12%). Para fines descriptivos y visualización, **2 componentes ya bastan** (~72%). PC3 agrega información complementaria solo si queremos una representación más fiel del dataset original.
+**Respuesta:** [PC1 solo captura ~62%]{.alert} de la varianza total: una sola dimensión resume casi dos tercios de la información de ocho variables. PC2 agrega ~14% (acumulado ~76%) y PC3 ~10% (acumulado [~86%]{.alert}). Hacen falta [tres componentes]{.alert} para superar el 80% de la varianza acumulada. Aun así, para visualizar en dos dimensiones, PC1 y PC2 con tres cuartos de la varianza son una síntesis muy razonable.
 
-### Pregunta 10: Interpretar PC3
+### Pregunta 10: Interpretar PC1 y PC2
 
 ```{r p10}
-pca$rotation[, 3] |> round(2) |> sort()
+round(pca$rotation[, 1:2], 2)
 ```
 
-**Respuesta:** PC3 carga sobre todo en `indice_gini` (≈ -0.72) y `anios_educacion` (≈ -0.54), con `gasto_salud_pib` (≈ +0.31) e `indice_democracia` (≈ +0.28) en el signo opuesto. Es decir, separa desigualdad y escolaridad (un polo) de gasto en salud y democracia (el otro). Podría leerse como un eje residual de **"desigualdad y rezago educativo vs. inversión institucional"**, pero al capturar solo ~12% de la varianza su interpretación sustantiva es ambigua y conviene no sobreinterpretarla.
+**Respuesta:** En [PC1]{.alert}, esperanza de vida, años de educación, acceso a internet, PIB y emisiones cargan todas con el mismo signo (~±0,4), y la mortalidad infantil carga con el signo opuesto. Es el eje clásico de [desarrollo socioeconómico]{.alert} (el signo concreto es arbitrario; lo que importa es la oposición). Noten que las emisiones de CO2 cargan del lado "desarrollado": los países ricos contaminan más per cápita. En [PC2]{.alert} domina por lejos el índice de Gini (~0,83), con la democracia cargando en sentido contrario: es un eje de [desigualdad]{.alert}, casi independiente del nivel de desarrollo. PC1 = "desarrollo", PC2 = "desigualdad" son nombres defendibles con estos loadings.
 
-### Pregunta 11: Países extremos en PC2
+### Pregunta 11: Países extremos
 
 ```{r p11}
-pca$x[, 1:2] |>
-  as.data.frame() |>
-  rownames_to_column("pais") |>
-  arrange(PC2) |>
-  mutate(PC1 = round(PC1, 2), PC2 = round(PC2, 2))
+scores <- as_tibble(pca$x[, 1:2], rownames = "pais")
+
+scores |> arrange(PC1) |> slice(c(1:3, 22:24))
+scores |> arrange(PC2) |> slice(c(1:3, 22:24))
 ```
 
-**Respuesta:** Los extremos de PC2 son **Venezuela** (≈ -3.0) en un polo y **Honduras**, **Costa Rica** y **Guatemala** (≈ +1.2 a +1.9) en el otro. PC2 carga positivamente en Gini, esperanza de vida y gasto en salud, y negativamente en urbanización y educación, así que el polo positivo reúne países desiguales o poco urbanizados pero con buenos indicadores de salud (Costa Rica destaca por la esperanza de vida más alta del grupo). Es una dimensión secundaria que mezcla desigualdad y salud, menos limpia que PC1, que sí es un eje de desarrollo claro.
+**Respuesta:** En PC1 los extremos son [Noruega, Australia y Canadá]{.alert} de un lado y [Nigeria, Etiopía y Kenia]{.alert} del otro: exactamente lo que esperamos de un eje de desarrollo. En PC2 los extremos confirman la lectura de "desigualdad": en un polo están [Sudáfrica, Arabia Saudita y Brasil]{.alert} (los Gini más altos del dataset, más el caso saudí de baja democracia), y en el otro Noruega, un país rico e igualitario. Que Brasil y Sudáfrica estén lejos de Etiopía en PC2 pero no tanto en PC1 muestra que las dos dimensiones capturan cosas distintas.
 
 ## Síntesis
 
-### Pregunta 12: Excluir Uruguay y re-correr PCA
+### Pregunta 12: ¿Qué pasa si no escalamos?
 
 ```{r p12}
-sin_uruguay <- paises |>
-  filter(pais != "Uruguay") |>
-  select(-cluster_km4)  # quitar la columna agregada antes
+datos_raw <- mundo |>
+  select(-region) |>
+  column_to_rownames("pais")
 
-datos_sin_uy <- sin_uruguay |>
-  column_to_rownames("pais") |>
-  scale()
+# Varianza de cada variable sin escalar
+sort(apply(datos_raw, 2, var), decreasing = TRUE) |> head(3)
 
-pca_sin_uy <- prcomp(datos_sin_uy)
+km3_raw <- kmeans(datos_raw, centers = 3, nstart = 25)
 
-# Comparar varianza explicada
-summary(pca_sin_uy)$importance[, 1:2]
+split(mundo$pais, km3_raw$cluster)
 
-# Loadings PC1
-pca_sin_uy$rotation[, 1] |> round(2) |> sort()
-
-# Países extremos
-pca_sin_uy$x[, 1:2] |>
-  as.data.frame() |>
-  rownames_to_column("pais") |>
-  arrange(PC1) |>
-  head(3)
-
-pca_sin_uy$x[, 1:2] |>
-  as.data.frame() |>
-  rownames_to_column("pais") |>
-  arrange(desc(PC1)) |>
-  head(3)
+table(escalado = km3$cluster, sin_escalar = km3_raw$cluster)
 ```
 
-**Respuesta:** Los loadings de PC1 son muy similares (sigue siendo un "eje de desarrollo"). Lo que cambia es **quién está en el extremo "desarrollado"**: ahora Chile o Argentina lideran. Esto muestra que PCA no es muy sensible a quitar un solo caso — la estructura global del dataset persiste. **Si quitar un caso cambia drásticamente PC1, ese caso es un outlier que distorsiona los resultados**.
+**Respuesta:** Sin escalar, la solución la dicta el [PIB per cápita]{.alert}, cuya varianza (del orden de 10^8^) es millones de veces mayor que la de las demás variables. Los "clusters" pasan a ser bandas de ingreso puras: un grupo de PIB altísimo, otro de PIB medio y otro con todo el resto. El caso revelador es [Arabia Saudita]{.alert}, que queda agrupada con España, Polonia, Japón y Corea del Sur sólo porque su PIB es parecido, aunque su índice de democracia (~2) y su perfil social sean completamente distintos. La mortalidad infantil, el Gini y la democracia se vuelven irrelevantes para la distancia. Por eso escalar no es un detalle técnico: define qué pregunta le estamos haciendo a los datos.
 
 ### Pregunta 13: Reflexión
 
 **Respuesta:**
 
-1. **¿Cuántos clusters?** K=3 ofrece el mejor balance entre estabilidad estadística (silueta razonable) e interpretación política (alto, medio, bajo desarrollo). K=2 es demasiado grueso; K=4 fragmenta sin ganar mucho.
-
-2. **¿Clustering y PCA coinciden?** Sí, parcialmente. Ambos identifican el eje "desarrollado vs. menos desarrollado" como el más informativo. El biplot de PCA muestra cómo los clusters se separan principalmente a lo largo de PC1. Pero PCA agrega una dimensión adicional (PC2 = desigualdad) que el clustering K-means no captura explícitamente, porque K-means solo asigna etiquetas categóricas.
-
-3. **¿Qué visualización?** El **biplot** (PCA + clusters K-means superpuestos) combina lo mejor de ambos métodos: muestra las dimensiones latentes (loadings = ejes interpretables), los grupos sustantivos (clusters como color), y los países individuales (puntos etiquetados). Es la representación más rica y le da al funcionario tanto una visión panorámica como información sobre cada país.
+1. Para un periodista, el [gráfico de clusters sobre los dos primeros componentes]{.alert} (estilo `fviz_cluster()`) es la mejor opción: muestra los grupos, la posición relativa de cada país y los casos fronterizos en una sola imagen intuitiva ("mapa de países"). El dendrograma exige explicar qué significa la altura de las uniones, y el biplot agrega flechas de loadings que confunden a un público no técnico
+2. Los promedios nacionales esconden la [desigualdad interna]{.alert}. Brasil o Sudáfrica tienen ingresos medios "intermedios", pero conviven regiones con indicadores de país rico y otras con indicadores de país pobre; el "país promedio" no describe bien a casi nadie. Lo mismo vale para brechas urbano-rurales o étnicas
+3. Hay varias respuestas defendibles. Algunos ejemplos: la [informalidad laboral]{.alert} o la calidad institucional (corrupción) distinguirían a los ingresos medios entre sí, porque es donde más varían; una medida de dependencia de materias primas separaría a los exportadores de petróleo (Arabia Saudita) de los manufactureros (Corea del Sur, en su momento). Lo importante es justificar que la variable nueva varíe justamente donde el dataset actual no discrimina
