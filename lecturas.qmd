@@ -6,9 +6,9 @@ title: "Lecturas"
 
 Este curso es autocontenido: todo lo necesario para seguir las clases y completar los laboratorios se cubre en las sesiones presenciales. Las lecturas que se listan a continuación son opcionales, pensadas para quienes quieran profundizar en algún tema o explorar aplicaciones adicionales. No es necesario leerlas antes de las sesiones.
 
-## Lecturas por día
+## Lecturas por dia
 
-### Día 1: Fundamentos de IA y Machine Learning
+### Dia 1: Fundamentos de IA y Machine Learning
 
 ::: {.resource-card}
 [Russell, S. & Norvig, P. (2021). *Artificial Intelligence: A Modern Approach*. Capítulo 1.]{.resource-title}
@@ -34,7 +34,7 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 [Referencia para `tidyverse`. Útil para quienes quieran repasar manipulación de datos y visualización en R. Disponible en [r4ds.hadley.nz](https://r4ds.hadley.nz/).]{.resource-meta}
 :::
 
-### Día 2: Aprendizaje supervisado
+### Dia 2: Aprendizaje supervisado
 
 ::: {.resource-card}
 [James, G., Witten, D., Hastie, T. & Tibshirani, R. (2021). *An Introduction to Statistical Learning*. Capítulos 4-6 y 8.]{.resource-title}
@@ -66,7 +66,7 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 [Aplicación de Random Forest a la predicción de conflictos civiles. Ejemplo clásico de ML en ciencia política.]{.resource-meta}
 :::
 
-### Día 3: Texto y aprendizaje no supervisado
+### Dia 3: Texto y aprendizaje no supervisado
 
 ::: {.resource-card}
 [Grimmer, J. & Stewart, B. (2013). Text as data: The promise and pitfalls of automatic content analysis methods for political texts. *Political Analysis*, 21(3), 267-297.]{.resource-title}
@@ -92,7 +92,7 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 [Clustering (cap. 10) y PCA (cap. 12). Disponible en [statlearning.com](https://www.statlearning.com/).]{.resource-meta}
 :::
 
-### Día 4: LLMs y aplicaciones
+### Dia 4: LLMs y aplicaciones
 
 ::: {.resource-card}
 [Gilardi, F., Alizadeh, M. & Kubli, M. (2023). ChatGPT outperforms crowd workers for text-annotation tasks. *PNAS*, 120(30).]{.resource-title}
@@ -130,7 +130,7 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 [El artículo original que propone la arquitectura Transformer. Lectura técnica, pero la sección 3 (atención) es accesible.]{.resource-meta}
 :::
 
-### Día 5: Ética y sesgo algorítmico
+### Dia 5: Etica y sesgo algoritmico
 
 ::: {.resource-card}
 [O'Neil, C. (2016). *Weapons of Math Destruction*. Crown.]{.resource-title}
@@ -156,7 +156,7 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 [Marco práctico para auditar algoritmos dentro de organizaciones.]{.resource-meta}
 :::
 
-## Bibliografía complementaria
+## Bibliografia complementaria
 
 Estas lecturas no son obligatorias, pero ofrecen perspectivas valiosas para profundizar en temas específicos:
 
