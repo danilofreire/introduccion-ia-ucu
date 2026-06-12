@@ -160,6 +160,7 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 
 Estas lecturas no son obligatorias, pero ofrecen perspectivas valiosas para profundizar en temas específicos:
 
+- Halevy, A., Norvig, P. & Pereira, F. (2009). The unreasonable effectiveness of data. *IEEE Intelligent Systems*, 24(2), 8-12.
 - Athey, S. (2017). Beyond prediction: Using big data for policy problems. *Science*, 355(6324), 483-485.
 - Crawford, K. (2021). *Atlas of AI*. Yale University Press.
 - Gentzkow, M., Kelly, B. & Taddy, M. (2019). Text as data. *Journal of Economic Literature*, 57(3), 535-574.
