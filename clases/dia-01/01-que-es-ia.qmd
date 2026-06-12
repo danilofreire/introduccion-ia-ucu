@@ -82,11 +82,11 @@ if (!require("fontawesome", character.only = TRUE)) {
 ### Enlaces importantes
 
 ::: {style="font-size: 30px;"}
+`r fa('globe')` [Sitio web del curso:]{.alert} <https://danilofreire.github.io/introduccion-ia-ucu>
+
 `r fa('github')` Repositorio del curso: <https://github.com/danilofreire/introduccion-ia-ucu>
 
-`r fa('globe')` Sitio web del curso: <https://danilofreire.github.io/introduccion-ia-ucu>
-
-Todos los materiales del curso (diapositivas, código, laboratorios y lecturas) están disponibles en nuestro [repositorio de GitHub](https://github.com/danilofreire/introduccion-ia-ucu) y [sitio web](https://danilofreire.github.io/introduccion-ia-ucu)
+Todos los materiales del curso (diapositivas, código, laboratorios y lecturas) están disponibles en nuestro [sitio web](https://danilofreire.github.io/introduccion-ia-ucu) y [repositorio de GitHub](https://github.com/danilofreire/introduccion-ia-ucu)
 
 Las diapositivas se publicarán antes de cada sesión y se actualizarán a lo largo de la semana si surgen nuevas ideas o preguntas 😉
 
