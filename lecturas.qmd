@@ -37,9 +37,15 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 ### Dia 2: Aprendizaje supervisado
 
 ::: {.resource-card}
-[Muchlinski, D. et al. (2016). Comparing random forest with logistic regression for predicting class-membership. *Political Analysis*, 24(2), 168-185.]{.resource-title}
+[James, G., Witten, D., Hastie, T. & Tibshirani, R. (2021). *An Introduction to Statistical Learning*. Capitulos 4-6 y 8.]{.resource-title}
 
-[Aplicacion de Random Forest a la prediccion de conflictos civiles. Ejemplo clasico de ML en ciencia politica.]{.resource-meta}
+[Regresion logistica (cap. 4), regularizacion (cap. 6) y arboles de decision y bosques aleatorios (cap. 8). Disponible en [statlearning.com](https://www.statlearning.com/).]{.resource-meta}
+:::
+
+::: {.resource-card}
+[Breiman, L. (2001). Statistical modeling: The two cultures. *Statistical Science*, 16(3), 199-231.]{.resource-title}
+
+[Ensayo clasico que contrasta la cultura de los modelos estadisticos tradicionales con la cultura de la prediccion algoritmica. Contexto ideal para los metodos de este dia.]{.resource-meta}
 :::
 
 ::: {.resource-card}
@@ -55,9 +61,9 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 :::
 
 ::: {.resource-card}
-[James, G., Witten, D., Hastie, T. & Tibshirani, R. (2021). *An Introduction to Statistical Learning*. Capitulos 4-6 y 8.]{.resource-title}
+[Muchlinski, D. et al. (2016). Comparing random forest with logistic regression for predicting class-membership. *Political Analysis*, 24(2), 168-185.]{.resource-title}
 
-[Regresion logistica (cap. 4), regularizacion (cap. 6) y arboles de decision y bosques aleatorios (cap. 8). Disponible en [statlearning.com](https://www.statlearning.com/).]{.resource-meta}
+[Aplicacion de Random Forest a la prediccion de conflictos civiles. Ejemplo clasico de ML en ciencia politica.]{.resource-meta}
 :::
 
 ### Dia 3: Texto y aprendizaje no supervisado
@@ -155,7 +161,6 @@ Este curso es autocontenido: todo lo necesario para seguir las clases y completa
 Estas lecturas no son obligatorias, pero ofrecen perspectivas valiosas para profundizar en temas especificos:
 
 - Athey, S. (2017). Beyond prediction: Using big data for policy problems. *Science*, 355(6324), 483-485.
-- Breiman, L. (2001). Statistical modeling: The two cultures. *Statistical Science*, 16(3), 199-231.
 - Crawford, K. (2021). *Atlas of AI*. Yale University Press.
 - Gentzkow, M., Kelly, B. & Taddy, M. (2019). Text as data. *Journal of Economic Literature*, 57(3), 535-574.
 - Grimmer, J., Roberts, M. E. & Stewart, B. M. (2022). *Text as Data: A New Framework*. Princeton University Press.
@@ -169,3 +174,4 @@ Estas lecturas no son obligatorias, pero ofrecen perspectivas valiosas para prof
 - Knox, D. & Lucas, C. (2021). A dynamic model of speech for the social sciences. *American Political Science Review*, 115(2), 649-666.
 - Russell, S. (2019). *Human Compatible: Artificial Intelligence and the Problem of Control*. Viking.
 - Christian, B. (2020). *The Alignment Problem: Machine Learning and Human Values*. W. W. Norton & Company.
+- Ananthaswamy, A. (2024). *Why Machines Learn: The Elegant Math Behind Modern AI*. Dutton.
