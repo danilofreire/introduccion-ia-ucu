@@ -168,7 +168,7 @@ arbol_demo <- rpart(
 
 ## Regresión logística: profundización
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=55%}
 - [Regresión logística]{.alert}: predice la probabilidad de pertenecer a una clase
@@ -192,7 +192,7 @@ Fuente: [Wikipedia](https://en.wikipedia.org/wiki/Logistic_function)
 
 ## ¿Cuándo usar regresión logística?
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=50%}
 **Ventajas**
@@ -333,7 +333,7 @@ tidy(ajuste_log) |>
 
 ## ¿Qué es un árbol de decisión?
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 27px;"}
 :::{.columns}
 :::{.column width=55%}
 - Un [árbol de decisión]{.alert} aprende una jerarquía de preguntas de sí/no
@@ -429,11 +429,10 @@ separación posible
 
 ## Árboles de decisión en R
 
-:::{style="margin-top: 30px; font-size: 21px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
 Con tidymodels, solo necesitamos cambiar la especificación del modelo:
 
-:::{style="font-size: 22px;"}
 ```{r arbol-fit, echo=TRUE, message=FALSE}
 # Ajustar un árbol de decisión (spec + fit en una sola pipeline)
 ajuste_arbol <- decision_tree(tree_depth = 5, min_n = 10) |>
@@ -446,7 +445,6 @@ pred_arbol <- augment(ajuste_arbol, datos_test)
 pred_arbol |> accuracy(truth = apoya_democracia, estimate = .pred_class)
 pred_arbol |> roc_auc(truth = apoya_democracia, .pred_si, event_level = "second")
 ```
-:::
 
 - Noten que la [interfaz es idéntica]{.alert}: solo cambiamos `logistic_reg()` por `decision_tree()`, ¡la misma sintaxis para todos los modelos!
 - `tree_depth` y `min_n` son [hiperparámetros]{.alert}: controlan la complejidad del modelo
@@ -499,7 +497,7 @@ rpart.plot(arbol_demo,
 
 ## Poda (pruning): controlando la complejidad
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 30px; font-size: 25px;"}
 :::{.columns}
 :::{.column width=55%}
 - Un árbol sin restricciones crece hasta [memorizar]{.alert} los datos
@@ -553,7 +551,7 @@ A partir de cierta profundidad, el error en test [empeora]{.alert} mientras el e
 
 ## La idea detrás de Random Forest
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 - Un solo árbol es [inestable]{.alert} y propenso al sobreajuste
