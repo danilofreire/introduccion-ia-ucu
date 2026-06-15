@@ -23,7 +23,6 @@ Esta es la clave de respuestas de la Tarea 4. Cada pregunta incluye el código R
 library(tidymodels)
 library(tidyverse)
 library(glmnet)
-library(ranger)
 
 datos <- read_csv("datos/desempeno_escuelas.csv", show_col_types = FALSE)
 
@@ -160,7 +159,7 @@ metricas_ols |>
 
 ### Pregunta 7: Tuning de LASSO
 
-Definan LASSO con `penalty = tune()`, grilla de 40 lambdas entre 10^-3 y 10^0.5, y CV con 5 folds. ¿Cuál es el mejor lambda?
+Definan LASSO con `penalty = tune()`, grilla de 40 lambdas entre 10^-3 y 10^0.5, y CV con 10 folds. ¿Cuál es el mejor lambda?
 
 ```{r p7}
 modelo_lasso <- linear_reg(penalty = tune(), mixture = 1) |>
@@ -173,7 +172,7 @@ wf_lasso <- workflow() |>
 grilla_lambda <- grid_regular(penalty(range = c(-3, 0.5)), levels = 40)
 
 set.seed(2026)
-folds <- vfold_cv(datos_train, v = 5)
+folds <- vfold_cv(datos_train, v = 10)
 
 resultados_lasso <- tune_grid(
   wf_lasso,
@@ -185,7 +184,7 @@ show_best(resultados_lasso, metric = "rmse", n = 5) |>
   mutate(across(where(is.numeric), \(x) round(x, 4)))
 ```
 
-**Respuesta:** El mejor lambda según RMSE es **~1,1**. Vale la pena mirar la tabla: hay varios lambdas vecinos con RMSE casi idéntico, lo que es típico. La curva de RMSE contra lambda suele ser plana cerca del mínimo, así que la elección exacta importa menos que el orden de magnitud. Lo que sí castiga fuerte el RMSE son los lambdas muy grandes, que aplastan todos los coeficientes hacia cero.
+**Respuesta:** El mejor lambda según RMSE es **~1,4**. Vale la pena mirar la tabla: hay varios lambdas vecinos con RMSE casi idéntico, lo que es típico. La curva de RMSE contra lambda suele ser plana cerca del mínimo, así que la elección exacta importa menos que el orden de magnitud. Lo que sí castiga fuerte el RMSE son los lambdas muy grandes, que aplastan todos los coeficientes hacia cero.
 
 ### Pregunta 8: Lambda mínimo vs. 1SE
 
@@ -202,7 +201,7 @@ cat("Razón 1SE / mínimo:",
     round(lambda_1se$penalty / lambda_min$penalty, 1), "\n")
 ```
 
-**Respuesta:** El lambda 1SE (~3,2) es casi **3 veces más grande** que el lambda mínimo (~1,1). La lógica de la regla 1SE: si varios lambdas rinden estadísticamente igual (dentro de un error estándar del mínimo), conviene elegir el más grande, porque penaliza más y produce un modelo **más simple**, con más coeficientes en cero. Es la versión regularizada del principio de parsimonia: ante igual desempeño, el modelo con menos variables. El costo es aceptar un RMSE nominalmente un poco peor a cambio de un modelo más interpretable y robusto.
+**Respuesta:** El lambda 1SE (~3,2) es algo **más del doble** que el lambda mínimo (~1,4). La lógica de la regla 1SE: si varios lambdas rinden estadísticamente igual (dentro de un error estándar del mínimo), conviene elegir el más grande, porque penaliza más y produce un modelo **más simple**, con más coeficientes en cero. Es la versión regularizada del principio de parsimonia: ante igual desempeño, el modelo con menos variables. El costo es aceptar un RMSE nominalmente un poco peor a cambio de un modelo más interpretable y robusto.
 
 ### Pregunta 9: Variables eliminadas por LASSO
 
@@ -296,40 +295,18 @@ select_best(resultados_en, metric = "rmse") |>
   mutate(across(where(is.numeric), \(x) round(x, 4)))
 ```
 
-**Respuesta:** La mejor combinación es `mixture = 1`, es decir, **LASSO puro**. Elastic Net tenía permitido elegir cualquier mezcla entre Ridge (0) y LASSO (1), y la validación cruzada concluyó que la penalización L1 sola es lo mejor para estos datos. Tiene sentido dada la estructura del dataset: hay un grupo claro de predictores irrelevantes o redundantes (los de la Pregunta 9) que conviene eliminar del todo, y pocos predictores fuertes que no necesitan el "reparto" de Ridge. La lección general: Elastic Net es un buen punto de partida porque contiene a los otros dos como casos particulares y deja que los datos decidan.
+**Respuesta:** La mejor combinación tiene `mixture = 0,75`: una mezcla que se inclina fuerte hacia LASSO (L1) pero conserva algo de Ridge (L2). Elastic Net tenía permitido elegir cualquier punto entre Ridge (0) y LASSO (1), y la validación cruzada se quedó cerca del extremo LASSO. Tiene sentido dada la estructura del dataset: hay un grupo claro de predictores irrelevantes o redundantes (los de la Pregunta 9) que conviene encoger con fuerza, y el componente L1 dominante hace casi todo el trabajo de selección. La lección general: Elastic Net es un buen punto de partida porque contiene a Ridge y LASSO como casos particulares (mixture 0 y 1) y deja que los datos elijan la mezcla.
 
 ## Comparación
 
 ### Pregunta 12: Tabla comparativa
 
-Comparen OLS, LASSO, Ridge, Elastic Net y Random Forest en el conjunto de prueba.
+Comparen OLS, LASSO, Ridge y Elastic Net en el conjunto de prueba.
 
 ```{r p12}
 ajuste_en <- finalize_workflow(
   wf_en,
   select_best(resultados_en, metric = "rmse")
-) |>
-  fit(data = datos_train)
-
-modelo_rf <- rand_forest(trees = 500, mtry = tune(), min_n = tune()) |>
-  set_engine("ranger") |>
-  set_mode("regression")
-
-wf_rf <- workflow() |>
-  add_recipe(receta) |>
-  add_model(modelo_rf)
-
-set.seed(2026)
-resultados_rf <- tune_grid(
-  wf_rf,
-  resamples = folds,
-  grid = grid_regular(mtry(range = c(2, 10)), min_n(range = c(5, 30)),
-                      levels = c(4, 4))
-)
-
-ajuste_rf <- finalize_workflow(
-  wf_rf,
-  select_best(resultados_rf, metric = "rmse")
 ) |>
   fit(data = datos_train)
 
@@ -343,8 +320,7 @@ bind_rows(
   evaluar(ajuste_ols, "OLS"),
   evaluar(ajuste_lasso, "LASSO"),
   evaluar(ajuste_ridge, "Ridge"),
-  evaluar(ajuste_en, "Elastic Net"),
-  evaluar(ajuste_rf, "Random Forest")
+  evaluar(ajuste_en, "Elastic Net")
 ) |>
   select(modelo, .metric, .estimate) |>
   pivot_wider(names_from = .metric, values_from = .estimate) |>
@@ -352,7 +328,7 @@ bind_rows(
   mutate(across(where(is.numeric), \(x) round(x, 2)))
 ```
 
-**Respuesta:** La tabla queda apretadísima: el mejor RMSE es el de **OLS** (~26,7), con LASSO, Elastic Net y Ridge a apenas 0,3-0,5 puntos, y Random Forest levemente detrás (~28). En términos prácticos, **la diferencia es irrelevante**: medio punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y sólo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar, y Random Forest no encuentra no-linealidades que explotar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).
+**Respuesta:** La tabla queda apretadísima: el mejor RMSE es el de **OLS** (~26,7), con LASSO, Elastic Net y Ridge a apenas ~0,3-0,4 puntos. En términos prácticos, **la diferencia es irrelevante**: una fracción de punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y sólo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).
 
 ### Pregunta 13: Reflexión
 

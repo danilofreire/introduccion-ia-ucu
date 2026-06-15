@@ -254,18 +254,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(glmnet)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ranger)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/desempeno_escuelas.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">departamento =</span> <span class="fu">factor</span>(departamento),</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">sector =</span> <span class="fu">factor</span>(sector),</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">zona =</span> <span class="fu">factor</span>(zona)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/desempeno_escuelas.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">departamento =</span> <span class="fu">factor</span>(departamento),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">sector =</span> <span class="fu">factor</span>(sector),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">zona =</span> <span class="fu">factor</span>(zona)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -453,7 +452,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="4" class="anchored" data-anchor-id="lasso"><span class="header-section-number">4</span> LASSO</h2>
 <section id="pregunta-7-tuning-de-lasso" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-7-tuning-de-lasso"><span class="header-section-number">4.1</span> Pregunta 7: Tuning de LASSO</h3>
-<p>Definan LASSO con <code>penalty = tune()</code>, grilla de 40 lambdas entre 10^-3 y 10^0.5, y CV con 5 folds. ¿Cuál es el mejor lambda?</p>
+<p>Definan LASSO con <code>penalty = tune()</code>, grilla de 40 lambdas entre 10^-3 y 10^0.5, y CV con 10 folds. ¿Cuál es el mejor lambda?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>modelo_lasso <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>)</span>
@@ -465,7 +464,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>grilla_lambda <span class="ot">&lt;-</span> <span class="fu">grid_regular</span>(<span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, <span class="fl">0.5</span>)), <span class="at">levels =</span> <span class="dv">40</span>)</span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(datos_train, <span class="at">v =</span> <span class="dv">10</span>)</span>
 <span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>resultados_lasso <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
 <span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  wf_lasso,</span>
@@ -479,14 +478,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 5 × 7
   penalty .metric .estimator  mean     n std_err .config         
     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;           
-1   1.13  rmse    standard    26.6     5   0.803 pre0_mod35_post0
-2   0.915 rmse    standard    26.6     5   0.815 pre0_mod34_post0
-3   1.38  rmse    standard    26.6     5   0.788 pre0_mod36_post0
-4   0.744 rmse    standard    26.6     5   0.823 pre0_mod33_post0
-5   0.605 rmse    standard    26.7     5   0.830 pre0_mod32_post0</code></pre>
+1   1.38  rmse    standard    26.6    10    1.46 pre0_mod36_post0
+2   1.13  rmse    standard    26.6    10    1.47 pre0_mod35_post0
+3   1.70  rmse    standard    26.6    10    1.44 pre0_mod37_post0
+4   0.915 rmse    standard    26.6    10    1.47 pre0_mod34_post0
+5   0.744 rmse    standard    26.7    10    1.47 pre0_mod33_post0</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El mejor lambda según RMSE es <strong>~1,1</strong>. Vale la pena mirar la tabla: hay varios lambdas vecinos con RMSE casi idéntico, lo que es típico. La curva de RMSE contra lambda suele ser plana cerca del mínimo, así que la elección exacta importa menos que el orden de magnitud. Lo que sí castiga fuerte el RMSE son los lambdas muy grandes, que aplastan todos los coeficientes hacia cero.</p>
+<p><strong>Respuesta:</strong> El mejor lambda según RMSE es <strong>~1,4</strong>. Vale la pena mirar la tabla: hay varios lambdas vecinos con RMSE casi idéntico, lo que es típico. La curva de RMSE contra lambda suele ser plana cerca del mínimo, así que la elección exacta importa menos que el orden de magnitud. Lo que sí castiga fuerte el RMSE son los lambdas muy grandes, que aplastan todos los coeficientes hacia cero.</p>
 </section>
 <section id="pregunta-8-lambda-mínimo-vs.-1se" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-lambda-mínimo-vs.-1se"><span class="header-section-number">4.2</span> Pregunta 8: Lambda mínimo vs.&nbsp;1SE</h3>
@@ -498,7 +497,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Lambda mínimo:"</span>, <span class="fu">round</span>(lambda_min<span class="sc">$</span>penalty, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Lambda mínimo: 1.1253 </code></pre>
+<pre><code>Lambda mínimo: 1.3836 </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Lambda 1SE:"</span>, <span class="fu">round</span>(lambda_1se<span class="sc">$</span>penalty, <span class="dv">4</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -507,10 +506,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Razón 1SE / mínimo:"</span>,</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(lambda_1se<span class="sc">$</span>penalty <span class="sc">/</span> lambda_min<span class="sc">$</span>penalty, <span class="dv">1</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Razón 1SE / mínimo: 2.8 </code></pre>
+<pre><code>Razón 1SE / mínimo: 2.3 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El lambda 1SE (~3,2) es casi <strong>3 veces más grande</strong> que el lambda mínimo (~1,1). La lógica de la regla 1SE: si varios lambdas rinden estadísticamente igual (dentro de un error estándar del mínimo), conviene elegir el más grande, porque penaliza más y produce un modelo <strong>más simple</strong>, con más coeficientes en cero. Es la versión regularizada del principio de parsimonia: ante igual desempeño, el modelo con menos variables. El costo es aceptar un RMSE nominalmente un poco peor a cambio de un modelo más interpretable y robusto.</p>
+<p><strong>Respuesta:</strong> El lambda 1SE (~3,2) es algo <strong>más del doble</strong> que el lambda mínimo (~1,4). La lógica de la regla 1SE: si varios lambdas rinden estadísticamente igual (dentro de un error estándar del mínimo), conviene elegir el más grande, porque penaliza más y produce un modelo <strong>más simple</strong>, con más coeficientes en cero. Es la versión regularizada del principio de parsimonia: ante igual desempeño, el modelo con menos variables. El costo es aceptar un RMSE nominalmente un poco peor a cambio de un modelo más interpretable y robusto.</p>
 </section>
 <section id="pregunta-9-variables-eliminadas-por-lasso" class="level3" data-number="4.3">
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-9-variables-eliminadas-por-lasso"><span class="header-section-number">4.3</span> Pregunta 9: Variables eliminadas por LASSO</h3>
@@ -589,16 +588,16 @@ Eliminadas: 10 de 17 predictores</code></pre>
 <pre><code># A tibble: 10 × 3
    term                    lasso ridge
    &lt;chr&gt;                   &lt;dbl&gt; &lt;dbl&gt;
- 1 computadoras_alumno         0 -1.38
+ 1 computadoras_alumno         0 -1.41
  2 horas_semanales             0  0.08
  3 formacion_docente_pct       0  0.09
  4 departamento_Maldonado      0  0.4 
  5 departamento_Paysandú       0 -0.68
  6 departamento_Rivera         0 -0.67
  7 departamento_Salto          0 -0.91
- 8 departamento_Tacuarembó     0  0.34
- 9 sector_publico              0  1.66
-10 zona_urbana                 0 -0.51</code></pre>
+ 8 departamento_Tacuarembó     0  0.35
+ 9 sector_publico              0  1.68
+10 zona_urbana                 0 -0.53</code></pre>
 </div>
 </div>
 <p><strong>Respuesta:</strong> LASSO deja <strong>10 coeficientes exactamente en cero</strong>; Ridge, <strong>ninguno</strong>. Es la diferencia de diseño entre las dos penalizaciones: la L1 de LASSO puede llevar coeficientes hasta el cero exacto (selección de variables), mientras que la L2 de Ridge los encoge hacia cero pero nunca los anula. En la tabla se ve bien: las variables que LASSO eliminó sobreviven en Ridge con coeficientes chicos (en general menores que ±2). Ridge “reparte” la señal entre predictores correlacionados; LASSO elige uno y descarta el resto.</p>
@@ -632,17 +631,17 @@ Eliminadas: 10 de 17 predictores</code></pre>
 <pre><code># A tibble: 1 × 3
   penalty mixture .config         
     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;           
-1       1       1 pre0_mod65_post0</code></pre>
+1    1.78    0.75 pre0_mod69_post0</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La mejor combinación es <code>mixture = 1</code>, es decir, <strong>LASSO puro</strong>. Elastic Net tenía permitido elegir cualquier mezcla entre Ridge (0) y LASSO (1), y la validación cruzada concluyó que la penalización L1 sola es lo mejor para estos datos. Tiene sentido dada la estructura del dataset: hay un grupo claro de predictores irrelevantes o redundantes (los de la Pregunta 9) que conviene eliminar del todo, y pocos predictores fuertes que no necesitan el “reparto” de Ridge. La lección general: Elastic Net es un buen punto de partida porque contiene a los otros dos como casos particulares y deja que los datos decidan.</p>
+<p><strong>Respuesta:</strong> La mejor combinación tiene <code>mixture = 0,75</code>: una mezcla que se inclina fuerte hacia LASSO (L1) pero conserva algo de Ridge (L2). Elastic Net tenía permitido elegir cualquier punto entre Ridge (0) y LASSO (1), y la validación cruzada se quedó cerca del extremo LASSO. Tiene sentido dada la estructura del dataset: hay un grupo claro de predictores irrelevantes o redundantes (los de la Pregunta 9) que conviene encoger con fuerza, y el componente L1 dominante hace casi todo el trabajo de selección. La lección general: Elastic Net es un buen punto de partida porque contiene a Ridge y LASSO como casos particulares (mixture 0 y 1) y deja que los datos elijan la mezcla.</p>
 </section>
 </section>
 <section id="comparación" class="level2" data-number="6">
 <h2 data-number="6" class="anchored" data-anchor-id="comparación"><span class="header-section-number">6</span> Comparación</h2>
 <section id="pregunta-12-tabla-comparativa" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-tabla-comparativa"><span class="header-section-number">6.1</span> Pregunta 12: Tabla comparativa</h3>
-<p>Comparen OLS, LASSO, Ridge, Elastic Net y Random Forest en el conjunto de prueba.</p>
+<p>Comparen OLS, LASSO, Ridge y Elastic Net en el conjunto de prueba.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>ajuste_en <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  wf_en,</span>
@@ -650,57 +649,33 @@ Eliminadas: 10 de 17 predictores</code></pre>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
 <span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
 <span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>modelo_rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">500</span>, <span class="at">mtry =</span> <span class="fu">tune</span>(), <span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">|&gt;</span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"ranger"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"regression"</span>)</span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>wf_rf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(receta) <span class="sc">|&gt;</span></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(modelo_rf)</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>resultados_rf <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  wf_rf,</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">resamples =</span> folds,</span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">grid =</span> <span class="fu">grid_regular</span>(<span class="fu">mtry</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">10</span>)), <span class="fu">min_n</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">30</span>)),</span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>                      <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>))</span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>ajuste_rf <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(</span>
-<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>  wf_rf,</span>
-<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_best</span>(resultados_rf, <span class="at">metric =</span> <span class="st">"rmse"</span>)</span>
-<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
-<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>evaluar <span class="ot">&lt;-</span> <span class="cf">function</span>(ajuste, nombre) {</span>
-<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(ajuste, datos_test) <span class="sc">|&gt;</span></span>
-<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> puntaje_prueba, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span></span>
-<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">modelo =</span> nombre)</span>
-<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_ols, <span class="st">"OLS"</span>),</span>
-<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_lasso, <span class="st">"LASSO"</span>),</span>
-<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_ridge, <span class="st">"Ridge"</span>),</span>
-<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_en, <span class="st">"Elastic Net"</span>),</span>
-<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_rf, <span class="st">"Random Forest"</span>)</span>
-<span id="cb37-41"><a href="#cb37-41" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb37-42"><a href="#cb37-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb37-43"><a href="#cb37-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rmse) <span class="sc">|&gt;</span></span>
-<span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">2</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>evaluar <span class="ot">&lt;-</span> <span class="cf">function</span>(ajuste, nombre) {</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(ajuste, datos_test) <span class="sc">|&gt;</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> puntaje_prueba, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">modelo =</span> nombre)</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_ols, <span class="st">"OLS"</span>),</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_lasso, <span class="st">"LASSO"</span>),</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_ridge, <span class="st">"Ridge"</span>),</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_en, <span class="st">"Elastic Net"</span>)</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rmse) <span class="sc">|&gt;</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">2</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 5 × 4
-  modelo         rmse   rsq   mae
-  &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 OLS            26.7  0.68  21.8
-2 Elastic Net    27.0  0.68  22.0
-3 LASSO          27.0  0.68  21.9
-4 Ridge          27.2  0.68  22.1
-5 Random Forest  28.0  0.67  22.2</code></pre>
+<pre><code># A tibble: 4 × 4
+  modelo       rmse   rsq   mae
+  &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 OLS          26.7  0.68  21.8
+2 LASSO        27.0  0.68  22.0
+3 Elastic Net  27.1  0.68  22.0
+4 Ridge        27.2  0.68  22.1</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La tabla queda apretadísima: el mejor RMSE es el de <strong>OLS</strong> (~26,7), con LASSO, Elastic Net y Ridge a apenas 0,3-0,5 puntos, y Random Forest levemente detrás (~28). En términos prácticos, <strong>la diferencia es irrelevante</strong>: medio punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y sólo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar, y Random Forest no encuentra no-linealidades que explotar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).</p>
+<p><strong>Respuesta:</strong> La tabla queda apretadísima: el mejor RMSE es el de <strong>OLS</strong> (~26,7), con LASSO, Elastic Net y Ridge a apenas ~0,3-0,4 puntos. En términos prácticos, <strong>la diferencia es irrelevante</strong>: una fracción de punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y sólo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).</p>
 </section>
 <section id="pregunta-13-reflexión" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-13-reflexión"><span class="header-section-number">6.2</span> Pregunta 13: Reflexión</h3>
