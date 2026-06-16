@@ -15,6 +15,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-01/03-laboratorio-01.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/03-laboratorio-01.qmd) |
 [Código (.R)](clases/dia-01/laboratorio-01.R) |
+[Datos Lab 1 (.csv)](clases/dia-01/datos/indicadores_mundiales.csv) |
 [Datos Tarea 1 (.csv)](clases/dia-01/datos/desarrollo_municipios.csv) |
 [Tarea 1 (.html)](clases/dia-01/tarea-01.html) |
 [Tarea 1 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/tarea-01.qmd) |
@@ -32,6 +33,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-01/04-laboratorio-02.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/04-laboratorio-02.qmd) |
 [Código (.R)](clases/dia-01/laboratorio-02.R) |
+[Datos Lab 2 (.csv)](clases/dia-01/datos/indicadores_mundiales.csv) |
 [Datos Tarea 2 (.csv)](clases/dia-01/datos/satisfaccion_democracia.csv) |
 [Tarea 2 (.html)](clases/dia-01/tarea-02.html) |
 [Tarea 2 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/tarea-02.qmd) |
@@ -49,7 +51,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-02/07-laboratorio-03.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/07-laboratorio-03.qmd) |
 [Código (.R)](clases/dia-02/laboratorio-03.R) |
-[Datos Tarea 3 (.csv)](clases/dia-02/datos/latinobarometro_sim.csv) |
+[Datos Lab 3 y Tarea 3 (.csv)](clases/dia-02/datos/latinobarometro_sim.csv) |
 [Tarea 3 (.html)](clases/dia-02/tarea-03.html) |
 [Tarea 3 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-03.qmd) |
 [Respuestas Tarea 3 (.html)](clases/dia-02/tarea-03-respuestas.html) |
@@ -66,6 +68,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-02/08-laboratorio-04.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/08-laboratorio-04.qmd) |
 [Código (.R)](clases/dia-02/laboratorio-04.R) |
+[Datos Lab 4 (.csv)](clases/dia-02/datos/latinobarometro_sim.csv) |
 [Datos Tarea 4 (.csv)](clases/dia-02/datos/desempeno_escuelas.csv) |
 [Tarea 4 (.html)](clases/dia-02/tarea-04.html) |
 [Tarea 4 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/tarea-04.qmd) |
@@ -83,6 +86,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-03/11-laboratorio-05.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/11-laboratorio-05.qmd) |
 [Código (.R)](clases/dia-03/laboratorio-05.R) |
+[Datos Lab 5 (.csv)](clases/dia-03/datos/indicadores_paises.csv) |
 [Datos Tarea 5 (.csv)](clases/dia-03/datos/indicadores_mundo.csv) |
 [Tarea 5 (.html)](clases/dia-03/tarea-05.html) |
 [Tarea 5 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-05.qmd) |
@@ -100,7 +104,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-03/12-laboratorio-06.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/12-laboratorio-06.qmd) |
 [Código (.R)](clases/dia-03/laboratorio-06.R) |
-[Datos Tarea 6 (.csv)](clases/dia-03/datos/textos_politicos.csv) |
+[Datos Lab 6 y Tarea 6 (.csv)](clases/dia-03/datos/textos_politicos.csv) |
 [Tarea 6 (.html)](clases/dia-03/tarea-06.html) |
 [Tarea 6 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/tarea-06.qmd) |
 [Respuestas Tarea 6 (.html)](clases/dia-03/tarea-06-respuestas.html) |
@@ -117,7 +121,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-04/15-laboratorio-07.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/15-laboratorio-07.qmd) |
 [Código (.R)](clases/dia-04/laboratorio-07.R) |
-[Datos Tarea 7 (.csv)](clases/dia-03/datos/textos_politicos.csv) |
+[Datos Lab 7 y Tarea 7 (.csv)](clases/dia-03/datos/textos_politicos.csv) |
 [Tarea 7 (.html)](clases/dia-04/tarea-07.html) |
 [Tarea 7 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-07.qmd) |
 [Respuestas Tarea 7 (.html)](clases/dia-04/tarea-07-respuestas.html) |
@@ -134,7 +138,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-04/16-laboratorio-08.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/16-laboratorio-08.qmd) |
 [Código (.R)](clases/dia-04/laboratorio-08.R) |
-[Datos Tarea 8 (.csv)](clases/dia-04/datos/discursos_ideologia.csv) |
+[Datos Lab 8 y Tarea 8 (.csv)](clases/dia-04/datos/discursos_ideologia.csv) |
 [Tarea 8 (.html)](clases/dia-04/tarea-08.html) |
 [Tarea 8 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-08.qmd) |
 [Respuestas Tarea 8 (.html)](clases/dia-04/tarea-08-respuestas.html) |
