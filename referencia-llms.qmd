@@ -346,7 +346,7 @@ codificado
 ```
 
 :::{.callout-tip}
-La columna `.error` guarda los fallos por fila en lugar de cortar todo el proceso. Si una fila falla (la API se saturó), su `score` queda `NA` y `.error` trae el detalle. Conviene revisarla: `filter(codificado, !map_lgl(.error, is.null))`
+Si alguna fila falla (por ejemplo, la API se saturó), `qlm_code()` no corta todo el proceso: agrega una columna `.error` con el detalle y deja el resto del registro en `NA`. Si todas las filas se codifican bien, esa columna no aparece. Por eso conviene revisar que exista antes de filtrarla: `if (".error" %in% names(codificado)) filter(codificado, !map_lgl(.error, is.null))`
 :::
 
 ## Validar contra códigos humanos

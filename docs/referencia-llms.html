@@ -638,7 +638,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>La columna <code>.error</code> guarda los fallos por fila en lugar de cortar todo el proceso. Si una fila falla (la API se saturó), su <code>score</code> queda <code>NA</code> y <code>.error</code> trae el detalle. Conviene revisarla: <code>filter(codificado, !map_lgl(.error, is.null))</code></p>
+<p>Si alguna fila falla (por ejemplo, la API se saturó), <code>qlm_code()</code> no corta todo el proceso: agrega una columna <code>.error</code> con el detalle y deja el resto del registro en <code>NA</code>. Si todas las filas se codifican bien, esa columna no aparece. Por eso conviene revisar que exista antes de filtrarla: <code>if (".error" %in% names(codificado)) filter(codificado, !map_lgl(.error, is.null))</code></p>
 </div>
 </div>
 </section>
