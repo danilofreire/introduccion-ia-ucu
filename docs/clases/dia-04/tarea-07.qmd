@@ -19,7 +19,7 @@ Esta tarea aplica los conceptos del Laboratorio 7. Responder cada pregunta escri
 
 **Para trabajar en esta tarea:**
 
-1. Descarguen este archivo `.qmd` y el dataset `textos_politicos.csv` (en `clases/dia-03/datos/`) de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
+1. Descarguen este archivo `.qmd` y el dataset `textos_politicos.csv` (en `clases/dia-04/datos/`) de la [página del curso](https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html), o clonen el repositorio completo con `git clone https://github.com/danilofreire/introduccion-ia-ucu.git`
 2. Necesitan [Quarto](https://quarto.org/docs/get-started/) instalado junto con RStudio. Las versiones recientes de RStudio (>= 2022.07) ya incluyen Quarto
 3. Necesitan una API key de [OpenRouter](https://openrouter.ai/keys) configurada como `OPENROUTER_API_KEY` en `.Renviron`. Alternativa: instalar [Ollama](https://ollama.com/) y usar `chat_ollama()` en lugar de `chat_openrouter()`
 4. Abrir este archivo `.qmd` en RStudio y ejecutar los bloques de código con Ctrl+Enter (Cmd+Enter en Mac)
@@ -37,7 +37,7 @@ set.seed(2026)
 stopifnot(Sys.getenv("OPENROUTER_API_KEY") != "")
 
 # Cargar los textos del Día 3
-textos <- read_csv("../dia-03/datos/textos_politicos.csv",
+textos <- read_csv("datos/textos_politicos.csv",
                    show_col_types = FALSE)
 
 # Modelo por defecto (cambiar si OpenRouter está saturado)
