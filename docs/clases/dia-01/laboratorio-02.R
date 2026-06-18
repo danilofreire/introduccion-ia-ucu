@@ -23,6 +23,8 @@ theme_set(theme_minimal(base_size = 14))
 
 # Cargar el dataset (mismo del lab 1)
 datos <- read_csv("datos/indicadores_mundiales.csv")
+# Leé el archivo directo desde la web:
+# datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/indicadores_mundiales.csv")
 glimpse(datos)
 
 

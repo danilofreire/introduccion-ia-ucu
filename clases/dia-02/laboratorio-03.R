@@ -34,6 +34,8 @@ set.seed(2026)
 
 # Cargar los datos
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+# Leé el archivo directo desde la web:
+# datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
 # Convertir categóricas a factores. El primer nivel de voto es
 # la clase positiva para yardstick.

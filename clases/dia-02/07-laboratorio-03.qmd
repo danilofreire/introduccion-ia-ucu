@@ -155,6 +155,8 @@ Vamos a trabajar con datos simulados inspirados en el [Latinobarómetro](https:/
 ```{r cargar-datos, prompt=FALSE, echo=TRUE}
 # Cargar el dataset (generado con datos/crear-datos.R)
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+# Leé el archivo directo desde la web:
+# datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
 # Convertir variables categóricas a factores
 # El primer nivel de voto es la clase positiva para yardstick

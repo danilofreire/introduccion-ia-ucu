@@ -1385,9 +1385,11 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Cargar textos políticos</span></span>
 <span id="cb2-2"><a></a>R<span class="sc">&gt;</span> textos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;datos/textos_politicos.csv&quot;</span>)</span>
-<span id="cb2-3"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb2-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Explorar estructura</span></span>
-<span id="cb2-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">glimpse</span>(textos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># Leé el archivo directo desde la web:</span></span>
+<span id="cb2-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># textos &lt;- read_csv(&quot;https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/textos_politicos.csv&quot;)</span></span>
+<span id="cb2-5"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb2-6"><a></a>R<span class="sc">&gt;</span> <span class="co"># Explorar estructura</span></span>
+<span id="cb2-7"><a></a>R<span class="sc">&gt;</span> <span class="fu">glimpse</span>(textos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 60
 Columns: 5

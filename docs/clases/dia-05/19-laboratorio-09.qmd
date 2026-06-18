@@ -178,6 +178,8 @@ La primera llamada tarda unos segundos: el modelo se está cargando en memoria. 
 #| eval: true
 #| cache: true
 entrevistas <- read_csv("datos/entrevistas_confianza.csv")
+# Leé el archivo directo desde la web:
+# entrevistas <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-05/datos/entrevistas_confianza.csv")
 
 entrevistas |> count(motivo_humano)
 ```

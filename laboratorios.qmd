@@ -121,7 +121,7 @@ Cada día incluye un laboratorio donde aplicamos los conceptos discutidos en cla
 [Diapositivas (.html)](clases/dia-04/15-laboratorio-07.html) |
 [Diapositivas (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/15-laboratorio-07.qmd) |
 [Código (.R)](clases/dia-04/laboratorio-07.R) |
-[Datos Lab 7 y Tarea 7 (.csv)](clases/dia-03/datos/textos_politicos.csv) |
+[Datos Lab 7 y Tarea 7 (.csv)](clases/dia-04/datos/textos_politicos.csv) |
 [Tarea 7 (.html)](clases/dia-04/tarea-07.html) |
 [Tarea 7 (.qmd)](https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/tarea-07.qmd) |
 [Respuestas Tarea 7 (.html)](clases/dia-04/tarea-07-respuestas.html) |

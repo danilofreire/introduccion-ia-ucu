@@ -23,6 +23,8 @@ set.seed(2026)
 
 # Cargar el dataset
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
+# Leé el archivo directo desde la web:
+# datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
 # Convertir categóricas a factor
 datos <- datos |>

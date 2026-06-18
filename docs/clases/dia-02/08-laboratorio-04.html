@@ -1339,17 +1339,19 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <span id="cb1-7"><a></a></span>
 <span id="cb1-8"><a></a><span class="co"># Cargar el dataset</span></span>
 <span id="cb1-9"><a></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;datos/latinobarometro_sim.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb1-10"><a></a></span>
-<span id="cb1-11"><a></a><span class="co"># Convertir categóricas a factor</span></span>
-<span id="cb1-12"><a></a>datos <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
-<span id="cb1-13"><a></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-14"><a></a>    <span class="at">pais         =</span> <span class="fu">factor</span>(pais),</span>
-<span id="cb1-15"><a></a>    <span class="at">zona         =</span> <span class="fu">factor</span>(zona),</span>
-<span id="cb1-16"><a></a>    <span class="at">genero       =</span> <span class="fu">factor</span>(genero),</span>
-<span id="cb1-17"><a></a>    <span class="at">uso_internet =</span> <span class="fu">factor</span>(uso_internet, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;nunca&quot;</span>, <span class="st">&quot;semanal&quot;</span>, <span class="st">&quot;diario&quot;</span>))</span>
-<span id="cb1-18"><a></a>  )</span>
-<span id="cb1-19"><a></a></span>
-<span id="cb1-20"><a></a><span class="fu">glimpse</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-10"><a></a><span class="co"># Leé el archivo directo desde la web:</span></span>
+<span id="cb1-11"><a></a><span class="co"># datos &lt;- read_csv(&quot;https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/datos/latinobarometro_sim.csv&quot;, show_col_types = FALSE)</span></span>
+<span id="cb1-12"><a></a></span>
+<span id="cb1-13"><a></a><span class="co"># Convertir categóricas a factor</span></span>
+<span id="cb1-14"><a></a>datos <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
+<span id="cb1-15"><a></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-16"><a></a>    <span class="at">pais         =</span> <span class="fu">factor</span>(pais),</span>
+<span id="cb1-17"><a></a>    <span class="at">zona         =</span> <span class="fu">factor</span>(zona),</span>
+<span id="cb1-18"><a></a>    <span class="at">genero       =</span> <span class="fu">factor</span>(genero),</span>
+<span id="cb1-19"><a></a>    <span class="at">uso_internet =</span> <span class="fu">factor</span>(uso_internet, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;nunca&quot;</span>, <span class="st">&quot;semanal&quot;</span>, <span class="st">&quot;diario&quot;</span>))</span>
+<span id="cb1-20"><a></a>  )</span>
+<span id="cb1-21"><a></a></span>
+<span id="cb1-22"><a></a><span class="fu">glimpse</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 500
 Columns: 14

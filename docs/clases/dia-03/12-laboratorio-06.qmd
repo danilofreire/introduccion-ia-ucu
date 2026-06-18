@@ -1,6 +1,6 @@
 ---
 title: "IA para Científicos Sociales"
-subtitle: "Sesión 3.4: Laboratorio - Análisis de texto"
+subtitle: "Sesión 3.4: Laboratorio 6 - Análisis de texto"
 author:
   - name: Danilo Freire
     orcid: 0000-0002-4712-6810
@@ -132,6 +132,8 @@ set.seed(2026)
 
 # Cargar textos políticos
 textos <- read_csv("datos/textos_politicos.csv")
+# Leé el archivo directo desde la web:
+# textos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/textos_politicos.csv")
 
 # Explorar estructura
 glimpse(textos)

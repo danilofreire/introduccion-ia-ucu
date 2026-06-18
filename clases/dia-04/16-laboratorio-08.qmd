@@ -163,6 +163,8 @@ library(tidyverse)
 Sys.getenv("OPENROUTER_API_KEY") != ""
 
 discursos <- read_csv("datos/discursos_ideologia.csv", show_col_types = FALSE)
+# Leé el archivo directo desde la web:
+# discursos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/discursos_ideologia.csv", show_col_types = FALSE)
 
 head(discursos)
 ```

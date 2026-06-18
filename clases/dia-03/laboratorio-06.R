@@ -29,6 +29,8 @@ set.seed(2026)
 
 # Cargar el corpus simulado (60 textos políticos)
 textos <- read_csv("datos/textos_politicos.csv", show_col_types = FALSE)
+# Leé el archivo directo desde la web:
+# textos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/textos_politicos.csv", show_col_types = FALSE)
 
 glimpse(textos)
 

@@ -69,6 +69,8 @@ entrevistas <- read_csv(
   "datos/entrevistas_confianza.csv",
   show_col_types = FALSE
 )
+# Leé el archivo directo desde la web:
+# entrevistas <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-05/datos/entrevistas_confianza.csv", show_col_types = FALSE)
 
 entrevistas |> count(motivo_humano)
 

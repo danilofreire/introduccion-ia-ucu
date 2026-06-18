@@ -153,6 +153,8 @@ Volvemos al dataset de [indicadores mundiales]{.alert} que ya usamos en el lab 1
 ```{r lab2-datos, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
 # Cargar datos
 datos <- read_csv("datos/indicadores_mundiales.csv")
+# Leé el archivo directo desde la web:
+# datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/indicadores_mundiales.csv")
 
 # Ver estructura
 glimpse(datos) # Ver las variables y tipos

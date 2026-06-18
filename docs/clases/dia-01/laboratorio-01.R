@@ -21,6 +21,8 @@ library(tidyverse)
 
 # Cargar los datos
 datos <- read_csv("datos/indicadores_mundiales.csv")
+# Leé el archivo directo desde la web:
+# datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/indicadores_mundiales.csv")
 
 # Ver las primeras filas
 glimpse(datos)

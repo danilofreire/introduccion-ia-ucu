@@ -30,6 +30,8 @@ set.seed(2026)
 
 # Cargar indicadores de 18 países latinoamericanos
 paises <- read_csv("datos/indicadores_paises.csv", show_col_types = FALSE)
+# Leé el archivo directo desde la web:
+# paises <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/indicadores_paises.csv", show_col_types = FALSE)
 
 glimpse(paises)
 

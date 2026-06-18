@@ -124,6 +124,8 @@ set.seed(2026)
 
 # Cargar indicadores por país
 paises <- read_csv("datos/indicadores_paises.csv")
+# Leé el archivo directo desde la web:
+# paises <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/indicadores_paises.csv")
 
 # Vista general
 glimpse(paises)
