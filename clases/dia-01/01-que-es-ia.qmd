@@ -144,9 +144,9 @@ Las diapositivas se publicarán antes de cada sesión y se actualizarán a lo la
 |-----|------|----------|--------------|
 | 1 | [Fundamentos de IA y ML]{.alert} | ¿Qué es la IA? + Flujo de ML | tidymodels + comparación de modelos |
 | 2 | [Aprendizaje supervisado]{.alert} | Clasificación + Predicción | clasificación + regresión |
-| 3 | [Texto y no supervisado]{.alert} | Clustering/PCA + Texto | clustering + análisis de texto |
+| 3 | [No supervisado y texto]{.alert} | Clustering/PCA + Texto | clustering + análisis de texto |
 | 4 | [LLMs y aplicaciones]{.alert} | Transformers + APIs | ellmer + aplicaciones avanzadas |
-| 5 | [Ética y cierre]{.alert} | Sesgo/regulación + Propuestas | auditoría de sesgo |
+| 5 | [Modelos locales y ética]{.alert} | Modelos locales + Sesgo/regulación | Ollama + auditoría de sesgo |
 
 :::
 

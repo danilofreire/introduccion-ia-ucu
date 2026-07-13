@@ -3525,7 +3525,7 @@
     "href": "clases/dia-01/01-que-es-ia.html#estructura-del-curso",
     "title": "IA para Científicos Sociales",
     "section": "Estructura del curso",
-    "text": "Estructura del curso\nCinco días, 20 horas\n\n\n\n\n\n\n\n\n\n\nDía\nTema\nSesiones\nLaboratorios\n\n\n\n\n1\nFundamentos de IA y ML\n¿Qué es la IA? + Flujo de ML\ntidymodels + comparación de modelos\n\n\n2\nAprendizaje supervisado\nClasificación + Predicción\nclasificación + regresión\n\n\n3\nTexto y no supervisado\nClustering/PCA + Texto\nclustering + análisis de texto\n\n\n4\nLLMs y aplicaciones\nTransformers + APIs\nellmer + aplicaciones avanzadas\n\n\n5\nÉtica y cierre\nSesgo/regulación + Propuestas\nauditoría de sesgo"
+    "text": "Estructura del curso\nCinco días, 20 horas\n\n\n\n\n\n\n\n\n\n\nDía\nTema\nSesiones\nLaboratorios\n\n\n\n\n1\nFundamentos de IA y ML\n¿Qué es la IA? + Flujo de ML\ntidymodels + comparación de modelos\n\n\n2\nAprendizaje supervisado\nClasificación + Predicción\nclasificación + regresión\n\n\n3\nNo supervisado y texto\nClustering/PCA + Texto\nclustering + análisis de texto\n\n\n4\nLLMs y aplicaciones\nTransformers + APIs\nellmer + aplicaciones avanzadas\n\n\n5\nModelos locales y ética\nModelos locales + Sesgo/regulación\nOllama + auditoría de sesgo"
   },
   {
     "objectID": "clases/dia-01/01-que-es-ia.html#objetivos-de-aprendizaje",
