@@ -579,3 +579,6 @@ rsconnect/
 
 # Agent config — never commit to public repo
 .claude/
+
+# Quarto freeze: keep execution cache, skip regenerable vendor assets
+/_freeze/site_libs/
