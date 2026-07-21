@@ -24,6 +24,8 @@ library(tidymodels)
 library(tidyverse)
 
 satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
+# Leé el archivo directo desde la web:
+# satisfaccion <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/satisfaccion_democracia.csv")
 
 satisfaccion <- satisfaccion |>
   mutate(
@@ -107,14 +109,14 @@ satisfaccion |>
 ### Pregunta 5: Explorar las nuevas variables
 
 ```{r p5}
-# Proporcion de satisfechos por confianza baja/alta
+# Proporción de satisfechos por confianza baja/alta
 satisfaccion |>
   count(confianza_baja, satisfecho) |>
   group_by(confianza_baja) |>
   mutate(prop = round(n / sum(n), 3)) |>
   filter(satisfecho == "si")
 
-# Proporcion de satisfechos entre jovenes vs. no jovenes
+# Proporción de satisfechos entre jóvenes vs. no jóvenes
 satisfaccion |>
   count(joven, satisfecho) |>
   group_by(joven) |>
@@ -165,7 +167,7 @@ modelo_arbol <- decision_tree() |>
 set.seed(42)
 folds <- vfold_cv(datos_train, v = 5, strata = satisfecho)
 
-# Formula basica
+# Fórmula básica
 formula_basica <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
                                confianza_gobierno + consumo_noticias +
                                participacion_politica + zona
@@ -176,14 +178,14 @@ eval_log <- fit_resamples(
   metrics = metric_set(accuracy),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Logistico")
+  collect_metrics() |> mutate(modelo = "Logístico")
 
 eval_arb <- fit_resamples(
   modelo_arbol, formula_basica, resamples = folds,
   metrics = metric_set(accuracy),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Arbol")
+  collect_metrics() |> mutate(modelo = "Árbol")
 
 bind_rows(eval_log, eval_arb) |>
   select(modelo, .metric, mean, std_err) |>
@@ -195,7 +197,7 @@ bind_rows(eval_log, eval_arb) |>
 ### Pregunta 8: Mejor modelo con fórmula extendida
 
 ```{r p8}
-# Formula extendida
+# Fórmula extendida
 formula_ext <- satisfecho ~ edad + educacion_anos + ingreso_hogar +
                             confianza_gobierno + consumo_noticias +
                             participacion_politica + zona +
@@ -207,13 +209,13 @@ eval_log_ext <- fit_resamples(
   metrics = metric_set(accuracy),
   control = control_resamples(event_level = "second")
 ) |>
-  collect_metrics() |> mutate(modelo = "Logistico (ext)")
+  collect_metrics() |> mutate(modelo = "Logístico (ext)")
 
 # Comparar
-cat("Accuracy formula basica:\n")
+cat("Accuracy fórmula básica:\n")
 eval_log |> select(modelo, mean, std_err)
 
-cat("\nAccuracy formula extendida:\n")
+cat("\nAccuracy fórmula extendida:\n")
 eval_log_ext |> select(modelo, mean, std_err)
 
 cat("\nDiferencia:", round(eval_log_ext$mean - eval_log$mean, 4), "\n")
@@ -226,7 +228,7 @@ cat("\nDiferencia:", round(eval_log_ext$mean - eval_log$mean, 4), "\n")
 ### Pregunta 9: Matriz de confusión
 
 ```{r p9}
-# Ajustar modelo logistico
+# Ajustar modelo logístico
 ajuste <- modelo_logistico |>
   fit(formula_basica, data = datos_train)
 
@@ -235,7 +237,7 @@ pred_test <- ajuste |>
   predict(datos_test) |>
   bind_cols(datos_test)
 
-# Matriz de confusion
+# Matriz de confusión
 mc <- conf_mat(pred_test, truth = satisfecho, estimate = .pred_class)
 mc
 
@@ -283,7 +285,7 @@ roc_data <- pred_probs |>
   roc_curve(truth = satisfecho, .pred_si, event_level = "second")
 
 autoplot(roc_data) +
-  labs(title = "Curva ROC - Modelo logistico para satisfaccion democratica")
+  labs(title = "Curva ROC - Modelo logístico para satisfacción democrática")
 ```
 
 ### Pregunta 12: Coeficientes del modelo

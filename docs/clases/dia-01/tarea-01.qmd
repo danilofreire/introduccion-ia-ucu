@@ -31,6 +31,8 @@ library(tidymodels)
 library(tidyverse)
 
 datos <- read_csv("datos/desarrollo_municipios.csv", show_col_types = FALSE)
+# Leé el archivo directo desde la web:
+# datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/desarrollo_municipios.csv", show_col_types = FALSE)
 
 datos <- datos |>
   mutate(desarrollo_alto = factor(desarrollo_alto, levels = c("no", "si")))
@@ -138,22 +140,26 @@ Calculen precisión y recall (con `event_level = "second"`) para el modelo compl
 
 Calculen precisión y recall para cinco umbrales distintos: 0.2, 0.35, 0.5, 0.65 y 0.8. Presenten los resultados en una tabla. ¿Qué umbral elegirían para el escenario de los subsidios de la pregunta anterior?
 
-Para no copiar y pegar el mismo cálculo cinco veces, usamos `map_df()` del paquete `purrr` (parte de `tidyverse`). `map_df()` toma una lista de valores, aplica la misma función a cada uno y junta todos los resultados en una sola tabla. Acá la lista son los cinco umbrales; por cada umbral `u` recalculamos la clase predicha y medimos precisión y recall. Usen esta estructura y completen las dos líneas marcadas con `___`:
+Para no copiar y pegar el mismo cálculo cinco veces, usamos el mismo patrón del Apéndice 4 del Laboratorio 1: apilamos varias copias de las predicciones con `bind_rows()`, cada una etiquetada con su umbral, y después calculamos las métricas dentro de cada grupo con `group_by()`. Acá son cinco umbrales en lugar de tres. Usen esta estructura y completen las dos líneas marcadas con `___`:
 
 ```r
-umbrales <- c(0.2, 0.35, 0.5, 0.65, 0.8)
-
 # pred_probs: probabilidades del modelo completo (predict(..., type = "prob"))
-tabla_umbrales <- map_df(umbrales, function(u) {
-  pred_probs |>
-    mutate(.pred_u = factor(if_else(.pred_si >= u, "si", "no"),
-                            levels = c("no", "si"))) |>
-    summarise(
-      umbral    = u,
-      precision = ___,   # precision_vec() sobre desarrollo_alto y .pred_u, con event_level = "second"
-      recall    = ___    # lo mismo con recall_vec()
-    )
-})
+tabla_umbrales <- bind_rows(
+  pred_probs |> mutate(umbral = 0.2),
+  pred_probs |> mutate(umbral = 0.35),
+  pred_probs |> mutate(umbral = 0.5),
+  pred_probs |> mutate(umbral = 0.65),
+  pred_probs |> mutate(umbral = 0.8)
+) |>
+  mutate(
+    .pred_u = if_else(.pred_si >= umbral, "si", "no"),
+    .pred_u = factor(.pred_u, levels = c("no", "si"))
+  ) |>
+  group_by(umbral) |>
+  summarise(
+    precision = ___,   # precision_vec() sobre desarrollo_alto y .pred_u, con event_level = "second"
+    recall    = ___    # lo mismo con recall_vec()
+  )
 
 tabla_umbrales
 ```

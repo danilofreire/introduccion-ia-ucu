@@ -24,6 +24,8 @@ library(tidymodels)
 library(tidyverse)
 
 datos <- read_csv("datos/desarrollo_municipios.csv", show_col_types = FALSE)
+# Leé el archivo directo desde la web:
+# datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/desarrollo_municipios.csv", show_col_types = FALSE)
 
 datos <- datos |>
   mutate(desarrollo_alto = factor(desarrollo_alto, levels = c("no", "si")))
@@ -222,20 +224,24 @@ pred_probs <- ajuste_completo |>
   predict(test, type = "prob") |>
   bind_cols(test)
 
-umbrales <- c(0.2, 0.35, 0.5, 0.65, 0.8)
-
-tabla_umbrales <- map_df(umbrales, function(u) {
-  pred_probs |>
-    mutate(.pred_u = factor(if_else(.pred_si >= u, "si", "no"),
-                            levels = c("no", "si"))) |>
-    summarise(
-      umbral    = u,
-      precision = precision_vec(desarrollo_alto, .pred_u,
-                                event_level = "second"),
-      recall    = recall_vec(desarrollo_alto, .pred_u,
-                             event_level = "second")
-    )
-})
+tabla_umbrales <- bind_rows(
+  pred_probs |> mutate(umbral = 0.2),
+  pred_probs |> mutate(umbral = 0.35),
+  pred_probs |> mutate(umbral = 0.5),
+  pred_probs |> mutate(umbral = 0.65),
+  pred_probs |> mutate(umbral = 0.8)
+) |>
+  mutate(
+    .pred_u = if_else(.pred_si >= umbral, "si", "no"),
+    .pred_u = factor(.pred_u, levels = c("no", "si"))
+  ) |>
+  group_by(umbral) |>
+  summarise(
+    precision = precision_vec(desarrollo_alto, .pred_u,
+                              event_level = "second"),
+    recall    = recall_vec(desarrollo_alto, .pred_u,
+                           event_level = "second")
+  )
 
 tabla_umbrales |>
   mutate(across(c(precision, recall), \(x) round(x, 3)))
@@ -266,14 +272,10 @@ pred_probs |>
 Realicen validación cruzada con 10 folds. ¿La accuracy del conjunto de prueba (Pregunta 6) cae dentro de media ± 2 errores estándar?
 
 ```{r p11}
-wf_completo <- workflow() |>
-  add_model(modelo_log) |>
-  add_formula(desarrollo_alto ~ .)
-
 set.seed(123)
 folds10 <- vfold_cv(train, v = 10, strata = desarrollo_alto)
 
-res_cv10 <- fit_resamples(wf_completo, folds10)
+res_cv10 <- fit_resamples(modelo_log, desarrollo_alto ~ ., resamples = folds10)
 collect_metrics(res_cv10)
 
 acc_cv <- collect_metrics(res_cv10) |> filter(.metric == "accuracy")
@@ -296,16 +298,16 @@ tidy(ajuste_completo) |>
   arrange(p.value) |>
   mutate(across(where(is.numeric), \(x) round(x, 4)))
 
-wf_reducido <- workflow() |>
-  add_model(modelo_log) |>
-  add_formula(desarrollo_alto ~ ingreso_promedio + acceso_agua +
-                presupuesto_per_capita + distancia_capital)
+formula_reducida <- desarrollo_alto ~ ingreso_promedio + acceso_agua +
+                      presupuesto_per_capita + distancia_capital
 
 set.seed(123)
 folds5 <- vfold_cv(train, v = 5, strata = desarrollo_alto)
 
-res_completo <- fit_resamples(wf_completo, folds5)
-res_reducido <- fit_resamples(wf_reducido, folds5)
+res_completo <- fit_resamples(modelo_log, desarrollo_alto ~ .,
+                              resamples = folds5)
+res_reducido <- fit_resamples(modelo_log, formula_reducida,
+                              resamples = folds5)
 
 bind_rows(
   collect_metrics(res_completo) |> mutate(modelo = "completo (8)"),

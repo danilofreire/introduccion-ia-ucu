@@ -250,7 +250,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Esta tarea usa un dataset nuevo, <code>satisfaccion_democracia.csv</code>: una encuesta simulada de opinión pública (inspirada en el <a href="https://www.latinobarometro.org/">Latinobarómetro</a>) sobre la satisfacción con la democracia. Es un primer contacto con el tipo de datos que trabajaremos en los laboratorios del Día 2. Las técnicas son las mismas del Laboratorio 2: validación cruzada y comparación de modelos. Respondan cada pregunta escribiendo código R en los bloques indicados. Cuando se pida una respuesta escrita, usen texto normal debajo del bloque de código.</p>
 <p><strong>Para trabajar en esta tarea:</strong></p>
 <ol type="1">
-<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>satisfaccion_democracia.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code></li>
+<li>Descarguen este archivo <code>.qmd</code> y el dataset <code>satisfaccion_democracia.csv</code> de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio completo con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code>. Mantengan el CSV en una subcarpeta <code>datos/</code> junto al <code>.qmd</code></li>
 <li>Necesitan <a href="https://quarto.org/docs/get-started/">Quarto</a> instalado junto con RStudio. Las versiones recientes de RStudio (&gt;= 2022.07) ya incluyen Quarto. Si no lo tienen, instálenlo desde <a href="https://quarto.org/docs/get-started/" class="uri">https://quarto.org/docs/get-started/</a></li>
 <li>Abran este archivo <code>.qmd</code> en RStudio y ejecuten los bloques de código con Ctrl+Enter (o Cmd+Enter en Mac)</li>
 <li>Cuando terminen, pueden renderizar el documento completo con el botón “Render” en RStudio</li>
@@ -262,14 +262,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/satisfaccion_democracia.csv"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">satisfecho =</span> <span class="fu">factor</span>(satisfecho, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>)),</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">zona =</span> <span class="fu">factor</span>(zona),</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">genero =</span> <span class="fu">factor</span>(genero),</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pais =</span> <span class="fu">factor</span>(pais)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Leé el archivo directo desde la web:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># satisfaccion &lt;- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/satisfaccion_democracia.csv")</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">satisfecho =</span> <span class="fu">factor</span>(satisfecho, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"no"</span>, <span class="st">"si"</span>)),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">zona =</span> <span class="fu">factor</span>(zona),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">genero =</span> <span class="fu">factor</span>(genero),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">pais =</span> <span class="fu">factor</span>(pais)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
@@ -279,7 +281,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-resumen-del-dataset"><span class="header-section-number">2.1</span> Pregunta 1: Resumen del dataset</h3>
 <p>Calculen la proporción de satisfechos (<code>"si"</code>) por país. ¿Cuál país tiene la proporción más alta? ¿Cuál tiene la más baja? Muestren los resultados en una tabla ordenada.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
@@ -287,7 +289,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-confianza-y-satisfacción"><span class="header-section-number">2.2</span> Pregunta 2: Confianza y satisfacción</h3>
 <p>Creen un boxplot que muestre la distribución de <code>confianza_gobierno</code> separada por <code>satisfecho</code>. Agreguen <code>labs()</code> con título y etiquetas claras. ¿Qué observan?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
@@ -295,7 +297,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
 <p>Calculen la matriz de correlaciones entre las 4 variables numéricas principales: <code>edad</code>, <code>educacion_anos</code>, <code>ingreso_hogar</code> y <code>confianza_gobierno</code>. ¿Cuáles dos variables tienen la mayor correlación? ¿Es fuerte o débil?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
@@ -312,14 +314,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Muestren las primeras 10 filas de las nuevas variables junto con <code>satisfecho</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="pregunta-5-explorar-las-nuevas-variables" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-explorar-las-nuevas-variables"><span class="header-section-number">3.2</span> Pregunta 5: Explorar las nuevas variables</h3>
 <p>Calculen la proporción de satisfechos entre personas con confianza baja vs.&nbsp;alta, y entre jóvenes vs.&nbsp;no jóvenes. ¿Qué variable parece más útil para predecir la satisfacción?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
@@ -330,7 +332,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-6-división-de-datos"><span class="header-section-number">4.1</span> Pregunta 6: División de datos</h3>
 <p>Dividan los datos en 75% entrenamiento y 25% prueba con <code>set.seed(42)</code> y estratificación por <code>satisfecho</code>. Verifiquen que las proporciones del outcome son similares en ambos conjuntos.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="pregunta-7-dos-modelos-con-fórmula-básica" class="level3" data-number="4.2">
@@ -338,7 +340,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Definan dos modelos (regresión logística y árbol de decisión) y evalúenlos con validación cruzada (5 folds) usando la fórmula: <code>satisfecho ~ edad + educacion_anos + ingreso_hogar + confianza_gobierno + consumo_noticias + participacion_politica + zona</code>. Reporten accuracy para cada uno.</p>
 <p><em>Pista:</em> usen <code>control_resamples(event_level = "second")</code> dentro de <code>fit_resamples()</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
@@ -346,7 +348,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="4.3" class="anchored" data-anchor-id="pregunta-8-mejor-modelo-con-fórmula-extendida"><span class="header-section-number">4.3</span> Pregunta 8: Mejor modelo con fórmula extendida</h3>
 <p>Ahora evaluen el mejor modelo de la pregunta anterior con una fórmula que agregue <code>confianza_baja</code> y <code>ingreso_x_educacion</code>. ¿Mejora la accuracy? ¿Cuánto?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
@@ -357,7 +359,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="5.1" class="anchored" data-anchor-id="pregunta-9-matriz-de-confusión"><span class="header-section-number">5.1</span> Pregunta 9: Matriz de confusión</h3>
 <p>Ajusten el modelo logístico con la fórmula básica en los datos de entrenamiento y generen predicciones sobre el conjunto de prueba. Construyan la matriz de confusión. ¿Cuántos errores comete el modelo en total?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
@@ -365,7 +367,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-precisión-recall-y-auc"><span class="header-section-number">5.2</span> Pregunta 10: Precisión, recall y AUC</h3>
 <p>Calculen precisión, recall y AUC del modelo logístico sobre el conjunto de prueba. Recuerden usar <code>event_level = "second"</code>. ¿Es un buen modelo según el AUC?</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
@@ -373,14 +375,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-curva-roc"><span class="header-section-number">5.3</span> Pregunta 11: Curva ROC</h3>
 <p>Grafiquen la curva ROC del modelo logístico. Agreguen un título al gráfico con <code>labs()</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="pregunta-12-coeficientes-del-modelo" class="level3" data-number="5.4">
 <h3 data-number="5.4" class="anchored" data-anchor-id="pregunta-12-coeficientes-del-modelo"><span class="header-section-number">5.4</span> Pregunta 12: Coeficientes del modelo</h3>
 <p>Usen el modelo logístico para esta pregunta (los coeficientes de un árbol no se interpretan con odds ratios). Extraigan los coeficientes con <code>tidy()</code> y calculen los odds ratios. ¿Cuál variable tiene el efecto más fuerte? ¿Cuál tiene el efecto más débil? Ordenen por p-valor.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su codigo aqui</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
