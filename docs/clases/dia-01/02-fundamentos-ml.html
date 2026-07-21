@@ -1977,6 +1977,120 @@ tendencia_reciente       ← ¿aumenta o baja?</code></pre>
 </div></div>
 </div>
 </section>
+<section id="rsample-dividir-los-datos" class="slide level2">
+<h2>rsample: dividir los datos</h2>
+<div style="margin-top: 30px; font-size: 24px;">
+<div class="columns">
+<div class="column" style="width:48%;">
+<ul>
+<li><span class="alert"><code>initial_split()</code></span> separa los datos en entrenamiento y prueba. Con <code>prop = 0.75</code> dejamos 75% para entrenar</li>
+<li><span class="alert"><code>strata =</code></span> mantiene la misma proporción de clases en ambos conjuntos, algo importante cuando una categoría es poco frecuente</li>
+<li><span class="alert"><code>training()</code></span> y <span class="alert"><code>testing()</code></span> extraen cada parte del objeto que devuelve <code>initial_split()</code></li>
+<li><span class="alert"><code>vfold_cv()</code></span> arma los K folds de validación cruzada, siempre a partir del conjunto de entrenamiento</li>
+<li><span class="alert"><code>set.seed()</code></span> antes de dividir: sin eso, cada ejecución da una división distinta y los resultados no son reproducibles</li>
+</ul>
+</div><div class="column" style="width:52%;">
+<div style="font-size: 24px; margin-top: 20px;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb10-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb10-3"><a></a></span>
+<span id="cb10-4"><a></a><span class="co"># 75% entrenamiento, 25% prueba</span></span>
+<span id="cb10-5"><a></a>datos_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(</span>
+<span id="cb10-6"><a></a>  datos,</span>
+<span id="cb10-7"><a></a>  <span class="at">prop   =</span> <span class="fl">0.75</span>,</span>
+<span id="cb10-8"><a></a>  <span class="at">strata =</span> crecimiento_alto</span>
+<span id="cb10-9"><a></a>)</span>
+<span id="cb10-10"><a></a></span>
+<span id="cb10-11"><a></a>datos_train <span class="ot">&lt;-</span> <span class="fu">training</span>(datos_split)</span>
+<span id="cb10-12"><a></a>datos_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(datos_split)</span>
+<span id="cb10-13"><a></a></span>
+<span id="cb10-14"><a></a><span class="co"># 5 folds para validación cruzada</span></span>
+<span id="cb10-15"><a></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(</span>
+<span id="cb10-16"><a></a>  datos_train,</span>
+<span id="cb10-17"><a></a>  <span class="at">v      =</span> <span class="dv">5</span>,</span>
+<span id="cb10-18"><a></a>  <span class="at">strata =</span> crecimiento_alto</span>
+<span id="cb10-19"><a></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div></div>
+</div>
+</section>
+<section id="parsnip-especificar-y-ajustar-el-modelo" class="slide level2">
+<h2>parsnip: especificar y ajustar el modelo</h2>
+<div style="margin-top: 30px; font-size: 22px;">
+<div class="columns">
+<div class="column" style="width:48%;">
+<p>Todo modelo se define con <span class="alert">tres verbos</span>:</p>
+<ul>
+<li>El <span class="alert">tipo de modelo</span>: <code>logistic_reg()</code>, <code>decision_tree()</code>, <code>rand_forest()</code>, <code>linear_reg()</code></li>
+<li><span class="alert"><code>set_engine()</code></span>: qué paquete de R hace el cálculo por detrás (<code>glm</code>, <code>rpart</code>, <code>ranger</code>)</li>
+<li><span class="alert"><code>set_mode()</code></span>: <code>&quot;classification&quot;</code> o <code>&quot;regression&quot;</code></li>
+</ul>
+<p>Después:</p>
+<ul>
+<li><span class="alert"><code>fit()</code></span> ajusta el modelo con los datos de entrenamiento</li>
+<li>La fórmula <code>y ~ .</code> significa “predecir <code>y</code> con todas las demás variables”</li>
+<li>La ventaja: cambiar de modelo es <span class="alert">cambiar dos líneas</span>, no reescribir el análisis</li>
+</ul>
+</div><div class="column" style="width:52%;">
+<div style="font-size: 23px; margin-top: 30px;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a><span class="co"># Regresión logística</span></span>
+<span id="cb11-2"><a></a>modelo_log <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;glm&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-4"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span>
+<span id="cb11-5"><a></a></span>
+<span id="cb11-6"><a></a><span class="co"># Árbol de decisión: mismo patrón,</span></span>
+<span id="cb11-7"><a></a><span class="co"># solo cambian el tipo y el motor</span></span>
+<span id="cb11-8"><a></a>modelo_arbol <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>() <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a></a>  <span class="fu">set_engine</span>(<span class="st">&quot;rpart&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-10"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span>
+<span id="cb11-11"><a></a></span>
+<span id="cb11-12"><a></a><span class="co"># Ajustar con los datos de entrenamiento</span></span>
+<span id="cb11-13"><a></a>ajuste <span class="ot">&lt;-</span> modelo_log <span class="sc">|&gt;</span></span>
+<span id="cb11-14"><a></a>  <span class="fu">fit</span>(crecimiento_alto <span class="sc">~</span> .,</span>
+<span id="cb11-15"><a></a>      <span class="at">data =</span> datos_train)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Especificar el modelo y ajustarlo son <span class="alert">pasos separados</span>: podemos definir varios modelos y recién después decidir cuáles ajustar. La lista de modelos está en <a href="https://www.tidymodels.org/find/parsnip/" class="uri">https://www.tidymodels.org/find/parsnip/</a></p>
+</div></div>
+</div>
+</section>
+<section id="yardstick-evaluar-el-modelo" class="slide level2">
+<h2>yardstick: evaluar el modelo</h2>
+<div style="margin-top: 30px; font-size: 23px;">
+<div class="columns">
+<div class="column" style="width:48%;">
+<ul>
+<li><span class="alert"><code>augment()</code></span> agrega las predicciones (clase y probabilidades) al conjunto de prueba en una sola línea</li>
+<li><span class="alert"><code>conf_mat()</code></span> arma la matriz de confusión que vimos antes</li>
+<li><span class="alert"><code>metric_set()</code></span> junta varias métricas. En los labs usamos <code>precision</code>, <code>recall</code> y <code>roc_auc</code> en lugar de accuracy</li>
+<li><span class="alert"><code>event_level = &quot;second&quot;</code></span> le indica cuál es la clase positiva, porque R ordena los niveles alfabéticamente y deja <code>&quot;si&quot;</code> en segundo lugar</li>
+<li>Para la versión con validación cruzada: <span class="alert"><code>fit_resamples()</code></span> entrena sobre los folds y <span class="alert"><code>collect_metrics()</code></span> promedia los resultados</li>
+</ul>
+</div><div class="column" style="width:52%;">
+<div style="font-size: 22px; margin-top: 20px;">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="co"># Predicciones sobre el test set</span></span>
+<span id="cb12-2"><a></a>pred_test <span class="ot">&lt;-</span> ajuste <span class="sc">|&gt;</span> <span class="fu">augment</span>(datos_test)</span>
+<span id="cb12-3"><a></a></span>
+<span id="cb12-4"><a></a><span class="fu">conf_mat</span>(pred_test,</span>
+<span id="cb12-5"><a></a>         <span class="at">truth    =</span> crecimiento_alto,</span>
+<span id="cb12-6"><a></a>         <span class="at">estimate =</span> .pred_class)</span>
+<span id="cb12-7"><a></a></span>
+<span id="cb12-8"><a></a><span class="co"># La misma evaluación, pero con</span></span>
+<span id="cb12-9"><a></a><span class="co"># validación cruzada sobre los folds</span></span>
+<span id="cb12-10"><a></a><span class="fu">fit_resamples</span>(</span>
+<span id="cb12-11"><a></a>  modelo_log,</span>
+<span id="cb12-12"><a></a>  crecimiento_alto <span class="sc">~</span> .,</span>
+<span id="cb12-13"><a></a>  <span class="at">resamples =</span> folds,</span>
+<span id="cb12-14"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(precision,</span>
+<span id="cb12-15"><a></a>                       recall, roc_auc),</span>
+<span id="cb12-16"><a></a>  <span class="at">control =</span> <span class="fu">control_resamples</span>(</span>
+<span id="cb12-17"><a></a>    <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span>
+<span id="cb12-18"><a></a>) <span class="sc">|&gt;</span></span>
+<span id="cb12-19"><a></a>  <span class="fu">collect_metrics</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Hoy pasamos la fórmula directamente a <code>fit()</code>. <span class="alert">Mañana</span> la vamos a reemplazar por <code>recipe()</code> + <code>workflow()</code>, pero el esqueleto sigue siendo este</p>
+</div></div>
+</div>
+</section>
 <section id="resumen-de-la-sesión" class="slide level2">
 <h2>Resumen de la sesión</h2>
 <div style="margin-top: 30px; font-size: 27px;">

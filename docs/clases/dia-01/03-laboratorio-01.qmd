@@ -187,7 +187,7 @@ datos |>
 
 ## Ejercicio 1: Exploración {#sec:exercise01}
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 
 **Instrucciones:** Antes de continuar, exploren los datos ustedes mismos
 
@@ -196,14 +196,23 @@ datos |>
 3. ¿Cómo se distribuye cada variable numérica?
 4. ¿Hay correlaciones fuertes entre las variables?
 
-```{r ej1-solucion, eval=FALSE, prompt=FALSE}
-# Sugerencias de código:
-dim(datos)                    # Dimensiones
-sum(is.na(datos))             # Total de NAs
-cor(datos |> select(where(is.numeric)))  # Correlaciones
-```
+[Pista:]{.alert} estos comandos les sirven para las cuatro preguntas. [¡Tómense unos minutos para explorar!]{.alert} 🤓
 
-[¡Tómense unos minutos para explorar!]{.alert}
+:::{style="font-size: 18px;"}
+```{r ej1-solucion, eval=FALSE, prompt=FALSE, echo=TRUE}
+dim(datos)              # 1. filas y columnas
+glimpse(datos)          #    tipo de cada variable
+
+sum(is.na(datos))       # 2. total de valores faltantes
+colSums(is.na(datos))   #    faltantes por columna
+
+datos |>                # 3. mínimo, mediana, máximo de cada variable
+  select(where(is.numeric)) |> summary()
+
+datos |>                # 4. correlaciones entre predictores
+  select(where(is.numeric)) |> cor() |> round(2)
+```
+:::
 
 [[Apéndice 1: Solución]{.button}](#sec:appendix01)
 :::
@@ -392,19 +401,19 @@ conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
 
 ## Métricas de evaluación
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r lab-metricas-adicionales, prompt=FALSE, echo=TRUE}
 # Conjunto completo de métricas
 predicciones |>
   conf_mat(truth = crecimiento_alto, estimate = .pred_class) |>
-  summary()
+  summary(event_level = "second")
 ```
 
-[¡Observen las diferentes métricas y piensen cuál es más relevante para este problema!]{.alert} 🤓
+[Recordatorio:]{.alert} `accuracy` = de todas las predicciones, cuántas acertó; `precision` (también aparece como `ppv`) = de las que predijo "sí", cuántas eran "sí"; `recall` (también `sens`) = de los "sí" reales, cuántos detectó. [¿Cuál de las tres les parece más relevante para este problema?]{.alert} 🤓
 :::
 
-## Ejercicio 3: Interpretación {#sec:exercise03}
+## Ejercicio 2: Interpretación {#sec:exercise02}
 
 :::{style="margin-top: 30px; font-size: 26px;"}
 
@@ -423,7 +432,7 @@ predicciones |>
 
 # Parte 4: Más allá de la clasificación binaria {background-color="#2d4563"}
 
-## Probabilidades y umbral (demo) {#sec:exercise04}
+## Probabilidades y umbral {#sec:exercise04}
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
@@ -446,7 +455,7 @@ pred_probs |> select(crecimiento_alto, .pred_no, .pred_si) |> head(5)
 [[Apéndice 3: Predicciones inciertas]{.button}](#sec:appendix03) · [[Apéndice 4: Comparación completa]{.button}](#sec:appendix04)
 :::
 
-## Curva ROC y AUC (demo) {#sec:exercise07}
+## Curva ROC y AUC {#sec:exercise07}
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
@@ -611,7 +620,7 @@ predicciones |>
 :::
 :::
 
-[[Volver al ejercicio]{.button}](#sec:exercise03)
+[[Volver al ejercicio]{.button}](#sec:exercise02)
 :::
 
 ## Apéndice 3: Probabilidades {#sec:appendix03}
@@ -641,19 +650,27 @@ pred_probs |>
 :::{style="margin-top: 20px; font-size: 21px;"}
 
 ```{r ap5-sol, prompt=FALSE, echo=TRUE, eval=TRUE}
-# Comparar precisión y recall para tres umbrales
-purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
-  pred_probs |>
-    mutate(.pred_u = factor(
-      dplyr::if_else(.pred_si >= u, "si", "no"),
-      levels = c("no", "si")
-    )) |>
-    summarise(
-      umbral    = u,
-      precision = precision_vec(crecimiento_alto, .pred_u, event_level = "second"),
-      recall    = recall_vec(crecimiento_alto, .pred_u, event_level = "second")
-    )
-})
+# 1. Tres copias de las predicciones, cada una con su umbral
+pred_umbrales <- bind_rows(
+  pred_probs |> mutate(umbral = 0.3),
+  pred_probs |> mutate(umbral = 0.5),
+  pred_probs |> mutate(umbral = 0.7)
+) |>
+  # 2. Clasificar como "si" si la probabilidad supera el umbral de esa copia
+  mutate(
+    clase_predicha = if_else(.pred_si >= umbral, "si", "no"),
+    clase_predicha = factor(clase_predicha, levels = c("no", "si"))
+  )
+
+# 3. Calcular precisión y recall dentro de cada umbral
+pred_umbrales |>
+  group_by(umbral) |>
+  summarise(
+    precision = precision_vec(crecimiento_alto, clase_predicha,
+                              event_level = "second"),
+    recall = recall_vec(crecimiento_alto, clase_predicha,
+                        event_level = "second")
+  )
 ```
 
 | Umbral | Precisión | Recall | Interpretación |

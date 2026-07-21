@@ -40,9 +40,9 @@ glimpse(datos)
 
 # --- Dividir los datos (75/25) ---------------------------------
 
-division    <- initial_split(datos, prop = 0.75)
-datos_train <- training(division)
-datos_test  <- testing(division)
+datos_split <- initial_split(datos, prop = 0.75)
+datos_train <- training(datos_split)
+datos_test  <- testing(datos_split)
 
 cat("Train:", nrow(datos_train), "obs | Test:", nrow(datos_test), "obs\n")
 

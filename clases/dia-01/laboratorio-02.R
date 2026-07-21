@@ -165,6 +165,15 @@ formula_basica <- crecimiento_alto ~ gasto_educacion + acceso_internet +
 
 # Validación cruzada en 5 folds. Usamos precision, recall y roc_auc en
 # lugar de accuracy: con clases desbalanceadas, accuracy puede engañar.
+#
+# control_resamples(event_level = "second") indica que la clase positiva
+# es "si". R ordena los niveles alfabéticamente y pone "no" primero, así
+# que sin esto precision y recall se calcularían sobre los países sin
+# crecimiento alto.
+#
+# En el resultado, .metric guarda el nombre de cada métrica y mean /
+# std_err sus valores entre folds. El punto inicial marca las columnas
+# que crea tidymodels, igual que en .pred_class.
 eval_logistico <- fit_resamples(
   modelo_logistico, formula_basica,
   resamples = folds,

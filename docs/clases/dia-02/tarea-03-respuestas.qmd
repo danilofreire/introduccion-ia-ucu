@@ -41,9 +41,9 @@ datos <- datos |>
   )
 
 # División train/test (reutilizada en varias preguntas)
-division <- initial_split(datos, prop = 0.75, strata = voto)
-datos_train <- training(division)
-datos_test <- testing(division)
+datos_split <- initial_split(datos, prop = 0.75, strata = voto)
+datos_train <- training(datos_split)
+datos_test <- testing(datos_split)
 
 # Receta estándar (reutilizada en varias preguntas)
 receta <- recipe(voto ~ edad + educacion_anios + ingreso_hogar + zona +

@@ -119,7 +119,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ```{r lab2-setup, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
 # Cargar paquetes
-# install.packages("tidymodels", "tidyverse") # Instalar si es necesario
+# install.packages("tidymodels", "tidyverse", "rpart") # Instalar si es necesario
 library(tidymodels)
 library(tidyverse)
 library(rpart) # Para el motor de árbol de decisión
@@ -241,7 +241,7 @@ cor(datos$acceso_internet, datos$urbanizacion)
 
 ## Preparar los datos
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
 Convertimos la variable objetivo a factor y descartamos las columnas que no usaremos como predictores. [`pais`]{.alert} tiene 179 valores únicos y [`continente`]{.alert} la dejamos fuera para quedarnos con predictores numéricos, igual que en el lab 1.
 
@@ -348,7 +348,7 @@ Con 179 países y 5 folds, cada partición tiene pocos países en validación. E
 
 ## Definir los modelos a comparar
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 Vamos a comparar dos modelos de naturaleza distinta: uno lineal y uno no lineal
 
@@ -364,7 +364,9 @@ modelo_arbol <- decision_tree() |>
   set_mode("classification")
 ```
 
-La [misma sintaxis]{.alert} sirve para ambos: esa es la ventaja de `parsnip`. Otros motores (`kknn`, `ranger`, `xgboost`) funcionan igual cambiando solo `set_engine()`
+La [misma sintaxis]{.alert} sirve para ambos: esa es la ventaja de `parsnip`. Otros motores (`kknn`, `ranger`, `xgboost`) funcionan igual cambiando solo `set_engine()` 
+
+Una vez más, la lista de modelos disponibles está en <https://www.tidymodels.org/find/parsnip/>
 :::
 
 ## Crear una fórmula
@@ -405,7 +407,9 @@ eval_logistico
 
 - `fit_resamples()` ajusta el modelo en cada fold de la validación cruzada
 - `collect_metrics()` devuelve la media y el error estándar de cada métrica entre folds
+- `control = control_resamples(event_level = "second")` indica que la clase positiva es [`"si"`]{.alert}
 - Usamos [precision, recall y roc_auc]{.alert} en lugar de accuracy: con clases desbalanceadas, la accuracy puede ser engañosa
+- En el resultado, [`.metric`]{.alert} guarda el nombre de cada métrica (`precision`, `recall`, `roc_auc`) y `mean` y `std_err` 
 :::
 
 ## Evaluar el árbol y comparar {#sec:evaluar-todos}
@@ -459,14 +463,13 @@ bind_rows(eval_logistico, eval_log_ext) |>
   pivot_wider(names_from = .metric, values_from = c(mean, std_err))
 ```
 
-- En este ejemplo, [`alto_desempleo`]{.alert} cambia las métricas del logístico apenas unas milésimas, dentro del error estándar
-- En el [Ejercicio 3]{.alert} van a repetir esto con los dos modelos y su propia variable
-- La lección: no todo feature engineering mejora el modelo. Cuando el predictor original ya capta la información, agregarle un recorte categórico es redundante. Hay que [medirlo]{.alert}, no asumirlo
+- En este ejemplo, [`alto_desempleo`]{.alert} cambia las métricas del logístico apenas unas milésimas
+- Una lección: no todo feature engineering mejora el modelo. Cuando el predictor original ya capta la información, agregarle un recorte categórico es redundante. Hay que [medirlo]{.alert}, no asumirlo
 :::
 
 ## Ejercicio 3: ¿Ayuda el feature engineering? {#sec:exercise03}
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 
 **Tarea:** Agreguen un feature a la fórmula y re-evalúen: la variable que crearon en el [Ejercicio 2]{.alert}, o una [interacción]{.alert} entre dos variables (como en el ejemplo)
 
@@ -520,8 +523,8 @@ ajuste_final <- modelo_logistico |>
 pred_test <- ajuste_final |> augment(datos_test)
 
 # Métricas finales (las mismas que usamos en validación cruzada)
-pred_test |> precision(truth = crecimiento_alto, estimate = .pred_class, event_level = "second")
-pred_test |> recall(truth = crecimiento_alto, estimate = .pred_class, event_level = "second")
+pred_test |> precision(truth = crecimiento_alto, .pred_class, event_level = "second")
+pred_test |> recall(truth = crecimiento_alto, .pred_class, event_level = "second")
 pred_test |> roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
 ```
 
@@ -600,7 +603,7 @@ Hay una [tarea para las dos sesiones]{.alert} con preguntas prácticas que aplic
 
 - Sesiones 2.3 y 2.4: Laboratorios con datos de Latinobarómetro
 
-**Para profundizar (todo gratis):** [Tidy Modeling with R](https://www.tmwr.org/) · [R for Data Science](https://r4ds.hadley.nz/) · [Get Started with tidymodels](https://www.tidymodels.org/start/)
+**Para profundizar (todo gratis):** [Tidy Modeling with R](https://www.tmwr.org/) -- [R for Data Science](https://r4ds.hadley.nz/) -- [Get Started with tidymodels](https://www.tidymodels.org/start/)
 
 [¡Descansen y vengan con energía mañana!]{.alert} 😄
 :::

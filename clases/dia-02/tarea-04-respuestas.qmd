@@ -101,9 +101,9 @@ Dividan 80/20 con `set.seed(2026)` y creen la receta (sin `escuela`, dummies, no
 
 ```{r p4}
 set.seed(2026)
-division <- initial_split(datos, prop = 0.8)
-datos_train <- training(division)
-datos_test  <- testing(division)
+datos_split <- initial_split(datos, prop = 0.8)
+datos_train <- training(datos_split)
+datos_test  <- testing(datos_split)
 
 receta <- recipe(puntaje_prueba ~ ., data = datos_train) |>
   step_rm(escuela) |>

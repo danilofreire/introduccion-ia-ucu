@@ -311,6 +311,37 @@ receta <- recipe(voto ~ ., data = datos_train) |>
 ```
 :::
 
+## Una receta es un plan, no los datos
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=50%}
+- `recipe()` [no transforma nada todavía]{.alert}: guarda la lista de pasos para ejecutarla después
+- [`prep()`]{.alert} calcula con los datos de entrenamiento los valores que cada paso necesita: medianas para imputar, medias y desvíos para normalizar
+- [`juice()`]{.alert} devuelve el conjunto de entrenamiento ya transformado
+- [`bake()`]{.alert} aplica esa misma receta a datos nuevos, con los valores aprendidos del entrenamiento
+- Separar el plan de su ejecución es lo que [evita el data leakage]{.alert}: el test set nunca influye en las medianas ni en los desvíos
+:::
+
+:::{.column width=50%}
+:::{style="font-size: 20px;"}
+```r
+# Inspeccionar el resultado de la receta
+receta |>
+  prep() |>
+  juice() |>
+  glimpse()
+
+# Aplicar la receta a datos nuevos
+bake(prep(receta), new_data = datos_test)
+```
+:::
+
+Dentro de un `workflow()` esto pasa [automáticamente]{.alert}. Usamos `prep()` y `juice()` solo para revisar que la receta haya hecho lo que esperábamos
+:::
+:::
+:::
+
 ## El flujo completo: `workflow()`
 
 :::{style="margin-top: 30px; font-size: 24px;"}

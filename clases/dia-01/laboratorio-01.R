@@ -45,8 +45,8 @@ datos |>
 # 3. ¿Cómo se distribuye cada variable numérica?
 # 4. ¿Hay correlaciones fuertes entre las variables?
 #
-# Pistas: dim(), nrow(), ncol(), sum(is.na()), colSums(is.na()),
-#         summary(), cor(), select(where(is.numeric))
+# Pistas: dim(), glimpse(), nrow(), ncol(), sum(is.na()),
+#         colSums(is.na()), summary(), cor(), select(where(is.numeric))
 
 
 # --- Parte 2: Preprocesamiento y división --------------------
@@ -115,10 +115,30 @@ predicciones |>
 # Matriz de confusión
 conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
 
-# Conjunto completo de métricas
+# Conjunto completo de métricas.
+# event_level = "second" hace que precision y recall se calculen
+# tomando "si" como clase positiva (sin esto, se usa "no").
+#
+# Recordatorio:
+# - accuracy:        de todas las predicciones, cuántas acertó
+# - precision (ppv): de las que predijo "si", cuántas eran "si"
+# - recall (sens):   de los "si" reales, cuántos detectó
 predicciones |>
   conf_mat(truth = crecimiento_alto, estimate = .pred_class) |>
-  summary()
+  summary(event_level = "second")
+
+
+# --- Ejercicio 2: Interpretación ------------------------------
+#
+# Discutan en grupos de 2-3 personas durante 3-5 minutos:
+#
+# 1. ¿El modelo tiene mejor precisión o mejor recall?
+# 2. ¿Qué significa eso en términos prácticos?
+#    - Si predecimos "crecimiento alto" cuando no lo es, ¿qué pasa?
+#    - Si no detectamos un caso de crecimiento alto, ¿qué pasa?
+# 3. ¿Qué métrica priorizarían ustedes y por qué?
+#
+# La reflexión completa está en el Apéndice 2.
 
 
 # --- Parte 4: Más allá de la clasificación binaria -----------
@@ -207,18 +227,28 @@ pred_probs |>
 # Para cada umbral, recalculamos la clase predicha y medimos:
 # - umbral bajo  -> recall alto, precisión baja
 # - umbral alto  -> precisión alta, recall bajo
-purrr::map_df(c(0.3, 0.5, 0.7), function(u) {
-  pred_probs |>
-    mutate(.pred_u = factor(
-      dplyr::if_else(.pred_si >= u, "si", "no"),
-      levels = c("no", "si")
-    )) |>
-    summarise(
-      umbral    = u,
-      precision = precision_vec(crecimiento_alto, .pred_u, event_level = "second"),
-      recall    = recall_vec(crecimiento_alto, .pred_u, event_level = "second")
-    )
-})
+
+# 1. Tres copias de las predicciones, cada una con su umbral
+pred_umbrales <- bind_rows(
+  pred_probs |> mutate(umbral = 0.3),
+  pred_probs |> mutate(umbral = 0.5),
+  pred_probs |> mutate(umbral = 0.7)
+) |>
+  # 2. Clasificar como "si" si la probabilidad supera el umbral de esa copia
+  mutate(
+    clase_predicha = if_else(.pred_si >= umbral, "si", "no"),
+    clase_predicha = factor(clase_predicha, levels = c("no", "si"))
+  )
+
+# 3. Calcular precisión y recall dentro de cada umbral
+pred_umbrales |>
+  group_by(umbral) |>
+  summarise(
+    precision = precision_vec(crecimiento_alto, clase_predicha,
+                              event_level = "second"),
+    recall = recall_vec(crecimiento_alto, clase_predicha,
+                        event_level = "second")
+  )
 
 
 # --- Apéndice 5: Validación cruzada --------------------------

@@ -185,10 +185,10 @@ datos |> count(voto) |> mutate(proporcion = n / sum(n))
 # initial_split(): divide los datos aleatoriamente en train y test
 # prop = 0.75: 75% para entrenamiento, 25% para test
 # strata = voto: estratificar para mantener la proporción de clases
-division <- initial_split(datos, prop = 0.75, strata = voto)
+datos_split <- initial_split(datos, prop = 0.75, strata = voto)
 
-datos_train <- training(division)
-datos_test <- testing(division)
+datos_train <- training(datos_split)
+datos_test <- testing(datos_split)
 
 # Verificar proporciones
 cat("Proporción en train:\n")

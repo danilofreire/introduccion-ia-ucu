@@ -53,9 +53,9 @@ glimpse(datos)
 datos |> count(voto) |> mutate(proporcion = n / sum(n))
 
 # División train/test estratificada
-division <- initial_split(datos, prop = 0.75, strata = voto)
-datos_train <- training(division)
-datos_test  <- testing(division)
+datos_split <- initial_split(datos, prop = 0.75, strata = voto)
+datos_train <- training(datos_split)
+datos_test  <- testing(datos_split)
 
 # Verificar proporciones
 cat("Proporción en train:\n")

@@ -704,6 +704,132 @@ predicciones <- predict(ajuste,
 :::
 :::
 
+## rsample: dividir los datos
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=48%}
+- [`initial_split()`]{.alert} separa los datos en entrenamiento y prueba. Con `prop = 0.75` dejamos 75% para entrenar
+- [`strata =`]{.alert} mantiene la misma proporción de clases en ambos conjuntos, algo importante cuando una categoría es poco frecuente
+- [`training()`]{.alert} y [`testing()`]{.alert} extraen cada parte del objeto que devuelve `initial_split()`
+- [`vfold_cv()`]{.alert} arma los K folds de validación cruzada, siempre a partir del conjunto de entrenamiento
+- [`set.seed()`]{.alert} antes de dividir: sin eso, cada ejecución da una división distinta y los resultados no son reproducibles
+:::
+
+:::{.column width=52%}
+:::{style="font-size: 24px; margin-top: 20px;"}
+```r
+library(tidymodels)
+set.seed(2026)
+
+# 75% entrenamiento, 25% prueba
+datos_split <- initial_split(
+  datos,
+  prop   = 0.75,
+  strata = crecimiento_alto
+)
+
+datos_train <- training(datos_split)
+datos_test  <- testing(datos_split)
+
+# 5 folds para validación cruzada
+folds <- vfold_cv(
+  datos_train,
+  v      = 5,
+  strata = crecimiento_alto
+)
+```
+:::
+:::
+:::
+:::
+
+## parsnip: especificar y ajustar el modelo
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=48%}
+Todo modelo se define con [tres verbos]{.alert}:
+
+- El [tipo de modelo]{.alert}: `logistic_reg()`, `decision_tree()`, `rand_forest()`, `linear_reg()`
+- [`set_engine()`]{.alert}: qué paquete de R hace el cálculo por detrás (`glm`, `rpart`, `ranger`)
+- [`set_mode()`]{.alert}: `"classification"` o `"regression"`
+
+Después:
+
+- [`fit()`]{.alert} ajusta el modelo con los datos de entrenamiento
+- La fórmula `y ~ .` significa "predecir `y` con todas las demás variables"
+- La ventaja: cambiar de modelo es [cambiar dos líneas]{.alert}, no reescribir el análisis
+:::
+
+:::{.column width=52%}
+:::{style="font-size: 23px; margin-top: 30px;"}
+```r
+# Regresión logística
+modelo_log <- logistic_reg() |>
+  set_engine("glm") |>
+  set_mode("classification")
+
+# Árbol de decisión: mismo patrón,
+# solo cambian el tipo y el motor
+modelo_arbol <- decision_tree() |>
+  set_engine("rpart") |>
+  set_mode("classification")
+
+# Ajustar con los datos de entrenamiento
+ajuste <- modelo_log |>
+  fit(crecimiento_alto ~ .,
+      data = datos_train)
+```
+:::
+
+Especificar el modelo y ajustarlo son [pasos separados]{.alert}: podemos definir varios modelos y recién después decidir cuáles ajustar. La lista de modelos está en <https://www.tidymodels.org/find/parsnip/>
+:::
+:::
+:::
+
+## yardstick: evaluar el modelo
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=48%}
+- [`augment()`]{.alert} agrega las predicciones (clase y probabilidades) al conjunto de prueba en una sola línea
+- [`conf_mat()`]{.alert} arma la matriz de confusión que vimos antes
+- [`metric_set()`]{.alert} junta varias métricas. En los labs usamos `precision`, `recall` y `roc_auc` en lugar de accuracy
+- [`event_level = "second"`]{.alert} le indica cuál es la clase positiva, porque R ordena los niveles alfabéticamente y deja `"si"` en segundo lugar
+- Para la versión con validación cruzada: [`fit_resamples()`]{.alert} entrena sobre los folds y [`collect_metrics()`]{.alert} promedia los resultados
+:::
+
+:::{.column width=52%}
+:::{style="font-size: 22px; margin-top: 20px;"}
+```r
+# Predicciones sobre el test set
+pred_test <- ajuste |> augment(datos_test)
+
+conf_mat(pred_test,
+         truth    = crecimiento_alto,
+         estimate = .pred_class)
+
+# La misma evaluación, pero con
+# validación cruzada sobre los folds
+fit_resamples(
+  modelo_log,
+  crecimiento_alto ~ .,
+  resamples = folds,
+  metrics = metric_set(precision,
+                       recall, roc_auc),
+  control = control_resamples(
+    event_level = "second")
+) |>
+  collect_metrics()
+```
+:::
+
+Hoy pasamos la fórmula directamente a `fit()`. [Mañana]{.alert} la vamos a reemplazar por `recipe()` + `workflow()`, pero el esqueleto sigue siendo este
+:::
+:::
+:::
+
 ## Resumen de la sesión
 
 :::{style="margin-top: 30px; font-size: 27px;"}

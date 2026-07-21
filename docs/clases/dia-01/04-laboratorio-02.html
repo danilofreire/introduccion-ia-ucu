@@ -1359,7 +1359,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a><span class="co"># Cargar paquetes</span></span>
-<span id="cb1-2"><a></a><span class="co"># install.packages(&quot;tidymodels&quot;, &quot;tidyverse&quot;) # Instalar si es necesario</span></span>
+<span id="cb1-2"><a></a><span class="co"># install.packages(&quot;tidymodels&quot;, &quot;tidyverse&quot;, &quot;rpart&quot;) # Instalar si es necesario</span></span>
 <span id="cb1-3"><a></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb1-4"><a></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-5"><a></a><span class="fu">library</span>(rpart) <span class="co"># Para el motor de árbol de decisión</span></span>
@@ -1568,7 +1568,7 @@ $ crecimiento_alto        &lt;chr&gt; &quot;si&quot;, &quot;si&quot;, &quot;no&q
 </section>
 <section id="preparar-los-datos" class="slide level2">
 <h2>Preparar los datos</h2>
-<div style="margin-top: 30px; font-size: 22px;">
+<div style="margin-top: 30px; font-size: 20px;">
 <p>Convertimos la variable objetivo a factor y descartamos las columnas que no usaremos como predictores. <span class="alert"><code>pais</code></span> tiene 179 valores únicos y <span class="alert"><code>continente</code></span> la dejamos fuera para quedarnos con predictores numéricos, igual que en el lab 1.</p>
 <p>Creamos un nuevo objeto <span class="alert"><code>datos_modelo</code></span> y mantenemos <code>datos</code> intacto para los apéndices y la exploración:</p>
 <div class="cell" data-layout-align="center">
@@ -1694,7 +1694,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </section>
 <section id="definir-los-modelos-a-comparar" class="slide level2">
 <h2>Definir los modelos a comparar</h2>
-<div style="margin-top: 30px; font-size: 22px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <p>Vamos a comparar dos modelos de naturaleza distinta: uno lineal y uno no lineal</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a></a><span class="co"># 1. Regresión logística (lineal)</span></span>
@@ -1708,6 +1708,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <span id="cb17-9"><a></a>  <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>La <span class="alert">misma sintaxis</span> sirve para ambos: esa es la ventaja de <code>parsnip</code>. Otros motores (<code>kknn</code>, <code>ranger</code>, <code>xgboost</code>) funcionan igual cambiando solo <code>set_engine()</code></p>
+<p>Una vez más, la lista de modelos disponibles está en <a href="https://www.tidymodels.org/find/parsnip/" class="uri">https://www.tidymodels.org/find/parsnip/</a></p>
 </div>
 </section>
 <section id="crear-una-fórmula" class="slide level2">
@@ -1751,7 +1752,9 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <ul>
 <li><code>fit_resamples()</code> ajusta el modelo en cada fold de la validación cruzada</li>
 <li><code>collect_metrics()</code> devuelve la media y el error estándar de cada métrica entre folds</li>
+<li><code>control = control_resamples(event_level = &quot;second&quot;)</code> indica que la clase positiva es <span class="alert"><code>&quot;si&quot;</code></span></li>
 <li>Usamos <span class="alert">precision, recall y roc_auc</span> en lugar de accuracy: con clases desbalanceadas, la accuracy puede ser engañosa</li>
+<li>En el resultado, <span class="alert"><code>.metric</code></span> guarda el nombre de cada métrica (<code>precision</code>, <code>recall</code>, <code>roc_auc</code>) y <code>mean</code> y <code>std_err</code></li>
 </ul>
 </div>
 </section>
@@ -1817,15 +1820,14 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </div>
 </div>
 <ul>
-<li>En este ejemplo, <span class="alert"><code>alto_desempleo</code></span> cambia las métricas del logístico apenas unas milésimas, dentro del error estándar</li>
-<li>En el <span class="alert">Ejercicio 3</span> van a repetir esto con los dos modelos y su propia variable</li>
-<li>La lección: no todo feature engineering mejora el modelo. Cuando el predictor original ya capta la información, agregarle un recorte categórico es redundante. Hay que <span class="alert">medirlo</span>, no asumirlo</li>
+<li>En este ejemplo, <span class="alert"><code>alto_desempleo</code></span> cambia las métricas del logístico apenas unas milésimas</li>
+<li>Una lección: no todo feature engineering mejora el modelo. Cuando el predictor original ya capta la información, agregarle un recorte categórico es redundante. Hay que <span class="alert">medirlo</span>, no asumirlo</li>
 </ul>
 </div>
 </section>
 <section id="sec:exercise03" class="slide level2 scrollable">
 <h2>Ejercicio 3: ¿Ayuda el feature engineering?</h2>
-<div style="margin-top: 30px; font-size: 24px;">
+<div style="margin-top: 30px; font-size: 22px;">
 <p><strong>Tarea:</strong> Agreguen un feature a la fórmula y re-evalúen: la variable que crearon en el <span class="alert">Ejercicio 2</span>, o una <span class="alert">interacción</span> entre dos variables (como en el ejemplo)</p>
 <ol type="1">
 <li>¿Mejora la regresión logística? ¿Y el árbol?</li>
@@ -1874,14 +1876,14 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <span id="cb26-7"><a></a>pred_test <span class="ot">&lt;-</span> ajuste_final <span class="sc">|&gt;</span> <span class="fu">augment</span>(datos_test)</span>
 <span id="cb26-8"><a></a></span>
 <span id="cb26-9"><a></a><span class="co"># Métricas finales (las mismas que usamos en validación cruzada)</span></span>
-<span id="cb26-10"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb26-10"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">precision</span>(<span class="at">truth =</span> crecimiento_alto, .pred_class, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric   .estimator .estimate
   &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;
 1 precision binary         0.783</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto, <span class="at">estimate =</span> .pred_class, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a>pred_test <span class="sc">|&gt;</span> <span class="fu">recall</span>(<span class="at">truth =</span> crecimiento_alto, .pred_class, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
@@ -1974,7 +1976,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </ul></li>
 <li>Sesiones 2.3 y 2.4: Laboratorios con datos de Latinobarómetro</li>
 </ul>
-<p><strong>Para profundizar (todo gratis):</strong> <a href="https://www.tmwr.org/">Tidy Modeling with R</a> · <a href="https://r4ds.hadley.nz/">R for Data Science</a> · <a href="https://www.tidymodels.org/start/">Get Started with tidymodels</a></p>
+<p><strong>Para profundizar (todo gratis):</strong> <a href="https://www.tmwr.org/">Tidy Modeling with R</a> – <a href="https://r4ds.hadley.nz/">R for Data Science</a> – <a href="https://www.tidymodels.org/start/">Get Started with tidymodels</a></p>
 <p><span class="alert">¡Descansen y vengan con energía mañana!</span> 😄</p>
 </div>
 </section></section>
