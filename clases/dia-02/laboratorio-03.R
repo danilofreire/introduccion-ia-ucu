@@ -104,12 +104,21 @@ conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
 # --- Ejercicio 1 + Apéndice 1: Threshold óptimo ------------
 
 # Versión simple (3 thresholds) — como aparece en la diapositiva del ejercicio
-for (t in c(0.3, 0.5, 0.7)) {
-  pred_nuevo <- pred_logit |>
-    mutate(.pred_class_nuevo = factor(
-      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
-  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
-  cat("Threshold", t, "→ F1 =", round(f1$.estimate, 3), "\n")
+umbrales <- c(0.3, 0.5, 0.7)
+
+for (umbral in umbrales) {
+  # 1. Clasificar como "si" si la probabilidad supera el umbral
+  pred_umbral <- pred_logit |>
+    mutate(
+      clase = ifelse(.pred_si > umbral, "si", "no"),
+      clase = factor(clase, levels = c("si", "no"))
+    )
+
+  # 2. Calcular el F1 de esas predicciones ("si" es la clase positiva)
+  f1 <- f_meas(pred_umbral, truth = voto, estimate = clase)
+
+  # 3. Mostrar el umbral y su F1
+  cat("Umbral", umbral, "→ F1 =", round(f1$.estimate, 3), "\n")
 }
 
 # Versión extendida (barrido fino) — del Apéndice 1

@@ -84,11 +84,11 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Cargar los paquetes necesarios
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 
 ```{r cargar-paquetes, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
 # Si algún paquete falta:
-# install.packages(c("ranger", "vip", "pdp", "xgboost"))
+# install.packages(c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "xgboost"))
 library(tidyverse)   # readr, dplyr, ggplot2, etc
 library(tidymodels)  # rsample, parsnip, recipes, workflows, tune, yardstick
 library(ranger)      # motor rápido para Random Forest
@@ -277,13 +277,22 @@ Por defecto, clasificamos como "sí" si P(sí) > 0.5. Pero este valor puede no s
 2. ¿Cómo cambia el F1 cuando subimos el threshold? ¿Por qué?
 
 ```{r ej1-codigo, eval=FALSE, prompt=FALSE, echo=TRUE}
-# Calcular F1 para tres thresholds distintos
-for (t in c(0.3, 0.5, 0.7)) {
-  pred_nuevo <- pred_logit |>
-    mutate(.pred_class_nuevo = factor(
-      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
-  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
-  cat("Threshold", t, "→ F1 =", round(f1$.estimate, 3), "\n")
+# F1 para tres umbrales distintos
+umbrales <- c(0.3, 0.5, 0.7)
+
+for (umbral in umbrales) {
+  # 1. Clasificar como "si" si la probabilidad supera el umbral
+  pred_umbral <- pred_logit |>
+    mutate(
+      clase = ifelse(.pred_si > umbral, "si", "no"),
+      clase = factor(clase, levels = c("si", "no"))
+    )
+
+  # 2. Calcular el F1 de esas predicciones ("si" es la clase positiva)
+  f1 <- f_meas(pred_umbral, truth = voto, estimate = clase)
+
+  # 3. Mostrar el umbral y su F1
+  cat("Umbral", umbral, "→ F1 =", round(f1$.estimate, 3), "\n")
 }
 ```
 
@@ -300,7 +309,7 @@ for (t in c(0.3, 0.5, 0.7)) {
 
 ## Definir Random Forest con hiperparámetros a ajustar
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r rf-tune-spec, prompt=FALSE, echo=TRUE}
 # rand_forest(): modelo de Random Forest

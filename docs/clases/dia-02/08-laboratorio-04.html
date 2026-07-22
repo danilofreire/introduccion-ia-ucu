@@ -1330,7 +1330,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <h2>Cargar paquetes y datos</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a><span class="co"># Si algún paquete falta: install.packages(c(&quot;glmnet&quot;, &quot;ranger&quot;, &quot;vip&quot;))</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a><span class="co"># Si algún paquete falta: install.packages(c( &quot;tidymodels&quot;, &quot;glmnet&quot;, &quot;ranger&quot;, &quot;vip&quot;))</span></span>
 <span id="cb1-2"><a></a><span class="fu">library</span>(tidymodels)  <span class="co"># rsample, parsnip, recipes, workflows, tune, yardstick</span></span>
 <span id="cb1-3"><a></a><span class="fu">library</span>(tidyverse)   <span class="co"># incluye readr (read_csv), dplyr, ggplot2, etc.</span></span>
 <span id="cb1-4"><a></a><span class="fu">library</span>(glmnet)      <span class="co"># motor para LASSO, Ridge, Elastic Net</span></span>
@@ -1375,12 +1375,12 @@ $ voto                    &lt;chr&gt; &quot;no&quot;, &quot;si&quot;, &quot;si&q
 </section>
 <section id="dividir-los-datos" class="slide level2">
 <h2>Dividir los datos</h2>
-<div style="margin-top: 30px; font-size: 22px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a></a><span class="co"># División train/test (75/25)</span></span>
-<span id="cb3-2"><a></a>division   <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
-<span id="cb3-3"><a></a>datos_train <span class="ot">&lt;-</span> <span class="fu">training</span>(division)</span>
-<span id="cb3-4"><a></a>datos_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(division)</span>
+<span id="cb3-2"><a></a>datos_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos, <span class="at">prop =</span> <span class="fl">0.75</span>)</span>
+<span id="cb3-3"><a></a>datos_train <span class="ot">&lt;-</span> <span class="fu">training</span>(datos_split)</span>
+<span id="cb3-4"><a></a>datos_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(datos_split)</span>
 <span id="cb3-5"><a></a></span>
 <span id="cb3-6"><a></a><span class="fu">cat</span>(<span class="st">&quot;Train:&quot;</span>, <span class="fu">nrow</span>(datos_train), <span class="st">&quot;obs | Test:&quot;</span>, <span class="fu">nrow</span>(datos_test), <span class="st">&quot;obs</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -1470,7 +1470,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 </section>
 <section id="evaluar-ols-en-test" class="slide level2">
 <h2>Evaluar OLS en test</h2>
-<div style="margin-top: 30px; font-size: 20px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a></a><span class="co"># Generar predicciones (augment() añade .pred al test set)</span></span>
 <span id="cb9-2"><a></a>pred_ols <span class="ot">&lt;-</span> <span class="fu">augment</span>(ajuste_ols, datos_test)</span>
@@ -1524,7 +1524,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 </section>
 <section id="definir-lasso-grilla-de-búsqueda" class="slide level2">
 <h2>Definir LASSO + grilla de búsqueda</h2>
-<div style="margin-top: 30px; font-size: 20px;">
+<div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a></a><span class="co"># LASSO: linear_reg con mixture = 1 (L1 puro)</span></span>
 <span id="cb10-2"><a></a><span class="co"># tune() = &quot;este valor se busca con CV&quot;</span></span>
@@ -1568,7 +1568,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <span id="cb12-6"><a></a>  wf_lasso,</span>
 <span id="cb12-7"><a></a>  <span class="at">resamples =</span> folds,</span>
 <span id="cb12-8"><a></a>  <span class="at">grid      =</span> grilla_lambda,</span>
-<span id="cb12-9"><a></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(rmse, rsq)</span>
+<span id="cb12-9"><a></a>  <span class="at">metrics   =</span> <span class="fu">metric_set</span>(rmse)</span>
 <span id="cb12-10"><a></a>)</span>
 <span id="cb12-11"><a></a></span>
 <span id="cb12-12"><a></a><span class="co"># Top 5 mejores λ por RMSE</span></span>
@@ -1882,7 +1882,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 </section>
 <section id="tabla-comparativa-ols-lasso-y-ridge" class="slide level2">
 <h2>Tabla comparativa: OLS, LASSO y Ridge</h2>
-<div style="margin-top: 30px; font-size: 19px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="co"># Combinar las métricas de los 3 modelos (ya creadas en los slides anteriores)</span></span>
 <span id="cb19-2"><a></a>tabla_final <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
@@ -1936,7 +1936,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 </section>
 <section id="sec:exercise02" class="slide level2 scrollable">
 <h2>Ejercicio 2: ¿Predicción o explicación?</h2>
-<div style="margin-top: 30px; font-size: 21px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <p><strong>Tarea (5 min):</strong> miren la tabla comparativa y el gráfico de coeficientes OLS vs. LASSO, y discutan en grupo</p>
 <ol type="1">
 <li>¿Qué variables redujo LASSO a cero? ¿Tiene sentido sustantivo que esas pesen menos?</li>
@@ -2115,7 +2115,7 @@ $ uso_internet_diario     &lt;dbl&gt; 0.8154072, -1.2231108, 0.8154072, -1.22311
 <span id="cb22-10"><a></a></span>
 <span id="cb22-11"><a></a>resultados_dem <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
 <span id="cb22-12"><a></a>  wf_lasso_dem, <span class="at">resamples =</span> folds, <span class="at">grid =</span> grilla_lambda,</span>
-<span id="cb22-13"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse, rsq)</span>
+<span id="cb22-13"><a></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(rmse)</span>
 <span id="cb22-14"><a></a>)</span>
 <span id="cb22-15"><a></a></span>
 <span id="cb22-16"><a></a>lambda_dem  <span class="ot">&lt;-</span> <span class="fu">select_best</span>(resultados_dem, <span class="at">metric =</span> <span class="st">&quot;rmse&quot;</span>)</span>

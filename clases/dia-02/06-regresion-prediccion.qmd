@@ -84,7 +84,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## El debate central en ciencias sociales
 
-:::{style="margin-top: 30px; font-size: 25px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=55%}
 - Breiman (2001), "[Statistical Modeling: The Two Cultures](https://doi.org/10.1214/ss/1009213726)":
@@ -94,7 +94,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 23px;"}
+:::{style="text-align: center; font-size: 24px;"}
 **Ejemplos**
 
 | Pregunta | Tipo |
@@ -114,7 +114,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## ¿Por qué la regresión lineal "clásica" no es suficiente para predecir?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 25px;"}
 :::{.columns}
 :::{.column width=55%}
 - La regresión lineal (OLS) minimiza el error en los datos de entrenamiento
@@ -138,7 +138,7 @@ A medida que agregamos variables, el error de entrenamiento baja pero el error d
 
 ## La idea de la regularización
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - [Regularización]{.alert} = agregar una penalización por la complejidad del modelo
@@ -157,10 +157,11 @@ $$\min \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 + \lambda \cdot \text{penalización}(\
     - $\lambda$ grande: penalización fuerte (coeficientes se reducen hacia 0)
 - El truco está en [elegir el $\lambda$ óptimo]{.alert} (por validación cruzada)
 
-**La intuición: un presupuesto para coeficientes**
+**Elegir λ es moverse por el equilibrio sesgo-varianza**
 
-- OLS asigna coeficientes sin límite → sobreajuste con muchas variables
-- Regularización impone un [presupuesto]{.alert}: el modelo reparte un total finito entre todas las variables, y $\lambda$ fija cuán ajustado es ese presupuesto
+- λ chico → bajo sesgo, alta varianza (sobreajuste)
+- λ grande → alto sesgo, baja varianza (subajuste)
+- El mejor λ está en el [punto intermedio]{.alert}
 :::
 :::
 :::
@@ -209,6 +210,44 @@ coeficientes pequeños
 :::
 :::
 
+## La penalización, con números
+
+:::{style="margin-top: 30px; font-size: 25px;"}
+:::{.columns}
+:::{.column width=50%}
+- La [penalización]{.alert} es una función: todos los coeficientes → un número
+- Ese número mide [qué tan grandes]{.alert} son los coeficientes juntos
+- Se suma al error: el modelo minimiza [error + λ · penalización]{.alert}
+- Se recalcula en [cada combinación]{.alert} que el optimizador prueba
+- Un coeficiente grande baja el error, pero [sube la penalización]{.alert}
+- Con λ grande no compensa, gana la [simplicidad]{.alert}
+:::
+
+:::{.column width=50%}
+:::{style="font-size: 21px; margin-bottom: 40px;"}
+Con los coeficientes anteriores:
+
+```
+penalización(β): el tamaño de los coeficientes (sin λ)
+  LASSO:  Σ|βⱼ|  = |0.023|+|0.085|+...+0  = 0.220
+  Ridge:  Σβⱼ²   = 0.018²+0.072²+...+0.009² = 0.009
+
+término que se suma al error = λ · penalización
+  (el mismo λ = 0.1, una sola vez)
+  LASSO:  0.1 · 0.220 = 0.022
+  Ridge:  0.1 · 0.009 = 0.0009
+```
+:::
+
+:::{style="font-size: 22px;"}
+- Los coeficientes ya son la solución para λ = 0.1; [multiplicar por λ no penaliza de nuevo]{.alert}, solo calcula el valor de ese término
+- Al [elevar al cuadrado]{.alert}, Ridge castiga sobre todo a los coeficientes grandes y casi ignora los chicos: por eso nunca los lleva a cero exacto
+- El [valor absoluto]{.alert} de LASSO cobra lo mismo por unidad sin importar el tamaño: por eso empuja los chicos hasta cero
+:::
+:::
+:::
+:::
+
 ## Elastic Net: lo mejor de ambos
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -216,7 +255,9 @@ coeficientes pequeños
 :::{.column width=55%}
 - [Elastic Net]{.alert} ([Zou y Hastie, 2005](https://doi.org/10.1111/j.1467-9868.2005.00503.x)) combina LASSO (L1) y Ridge (L2):
 
+:::{style="font-size: 22px;"}
 $$\min \sum (y_i - \hat{y}_i)^2 + \lambda \left[ \alpha \sum |\beta_j| + (1-\alpha) \sum \beta_j^2 \right]$$
+:::
 
 - Dos hiperparámetros:
     - $\lambda$: fuerza general de la penalización
@@ -240,12 +281,43 @@ $$\min \sum (y_i - \hat{y}_i)^2 + \lambda \left[ \alpha \sum |\beta_j| + (1-\alp
 
 <br>
 
-:::{style="font-size: 20px;"}
+:::{style="font-size: 24px;"}
 **Regla general:**
 
 - Pocas variables importantes → [LASSO]{.alert}
 - Muchas variables correlacionadas → [Ridge]{.alert}
 - No estoy seguro → [Elastic Net]{.alert}
+:::
+:::
+:::
+:::
+:::
+
+## ¿Explicar o predecir? El sesgo de la regularización
+
+:::{style="margin-top: 30px; font-size: 25px;"}
+:::{.columns}
+:::{.column width=55%}
+- [OLS es insesgado]{.alert}: bajo los supuestos clásicos (Gauss-Markov), en promedio sus coeficientes aciertan el efecto verdadero
+- [Ridge, LASSO y Elastic Net son sesgados a propósito]{.alert}: la penalización empuja todos los coeficientes hacia cero (_shrinkage_)
+- Ese sesgo es el [precio que pagamos]{.alert} por reducir la varianza y predecir mejor en datos nuevos
+- Un coeficiente penalizado [ya no es una estimación insesgada del efecto]{.alert}: está encogido hacia cero
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 24px; margin-top: 30px;"}
+
+| Objetivo | Herramienta | Coeficientes |
+|---|---|---|
+| [Explicar]{.alert} | OLS (MCO) | Insesgados, interpretables |
+| [Predecir]{.alert} | LASSO, Ridge, Elastic Net | Sesgados, no causales |
+
+<br>
+
+:::{style="font-size: 25px; text-align: left;"}
+- Para estimar [el efecto]{.alert} de una variable: OLS
+- Para [la mejor predicción]{.alert}: regularización
+- La regularización vive del lado de [predecir]{.alert}, no de explicar
 :::
 :::
 :::
@@ -313,7 +385,7 @@ receta <- recipe(voto ~ ., data = datos_train) |>
 
 ## Una receta es un plan, no los datos
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 25px;"}
 :::{.columns}
 :::{.column width=50%}
 - `recipe()` [no transforma nada todavía]{.alert}: guarda la lista de pasos para ejecutarla después
@@ -324,7 +396,7 @@ receta <- recipe(voto ~ ., data = datos_train) |>
 :::
 
 :::{.column width=50%}
-:::{style="font-size: 20px;"}
+:::{style="font-size: 23px; margin-top: 20px;"}
 ```r
 # Inspeccionar el resultado de la receta
 receta |>
@@ -347,7 +419,7 @@ Dentro de un `workflow()` esto pasa [automáticamente]{.alert}. Usamos `prep()` 
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- En tidymodels, `recipe` y `model` se combinan en un [workflow()]{.alert}
+- En tidymodels, `recipe` y `model` se combinan en un `workflow()`
 - El workflow conecta el preprocesamiento con el modelo en un solo objeto
 - Ventaja: se aplica automáticamente a datos nuevos, sin repetir pasos manualmente
 
@@ -387,6 +459,44 @@ collect_predictions(resultado)
 <br>
 
 [`last_fit()` ajusta con todo el train set y evalúa con el test set en un solo paso.]{.alert} Es la forma recomendada de obtener las métricas finales del modelo
+:::
+:::
+:::
+:::
+
+## ¿Qué hace un `workflow()` por dentro?
+
+:::{style="margin-top: 30px; font-size: 24px;"}
+:::{.columns}
+:::{.column width=55%}
+- Un `workflow()` [empaqueta la receta y el modelo]{.alert} en un solo objeto
+- Antes teníamos [pasos sueltos]{.alert}: preparar la receta, aplicarla al train, ajustar el modelo, aplicar la receta al test, predecir. Es fácil equivocarse en el orden
+- El workflow los une: cuando llamamos a `fit()` o `predict()`, aplica la receta y después el modelo [en el orden correcto, solo]{.alert}
+- Garantiza que el test pase por [exactamente la misma transformación]{.alert} que el train, con las medianas y desvíos aprendidos [solo del train]{.alert}: así se evita el _data leakage_
+- Un solo objeto viaja por todo el flujo: [ajustar, predecir, tunear y evaluar]{.alert}
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 24px;"}
+**Un objeto, todo el flujo:**
+
+```
+   receta   +   modelo
+        │
+        ▼
+     workflow()
+        │
+   ┌────┴─────┐
+ fit()    last_fit()
+   │          │
+   ▼          ▼
+ ajuste    métricas
+   │        en test
+   ▼
+ predict(datos nuevos)
+```
+
+[`add_recipe()` y `add_model()` son las dos piezas; el workflow sabe aplicarlas en orden]{.alert}
 :::
 :::
 :::
@@ -477,6 +587,40 @@ collect_metrics(resultado_final)
 [Es el mismo patrón de tuning de la sesión 2.1; lo corren paso a paso en el laboratorio]{.alert}
 :::
 
+## Del código anterior: ¿qué hacen los pasos 5 a 7?
+
+:::{style="margin-top: 30px; font-size: 25px;"}
+:::{.columns}
+:::{.column width=55%}
+- **Paso 5**, `tune_grid()`: prueba los 30 valores de λ de la grilla
+- Para [cada]{.alert} λ ajusta el modelo en los folds de validación cruzada y mide el error (RMSE, R²). Devuelve una tabla con el rendimiento de cada λ
+- **Paso 6**, `select_best()`: mira esa tabla y elige el λ con el [menor RMSE promedio]{.alert} entre folds
+- **Paso 7**, `finalize_workflow()` + `last_fit()`: fija ese λ ganador en el workflow, reajusta con [todo el train]{.alert} y evalúa [una sola vez]{.alert} en el test
+- Más información en <https://www.tidymodels.org/start/tuning/>
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 25px;"}
+**El λ se elige sin tocar el test:**
+
+```
+resultados        (rendimiento de
+     │             cada λ, vía CV)
+     │  select_best()
+     ▼
+mejor_lambda      (un solo valor)
+     │  finalize_workflow()
+     │  + last_fit()
+     ▼
+resultado_final   (métricas en test)
+```
+
+[La grilla y la CV eligen λ; el test set entra recién en el paso 7, una sola vez, para la métrica final]{.alert}
+:::
+:::
+:::
+:::
+
 ## Dos criterios para elegir λ
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -513,6 +657,40 @@ select_by_one_std_err(
 <br>
 
 [En ciencias sociales, el λ 1SE suele preferirse por producir modelos más interpretables]{.alert}
+:::
+
+## Regularización en alta dimensionalidad
+
+:::{style="margin-top: 30px; font-size: 23px;"}
+:::{.columns}
+:::{.column width=55%}
+**Útil cuando:**
+
+- [Muchas variables, pocas observaciones]{.alert} ($p \gg n$)
+- Variables altamente [correlacionadas]{.alert}
+- Solo algunas variables importan, sin hacer selección manual
+
+**Ejemplos en ciencias sociales:** análisis de texto (miles de palabras), datos genómicos, encuestas con muchas preguntas, datos administrativos
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 20px;"}
+**La regla del pulgar:**
+
+| Situación | Significado | Recomendación |
+|-----------|-------------|---------------|
+| $n \gg p$ | Muchos datos, pocas variables | OLS probablemente está bien |
+| $n \approx p$ | Datos y variables similares | Regularización ayuda |
+| $n \ll p$ | Pocas observaciones, muchas variables | Regularización es [necesaria]{.alert} (OLS no funciona) |
+:::
+
+<br>
+
+:::{style="font-size: 23px;"}
+[LASSO funciona incluso cuando $p > n$, lo cual es imposible con OLS clásico]{.alert}
+:::
+:::
+:::
 :::
 
 ## Regularización también para clasificación
@@ -609,14 +787,14 @@ LASSO identifica automáticamente qué variables [realmente predicen]{.alert} la
 :::
 :::
 
-## Comparación: Regularización vs. Random Forest
+## Comparación
 
 :::{style="margin-top: 30px; font-size: 26px;"}
 
 :::{style="text-align: center;"}
 
-| Criterio | LASSO/Ridge | Random Forest |
-|----------|-------------|---------------|
+| Criterio | LASSO/Ridge | Random Forest/Gradient Boosting |
+|----------|-------------|---------------------------------|
 | [Interpretabilidad]{.alert} | Alta (coeficientes) | Baja (importancia) |
 | [Relaciones no lineales]{.alert} | No | Sí |
 | [Interacciones]{.alert} | Manual | Automáticas |
@@ -703,7 +881,7 @@ Las variables con coeficiente = 0 (no mostradas) fueron [descartadas]{.alert} po
 - [LASSO:]{.alert} muchos predictores, queremos selección automática
 - [Ridge:]{.alert} predictores correlacionados, no queremos eliminar ninguno
 - [Elastic Net:]{.alert} no estamos seguros, queremos lo mejor de ambos
-- [Random Forest:]{.alert} mejor predicción posible, relaciones complejas
+- [Random Forest/Gradient Boosting:]{.alert} mejor predicción posible, relaciones complejas
 :::
 :::
 :::
@@ -724,93 +902,6 @@ Las variables con coeficiente = 0 (no mostradas) fueron [descartadas]{.alert} po
     - Topic modeling
 
 [¡Nos vemos en el laboratorio!]{.alert} 🤓
-:::
-
-# Apéndices {background-color="#2d4563"}
-
-## Apéndice 1: Ejemplo - Satisfacción con la democracia
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-:::{.columns}
-:::{.column width=55%}
-**Pregunta de investigación:**
-
-¿Qué factores predicen la satisfacción con la democracia en América Latina? (datos simulados)
-
-**Enfoque:**
-
-1. OLS como [baseline]{.alert}
-2. LASSO para [selección de variables]{.alert}
-3. Random Forest para [mejor predicción]{.alert}
-4. Comparar resultados
-
-**Hallazgos típicos:**
-
-- Confianza en instituciones es el mejor predictor
-- La percepción económica importa más que el ingreso real
-- Hay interacciones que LASSO no captura pero RF sí
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 24px;"}
-**Comparación de modelos:**
-
-```
-Modelo          RMSE    R²
-──────────────────────────
-OLS             1.82    0.31
-LASSO           1.78    0.33
-Ridge           1.80    0.32
-Elastic Net     1.77    0.34
-Random Forest   1.62    0.42
-
-RF tiene mejor R², pero...
-¿podemos interpretar el efecto
-de cada variable?
-```
-:::
-
-<br>
-
-:::{style="font-size: 21px;"}
-[El trade-off interpretabilidad-rendimiento es real. La elección depende del objetivo]{.alert}
-:::
-:::
-:::
-:::
-
-## Apéndice 2: Regularización en alta dimensionalidad
-
-:::{style="margin-top: 30px; font-size: 23px;"}
-:::{.columns}
-:::{.column width=55%}
-**Útil cuando:**
-
-- [Muchas variables, pocas observaciones]{.alert} ($p \gg n$)
-- Variables altamente [correlacionadas]{.alert}
-- Solo algunas variables importan, sin hacer selección manual
-
-**Ejemplos en ciencias sociales:** análisis de texto (miles de palabras), datos genómicos, encuestas con muchas preguntas, datos administrativos
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**La regla del pulgar:**
-
-| Situación | Significado | Recomendación |
-|-----------|-------------|---------------|
-| $n \gg p$ | Muchos datos, pocas variables | OLS probablemente está bien |
-| $n \approx p$ | Datos y variables similares | Regularización ayuda |
-| $n \ll p$ | Pocas observaciones, muchas variables | Regularización es [necesaria]{.alert} (OLS no funciona) |
-:::
-
-<br>
-
-:::{style="font-size: 23px;"}
-[LASSO funciona incluso cuando $p > n$, lo cual es imposible con OLS clásico]{.alert}
-:::
-:::
-:::
 :::
 
 # ¡Nos vemos en el laboratorio! 😊 {background-color="#2d4563"}

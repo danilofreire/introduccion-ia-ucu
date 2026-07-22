@@ -116,7 +116,7 @@ resultados_lasso <- tune_grid(
   wf_lasso,
   resamples = folds,
   grid      = grilla_lambda,
-  metrics   = metric_set(rmse, rsq)
+  metrics   = metric_set(rmse)
 )
 
 # Top 5 mejores λ por RMSE
@@ -271,7 +271,7 @@ wf_lasso_dem <- workflow() |> add_recipe(receta_dem) |> add_model(modelo_lasso)
 
 resultados_dem <- tune_grid(
   wf_lasso_dem, resamples = folds, grid = grilla_lambda,
-  metrics = metric_set(rmse, rsq)
+  metrics = metric_set(rmse)
 )
 
 lambda_dem <- select_best(resultados_dem, metric = "rmse")

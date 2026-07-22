@@ -95,7 +95,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 #| warning: false
 #| eval: true
 
-# Si algún paquete falta: install.packages(c("glmnet", "ranger", "vip"))
+# Si algún paquete falta: install.packages(c( "tidymodels", "glmnet", "ranger", "vip"))
 library(tidymodels)  # rsample, parsnip, recipes, workflows, tune, yardstick
 library(tidyverse)   # incluye readr (read_csv), dplyr, ggplot2, etc.
 library(glmnet)      # motor para LASSO, Ridge, Elastic Net
@@ -122,7 +122,7 @@ glimpse(datos)
 
 ## Dividir los datos
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r}
 #| label: split-datos
@@ -194,7 +194,7 @@ tidy(ajuste_ols) |>
 
 ## Evaluar OLS en test
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r}
 #| label: ols-eval
@@ -220,7 +220,7 @@ metricas_ols |> knitr::kable(digits = 3)
 
 ## Definir LASSO + grilla de búsqueda
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 
 ```{r}
 #| label: lasso-spec
@@ -260,7 +260,7 @@ resultados_lasso <- tune_grid(
   wf_lasso,
   resamples = folds,
   grid      = grilla_lambda,
-  metrics   = metric_set(rmse, rsq)
+  metrics   = metric_set(rmse)
 )
 
 # Top 5 mejores λ por RMSE
@@ -465,7 +465,7 @@ Para una versión intermedia (Elastic Net), ver [[Apéndice 5]{.button}](#sec:ap
 
 ## Tabla comparativa: OLS, LASSO y Ridge
 
-:::{style="margin-top: 30px; font-size: 19px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r}
 #| label: tabla-comparativa
@@ -490,7 +490,7 @@ tabla_final |> knitr::kable(digits = 3)
 
 ## Ejercicio 2: ¿Predicción o explicación? {#sec:exercise02}
 
-:::{style="margin-top: 30px; font-size: 21px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 **Tarea (5 min):** miren la tabla comparativa y el gráfico de coeficientes OLS vs. LASSO, y discutan en grupo
 
@@ -653,7 +653,7 @@ wf_lasso_dem <- workflow() |> add_recipe(receta_dem) |> add_model(modelo_lasso)
 
 resultados_dem <- tune_grid(
   wf_lasso_dem, resamples = folds, grid = grilla_lambda,
-  metrics = metric_set(rmse, rsq)
+  metrics = metric_set(rmse)
 )
 
 lambda_dem  <- select_best(resultados_dem, metric = "rmse")

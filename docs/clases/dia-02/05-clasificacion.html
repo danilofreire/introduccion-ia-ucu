@@ -1316,19 +1316,16 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </section>
 <section id="agenda-de-la-sesión" class="slide level2">
 <h2>Agenda de la sesión</h2>
-<div style="margin-top: 20px; font-size: 28px;">
+<div style="margin-top: 30px; font-size: 28px;">
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>Primera parte</strong></p>
 <ul>
 <li>Regresión logística (profundización)</li>
 <li>Árboles de decisión</li>
 <li>Random Forests</li>
 <li>Interpretación de importancia de variables</li>
-</ul>
-<p><strong>Segunda parte</strong></p>
-<ul>
 <li>Ajuste de hiperparámetros (tuning)</li>
+<li>Gradient Boosting (XGBoost)</li>
 <li>Comparación sistemática de modelos</li>
 <li>Aplicaciones</li>
 </ul>
@@ -2055,33 +2052,111 @@ Predicción final: VOTÓ
 </div>
 </section></section>
 <section>
+<section id="gradient-boosting" class="title-slide slide level1 center" data-background-color="#2d4563">
+<h1>Gradient Boosting</h1>
+
+</section>
+<section id="más-allá-de-random-forest-gradient-boosting" class="slide level2">
+<h2>Más allá de Random Forest: Gradient Boosting</h2>
+<div style="margin-top: 30px; font-size: 22px;">
+<div class="columns">
+<div class="column" style="width:55%;">
+<ul>
+<li>Random Forest entrena muchos árboles <span class="alert">en paralelo</span> y promedia</li>
+<li><span class="alert">Gradient Boosting</span> los entrena <span class="alert">en secuencia</span>: cada árbol nuevo intenta corregir los errores del anterior</li>
+<li>Suele dar <span class="alert">muy buen rendimiento</span>, pero tiene <span class="alert">muchos hiperparámetros</span> (número de árboles, profundidad, tasa de aprendizaje), así que el tuning que acabamos de ver <span class="alert">se vuelve esencial</span></li>
+<li>Implementaciones populares:
+<ul>
+<li><span class="alert">XGBoost</span>: muy usado en competencias de Kaggle</li>
+<li><span class="alert">LightGBM</span>: rápido para datasets grandes</li>
+<li><span class="alert">CatBoost</span>: bueno con variables categóricas</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:45%;">
+<div style="text-align: center; font-size: 22px;">
+<p><strong>Random Forest vs. Gradient Boosting:</strong></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th>RF</th>
+<th>Boosting</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Entrenamiento</td>
+<td>Paralelo</td>
+<td>Secuencial</td>
+</tr>
+<tr class="even">
+<td>Hiperparámetros</td>
+<td>Pocos</td>
+<td>Muchos</td>
+</tr>
+<tr class="odd">
+<td>Riesgo de sobreajuste</td>
+<td>Bajo</td>
+<td>Más alto</td>
+</tr>
+<tr class="even">
+<td>Velocidad</td>
+<td>Rápido</td>
+<td>Variable</td>
+</tr>
+<tr class="odd">
+<td>Rendimiento típico</td>
+<td>Muy bueno</td>
+<td>Excelente</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p>En tidymodels, la misma interfaz de siempre:</p>
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a>R<span class="sc">&gt;</span> modelo_xgb <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>(</span>
+<span id="cb18-2"><a></a><span class="sc">+</span>   <span class="at">trees      =</span> <span class="dv">500</span>,</span>
+<span id="cb18-3"><a></a><span class="sc">+</span>   <span class="at">tree_depth =</span> <span class="dv">3</span>,</span>
+<span id="cb18-4"><a></a><span class="sc">+</span>   <span class="at">learn_rate =</span> <span class="fl">0.05</span></span>
+<span id="cb18-5"><a></a><span class="sc">+</span> ) <span class="sc">|&gt;</span></span>
+<span id="cb18-6"><a></a><span class="sc">+</span>   <span class="fu">set_engine</span>(<span class="st">&quot;xgboost&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-7"><a></a><span class="sc">+</span>   <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div></div>
+</div>
+</section></section>
+<section>
 <section id="comparación-de-modelos" class="title-slide slide level1 center" data-background-color="#2d4563">
 <h1>Comparación de modelos</h1>
 
 </section>
-<section id="comparando-los-tres-modelos" class="slide level2">
-<h2>Comparando los tres modelos</h2>
+<section id="comparando-los-cuatro-modelos" class="slide level2">
+<h2>Comparando los cuatro modelos</h2>
 <div style="margin-top: 30px; font-size: 22px;">
-<p>Como los tres ajustes comparten la misma estructura, podemos compararlos en una métrica común (ROC-AUC en test):</p>
+<p>Como los cuatro ajustes comparten la misma estructura, podemos compararlos en una métrica común (ROC-AUC en test):</p>
 <div style="font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Repaso: los tres ajustes que vimos en este capítulo (misma estructura, distinta spec)</span></span>
-<span id="cb18-2"><a></a>R<span class="sc">&gt;</span> ajuste_log <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;glm&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a></a><span class="sc">+</span>   <span class="fu">fit</span>(apoya_democracia <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
-<span id="cb18-4"><a></a>R<span class="sc">&gt;</span> ajuste_arbol <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">tree_depth =</span> <span class="dv">5</span>, <span class="at">min_n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;rpart&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-5"><a></a><span class="sc">+</span>   <span class="fu">fit</span>(apoya_democracia <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
-<span id="cb18-6"><a></a>R<span class="sc">&gt;</span> ajuste_rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">2000</span>, <span class="at">mtry =</span> <span class="dv">2</span>, <span class="at">min_n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>, <span class="at">seed =</span> <span class="dv">1</span>, <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-7"><a></a><span class="sc">+</span>   <span class="fu">fit</span>(apoya_democracia <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
-<span id="cb18-8"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb18-9"><a></a>R<span class="sc">&gt;</span> <span class="co"># Métrica: ROC-AUC en test</span></span>
-<span id="cb18-10"><a></a>R<span class="sc">&gt;</span> <span class="fu">tibble</span>(</span>
-<span id="cb18-11"><a></a><span class="sc">+</span>   <span class="at">Modelo =</span> <span class="fu">c</span>(<span class="st">&quot;Logística&quot;</span>, <span class="st">&quot;Árbol&quot;</span>, <span class="st">&quot;Random Forest&quot;</span>),</span>
-<span id="cb18-12"><a></a><span class="sc">+</span>   <span class="st">`</span><span class="at">ROC-AUC</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb18-13"><a></a><span class="sc">+</span>     <span class="fu">augment</span>(ajuste_log,   datos_test) <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(apoya_democracia, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(.estimate),</span>
-<span id="cb18-14"><a></a><span class="sc">+</span>     <span class="fu">augment</span>(ajuste_arbol, datos_test) <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(apoya_democracia, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(.estimate),</span>
-<span id="cb18-15"><a></a><span class="sc">+</span>     <span class="fu">augment</span>(ajuste_rf,    datos_test) <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(apoya_democracia, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(.estimate)</span>
-<span id="cb18-16"><a></a><span class="sc">+</span>   )</span>
-<span id="cb18-17"><a></a><span class="sc">+</span> ) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Los cuatro ajustes de esta sesión (misma estructura, distinta spec)</span></span>
+<span id="cb19-2"><a></a>R<span class="sc">&gt;</span> ajuste_log <span class="ot">&lt;-</span> <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;glm&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a></a><span class="sc">+</span>   <span class="fu">fit</span>(apoya_democracia <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
+<span id="cb19-4"><a></a>R<span class="sc">&gt;</span> ajuste_arbol <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">tree_depth =</span> <span class="dv">5</span>, <span class="at">min_n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;rpart&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a></a><span class="sc">+</span>   <span class="fu">fit</span>(apoya_democracia <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
+<span id="cb19-6"><a></a>R<span class="sc">&gt;</span> ajuste_rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">2000</span>, <span class="at">mtry =</span> <span class="dv">2</span>, <span class="at">min_n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;ranger&quot;</span>, <span class="at">seed =</span> <span class="dv">1</span>, <span class="at">importance =</span> <span class="st">&quot;permutation&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-7"><a></a><span class="sc">+</span>   <span class="fu">fit</span>(apoya_democracia <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
+<span id="cb19-8"><a></a>R<span class="sc">&gt;</span> ajuste_xgb <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>(<span class="at">trees =</span> <span class="dv">500</span>, <span class="at">tree_depth =</span> <span class="dv">3</span>, <span class="at">learn_rate =</span> <span class="fl">0.05</span>, <span class="at">min_n =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> <span class="fu">set_engine</span>(<span class="st">&quot;xgboost&quot;</span>, <span class="at">seed =</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-9"><a></a><span class="sc">+</span>   <span class="fu">fit</span>(apoya_democracia <span class="sc">~</span> ., <span class="at">data =</span> datos_train)</span>
+<span id="cb19-10"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb19-11"><a></a>R<span class="sc">&gt;</span> <span class="co"># Métrica: ROC-AUC en test</span></span>
+<span id="cb19-12"><a></a>R<span class="sc">&gt;</span> <span class="fu">tibble</span>(</span>
+<span id="cb19-13"><a></a><span class="sc">+</span>   <span class="at">Modelo =</span> <span class="fu">c</span>(<span class="st">&quot;Logística&quot;</span>, <span class="st">&quot;Árbol&quot;</span>, <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;XGBoost&quot;</span>),</span>
+<span id="cb19-14"><a></a><span class="sc">+</span>   <span class="st">`</span><span class="at">ROC-AUC</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb19-15"><a></a><span class="sc">+</span>     <span class="fu">augment</span>(ajuste_log,   datos_test) <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(apoya_democracia, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(.estimate),</span>
+<span id="cb19-16"><a></a><span class="sc">+</span>     <span class="fu">augment</span>(ajuste_arbol, datos_test) <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(apoya_democracia, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(.estimate),</span>
+<span id="cb19-17"><a></a><span class="sc">+</span>     <span class="fu">augment</span>(ajuste_rf,    datos_test) <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(apoya_democracia, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(.estimate),</span>
+<span id="cb19-18"><a></a><span class="sc">+</span>     <span class="fu">augment</span>(ajuste_xgb,   datos_test) <span class="sc">|&gt;</span> <span class="fu">roc_auc</span>(apoya_democracia, .pred_si, <span class="at">event_level =</span> <span class="st">&quot;second&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(.estimate)</span>
+<span id="cb19-19"><a></a><span class="sc">+</span>   )</span>
+<span id="cb19-20"><a></a><span class="sc">+</span> ) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="caption-top">
 <thead>
@@ -2103,13 +2178,18 @@ Predicción final: VOTÓ
 <td style="text-align: left;">Random Forest</td>
 <td style="text-align: right;">0.676</td>
 </tr>
+<tr class="even">
+<td style="text-align: left;">XGBoost</td>
+<td style="text-align: right;">0.687</td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
 <ul>
-<li>En la práctica, <span class="alert">siempre hay que comparar modelos</span> antes de elegir uno</li>
+<li>Acá <span class="alert">gana la regresión logística</span>, y ni el Random Forest ni el XGBoost la superan. No es casualidad: <span class="alert">estos datos se generaron con relaciones lineales</span>, y ningún modelo complejo puede encontrar una estructura no lineal que no existe</li>
+<li>La lección: <span class="alert">más complejo no es sinónimo de mejor</span>. Con datos reales, más ruidosos y no lineales, el orden suele invertirse. Por eso <span class="alert">siempre hay que comparar</span> antes de elegir</li>
 </ul>
 </div>
 </section>
@@ -2117,32 +2197,36 @@ Predicción final: VOTÓ
 <h2>¿Qué modelo elegir?</h2>
 <div style="margin-top: 30px; font-size: 26px;">
 <div style="text-align: center;">
-<table class="caption-top">
+<table class="caption-top" style="width:100%;">
 <colgroup>
+<col style="width: 17%">
+<col style="width: 26%">
+<col style="width: 12%">
+<col style="width: 26%">
 <col style="width: 16%">
-<col style="width: 25%">
-<col style="width: 32%">
-<col style="width: 25%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Criterio</th>
 <th>Reg. logística</th>
-<th>Árbol de decisión</th>
+<th>Árbol</th>
 <th>Random Forest</th>
+<th>XGBoost</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><span class="alert">Interpretabilidad</span></td>
-<td>Alta (coeficientes)</td>
+<td>Alta</td>
 <td>Alta (visual)</td>
-<td>Baja (caja negra)</td>
+<td>Baja</td>
+<td>Baja</td>
 </tr>
 <tr class="even">
 <td><span class="alert">Capacidad predictiva</span></td>
 <td>Moderada</td>
 <td>Moderada-baja</td>
+<td>Alta</td>
 <td>Alta</td>
 </tr>
 <tr class="odd">
@@ -2150,11 +2234,13 @@ Predicción final: VOTÓ
 <td>Bajo</td>
 <td>Alto</td>
 <td>Bajo</td>
+<td>Medio-alto</td>
 </tr>
 <tr class="even">
 <td><span class="alert">Velocidad</span></td>
 <td>Muy rápida</td>
 <td>Rápida</td>
+<td>Moderada</td>
 <td>Moderada</td>
 </tr>
 <tr class="odd">
@@ -2162,12 +2248,14 @@ Predicción final: VOTÓ
 <td>No</td>
 <td>Sí</td>
 <td>Sí</td>
+<td>Sí</td>
 </tr>
 <tr class="even">
-<td><span class="alert">Datos necesarios</span></td>
+<td><span class="alert">Hiperparámetros</span></td>
+<td>Ninguno</td>
 <td>Pocos</td>
 <td>Pocos</td>
-<td>Moderados</td>
+<td>Muchos</td>
 </tr>
 </tbody>
 </table>
@@ -2176,7 +2264,7 @@ Predicción final: VOTÓ
 <ul>
 <li>Si necesitan <span class="alert">entender por qué</span> el modelo predice algo: regresión logística</li>
 <li>Si necesitan <span class="alert">explicar la lógica</span> a no técnicos: árbol de decisión</li>
-<li>Si necesitan la <span class="alert">mejor predicción posible</span>: Random Forest (o modelos aún más complejos)</li>
+<li>Si necesitan la <span class="alert">mejor predicción posible</span>: Random Forest o Gradient Boosting, pero sólo si los datos tienen estructura no lineal que aprovechar</li>
 <li>En ciencias sociales, la elección depende de si el objetivo es <span class="alert">explicar o predecir</span></li>
 </ul>
 </div>
@@ -2187,16 +2275,18 @@ Predicción final: VOTÓ
 <div style="margin-top: 30px; font-size: 24px;">
 <p><strong>Lo que vimos hoy:</strong></p>
 <ul>
-<li>Tres modelos, del más interpretable al más predictivo: <span class="alert">regresión logística</span>, <span class="alert">árboles de decisión</span> y <span class="alert">Random Forests</span></li>
+<li>Cuatro modelos, del más interpretable al más predictivo: <span class="alert">regresión logística</span>, <span class="alert">árboles de decisión</span>, <span class="alert">Random Forests</span> y <span class="alert">Gradient Boosting</span></li>
 <li><span class="alert">Importancia de variables</span> y <span class="alert">dependencia parcial</span> para interpretar modelos de caja negra</li>
 <li><span class="alert">Tuning de hiperparámetros</span> con validación cruzada y <span class="alert">comparación</span> de modelos en tidymodels</li>
+<li>El modelo más complejo <span class="alert">no siempre gana</span>: cuando la relación es lineal, la regresión logística es difícil de superar</li>
 </ul>
 <p><strong>Para explorar:</strong></p>
 <ul>
-<li><span class="alert">Gradient Boosting</span> (XGBoost): suele predecir aún mejor, pero es más difícil de ajustar (apéndice 2)</li>
+<li><span class="alert">LightGBM</span> y <span class="alert">CatBoost</span>, otras variantes de boosting, y <span class="alert">SHAP</span> para interpretar modelos de caja negra</li>
 </ul>
-<p><br></p>
+<div style="margin-top: 40px; text-align: center; font-size: 24px;">
 <p><span class="alert">La elección del modelo depende del objetivo: ¿explicar o predecir?</span></p>
+</div>
 </div>
 </section>
 <section id="próximos-pasos" class="slide level2">
@@ -2284,77 +2374,8 @@ Predicción final: VOTÓ
 </div></div>
 </div>
 </section>
-<section id="apéndice-2-más-allá-de-random-forest-gradient-boosting" class="slide level2">
-<h2>Apéndice 2: Más allá de Random Forest: Gradient Boosting</h2>
-<div style="margin-top: 30px; font-size: 23px;">
-<div class="columns">
-<div class="column" style="width:55%;">
-<ul>
-<li>Random Forest es un <span class="alert">ensemble</span> (muchos modelos juntos)</li>
-<li>Otra familia de ensembles: <span class="alert">Gradient Boosting</span></li>
-<li>En lugar de entrenar árboles en paralelo, los entrena <span class="alert">secuencialmente</span></li>
-<li>Cada árbol nuevo intenta corregir los errores del anterior</li>
-<li>Implementaciones populares:
-<ul>
-<li><span class="alert">XGBoost</span>: muy usado en competencias de Kaggle</li>
-<li><span class="alert">LightGBM</span>: rápido para datasets grandes</li>
-<li><span class="alert">CatBoost</span>: bueno con variables categóricas</li>
-</ul></li>
-</ul>
-<p><span class="alert">Suele tener mejor rendimiento que RF, pero es más difícil de ajustar</span></p>
-</div><div class="column" style="width:45%;">
-<div style="text-align: center; font-size: 22px;">
-<p><strong>Random Forest vs. Gradient Boosting:</strong></p>
-<table class="caption-top">
-<thead>
-<tr class="header">
-<th></th>
-<th>RF</th>
-<th>Boosting</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Entrenamiento</td>
-<td>Paralelo</td>
-<td>Secuencial</td>
-</tr>
-<tr class="even">
-<td>Hiperparámetros</td>
-<td>Pocos</td>
-<td>Muchos</td>
-</tr>
-<tr class="odd">
-<td>Riesgo de sobreajuste</td>
-<td>Bajo</td>
-<td>Más alto</td>
-</tr>
-<tr class="even">
-<td>Velocidad</td>
-<td>Rápido</td>
-<td>Variable</td>
-</tr>
-<tr class="odd">
-<td>Rendimiento típico</td>
-<td>Muy bueno</td>
-<td>Excelente</td>
-</tr>
-</tbody>
-</table>
-<p><br></p>
-<p>En tidymodels:</p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a>R<span class="sc">&gt;</span> modelo_xgb <span class="ot">&lt;-</span> <span class="fu">boost_tree</span>() <span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a></a><span class="sc">+</span>   <span class="fu">set_engine</span>(<span class="st">&quot;xgboost&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb19-3"><a></a><span class="sc">+</span>   <span class="fu">set_mode</span>(<span class="st">&quot;classification&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p><span class="alert">Lo veremos con más detalle en los laboratorios</span></p>
-</div>
-</div></div>
-</div>
-</section>
-<section id="apéndice-3-aplicaciones-en-ciencias-sociales" class="slide level2">
-<h2>Apéndice 3: Aplicaciones en ciencias sociales</h2>
+<section id="apéndice-2-aplicaciones-en-ciencias-sociales" class="slide level2">
+<h2>Apéndice 2: Aplicaciones en ciencias sociales</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="columns">
 <div class="column" style="width:50%;">

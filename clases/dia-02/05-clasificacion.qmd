@@ -60,6 +60,7 @@ suppressPackageStartupMessages({
   library(rpart.plot)
   library(pdp)
   library(ggplot2)
+  library(xgboost)
 })
 
 set.seed(20260419)
@@ -138,20 +139,16 @@ arbol_demo <- rpart(
 
 ## Agenda de la sesión
 
-:::{style="margin-top: 20px; font-size: 28px;"}
+:::{style="margin-top: 30px; font-size: 28px;"}
 
 :::{.columns}
 :::{.column width=50%}
-**Primera parte**
-
 - Regresión logística (profundización)
 - Árboles de decisión
 - Random Forests
 - Interpretación de importancia de variables
-
-**Segunda parte**
-
 - Ajuste de hiperparámetros (tuning)
+- Gradient Boosting (XGBoost)
 - Comparación sistemática de modelos
 - Aplicaciones
 :::
@@ -745,37 +742,86 @@ ajuste_final <- finalize_model(modelo_rf_tune, mejor) |>
 [El tuning mejora el rendimiento pero toma tiempo. Lo ejecutan paso a paso en el laboratorio]{.alert}
 :::
 
+# Gradient Boosting {background-color="#2d4563"}
+
+## Más allá de Random Forest: Gradient Boosting
+
+:::{style="margin-top: 30px; font-size: 22px;"}
+:::{.columns}
+:::{.column width=55%}
+- Random Forest entrena muchos árboles [en paralelo]{.alert} y promedia
+- [Gradient Boosting]{.alert} los entrena [en secuencia]{.alert}: cada árbol nuevo intenta corregir los errores del anterior
+- Suele dar [muy buen rendimiento]{.alert}, pero tiene [muchos hiperparámetros]{.alert} (número de árboles, profundidad, tasa de aprendizaje), así que el tuning que acabamos de ver [se vuelve esencial]{.alert}
+- Implementaciones populares:
+    - [XGBoost]{.alert}: muy usado en competencias de Kaggle
+    - [LightGBM]{.alert}: rápido para datasets grandes
+    - [CatBoost]{.alert}: bueno con variables categóricas
+:::
+
+:::{.column width=45%}
+:::{style="text-align: center; font-size: 22px;"}
+**Random Forest vs. Gradient Boosting:**
+
+| | RF | Boosting |
+|---|---|---|
+| Entrenamiento | Paralelo | Secuencial |
+| Hiperparámetros | Pocos | Muchos |
+| Riesgo de sobreajuste | Bajo | Más alto |
+| Velocidad | Rápido | Variable |
+| Rendimiento típico | Muy bueno | Excelente |
+
+<br>
+
+En tidymodels, la misma interfaz de siempre:
+```{r boost-spec, echo=TRUE, message=FALSE, eval=FALSE}
+modelo_xgb <- boost_tree(
+  trees      = 500,
+  tree_depth = 3,
+  learn_rate = 0.05
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+```
+:::
+:::
+:::
+:::
+
 # Comparación de modelos {background-color="#2d4563"}
 
-## Comparando los tres modelos
+## Comparando los cuatro modelos
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-Como los tres ajustes comparten la misma estructura, podemos compararlos en una métrica común (ROC-AUC en test):
+Como los cuatro ajustes comparten la misma estructura, podemos compararlos en una métrica común (ROC-AUC en test):
 
 :::{style="font-size: 20px;"}
 ```{r comparacion-modelos, echo=TRUE, message=FALSE, warning=FALSE}
-# Repaso: los tres ajustes que vimos en este capítulo (misma estructura, distinta spec)
+# Los cuatro ajustes de esta sesión (misma estructura, distinta spec)
 ajuste_log <- logistic_reg() |> set_engine("glm") |> set_mode("classification") |>
   fit(apoya_democracia ~ ., data = datos_train)
 ajuste_arbol <- decision_tree(tree_depth = 5, min_n = 10) |> set_engine("rpart") |> set_mode("classification") |>
   fit(apoya_democracia ~ ., data = datos_train)
 ajuste_rf <- rand_forest(trees = 2000, mtry = 2, min_n = 5) |> set_engine("ranger", seed = 1, importance = "permutation") |> set_mode("classification") |>
   fit(apoya_democracia ~ ., data = datos_train)
+ajuste_xgb <- boost_tree(trees = 500, tree_depth = 3, learn_rate = 0.05, min_n = 10) |> set_engine("xgboost", seed = 1) |> set_mode("classification") |>
+  fit(apoya_democracia ~ ., data = datos_train)
 
 # Métrica: ROC-AUC en test
 tibble(
-  Modelo = c("Logística", "Árbol", "Random Forest"),
+  Modelo = c("Logística", "Árbol", "Random Forest", "XGBoost"),
   `ROC-AUC` = c(
     augment(ajuste_log,   datos_test) |> roc_auc(apoya_democracia, .pred_si, event_level = "second") |> pull(.estimate),
     augment(ajuste_arbol, datos_test) |> roc_auc(apoya_democracia, .pred_si, event_level = "second") |> pull(.estimate),
-    augment(ajuste_rf,    datos_test) |> roc_auc(apoya_democracia, .pred_si, event_level = "second") |> pull(.estimate)
+    augment(ajuste_rf,    datos_test) |> roc_auc(apoya_democracia, .pred_si, event_level = "second") |> pull(.estimate),
+    augment(ajuste_xgb,   datos_test) |> roc_auc(apoya_democracia, .pred_si, event_level = "second") |> pull(.estimate)
   )
 ) |> knitr::kable(digits = 3)
 ```
 :::
 
-- En la práctica, [siempre hay que comparar modelos]{.alert} antes de elegir uno
+- Acá [gana la regresión logística]{.alert}, y ni el Random Forest ni el XGBoost la superan. No es casualidad: [estos datos se generaron con relaciones lineales]{.alert}, y ningún modelo complejo puede encontrar una estructura no lineal que no existe
+- La lección: [más complejo no es sinónimo de mejor]{.alert}. Con datos reales, más ruidosos y no lineales, el orden suele invertirse. Por eso [siempre hay que comparar]{.alert} antes de elegir
 :::
 
 ## ¿Qué modelo elegir?
@@ -784,21 +830,21 @@ tibble(
 
 :::{style="text-align: center;"}
 
-| Criterio | Reg. logística | Árbol de decisión | Random Forest |
-|----------|---------------|-------------------|---------------|
-| [Interpretabilidad]{.alert} | Alta (coeficientes) | Alta (visual) | Baja (caja negra) |
-| [Capacidad predictiva]{.alert} | Moderada | Moderada-baja | Alta |
-| [Riesgo de sobreajuste]{.alert} | Bajo | Alto | Bajo |
-| [Velocidad]{.alert} | Muy rápida | Rápida | Moderada |
-| [Relaciones no lineales]{.alert} | No | Sí | Sí |
-| [Datos necesarios]{.alert} | Pocos | Pocos | Moderados |
+| Criterio | Reg. logística | Árbol | Random Forest | XGBoost |
+|----------|---------------|-------|---------------|---------|
+| [Interpretabilidad]{.alert} | Alta | Alta (visual) | Baja | Baja |
+| [Capacidad predictiva]{.alert} | Moderada | Moderada-baja | Alta | Alta |
+| [Riesgo de sobreajuste]{.alert} | Bajo | Alto | Bajo | Medio-alto |
+| [Velocidad]{.alert} | Muy rápida | Rápida | Moderada | Moderada |
+| [Relaciones no lineales]{.alert} | No | Sí | Sí | Sí |
+| [Hiperparámetros]{.alert} | Ninguno | Pocos | Pocos | Muchos |
 
 :::
 
 :::{style="margin-top: 20px;"}
 - Si necesitan [entender por qué]{.alert} el modelo predice algo: regresión logística
 - Si necesitan [explicar la lógica]{.alert} a no técnicos: árbol de decisión
-- Si necesitan la [mejor predicción posible]{.alert}: Random Forest (o modelos aún más complejos)
+- Si necesitan la [mejor predicción posible]{.alert}: Random Forest o Gradient Boosting, pero sólo si los datos tienen estructura no lineal que aprovechar
 - En ciencias sociales, la elección depende de si el objetivo es [explicar o predecir]{.alert}
 :::
 :::
@@ -809,17 +855,18 @@ tibble(
 
 **Lo que vimos hoy:**
 
-- Tres modelos, del más interpretable al más predictivo: [regresión logística]{.alert}, [árboles de decisión]{.alert} y [Random Forests]{.alert}
+- Cuatro modelos, del más interpretable al más predictivo: [regresión logística]{.alert}, [árboles de decisión]{.alert}, [Random Forests]{.alert} y [Gradient Boosting]{.alert}
 - [Importancia de variables]{.alert} y [dependencia parcial]{.alert} para interpretar modelos de caja negra
 - [Tuning de hiperparámetros]{.alert} con validación cruzada y [comparación]{.alert} de modelos en tidymodels
+- El modelo más complejo [no siempre gana]{.alert}: cuando la relación es lineal, la regresión logística es difícil de superar
 
 **Para explorar:**
 
-- [Gradient Boosting]{.alert} (XGBoost): suele predecir aún mejor, pero es más difícil de ajustar (apéndice 2)
+- [LightGBM]{.alert} y [CatBoost]{.alert}, otras variantes de boosting, y [SHAP]{.alert} para interpretar modelos de caja negra
 
-<br>
-
+:::{style="margin-top: 40px; text-align: center; font-size: 24px;"}
 [La elección del modelo depende del objetivo: ¿explicar o predecir?]{.alert}
+:::
 :::
 
 ## Próximos pasos
@@ -909,51 +956,7 @@ Como $`r round(g_split,3)` < `r round(g_root,3)`$, [esta división mejora la sep
 :::
 :::
 
-## Apéndice 2: Más allá de Random Forest: Gradient Boosting
-
-:::{style="margin-top: 30px; font-size: 23px;"}
-:::{.columns}
-:::{.column width=55%}
-- Random Forest es un [ensemble]{.alert} (muchos modelos juntos)
-- Otra familia de ensembles: [Gradient Boosting]{.alert}
-- En lugar de entrenar árboles en paralelo, los entrena [secuencialmente]{.alert}
-- Cada árbol nuevo intenta corregir los errores del anterior
-- Implementaciones populares:
-    - [XGBoost]{.alert}: muy usado en competencias de Kaggle
-    - [LightGBM]{.alert}: rápido para datasets grandes
-    - [CatBoost]{.alert}: bueno con variables categóricas
-
-[Suele tener mejor rendimiento que RF, pero es más difícil de ajustar]{.alert}
-:::
-
-:::{.column width=45%}
-:::{style="text-align: center; font-size: 22px;"}
-**Random Forest vs. Gradient Boosting:**
-
-| | RF | Boosting |
-|---|---|---|
-| Entrenamiento | Paralelo | Secuencial |
-| Hiperparámetros | Pocos | Muchos |
-| Riesgo de sobreajuste | Bajo | Más alto |
-| Velocidad | Rápido | Variable |
-| Rendimiento típico | Muy bueno | Excelente |
-
-<br>
-
-En tidymodels:
-```{r boost-spec, echo=TRUE, message=FALSE, eval=FALSE}
-modelo_xgb <- boost_tree() |>
-  set_engine("xgboost") |>
-  set_mode("classification")
-```
-
-[Lo veremos con más detalle en los laboratorios]{.alert}
-:::
-:::
-:::
-:::
-
-## Apéndice 3: Aplicaciones en ciencias sociales
+## Apéndice 2: Aplicaciones en ciencias sociales
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
