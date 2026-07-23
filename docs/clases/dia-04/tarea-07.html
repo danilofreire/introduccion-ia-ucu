@@ -297,7 +297,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-3-el-system-prompt-como-barrera" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-el-system-prompt-como-barrera"><span class="header-section-number">2.3</span> Pregunta 3: El system prompt como barrera</h3>
-<p>Los asistentes que se usan en investigación suelen estar restringidos a su dominio. Crear un chat cuyo system prompt lo limite a responder <span class="alert">sólo preguntas sobre política latinoamericana</span> y a rechazar amablemente cualquier otro tema. Probarlo con dos preguntas: una sobre política latinoamericana y otra claramente fuera de tema (por ejemplo, una receta de cocina). ¿El modelo respetó la barrera? Propongan además una pregunta “fronteriza” (mitad dentro, mitad fuera del dominio) y comenten qué hizo el modelo con ella.</p>
+<p>Los asistentes que se usan en investigación suelen estar restringidos a su dominio. Crear un chat cuyo system prompt lo limite a responder <span class="alert">solo preguntas sobre política latinoamericana</span> y a rechazar amablemente cualquier otro tema. Probarlo con dos preguntas: una sobre política latinoamericana y otra claramente fuera de tema (por ejemplo, una receta de cocina). ¿El modelo respetó la barrera? Propongan además una pregunta “fronteriza” (mitad dentro, mitad fuera del dominio) y comenten qué hizo el modelo con ella.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -338,8 +338,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-7-sensibilidad-al-prompt" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-7-sensibilidad-al-prompt"><span class="header-section-number">4.2</span> Pregunta 7: Sensibilidad al prompt</h3>
-<p>El resultado depende de cómo se escribe el prompt. Escribir dos versiones del system prompt para clasificar por tema: una <strong>breve</strong> (sólo las cinco categorías de <code>textos_politicos.csv</code>) y una <strong>detallada</strong> (con una regla extra, por ejemplo “si el texto toca dos temas, elegí el más concreto”). Aplicar ambas a los mismos cinco textos y mostrar en qué textos difieren.</p>
-<p><em>Pista:</em> definir dos funciones que sólo cambien en el <code>system_prompt</code>, y <code>filter()</code> las filas donde las dos clasificaciones no coinciden.</p>
+<p>El resultado depende de cómo se escribe el prompt. Escribir dos versiones del system prompt para clasificar por tema: una <strong>breve</strong> (solo las cinco categorías de <code>textos_politicos.csv</code>) y una <strong>detallada</strong> (con una regla extra, por ejemplo “si el texto toca dos temas, elegí el más concreto”). Aplicar ambas a los mismos cinco textos y mostrar en qué textos difieren.</p>
+<p><em>Pista:</em> definir dos funciones que solo cambien en el <code>system_prompt</code>, y <code>filter()</code> las filas donde las dos clasificaciones no coinciden.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -368,8 +368,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-10-razonamiento-paso-a-paso" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-razonamiento-paso-a-paso"><span class="header-section-number">5.2</span> Pregunta 10: Razonamiento paso a paso</h3>
-<p>Tomar un texto ambiguo y clasificarlo de dos formas: (a) directa (sólo la categoría) y (b) con cadena de pensamiento, pidiéndole al modelo que explique su razonamiento en una o dos oraciones ANTES de dar la categoría. ¿Cambia la respuesta? ¿Cuándo conviene pedir el razonamiento paso a paso?</p>
-<p><em>Pista:</em> la diferencia está sólo en el system prompt: en (b) pedile que razone primero y termine con una línea del tipo <code>Categoría: &lt;categoria&gt;</code>.</p>
+<p>Tomar un texto ambiguo y clasificarlo de dos formas: (a) directa (solo la categoría) y (b) con cadena de pensamiento, pidiéndole al modelo que explique su razonamiento en una o dos oraciones ANTES de dar la categoría. ¿Cambia la respuesta? ¿Cuándo conviene pedir el razonamiento paso a paso?</p>
+<p><em>Pista:</em> la diferencia está solo en el system prompt: en (b) pídanle que razone primero y termine con una línea del tipo <code>Categoría: &lt;categoria&gt;</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>

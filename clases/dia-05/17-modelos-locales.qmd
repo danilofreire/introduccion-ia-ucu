@@ -121,10 +121,10 @@ Correr un LLM [enteramente en nuestra propia máquina]{.alert}, sin internet, si
 :::{style="font-size: 24px;"}
 **Correr local resuelve varias cosas a la vez**
 
-- [Privacidad]{.alert}: los datos nunca salen de tu máquina
+- [Privacidad]{.alert}: los datos nunca salen de su máquina
 - [Costo]{.alert}: cero por uso, sin tarjeta
-- [Reproducibilidad]{.alert}: la versión exacta del modelo queda congelada en tu disco
-- [Autonomía]{.alert}: funciona sin internet y nadie puede quitártelo
+- [Reproducibilidad]{.alert}: la versión exacta del modelo queda congelada en su disco
+- [Autonomía]{.alert}: funciona sin internet y nadie puede quitárselo
 
 :::{.callout-note}
 **Pista**: para datos de sujetos humanos, "local" no es un lujo técnico, es muchas veces un [requisito ético]{.alert}.
@@ -140,12 +140,12 @@ Correr un LLM [enteramente en nuestra propia máquina]{.alert}, sin internet, si
 
 | Criterio | Modelo local (Ollama) | Modelo en la nube |
 |---|---|---|
-| [Privacidad]{.alert} | Los datos no salen de tu máquina | El texto viaja a un servidor externo |
+| [Privacidad]{.alert} | Los datos no salen de su máquina | El texto viaja a un servidor externo |
 | [Costo]{.alert} | Cero por uso | Gratuito limitado o pago por uso |
 | [Reproducibilidad]{.alert} | Versión exacta congelada | Puede cambiar entre versiones |
 | [Calidad]{.alert} | Buena, por debajo de los de frontera | La mejor disponible |
-| [Velocidad]{.alert} | Depende de tu hardware | Rápida y constante |
-| [Requisitos]{.alert} | 8+ GB de RAM, descarga inicial | Sólo una conexión y una API key |
+| [Velocidad]{.alert} | Depende de su hardware | Rápida y constante |
+| [Requisitos]{.alert} | 8+ GB de RAM, descarga inicial | Solo una conexión y una API key |
 
 <br>
 
@@ -163,7 +163,7 @@ Correr un LLM [enteramente en nuestra propia máquina]{.alert}, sin internet, si
 :::{.column width=55%}
 - Los [pesos]{.alert} son los miles de millones de parámetros que el modelo aprendió durante el entrenamiento. Son, literalmente, el modelo
 - Un modelo de [pesos abiertos]{.alert} es uno cuya empresa publica ese archivo de números: cualquiera puede descargarlo, correrlo y modificarlo
-- Las familias que vimos ayer: [Llama](https://www.llama.com/) (Meta), [Qwen](https://qwen.ai/) (Alibaba), [DeepSeek](https://www.deepseek.com), [Mistral](https://mistral.ai), [Gemma](https://deepmind.google/models/gemma/) (Google), [Granite](https://www.ibm.com/granite) (IBM)
+- Las familias que vimos ayer: [Llama](https://www.llama.com/) (Meta), [Qwen](https://qwen.ai/) (Alibaba), [DeepSeek](https://www.deepseek.com), [Mistral](https://mistral.ai), [Gemma](https://deepmind.google/models/gemma/) (Google); y otras como [Granite](https://www.ibm.com/granite) (IBM), la que usaremos hoy
 - ¿Dónde viven? En [Hugging Face](https://huggingface.co/) (el "GitHub de los modelos") y en la [biblioteca de Ollama](https://ollama.com/library)
 - ¿Por qué las empresas los liberan? Para crear ecosistema, atraer talento y volverse el estándar que todos usan
 :::
@@ -177,7 +177,7 @@ Correr un LLM [enteramente en nuestra propia máquina]{.alert}, sin internet, si
 - Lo que sí obtenemos: el modelo exacto, congelado, en nuestro disco
 
 :::{.callout-note}
-**Pista**: para investigación, lo decisivo no es la licencia sino el [control]{.alert}: nadie puede cambiar ni retirar un modelo que ya está en tu máquina.
+**Pista**: para investigación, lo decisivo no es la licencia sino el [control]{.alert}: nadie puede cambiar ni retirar un modelo que ya está en su máquina.
 :::
 :::
 :::
@@ -191,7 +191,7 @@ Correr un LLM [enteramente en nuestra propia máquina]{.alert}, sin internet, si
 :::{.column width=55%}
 Un argumento que gana fuerza en la metodología ([Spirling, 2023](https://www.nature.com/articles/d41586-023-01295-4); [Palmer, Smith y Spirling, 2024](https://www.nature.com/articles/s43588-023-00585-1)):
 
-- Un modelo cerrado puede [cambiar o desaparecer]{.alert} sin aviso. Si tu medición dependía de él, nadie puede repetirla
+- Un modelo cerrado puede [cambiar o desaparecer]{.alert} sin aviso. Si su medición dependía de él, nadie puede repetirla
 - No se puede [auditar]{.alert}: no sabemos con qué datos fue entrenado ni qué sesgos trae
 - El costo por uso crea [desigualdad]{.alert} entre equipos de investigación con y sin presupuesto
 - Con pesos abiertos, el paquete de replicación puede [fijar el modelo exacto]{.alert}, igual que fijamos la versión de un paquete de R
@@ -213,24 +213,24 @@ Algunas revistas ya piden esa justificación en la sección de métodos.
 :::
 :::
 
-## ¿Cómo entra un LLM en tu laptop? Cuantización
+## ¿Cómo entra un LLM en su laptop? Cuantización
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 - Cada parámetro es un número guardado con cierta [precisión]{.alert} (cantidad de bits)
-- La cuenta para un modelo de 4 mil millones de parámetros (un "4B"):
-    - A 16 bits (2 bytes) por parámetro: [~8 GB]{.alert} de RAM
-    - [Cuantizado]{.alert} a 4 bits: [~3,4 GB]{.alert}. Eso es lo que baja Ollama por defecto
+- La cuenta para un modelo de 3 mil millones de parámetros (un "3B", como el del curso):
+    - A 16 bits (2 bytes) por parámetro: [~6 GB]{.alert} de RAM
+    - [Cuantizado]{.alert} a 4 bits: [~2,1 GB]{.alert}. Eso es lo que baja Ollama por defecto
 - La analogía: como redondear 3,14159265 a 3,14. Se pierde un poco de precisión y se gana muchísimo espacio
 - El costo en calidad es [pequeño]{.alert}: se nota recién en tareas muy finas o razonamiento largo
 
 :::{style="text-align: center;"}
-| Precisión | Bits | RAM aproximada (modelo 4B) |
+| Precisión | Bits | RAM aproximada (modelo 3B) |
 |---|---|---|
-| Original (FP16) | 16 | ~8 GB |
-| q8 | 8 | ~4,5 GB |
-| q4 (default de Ollama) | 4 | ~3,4 GB |
+| Original (FP16) | 16 | ~6 GB |
+| q8 | 8 | ~3,2 GB |
+| q4 (default de Ollama) | 4 | ~2,1 GB |
 :::
 :::
 
@@ -238,14 +238,14 @@ Algunas revistas ya piden esa justificación en la sección de métodos.
 :::{style="font-size: 23px;"}
 **La regla práctica**
 
-El modelo tiene que entrar [cómodo]{.alert} en tu RAM, dejando espacio para el sistema y para R.
+El modelo tiene que entrar [cómodo]{.alert} en su RAM, dejando espacio para el sistema y para R.
 
 - 8 GB de RAM → modelos de hasta ~3 GB
 - 16 GB de RAM → modelos de hasta ~9 GB
 - 32+ GB → modelos medianos (14B-30B cuantizados)
 
 :::{.callout-note}
-**Pista**: ayer vimos que los modelos MoE activan sólo una parte de sus parámetros por token. Cuantización y MoE son las dos razones por las que hoy corre en tu laptop algo que hace tres años necesitaba un servidor.
+**Pista**: ayer vimos que los modelos MoE activan solo una parte de sus parámetros por token. Cuantización y MoE son las dos razones por las que hoy corre en su laptop algo que hace tres años necesitaba un servidor.
 :::
 :::
 :::
@@ -275,7 +275,7 @@ Subir ese texto a una API es transferirlo a un tercero, a veces en otro país. P
 
 :::{.column width=45%}
 :::{style="font-size: 23px;"}
-**Con un modelo local, todo queda en tu máquina**
+**Con un modelo local, todo queda en su máquina**
 
 - [Transcribir]{.alert} las entrevistas (Whisper también corre local)
 - [Codificar]{.alert} y clasificar el material
@@ -283,7 +283,7 @@ Subir ese texto a una API es transferirlo a un tercero, a veces en otro país. P
 - [Anonimizar]{.alert}: detectar y reemplazar nombres, lugares y fechas
 
 :::{.callout-note}
-**Pista**: una estrategia híbrida común: anonimizar primero con el modelo local y recién después, si hace falta más calidad, mandar el texto ya anónimo a la nube.
+**Pista**: una estrategia híbrida común: anonimizar primero con el modelo local y recién después, si hace falta más calidad, mandar el texto ya anónimo a la nube
 :::
 :::
 :::
@@ -298,10 +298,10 @@ Subir ese texto a una API es transferirlo a un tercero, a veces en otro país. P
 En la nube se paga [por token]{.alert}. Una cuenta rápida:
 
 - Clasificar [1 millón de noticias]{.alert} (~400 tokens cada una) ≈ 400 millones de tokens de entrada
-- A USD 1,25 por millón de tokens ≈ [USD 500]{.alert} sólo de entrada, más la salida
+- A USD 1,25 por millón de tokens ≈ [USD 500]{.alert} solo de entrada, más la salida
 - Y los modelos `:free` tienen límites de velocidad (lo sufrimos en el lab 7)
 
-Con un modelo local: [cero costo por uso]{.alert}, sin límites de requests, y la computadora puede trabajar de noche.
+Con un modelo local: [cero costo por uso]{.alert}, sin límites de requests, y la computadora puede trabajar de noche
 :::
 
 :::{.column width=45%}
@@ -314,7 +314,7 @@ Con un modelo local: [cero costo por uso]{.alert}, sin límites de requests, y l
 - Millones de posteos de redes sociales
 
 :::{.callout-note}
-**Pista**: el flujo del lab 8 sigue valiendo: validar el codificador en una [muestra]{.alert} con gold standard y recién después soltarlo sobre el corpus completo.
+**Pista**: el flujo del lab 8 sigue valiendo: validar el codificador en una [muestra]{.alert} con gold standard y recién después soltarlo sobre el corpus completo
 :::
 :::
 :::
@@ -327,11 +327,11 @@ Con un modelo local: [cero costo por uso]{.alert}, sin límites de requests, y l
 :::{.columns}
 :::{.column width=55%}
 - Ayer vimos el problema: el GPT-4 de marzo no era el de diciembre, y la API puede cambiar [sin aviso]{.alert}
-- Con un modelo local, la versión queda [congelada en tu disco]{.alert}
+- Con un modelo local, la versión queda [congelada en su disco]{.alert}
 - Ollama identifica cada modelo con un [digest]{.alert}, una huella digital única (`ollama show` la muestra)
 - Un paquete de replicación completo: el Modelfile, el digest del modelo, los prompts y el código
 
-Quien quiera replicar tu medición en 2030 puede correr [exactamente]{.alert} el mismo pipeline.
+Quien quiera replicar su medición en 2030 puede correr [exactamente]{.alert} el mismo pipeline
 :::
 
 :::{.column width=45%}
@@ -341,7 +341,7 @@ Quien quiera replicar tu medición en 2030 puede correr [exactamente]{.alert} el
 `qlm_trail()` ya documenta el flujo de codificación. Con un modelo local, ese registro pasa de "documentado" a [completamente reproducible]{.alert}: el motor también está versionado.
 
 :::{.callout-note}
-**Pista**: temperatura 0 + modelo local + semilla fija es lo más cerca de un análisis determinista que se puede estar con un LLM.
+**Pista**: temperatura 0 + modelo local + semilla fija es lo más cerca de un análisis determinista que se puede estar con un LLM
 :::
 :::
 :::
@@ -363,18 +363,18 @@ La pregunta no es "¿nube o local?", es [qué parte del flujo va en cada lado]{.
 <br>
 
 :::{.callout-note}
-**Pista**: si el modelo local pierde demasiada precisión en el paso 2, las opciones son: un modelo local más grande, anonimizar y usar la nube, o codificar en la nube sólo los casos difíciles.
+**Pista**: si el modelo local pierde demasiada precisión en el paso 2, las opciones son: un modelo local más grande, anonimizar y usar la nube, o codificar en la nube solo los casos difíciles
 :::
 :::
 
-# Ollama: tu LLM en la terminal {background-color="#2d4563"}
+# Ollama: su LLM en la terminal {background-color="#2d4563"}
 
 ## ¿Qué es Ollama?
 
 :::{style="margin-top: 30px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=55%}
-- [Ollama]{.alert} ([ollama.com](https://ollama.com/)) es una herramienta de línea de comandos para correr LLMs en tu computadora
+- [Ollama]{.alert} ([ollama.com](https://ollama.com/)) es una herramienta de línea de comandos para correr LLMs en su computadora
 - Los modelos vienen [pre-entrenados]{.alert}: se descargan y se usan, sin configurar nada
 - Hay [decenas de modelos]{.alert} en su biblioteca: Llama, Qwen, DeepSeek, Gemma, Granite, phi, entre otros
 - Funciona en [Windows, macOS y Linux]{.alert}
@@ -383,14 +383,16 @@ La pregunta no es "¿nube o local?", es [qué parte del flujo va en cada lado]{.
 
 :::{.column width=45%}
 :::{style="font-size: 22px;"}
-**La idea en una frase**
+:::{style="text-align: center; margin-bottom: 25px;"}
+[![https://ollama.com](figures/ollama-logo.png){width="75%"}](#){data-modal-type="image" data-modal-url="figures/ollama-logo.png"}
+:::
 
 Ollama es como un gestor de modelos: `pull` para bajar, `run` para conversar, y listo.
 
 <br>
 
 :::{.callout-note}
-**Pista**: el mismo programa que usás para chatear en la terminal expone un servidor local que [R puede consultar]{.alert}. Eso es lo que conecta Ollama con `ellmer`.
+**Pista**: el mismo programa que usan para chatear en la terminal expone un servidor local que [R puede consultar]{.alert}. Eso es lo que conecta Ollama con `ellmer`
 :::
 :::
 :::
@@ -425,12 +427,12 @@ Para salir de la conversación: `/bye`
 :::{style="font-size: 24px;"}
 **Qué esperar**
 
-- La descarga tarda según tu conexión, hacela [antes de la clase]{.alert}
-- Una vez bajado, el modelo queda en tu disco y [no hay que volver a descargarlo]{.alert}
+- La descarga tarda según su conexión, háganla [antes de la clase]{.alert}
+- Una vez bajado, el modelo queda en su disco y [no hay que volver a descargarlo]{.alert}
 - La primera respuesta puede tardar unos segundos mientras el modelo se carga en memoria
 
 :::{.callout-note}
-**Pista**: con ~2 GB, el modelo entra cómodo en cualquier laptop con 8 GB de RAM. Con más memoria, podés probar modelos más grandes y comparar la calidad.
+**Pista**: con ~2 GB, el modelo entra cómodo en cualquier laptop con 8 GB de RAM. Con más memoria, pueden probar modelos más grandes y comparar la calidad
 :::
 :::
 :::
@@ -465,7 +467,7 @@ ollama help            # ayuda general
 ```
 
 :::{style="text-align: center; font-size: 24px; margin-top: 20px;"}
-[Con `pull`, `run` y `ls` ya alcanza para todo lo de hoy.]{.alert}
+[Con `pull`, `run` y `ls` ya alcanza para todo lo de hoy]{.alert}
 :::
 :::
 
@@ -487,19 +489,19 @@ ollama help            # ayuda general
 | `granite4.1:3b` | ~2,1 GB | Default del curso |
 :::
 
-La familia Granite incluye modelos más grandes para máquinas con más memoria; para codificar en el laboratorio, la versión de 3B alcanza.
+La familia Granite incluye modelos más grandes para máquinas con más memoria; para codificar en el laboratorio, la versión de 3B alcanza
 :::
 
 :::{.column width=45%}
 :::{style="font-size: 23px; margin-top: -10px;"}
 **Una cosa importante para investigación**
 
-Algunos modelos "piensan" antes de responder (modo razonamiento). Ayuda en problemas difíciles, pero para codificar miles de textos es [lento e inestable]{.alert}.
+Algunos modelos "piensan" antes de responder (modo razonamiento). Ayuda en problemas difíciles, pero para codificar miles de textos es [lento e inestable]{.alert}
 
-Granite [responde directo]{.alert} y está afinado para [salida estructurada]{.alert}: devuelve el JSON que `quallmer` necesita, texto a texto, sin divagar.
+Granite [responde directo]{.alert} y está afinado para [salida estructurada]{.alert}: devuelve el JSON que `quallmer` necesita, texto a texto, sin divagar
 
 :::{.callout-note}
-**Pista**: es la misma idea de reproducibilidad de ayer. Salida estructurada + [temperatura 0]{.alert} = la misma entrada da casi siempre la misma salida.
+**Pista**: es la misma idea de reproducibilidad de ayer. Salida estructurada + [temperatura 0]{.alert} = la misma entrada da casi siempre la misma salida
 :::
 :::
 :::
@@ -521,10 +523,10 @@ Granite [responde directo]{.alert} y está afinado para [salida estructurada]{.a
 :::{style="font-size: 25px;"}
 **La buena noticia para codificar**
 
-Las tareas del laboratorio piden respuestas [cortas]{.alert} (una categoría, un puntaje). Eso es rápido incluso en máquinas modestas.
+Las tareas del laboratorio piden respuestas [cortas]{.alert} (una categoría, un puntaje). Eso es rápido incluso en máquinas modestas
 
 :::{.callout-note}
-**Pista**: para un corpus grande no importa tanto la velocidad por texto sino dejar el script corriendo solo. Mil textos a 5 segundos cada uno son menos de una hora y media.
+**Pista**: para un corpus grande no importa tanto la velocidad por texto sino dejar el script corriendo solo. Mil textos a 5 segundos cada uno son menos de una hora y media
 :::
 :::
 :::
@@ -536,7 +538,7 @@ Las tareas del laboratorio piden respuestas [cortas]{.alert} (una categoría, un
 ## ¿Qué es un Modelfile?
 
 :::{style="margin-top: 30px; font-size: 26px;"}
-- Un [Modelfile]{.alert} es un archivo de texto con [instrucciones para crear tu propia versión]{.alert} de un modelo
+- Un [Modelfile]{.alert} es un archivo de texto con [instrucciones para crear su propia versión]{.alert} de un modelo
 - Parte de un modelo base y le agrega configuración fija: un rol, parámetros, ejemplos
 - Los campos más usados:
     - [`FROM`]{.alert}: el modelo base (por ejemplo, `granite4.1:3b`)
@@ -547,14 +549,14 @@ Las tareas del laboratorio piden respuestas [cortas]{.alert} (una categoría, un
 <br>
 
 :::{style="text-align: center; font-size: 23px;"}
-[Es como guardar tu mejor prompt dentro del modelo, para no repetirlo cada vez.]{.alert}
+[Es como guardar su mejor prompt dentro del modelo, para no repetirlo cada vez]{.alert}
 :::
 :::
 
 ## Un Modelfile para investigación
 
 :::{style="margin-top: 20px; font-size: 21px;"}
-Un asistente de codificación cualitativa: cauteloso, en español, que no inventa.
+Un asistente de codificación cualitativa: cauteloso, en español, que no inventa
 
 ```dockerfile
 FROM granite4.1:3b
@@ -571,7 +573,7 @@ Tu tarea es clasificar y resumir textos políticos en español
 de forma cuidadosa y conservadora.
 
 Reglas:
-- Respondé sólo con lo que el texto dice. No inventes datos,
+- Respondé solo con lo que el texto dice. No inventes datos,
   nombres ni cifras.
 - Si el texto no da información suficiente, respondé
   "no determinado" en vez de adivinar.
@@ -582,21 +584,21 @@ Reglas:
 ```
 :::
 
-## Crear y correr tu modelo
+## Crear y correr su modelo
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-1. Guardá el texto anterior en un archivo llamado `codificador` (sin extensión)
+1. Guarden el texto anterior en un archivo llamado `codificador` (sin extensión)
 
-2. Creá el modelo a partir del Modelfile:
+2. Creen el modelo a partir del Modelfile:
   - `-f` indica el archivo (file)
 
 ```bash
 ollama create codificador -f codificador
 ```
 
-3. Usalo como cualquier otro modelo:
+3. Úsenlo como cualquier otro modelo:
 
 ```bash
 ollama run codificador
@@ -612,7 +614,7 @@ ollama run codificador
 - Si otra persona usa el mismo Modelfile, obtiene el [mismo asistente]{.alert}
 
 :::{.callout-note}
-**Pista**: un Modelfile es texto plano. Subilo a tu repositorio y tu codificador queda [documentado y reproducible]{.alert}.
+**Pista**: un Modelfile es texto plano. Súbanlo a su repositorio y su codificador queda [documentado y reproducible]{.alert}
 :::
 :::
 :::
@@ -622,15 +624,15 @@ ollama run codificador
 ## ¿Para qué sirve un Modelfile?
 
 :::{style="margin-top: 30px; font-size: 26px;"}
-- [A medida]{.alert}: un asistente especializado en tu tema, tu esquema de codificación o tu idioma
+- [A medida]{.alert}: un asistente especializado en su tema, su esquema de codificación o su idioma
 - [Reproducible]{.alert}: el rol y los parámetros quedan escritos y versionados, no dependen de la memoria de quien lo usa
-- [Eficiente]{.alert}: fijás un comportamiento una vez y lo reutilizás en todo el proyecto
-- [Privado]{.alert}: corre en tu máquina, ideal para datos que no pueden salir de ahí
+- [Eficiente]{.alert}: fijan un comportamiento una vez y lo reutilizan en todo el proyecto
+- [Privado]{.alert}: corre en su máquina, ideal para datos que no pueden salir de ahí
 
 <br>
 
 :::{style="text-align: center; font-size: 24px;"}
-[Para un proyecto de codificación, el Modelfile es tu "libro de códigos" hecho modelo.]{.alert}
+[Para un proyecto de codificación, el Modelfile es su "libro de códigos"]{.alert}
 :::
 :::
 
@@ -642,7 +644,7 @@ ollama run codificador
 :::{.columns}
 :::{.column width=52%}
 - Ollama deja corriendo un [servidor local]{.alert} que `ellmer` consulta igual que a la nube
-- Cambiás `chat_openrouter()` por [`chat_ollama()`]{.alert} y el resto del código no se toca
+- Cambian `chat_openrouter()` por [`chat_ollama()`]{.alert} y el resto del código no se toca
 - Las mismas [cuatro defensas]{.alert} de ayer siguen aplicando
 
 ```r
@@ -662,7 +664,7 @@ chat$chat("Clasificá el sentimiento de este texto: ...")
 **Extracción estructurada, local**
 
 ```r
-chat$extract_data(
+chat$chat_structured(
   "La economía está en crisis.",
   type = type_object(
     tema        = type_string(),
@@ -675,7 +677,7 @@ chat$extract_data(
 - `quallmer`, el paquete de codificación cualitativa, usa [`ellmer`]{.alert} por debajo
 - Así que todo esto funciona también con un modelo [local]{.alert}
 
-[En el laboratorio: codificamos un corpus con `granite4.1` y validamos el resultado.]{.alert}
+[En el laboratorio: codificamos un corpus con `granite4.1` y validamos el resultado]{.alert}
 :::
 :::
 :::
@@ -708,7 +710,7 @@ codificado_local <- qlm_code(
 :::{style="font-size: 23px; margin-top: -15px;"}
 **Ventajas inmediatas**
 
-- No hay límites de la API ni errores `400`: el servidor es tuyo
+- No hay límites de la API ni errores `400`: el servidor es suyo
 - No hay API key que configurar
 - Se puede correr con la computadora [sin internet]{.alert}
 
@@ -726,20 +728,20 @@ codificado_local <- qlm_code(
 :::{.columns}
 :::{.column width=55%}
 - Todo lo que hicimos esta semana cambia el [contexto]{.alert} (prompts, ejemplos, Modelfile), nunca los pesos
-- El [fine-tuning]{.alert} va un paso más allá: re-entrena parcialmente los pesos con tus propios ejemplos etiquetados
+- El [fine-tuning]{.alert} va un paso más allá: re-entrena parcialmente los pesos con sus propios ejemplos etiquetados
 - La técnica más común es [LoRA]{.alert} ([Hu et al., 2021](https://arxiv.org/abs/2106.09685)): entrena unos adaptadores chicos en vez de tocar todo el modelo, así que es viable en una sola GPU
-- Con pesos abiertos, el fine-tuning es posible. Con modelos cerrados, dependés de lo que ofrezca la empresa
+- Con pesos abiertos, el fine-tuning es posible. Con modelos cerrados, dependen de lo que ofrezca la empresa
 :::
 
 :::{.column width=45%}
 :::{style="font-size: 24px; margin-top: -15px;"}
 **¿Cuándo considerarlo?**
 
-- Cuando el prompting con few-shot [no alcanza]{.alert} y tenés miles de ejemplos etiquetados
+- Cuando el prompting con few-shot [no alcanza]{.alert} y tienen miles de ejemplos etiquetados
 - Para tareas muy especializadas (jerga legal, registros históricos)
 
 :::{.callout-note}
-**Pista**: para la mayoría de los proyectos de investigación social, un buen codebook bien validado alcanza. El fine-tuning es la herramienta de último recurso, no la primera.
+**Pista**: para la mayoría de los proyectos de investigación social, un buen codebook bien validado alcanza. El fine-tuning es la herramienta de último recurso, no la primera
 :::
 :::
 :::
@@ -752,7 +754,7 @@ codificado_local <- qlm_code(
 :::{.columns}
 :::{.column width=55%}
 - [Calidad]{.alert}: un modelo de 3 mil millones de parámetros codifica peor que uno de frontera en la nube
-- [Velocidad]{.alert}: depende de tu hardware; sin GPU puede ser lento
+- [Velocidad]{.alert}: depende de su hardware; sin GPU puede ser lento
 - [Memoria]{.alert}: los modelos grandes (30B+) no entran en una laptop
 - [Tareas complejas]{.alert}: razonamiento largo o matices sutiles pueden superarlo
 :::
@@ -761,12 +763,12 @@ codificado_local <- qlm_code(
 :::{style="font-size: 24px; margin-top: -15px;"}
 **Por eso siempre validamos**
 
-Un modelo local es un [punto de partida útil]{.alert}, no la última palabra.
+Un modelo local es un [punto de partida útil]{.alert} apenas
 
 La defensa 4 de ayer sigue siendo la regla: [la validación y la reproducibilidad mejoran mucho la calidad de la investigación]{.alert}
 
 :::{.callout-note}
-**Pista**: corré el modelo local sobre una muestra con respuestas conocidas (gold standard) y medí qué tan seguido acierta antes de confiar en él para todo el corpus.
+**Pista**: corran el modelo local sobre una muestra con respuestas conocidas (gold standard) y midan qué tan seguido acierta antes de confiar en él para todo el corpus
 :::
 :::
 :::
@@ -781,7 +783,7 @@ La defensa 4 de ayer sigue siendo la regla: [la validación y la reproducibilida
 **Lo que vimos**
 
 - Correr local da [privacidad, costo cero y reproducibilidad]{.alert}
-- [Pesos abiertos]{.alert}: el modelo congelado en tu disco, auditable y replicable
+- [Pesos abiertos]{.alert}: el modelo congelado en su disco, auditable y replicable
 - La [cuantización]{.alert} es lo que hace entrar un LLM en una laptop común
 - En investigación social: [datos sensibles]{.alert}, corpus enormes y paquetes de replicación
 - [Ollama]{.alert}: `pull`, `run`, `ls` y poco más; el [Modelfile]{.alert} fija un rol reproducible
@@ -793,12 +795,12 @@ La defensa 4 de ayer sigue siendo la regla: [la validación y la reproducibilida
 
 - [Datos sensibles]{.alert} o reproducibilidad → local
 - [Máxima calidad]{.alert} o prototipo rápido → nube
-- Lo habitual: [combinar]{.alert}. Prototipar en la nube, validar ambos, producir en local
+- Lo habitual es [combinar]{.alert}. Prototipar en la nube, validar ambos, producir en local. O viceversa, dependiendo del proyecto
 
 **Regla de oro**
 
 :::{.callout-note}
-**Pista**: local o nube, ningún LLM es fuente de verdad. Siempre validar contra un estándar conocido.
+**Pista**: local o nube, ningún LLM es fuente de verdad. Siempre validar contra un estándar conocido
 :::
 :::
 :::
@@ -814,7 +816,7 @@ La defensa 4 de ayer sigue siendo la regla: [la validación y la reproducibilida
     - Codificar datos sensibles (simulados) con `quallmer` y el modelo local, y validar contra un gold standard
     - Auditar la equidad de un modelo de crédito con `fairmodels`
 
-- [Laboratorio 10]{.alert}: discusión de proyectos y preguntas y respuestas
+- [Sesión 5.4]{.alert}: mini-propuestas de investigación, discusión de proyectos y cierre
 
 <br>
 

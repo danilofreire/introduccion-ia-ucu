@@ -246,7 +246,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="instrucciones" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="instrucciones"><span class="header-section-number">1</span> Instrucciones</h2>
-<p>Esta tarea aplica los conceptos del Laboratorio 8 a una construcción <span class="alert">nueva</span>: la retórica populista. En la clase medimos retórica liberal-iliberal con un codebook que ya venía dado; acá vas a <span class="alert">diseñar el tuyo desde cero</span>, codificar a mano tu propio gold standard, validar, medir confiabilidad y auditar un sesgo. Responder cada pregunta escribiendo código R en los bloques indicados.</p>
+<p>Esta tarea aplica los conceptos del Laboratorio 8 a una construcción <span class="alert">nueva</span>: la retórica populista. En la clase medimos retórica liberal-iliberal con un codebook que ya venía dado; acá van a <span class="alert">diseñar el suyo desde cero</span>, codificar a mano su propio gold standard, validar, medir confiabilidad y auditar un sesgo. Responder cada pregunta escribiendo código R en los bloques indicados.</p>
 <p><strong>Para trabajar en esta tarea:</strong></p>
 <ol type="1">
 <li>Descarguen este archivo <code>.qmd</code> y <code>discursos_ideologia.csv</code> (en <code>clases/dia-04/datos/</code>) de la <a href="https://danilofreire.github.io/introduccion-ia-ucu/laboratorios.html">página del curso</a>, o clonen el repositorio con <code>git clone https://github.com/danilofreire/introduccion-ia-ucu.git</code>. Mantengan el CSV en una subcarpeta <code>datos/</code> junto al <code>.qmd</code></li>
@@ -278,17 +278,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="2" class="anchored" data-anchor-id="codificación-y-validación"><span class="header-section-number">2</span> Codificación y validación</h2>
 <section id="pregunta-1-diseñar-un-codebook-para-populismo" class="level3" data-number="2.1">
 <h3 data-number="2.1" class="anchored" data-anchor-id="pregunta-1-diseñar-un-codebook-para-populismo"><span class="header-section-number">2.1</span> Pregunta 1: Diseñar un codebook para populismo</h3>
-<p>Diseñá desde cero un codebook para medir <span class="alert">retórica populista</span>: el grado en que un discurso apela al “pueblo” o “la gente común” en contra de una “élite”, “casta” o “los de arriba”. Usá una escala de 0 (nada populista) a 10 (muy populista). Escribí instrucciones claras de qué cuenta como populismo.</p>
-<p><em>Pista:</em> mirá el codebook de la clase como molde, pero las <code>instructions</code> y la escala son tuyas. Un <code>type_integer</code> con <code>levels = list(... = "interval")</code>.</p>
+<p>Diseñen desde cero un codebook para medir <span class="alert">retórica populista</span>: el grado en que un discurso apela al “pueblo” o “la gente común” en contra de una “élite”, “casta” o “los de arriba”. Usen una escala de 0 (nada populista) a 10 (muy populista). Escriban instrucciones claras de qué cuenta como populismo.</p>
+<p><em>Pista:</em> miren el codebook de la clase como molde, pero las <code>instructions</code> y la escala son suyas. Un <code>type_integer</code> con <code>levels = list(... = "interval")</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><strong>Respuesta:</strong></p>
 </section>
-<section id="pregunta-2-codificar-a-mano-tu-propio-gold" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-codificar-a-mano-tu-propio-gold"><span class="header-section-number">2.2</span> Pregunta 2: Codificar a mano tu propio gold</h3>
-<p>Antes de confiar en el LLM, codificá vos. Elegí seis discursos del corpus y asignales a mano un puntaje de populismo (0 a 10) según tu propio juicio y tu codebook. Construí el gold standard con <code>qlm_humancoded()</code>.</p>
-<p><em>Pista:</em> el gold necesita una columna <code>.id</code> y tu columna de puntaje. Es la misma estructura que usaste para las etiquetas humanas en la clase.</p>
+<section id="pregunta-2-codificar-a-mano-su-propio-gold" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-codificar-a-mano-su-propio-gold"><span class="header-section-number">2.2</span> Pregunta 2: Codificar a mano su propio gold</h3>
+<p>Antes de confiar en el LLM, codifiquen ustedes. Elijan seis discursos del corpus y asígnenles a mano un puntaje de populismo (0 a 10) según su propio juicio y su codebook. Construyan el gold standard con <code>qlm_humancoded()</code>.</p>
+<p><em>Pista:</em> el gold necesita una columna <code>.id</code> y su columna de puntaje. Es la misma estructura que usaron para las etiquetas humanas en la clase.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -296,8 +296,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-3-codificar-con-el-llm-y-validar" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-codificar-con-el-llm-y-validar"><span class="header-section-number">2.3</span> Pregunta 3: Codificar con el LLM y validar</h3>
-<p>Codificá los mismos seis discursos con <code>qlm_code()</code> y validá contra tu gold con <code>qlm_validate()</code> a nivel de intervalo. Reportá la correlación de Pearson y el ICC. ¿El LLM coincide con tu juicio?</p>
-<p><em>Pista:</em> <code>qlm_validate(coded, gold = gold, by = "populismo", level = "interval")</code>. Mostralo como tabla con <code>as_tibble(...) |&gt; select(measure, value)</code>.</p>
+<p>Codifiquen los mismos seis discursos con <code>qlm_code()</code> y validen contra su gold con <code>qlm_validate()</code> a nivel de intervalo. Reporten la correlación de Pearson y el ICC. ¿El LLM coincide con su juicio?</p>
+<p><em>Pista:</em> <code>qlm_validate(coded, gold = gold, by = "populismo", level = "interval")</code>. Muéstrenlo como tabla con <code>as_tibble(...) |&gt; select(measure, value)</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -308,7 +308,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="3" class="anchored" data-anchor-id="confiabilidad-y-métodos-clásicos"><span class="header-section-number">3</span> Confiabilidad y métodos clásicos</h2>
 <section id="pregunta-4-confiabilidad-de-dos-formulaciones" class="level3" data-number="3.1">
 <h3 data-number="3.1" class="anchored" data-anchor-id="pregunta-4-confiabilidad-de-dos-formulaciones"><span class="header-section-number">3.1</span> Pregunta 4: Confiabilidad de dos formulaciones</h3>
-<p>La confiabilidad no es sólo entre corridas: también importa si el resultado cambia al reformular el codebook. Escribí una segunda versión de tu codebook con instrucciones más breves (<code>codebook_breve</code>), codificá los mismos textos y compará las dos codificaciones con <code>qlm_compare()</code>. ¿Son estables?</p>
+<p>La confiabilidad no es solo entre corridas: también importa si el resultado cambia al reformular el codebook. Escriban una segunda versión de su codebook con instrucciones más breves (<code>codebook_breve</code>), codifiquen los mismos textos y comparen las dos codificaciones con <code>qlm_compare()</code>. ¿Son estables?</p>
 <p><em>Pista:</em> <code>qlm_compare(coded1, coded2, by = "populismo", level = "interval", tolerance = 1)</code> da el alpha de Krippendorff.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -317,8 +317,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-5-llm-vs-diccionario" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-llm-vs-diccionario"><span class="header-section-number">3.2</span> Pregunta 5: LLM vs diccionario</h3>
-<p>Compará el LLM con un método clásico. Armá un diccionario de palabras populistas (pueblo, gente, élite, casta, corruptos, privilegiados…) y contá cuántas aparecen en cada discurso. Correlacioná ese conteo con el puntaje del LLM. ¿Cuánto se parecen?</p>
-<p><em>Pista:</em> tokenizá con <code>tidytext::unnest_tokens()</code>, contá las coincidencias por discurso y usá <code>cor()</code>.</p>
+<p>Comparen el LLM con un método clásico. Armen un diccionario de palabras populistas (pueblo, gente, élite, casta, corruptos, privilegiados…) y cuenten cuántas aparecen en cada discurso. Correlacionen ese conteo con el puntaje del LLM. ¿Cuánto se parecen?</p>
+<p><em>Pista:</em> tokenicen con <code>tidytext::unnest_tokens()</code>, cuenten las coincidencias por discurso y usen <code>cor()</code>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -329,8 +329,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="4" class="anchored" data-anchor-id="auditoría-y-datos-sintéticos"><span class="header-section-number">4</span> Auditoría y datos sintéticos</h2>
 <section id="pregunta-6-sesgo-por-etiqueta-ideológica" class="level3" data-number="4.1">
 <h3 data-number="4.1" class="anchored" data-anchor-id="pregunta-6-sesgo-por-etiqueta-ideológica"><span class="header-section-number">4.1</span> Pregunta 6: Sesgo por etiqueta ideológica</h3>
-<p>Auditá un sesgo distinto al del género. Pedile al modelo que describa las propuestas económicas de un político, variando sólo una etiqueta: “un político de izquierda” vs “un político de derecha”. Codificá las dos descripciones con un codebook de tono (-5 a +5) y compará. ¿El modelo trata distinto a una etiqueta que a la otra?</p>
-<p><em>Pista:</em> mismo texto, sólo cambia la etiqueta. Es el patrón de la slide “Medir el sesgo”, con etiquetas ideológicas en vez de nombres.</p>
+<p>Auditen un sesgo distinto al del género. Pídanle al modelo que describa las propuestas económicas de un político, variando solo una etiqueta: “un político de izquierda” vs “un político de derecha”. Codifiquen las dos descripciones con un codebook de tono (-5 a +5) y comparen. ¿El modelo trata distinto a una etiqueta que a la otra?</p>
+<p><em>Pista:</em> mismo texto, solo cambia la etiqueta. Es el patrón de la slide “Medir el sesgo”, con etiquetas ideológicas en vez de nombres.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -338,8 +338,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="pregunta-7-viñetas-sintéticas-para-un-experimento" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-7-viñetas-sintéticas-para-un-experimento"><span class="header-section-number">4.2</span> Pregunta 7: Viñetas sintéticas para un experimento</h3>
-<p>Los LLMs sirven para generar estímulos de experimentos. Usá <code>chat_structured()</code> para generar cuatro viñetas cortas que describan a un candidato, variando una sola dimensión: su postura migratoria (restrictiva / abierta). Cada viñeta debe ser plausible y comparable. Mostralas.</p>
-<p><em>Pista:</em> definí un <code>type_array</code> de <code>type_object</code> con un campo <code>postura</code> y un campo <code>texto</code>. Pedile viñetas equilibradas que sólo difieran en esa dimensión.</p>
+<p>Los LLMs sirven para generar estímulos de experimentos. Usen <code>chat_structured()</code> para generar cuatro viñetas cortas que describan a un candidato, variando una sola dimensión: su postura migratoria (restrictiva / abierta). Cada viñeta debe ser plausible y comparable. Muéstrenlas.</p>
+<p><em>Pista:</em> definan un <code>type_array</code> de <code>type_object</code> con un campo <code>postura</code> y un campo <code>texto</code>. Pídanle viñetas equilibradas que solo difieran en esa dimensión.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>

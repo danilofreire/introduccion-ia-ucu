@@ -63,7 +63,7 @@ longitudes <- tokens |>
   count(id, name = "n_tokens")
 
 # Texto más corto
-mas_corto <- longitudes |> slice_min(n_tokens, n = 1)
+mas_corto <- longitudes |> slice_min(n_tokens, n = 1, with_ties = FALSE)
 mas_corto
 
 # Texto más largo
@@ -74,7 +74,7 @@ mas_largo
 textos |> filter(id %in% c(mas_corto$id, mas_largo$id)) |> select(id, tema, texto)
 ```
 
-**Respuesta:** El texto más corto tiene 10 palabras (tokens) y el más largo 20; la variación es moderada. Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).
+**Respuesta:** El texto más corto tiene 10 palabras (tokens) y el más largo 20; la variación es moderada (hay un empate en el mínimo, con dos textos de 10 palabras; `with_ties = FALSE` se queda con uno solo para la comparación). Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).
 
 ### Pregunta 3: Bigramas más frecuentes
 
@@ -93,7 +93,7 @@ bigramas <- textos |>
 bigramas
 ```
 
-**Respuesta:** En este corpus pequeño casi ningún bigrama se repite mucho: los más frecuentes aparecen solo 2 veces (**"crecimiento económico"**, **"comunidades indígenas"**, **"implementado programas"**, **"alcanzado niveles"**). Aun así ilustran la ventaja de los bigramas: recuperan colocaciones (palabras que van juntas con significado conjunto, como "crecimiento económico") que las palabras sueltas pierden. Con un corpus más grande, estas colocaciones se repetirían lo suficiente como para ser muy informativas.
+**Respuesta:** En este corpus pequeño casi ningún bigrama se repite mucho: los más frecuentes aparecen solo 2 veces (**"crecimiento económico"**, **"comunidades indígenas"**, **"implementado programas"**, **"alcanzado niveles"**, **"necesita mayor"**). Aun así ilustran la ventaja de los bigramas: recuperan colocaciones (palabras que van juntas con significado conjunto, como "crecimiento económico") que las palabras sueltas pierden. Con un corpus más grande, estas colocaciones se repetirían lo suficiente como para ser muy informativas.
 
 ## TF-IDF
 
@@ -115,7 +115,7 @@ tokens_limpios |>
   select(tema, palabra, tf_idf)
 ```
 
-**Respuesta:** La lista por frecuencia bruta está dominada por palabras genéricas que aparecen en muchos temas: **región, programas, sigue, comunidades, año**. Son frecuentes pero no distinguen un tema de otro. En la lista de TF-IDF esas palabras genéricas desaparecen y emergen términos específicos de cada tema (económico, estudiantes, biodiversidad, etc.). La razón es el factor IDF: una palabra que aparece en muchos grupos tiene IDF bajo (el logaritmo se acerca a cero), así que su TF-IDF se hunde por más frecuente que sea. Esta es justamente la razón de ser de TF-IDF: la frecuencia no es lo mismo que la capacidad de distinguir.
+**Respuesta:** La lista por frecuencia bruta está dominada por palabras genéricas que aparecen en muchos temas: **región, programas, sigue, comunidades, representan**. Son frecuentes pero no distinguen un tema de otro. En la lista de TF-IDF esas palabras genéricas desaparecen y emergen términos específicos de cada tema (económico, estudiantes, biodiversidad, etc.). La razón es el factor IDF: una palabra que aparece en muchos grupos tiene IDF bajo (el logaritmo se acerca a cero), así que su TF-IDF se hunde por más frecuente que sea. Esta es justamente la razón de ser de TF-IDF: la frecuencia no es lo mismo que la capacidad de distinguir.
 
 ### Pregunta 5: ¿Cuándo informa el TF-IDF por grupo?
 
@@ -221,7 +221,7 @@ textos |>
   select(id, tema, pais, anio, texto)
 ```
 
-**Respuesta:** El texto más positivo suele estar en los temas **economía** o **educación**, con palabras como crecimiento, mejora, sólido, oportunidad. El método capta bien el tono explícitamente positivo. Lo que NO capta: matices, condicionales ("podríamos crecer si..."), o palabras positivas específicas al dominio que no están en el diccionario (p. ej. "renacimiento", "auge").
+**Respuesta:** El texto más positivo es el id 1 (tema **economía**, México, 2020), con palabras como crecimiento, económico, sólido. El método capta bien el tono explícitamente positivo. Lo que NO capta: matices, condicionales ("podríamos crecer si..."), o palabras positivas específicas al dominio que no están en el diccionario (p. ej. "renacimiento", "auge").
 
 ### Pregunta 10: Heatmap sentimiento por tema y año
 

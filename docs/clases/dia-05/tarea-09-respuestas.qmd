@@ -111,7 +111,7 @@ validacion <- qlm_validate(codificado, gold = gold, by = "motivo", level = "nomi
 as_tibble(validacion) |> select(measure, value)
 ```
 
-**Respuesta:** los datos nunca salieron de la máquina: cada texto viajó al servidor local de Ollama y volvió con su categoría. Con cinco categorías, adivinar al azar daría un 20% de aciertos, así que el kappa (acuerdo corregido por azar) es la métrica honesta. Si supera el umbral de 0,7 del curso, el modelo local es un codificador utilizable; conviene además mirar la pregunta 4 antes de declararlo confiable, porque la accuracy global puede esconder errores concentrados en una frontera.
+**Respuesta:** los datos nunca salieron de la máquina: cada texto viajó al servidor local de Ollama y volvió con su categoría. Con cinco categorías, adivinar al azar daría un 20% de aciertos, así que el kappa (acuerdo corregido por azar) es la métrica honesta. En esta corrida, accuracy = 0,83 y kappa = 0,79, por encima del umbral de 0,7 del curso: el modelo local es un codificador utilizable. Aun así conviene mirar la pregunta 4 antes de declararlo confiable, porque la accuracy global puede esconder errores concentrados en una frontera.
 
 ### Pregunta 4: La tabla de confusión
 
@@ -122,7 +122,7 @@ tabla_confusion <- as_tibble(codificado) |>
 
 tabla_confusion |> arrange(desc(n))
 
-# Sólo los desacuerdos
+# Solo los desacuerdos
 tabla_confusion |> filter(motivo != gold)
 ```
 
@@ -168,7 +168,7 @@ validacion_v2 <- qlm_validate(codificado_v2, gold = gold, by = "motivo", level =
 as_tibble(validacion_v2) |> select(measure, value)
 ```
 
-**Respuesta:** la tabla de confusión convierte una lista de errores en un diagnóstico: si el modelo confunde de forma repetida un mismo par de categorías, el problema casi siempre está en el codebook, no en el modelo. La regla nueva debe atacar ese par concreto (acá usamos como ejemplo la frontera entre `desconfianza` y `estigma`: ambas hablan de razones para no ir, pero una mira a los profesionales y la otra al entorno social). Sobre la mejora, la advertencia de la pista es seria: con 18 textos cada caso vale 5,6 puntos de accuracy, así que pasar de una corrida a otra con un acierto más o menos puede ser ruido. La forma correcta de evaluar una regla es con más datos o con varias corridas, mirando también si las justificaciones citan la regla.
+**Respuesta:** la tabla de confusión convierte una lista de errores en un diagnóstico: si el modelo confunde de forma repetida un mismo par de categorías, el problema casi siempre está en el codebook, no en el modelo. Con solo 18 textos hay apenas tres desacuerdos, cada uno distinto (`costo`/`autosuficiencia`, `desconfianza`/`estigma`, `falta_tiempo`/`desconfianza`), así que no hay un único par que domine; elegimos como ejemplo la frontera entre `desconfianza` y `estigma`, porque ambas hablan de razones para no ir, pero una mira a los profesionales y la otra al entorno social. La regla nueva mejoró el resultado (accuracy 0,83 → 0,89; kappa 0,79 → 0,86), pero la advertencia de la pista es seria: con 18 textos cada caso vale 5,6 puntos de accuracy, así que una mejora de un solo acierto puede ser ruido. La forma correcta de evaluar una regla es con más datos o con varias corridas, mirando también si las justificaciones citan la regla.
 
 ### Pregunta 5: ¿El modelo local es determinista?
 
@@ -179,7 +179,7 @@ confiabilidad <- qlm_compare(codificado, corrida_b, by = "motivo", level = "nomi
 as_tibble(confiabilidad) |> select(measure, value)
 ```
 
-**Respuesta:** con `temperature = 0` el modelo elige siempre el token más probable, así que el acuerdo entre corridas suele ser perfecto o casi perfecto, mucho más alto que con los modelos de la nube del Día 4 (donde además el proveedor puede cambiar el modelo sin avisar). Pero no es una garantía matemática: la aritmética de punto flotante en la GPU puede producir empates que se resuelven distinto, y actualizar Ollama o el archivo del modelo puede cambiar los resultados. Por eso la sesión 5.1 insiste en congelar y reportar la versión exacta del modelo (el digest de `ollama list`): la reproducibilidad viene del paquete completo (modelo fijo + temperatura 0 + codebook documentado), no de un solo parámetro.
+**Respuesta:** con `temperature = 0` el modelo elige siempre el token más probable; en esta corrida el acuerdo entre las dos pasadas fue perfecto (kappa = 1), mucho más alto que con los modelos de la nube del Día 4 (donde además el proveedor puede cambiar el modelo sin avisar). Pero no es una garantía matemática: la aritmética de punto flotante en la GPU puede producir empates que se resuelven distinto, y actualizar Ollama o el archivo del modelo puede cambiar los resultados. Por eso la sesión 5.1 insiste en congelar y reportar la versión exacta del modelo (el digest de `ollama list`): la reproducibilidad viene del paquete completo (modelo fijo + temperatura 0 + codebook documentado), no de un solo parámetro.
 
 ## Auditoría de equidad
 
@@ -219,7 +219,7 @@ fobject
 plot(fobject)
 ```
 
-**Respuesta:** igual que en el laboratorio, la regresión logística no usa `Sex` y aun así puede tratar distinto a los grupos, porque otras variables (monto, historial, vivienda) funcionan como proxies. La lectura es la del laboratorio: cada barra es el ratio mujer/hombre de una métrica, y la zona verde (0,8 a 1,25) es la regla del 80%. El `print()` del objeto dice cuántas métricas pasan; típicamente alguna queda fuera, y el teorema de imposibilidad nos recuerda que no podríamos arreglarlas todas a la vez aunque quisiéramos.
+**Respuesta:** igual que en el laboratorio, la regresión logística no usa `Sex`, pero eso no garantiza equidad: otras variables (monto, historial, vivienda) pueden funcionar como proxies. En esta corrida el modelo pasa las 5/5 métricas de la regla del 80% (los ratios mujer/hombre van de 0,93 a 1,01), así que a nivel de sexo solo no se detecta una violación clara. Eso no significa que el modelo sea equitativo: la Pregunta 7 muestra que mirar solo el sexo puede esconder un problema que aparece al cruzarlo con la edad.
 
 ### Pregunta 7: Auditoría interseccional
 
@@ -246,7 +246,7 @@ fobject_int
 plot(fobject_int)
 ```
 
-**Respuesta:** ahora cada métrica se calcula para tres grupos contra el de referencia (`hombre_mayor`), y el gráfico muestra lo que la auditoría por sexo solo no podía mostrar: las disparidades más grandes suelen concentrarse en una intersección (en general, las mujeres jóvenes quedan peor que lo que sugiere el promedio de "las mujeres"). La lección metodológica es general: auditar por un atributo a la vez puede dar un falso aprobado, porque los promedios de cada grupo esconden a los subgrupos. El costo de la interseccionalidad es estadístico: cuantos más grupos, menos casos por celda y más ruidosas las métricas, así que conviene elegir las intersecciones con teoría y no probar todas las combinaciones posibles.
+**Respuesta:** ahora cada métrica se calcula para tres grupos contra el de referencia (`hombre_mayor`), y el modelo pasa 4/5 métricas: falla la razón de igualdad predictiva (FP/(FP+TN)), con `hombre_joven` (0,77) y `mujer_mayor` (0,78) por debajo de 0,8, mientras que `mujer_joven` (0,88) sí queda dentro del rango. Es exactamente lo que la auditoría por sexo solo no podía mostrar (la Pregunta 6 pasaba las 5/5 métricas): el sesgo no sigue una única línea divisoria sino su combinación, y el grupo más perjudicado no es necesariamente el que uno esperaría mirando cada atributo por separado. La lección metodológica es general: auditar por un atributo a la vez puede dar un falso aprobado, porque los promedios de cada grupo esconden a los subgrupos. El costo de la interseccionalidad es estadístico: cuantos más grupos, menos casos por celda y más ruidosas las métricas, así que conviene elegir las intersecciones con teoría y no probar todas las combinaciones posibles.
 
 ## Reflexión
 

@@ -29,7 +29,7 @@ set.seed(2026)
 
 # Cargar el corpus simulado (60 textos políticos)
 textos <- read_csv("datos/textos_politicos.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # textos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/textos_politicos.csv", show_col_types = FALSE)
 
 glimpse(textos)
@@ -118,7 +118,7 @@ tfidf |>
 
 tfidf |>
   group_by(tema) |>
-  slice_max(tf_idf, n = 6) |>
+  slice_max(tf_idf, n = 6, with_ties = FALSE) |>
   ungroup() |>
   mutate(palabra = reorder_within(palabra, tf_idf, tema)) |>
   ggplot(aes(x = tf_idf, y = palabra, fill = tema)) +
@@ -139,8 +139,12 @@ tfidf_pais <- tokens_limpios |>
 # Top 5 palabras distintivas por país
 tfidf_pais |>
   group_by(pais) |>
-  slice_max(tf_idf, n = 5) |>
+  slice_max(tf_idf, n = 5, with_ties = FALSE) |>
   arrange(pais, desc(tf_idf))
+
+# Para ver TODAS las palabras: sin slice_max() y con print(n = Inf), porque
+# las tibbles muestran solo diez filas por defecto (o View(tfidf_pais))
+tfidf_pais |> arrange(pais, desc(tf_idf)) |> print(n = Inf)
 
 # Lecciones:
 # - Aparecen palabras locales (instituciones, ciudades) y términos específicos

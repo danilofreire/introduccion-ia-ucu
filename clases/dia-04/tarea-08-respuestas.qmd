@@ -15,7 +15,7 @@ engine: knitr
 
 ## Instrucciones
 
-Esta es la clave de respuestas de la Tarea 8. Los bloques que sólo definen un codebook corren al renderizar; los que llaman a la API están marcados con `eval=FALSE` para no gastar peticiones. Para correrlos hace falta `OPENROUTER_API_KEY` en `.Renviron`, el paquete `quallmer` instalado y `max_active = 2` para que el modelo `:free` no se sature. Los puntajes hechos a mano son ejemplos: cada estudiante puede tener juicios distintos.
+Esta es la clave de respuestas de la Tarea 8. Los bloques que solo definen un codebook corren al renderizar; los que llaman a la API están marcados con `eval=FALSE` para no gastar peticiones. Para correrlos hace falta `OPENROUTER_API_KEY` en `.Renviron`, el paquete `quallmer` instalado y `max_active = 2` para que el modelo `:free` no se sature. Los puntajes hechos a mano son ejemplos: cada estudiante puede tener juicios distintos.
 
 ### Configuración
 
@@ -58,7 +58,7 @@ codebook_populismo <- qlm_codebook(
 
 **Respuesta:** un buen codebook nombra la construcción, fija la escala y define los polos de forma concreta (qué cuenta como populismo y qué no). La parte difícil no es el código sino las `instructions`: cuanto más operacionales, más confiable y replicable es la codificación. Marcar `populismo` como `interval` le dice a `quallmer` que use correlación y error, no accuracy.
 
-### Pregunta 2: Codificar a mano tu propio gold
+### Pregunta 2: Codificar a mano su propio gold
 
 ```{r p2, eval=FALSE}
 # Seis discursos variados del corpus
@@ -88,7 +88,7 @@ validacion <- qlm_validate(codificado, gold = gold,
 as_tibble(validacion) |> select(measure, value)
 ```
 
-**Respuesta:** con seis puntos las métricas son ruidosas, pero la lectura es la de siempre: si la correlación de Pearson es alta, el LLM ordena los discursos como vos; si el ICC es más bajo, coincide en el orden pero no en el nivel exacto. Mostramos el resultado con `as_tibble() |> select()` porque el `print()` de `qlm_validate()` usa `cli` y no siempre se ve al renderizar. Lo importante es el método: nunca usar el LLM sin haberlo comparado contra una muestra codificada por uno mismo.
+**Respuesta:** con seis puntos las métricas son ruidosas, pero la lectura es la de siempre: si la correlación de Pearson es alta, el LLM ordena los discursos como ustedes; si el ICC es más bajo, coincide en el orden pero no en el nivel exacto. Mostramos el resultado con `as_tibble() |> select()` porque el `print()` de `qlm_validate()` usa `cli` y no siempre se ve al renderizar. Lo importante es el método: nunca usar el LLM sin haberlo comparado contra una muestra codificada por uno mismo.
 
 ## Confiabilidad y métodos clásicos
 
@@ -173,7 +173,7 @@ tono <- qlm_code(respuestas$respuesta, codebook_tono,
 respuestas |> mutate(tono = tono$tono) |> select(etiqueta, tono)
 ```
 
-**Respuesta:** mismo pedido, sólo cambia la etiqueta ideológica. Si una etiqueta recibe de forma sistemática un tono más favorable, el modelo está proyectando una asociación de su corpus de entrenamiento, no un hecho del mundo. Con sólo dos descripciones es una demostración; un estudio real generaría muchas descripciones por etiqueta y compararía las medias con un test. La auditoría no elimina el sesgo, pero lo vuelve visible y reportable, que es lo mínimo exigible.
+**Respuesta:** mismo pedido, solo cambia la etiqueta ideológica. Si una etiqueta recibe de forma sistemática un tono más favorable, el modelo está proyectando una asociación de su corpus de entrenamiento, no un hecho del mundo. Con solo dos descripciones es una demostración; un estudio real generaría muchas descripciones por etiqueta y compararía las medias con un test. La auditoría no elimina el sesgo, pero lo vuelve visible y reportable, que es lo mínimo exigible.
 
 ### Pregunta 7: Viñetas sintéticas para un experimento
 
@@ -187,7 +187,7 @@ tipo_vinetas <- type_array(tipo_vineta, "lista de viñetas")
 generador <- chat_openrouter(
   model = "nvidia/nemotron-3-super-120b-a12b:free",
   system_prompt = "Generás viñetas para un experimento de encuesta. Las viñetas
-  deben ser realistas, comparables y diferir SÓLO en la postura migratoria."
+  deben ser realistas, comparables y diferir SOLO en la postura migratoria."
 )
 
 vinetas <- generador$chat_structured(
@@ -204,7 +204,7 @@ as_tibble(vinetas)
 
 ### Pregunta 8: Reporte para un paper
 
-**Respuesta (ejemplo):** Para medir el populismo de los 3.000 discursos construimos un libro de códigos con `quallmer` que define una escala continua de 0 (sin retórica populista) a 10 (populismo intenso), con instrucciones explícitas sobre la oposición entre "el pueblo" y "la élite". La codificación se realizó con el modelo `nvidia/nemotron-3-super-120b` a través de OpenRouter (acceso del 15 de abril de 2026), con temperatura 0 para favorecer la reproducibilidad. Validamos la codificación contra una submuestra de 150 discursos codificados a mano por dos asistentes, reportando la correlación de Pearson y el ICC. Evaluamos la confiabilidad reformulando el codebook y comparando las dos codificaciones con el alpha de Krippendorff. Antes de aplicar el modelo al corpus completo auditamos posibles sesgos enviando descripciones que sólo diferían en la etiqueta ideológica del actor. El codebook, los prompts y el registro de ejecución (`qlm_trail()`) se incluyen como material suplementario. (≈150 palabras.)
+**Respuesta (ejemplo):** Para medir el populismo de los 3.000 discursos construimos un libro de códigos con `quallmer` que define una escala continua de 0 (sin retórica populista) a 10 (populismo intenso), con instrucciones explícitas sobre la oposición entre "el pueblo" y "la élite". La codificación se realizó con el modelo `nvidia/nemotron-3-super-120b` a través de OpenRouter (acceso del 15 de abril de 2026), con temperatura 0 para favorecer la reproducibilidad. Validamos la codificación contra una submuestra de 150 discursos codificados a mano por dos asistentes, reportando la correlación de Pearson y el ICC. Evaluamos la confiabilidad reformulando el codebook y comparando las dos codificaciones con el alpha de Krippendorff. Antes de aplicar el modelo al corpus completo auditamos posibles sesgos enviando descripciones que solo diferían en la etiqueta ideológica del actor. El codebook, los prompts y el registro de ejecución (`qlm_trail()`) se incluyen como material suplementario. (≈150 palabras.)
 
 ### Pregunta 9: Diseño de un mini-experimento
 

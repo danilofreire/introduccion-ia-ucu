@@ -37,7 +37,7 @@ set.seed(2026)
 mundo <- read_csv("datos/indicadores_mundo.csv", show_col_types = FALSE)
 ```
 
-A diferencia del dataset del laboratorio, este tiene una columna de texto extra: `region`. Tenganla presente, porque va a aparecer varias veces en la tarea.
+A diferencia del dataset del laboratorio, este tiene una columna de texto extra: `region`. Ténganla presente, porque va a aparecer varias veces en la tarea.
 
 ## Exploración
 
@@ -69,7 +69,7 @@ Identifiquen los 5 países con [mayor PIB per cápita]{.alert} y los 5 con [meno
 
 Calculen la matriz de correlaciones de las variables numéricas y visualícenla con `corrplot()`. ¿Cuál par de variables tiene la correlación positiva más fuerte? ¿Cuál tiene la negativa más fuerte? Hagan además un scatterplot de PIB per cápita contra esperanza de vida: ¿la relación parece lineal o se "aplana" en los países ricos?
 
-*Pista:* para la matriz hay que quedarse sólo con las columnas numéricas (`select()` ayuda a sacar `pais` y `region`).
+*Pista:* para la matriz hay que quedarse solo con las columnas numéricas (`select()` ayuda a sacar `pais` y `region`).
 
 ```{r p3}
 # Escriban su código aquí
@@ -178,7 +178,7 @@ Ordenen los países por su valor en PC1 y luego por PC2. ¿Qué países están e
 
 ### Pregunta 12: ¿Qué pasa si no escalamos?
 
-Repitan K-means con K=3 pero sobre los datos [sin escalar]{.alert} (sólo saquen `region` y muevan `pais` a rownames). Comparen los clusters con los de la pregunta 5. ¿Qué variable domina ahora la solución? Busquen un país que quede agrupado con países muy distintos en democracia o desigualdad, y expliquen por qué terminó ahí.
+Repitan K-means con K=3 pero sobre los datos [sin escalar]{.alert} (solo saquen `region` y muevan `pais` a rownames). Comparen los clusters con los de la pregunta 5. ¿Qué variable domina ahora la solución? Busquen un país que quede agrupado con países muy distintos en democracia o desigualdad, y expliquen por qué terminó ahí.
 
 *Pista:* miren las unidades de cada variable. ¿Cuál tiene la varianza más grande, por lejos, cuando no escalamos?
 

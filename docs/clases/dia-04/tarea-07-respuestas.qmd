@@ -28,7 +28,7 @@ set.seed(2026)
 
 stopifnot(Sys.getenv("OPENROUTER_API_KEY") != "")
 
-textos <- read_csv("../dia-03/datos/textos_politicos.csv",
+textos <- read_csv("datos/textos_politicos.csv",
                    show_col_types = FALSE)
 
 MODELO <- "nvidia/nemotron-3-super-120b-a12b:free"
@@ -164,7 +164,7 @@ muestra <- textos |> group_by(tema) |> slice_sample(n = 1) |> ungroup()
 clasificar_breve <- function(texto) {
   chat <- chat_openrouter(model = MODELO,
     system_prompt = "Clasificá en: economia, educacion, seguridad, salud,
-    medioambiente. Respondé sólo con la categoría.")
+    medioambiente. Respondé solo con la categoría.")
   trimws(tolower(chat$chat(texto)))
 }
 
@@ -172,7 +172,7 @@ clasificar_detallado <- function(texto) {
   chat <- chat_openrouter(model = MODELO,
     system_prompt = "Clasificá en: economia, educacion, seguridad, salud,
     medioambiente. Regla: si el texto toca dos temas, elegí el más concreto
-    y central. Respondé sólo con la categoría, en minúsculas y sin tildes.")
+    y central. Respondé solo con la categoría, en minúsculas y sin tildes.")
   trimws(tolower(chat$chat(texto)))
 }
 
@@ -253,7 +253,7 @@ entidades <- chat$chat_structured(texto, type = tipo_entidades)
 entidades
 ```
 
-**Respuesta:** la extracción de entidades nombradas (NER) tradicionalmente requería un modelo entrenado por idioma; un LLM lo hace zero-shot con sólo un esquema. `type_array(type_string())` maneja un número variable de entidades (cero, una o varias). Sirve para armar redes de actores (quién se reunió con quién), bases de eventos o índices de organizaciones. Como con la clasificación, hay que validar: el modelo puede inventar una entidad o pasar por alto otra.
+**Respuesta:** la extracción de entidades nombradas (NER) tradicionalmente requería un modelo entrenado por idioma; un LLM lo hace zero-shot con solo un esquema. `type_array(type_string())` maneja un número variable de entidades (cero, una o varias). Sirve para armar redes de actores (quién se reunió con quién), bases de eventos o índices de organizaciones. Como con la clasificación, hay que validar: el modelo puede inventar una entidad o pasar por alto otra.
 
 ### Pregunta 10: Razonamiento paso a paso
 
@@ -276,7 +276,7 @@ directa
 cat(con_cot)
 ```
 
-**Respuesta:** en textos claros, la cadena de pensamiento rara vez cambia la respuesta y es gasto extra. En textos ambiguos o que tocan dos temas, pedir el razonamiento puede cambiar (y mejorar) la decisión, y deja una justificación que se puede auditar. El costo es más tokens y más tiempo. La idea de la lecture 14: el razonamiento paso a paso ayuda en tareas que requieren inferencia, no en clasificaciones simples donde el modelo ya "sabe" la respuesta.
+**Respuesta:** en textos claros, la cadena de pensamiento rara vez cambia la respuesta y es gasto extra. En textos ambiguos o que tocan dos temas, pedir el razonamiento puede cambiar (y mejorar) la decisión, y deja una justificación que se puede auditar. El costo es más tokens y más tiempo. La idea de la clase 14 ("Chain-of-thought: pensar paso a paso"): el razonamiento paso a paso ayuda en tareas que requieren inferencia, no en clasificaciones simples donde el modelo ya "sabe" la respuesta.
 
 ## Reflexión
 
@@ -295,7 +295,7 @@ costo <- (n_textos * tokens_entrada_por_texto * precio_entrada +
 costo
 ```
 
-**Respuesta:** El costo aproximado es de USD 0,01 para los 60 textos (un centavo). Esto es órdenes de magnitud más barato que un anotador humano (~USD 0,10 por texto en plataformas tipo Mechanical Turk, ~USD 1 por texto si es un investigador). Para 5.000 textos, el costo escalaría a ~USD 1, todavía trivial.
+**Respuesta:** El costo aproximado es de USD 0,01 para los 60 textos (un centavo). Esto es órdenes de magnitud más barato que un anotador humano (~USD 0,10 por texto en plataformas tipo Mechanical Turk, ~USD 1 por texto si es un investigador). Para 5.000 textos, el costo escalaría a ~USD 0,90, todavía trivial.
 
 ### Pregunta 12: Recomendación para una investigación real
 

@@ -62,7 +62,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 - Procesa texto como [subpalabras]{.alert} (tokens BPE)
 - Usa [atención]{.alert} para ponderar qué contexto importa
 - Los [embeddings son contextuales]{.alert}: la misma palabra cambia de vector según el entorno
-- La [escala]{.alert} (parámetros, datos, cómputo) produce [emergencia]{.alert}: capacidades nuevas que aparecen sólo a partir de cierto tamaño
+- La [escala]{.alert} (parámetros, datos, cómputo) produce [emergencia]{.alert}: capacidades nuevas que aparecen solo a partir de cierto tamaño
 :::
 
 :::{.column width=50%}
@@ -120,12 +120,12 @@ if (!require("fontawesome", character.only = TRUE)) {
     - Trabajamos con [hechos]{.alert} (eventos, fechas, citas, estadísticas)
     - Necesitamos [reproducibilidad]{.alert} para que otros validen
     - Nuestros lectores [confían]{.alert} en lo que publicamos
-- Un LLM que inventa un nombre, una fecha o una cita no es sólo molesto: arruina la investigación
+- Un LLM que inventa un nombre, una fecha o una cita no es solo molesto: arruina la investigación
 :::
 
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 22px;"}
-**La tensión central**
+**El problema:**
 
 Por un lado, los LLMs nos permiten hacer en minutos lo que antes llevaba semanas (anotar miles de textos, extraer entidades, sintetizar literatura)
 
@@ -157,7 +157,7 @@ Esta clase es sobre [cómo aprovechar lo primero sin caer en lo segundo]{.alert}
 
 :::{.column width=45%}
 :::{style="text-align: center;"}
-[![](figures/lawyer-case.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/lawyer-case.png"}
+[![](figures/lawyer-case.png){width="90%"}](#){data-modal-type="image" data-modal-url="figures/lawyer-case.png"}
 
 :::{style="font-size: 22px;"}
 :::{.callout-note}
@@ -176,7 +176,7 @@ Cuando el abogado le preguntó a ChatGPT si los casos eran reales, [el modelo le
 :::{.column width=55%}
 - [Fabricación]{.alert}: el modelo inventa datos, nombres, fechas o eventos que no existen
 - [Citas falsas]{.alert}: papers académicos, libros, números de expediente con apariencia real pero inventados
-- [Sicofancia]{.alert}: el modelo acuerda con la premisa del usuario aunque sea falsa ("Sí, claro, ese estudio existe...")
+- [Sicofancia]{.alert} (sycophancy): el modelo acuerda con la premisa del usuario aunque sea falsa ("Sí, claro, ese estudio existe...")
 - [Atribuciones erróneas]{.alert}: asigna una frase a un autor que nunca la dijo
 - [Confabulación silenciosa]{.alert}: cuando no sabe algo, llena el vacío con texto plausible en lugar de admitir ignorancia
 
@@ -186,14 +186,18 @@ Las cuatro defensas que veremos atacan distintas alucinaciones. Ninguna defensa 
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center;"}
-[![Tasas de alucinación por modelo](figures/hallucination-rates.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/hallucination-rates.png"}
-
 :::{style="font-size: 22px;"}
-Modelos de frontera tienen tasas de alucinación bajas pero no nulas, incluso en tareas simples
+**Una cita falsa**
 
-[Para investigación, "bajo" no es "aceptable"]{.alert}
+:::{style="border-left: 4px solid #b85450; padding: 8px 18px; font-size: 20px; margin-top: 10px;"}
+Bertoni, L. y Salgado, M. (2021). "Participación electoral y transferencias condicionadas en el Cono Sur". *Latin American Politics and Society*, 63(2), 88-114. doi:10.1017/lap.2021.14
 :::
+
+- El formato es [impecable]{.alert}: revista real, volumen, páginas y un DOI con estructura válida
+- Los autores, el artículo y el DOI [no existen]{.alert}
+- Verificarla toma [30 segundos]{.alert}: peguen el DOI en [doi.org](https://www.doi.org/) o el título entre comillas en [Google Scholar](https://scholar.google.com/)
+
+[Para investigación, "bajo" no es "aceptable": una cita inventada en un paper es una cita inventada]{.alert}
 :::
 :::
 :::
@@ -206,13 +210,13 @@ Modelos de frontera tienen tasas de alucinación bajas pero no nulas, incluso en
 :::{style="margin-top: 25px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=52%}
-- Un [buen prompt]{.alert} reduce la varianza de la respuesta hacia lo que querés. Mismo modelo y mismo input: [distintos prompts dan resultados muy distintos]{.alert}
+- Un [buen prompt]{.alert} reduce la varianza de la respuesta hacia lo que quieren. Mismo modelo y mismo input: [distintos prompts dan resultados muy distintos]{.alert}
 - Es [prompt engineering]{.alert}. Sus cuatro componentes son el framework [PTCF]{.alert}:
     - **[Persona]{.alert}**: ¿quién es el modelo? ("Sos un analista político...")
     - **[Tarea]{.alert}**: ¿qué tiene que hacer? ("Clasificá la orientación ideológica...")
     - **[Contexto]{.alert}**: lo que necesita saber (categorías, origen del texto)
     - **[Formato]{.alert}**: estructura de salida (JSON con campos definidos)
-- No siempre hacen falta los cuatro: usá los que apliquen
+- No siempre hacen falta los cuatro: usen los que apliquen
 - Fuente: [Google (2024)](https://services.google.com/fh/files/misc/gemini_for_workspace_prompt_guide_october_2024_digital_final.pdf)
 :::
 
@@ -222,13 +226,13 @@ Modelos de frontera tienen tasas de alucinación bajas pero no nulas, incluso en
 
 Prompt: *"Analiza este texto."*
 
-Problema: ¿analizar qué? ¿sentimiento? ¿tema? El modelo elige por vos.
+Problema: ¿analizar qué? ¿sentimiento? ¿tema? El modelo elige por ustedes
 
 **Buena práctica**
 
 Prompt: *"Sos un analista político con experiencia en discurso latinoamericano. Clasificá el sentimiento del siguiente texto como positivo, negativo o neutro. Responde en JSON con campos `sentimiento` y `justificacion`."*
 
-[Mismo modelo, salida mucho más útil.]{.alert}
+[Mismo modelo, output mucho más útil]{.alert}
 :::
 :::
 :::
@@ -241,7 +245,7 @@ Prompt: *"Sos un analista político con experiencia en discurso latinoamericano.
 :::{.column width=55%}
 - El [system prompt]{.alert} se envía [antes]{.alert} de cualquier mensaje del usuario
 - Establece [reglas que valen para toda la conversación]{.alert}: rol, restricciones, formato
-- Es la forma más efectiva de obtener [comportamiento consistente]{.alert} cuando procesás muchos documentos
+- Es la forma más efectiva de obtener [comportamiento consistente]{.alert} cuando procesan muchos documentos
 
 **Ejemplo para anotación sistemática**
 
@@ -291,12 +295,12 @@ negativo o neutro:
 pero el desempleo subió."
 ```
 
-Funciona para tareas simples y bien definidas. Lo que vimos en la Sesión 4.1 como [emergencia]{.alert} hace esto posible.
+Funciona para tareas simples y bien definidas. Lo que vimos en la Sesión 4.1 como [emergencia]{.alert} hace esto posible
 
-[Bueno para empezar y baseline.]{.alert}
+[Bueno para empezar y baseline]{.alert}
 
 :::{.callout-note}
-**Pista**: few-shot funciona porque el modelo aprende del [patrón del prompt]{.alert} mismo. Es la capacidad emergente que vimos ayer (in-context learning)
+**Pista**: few-shot funciona porque el modelo aprende del [patrón del prompt]{.alert} mismo. Es la capacidad emergente que vimos en la sesión anterior (in-context learning)
 :::
 :::
 
@@ -331,7 +335,7 @@ Mejora la precisión al [mostrar]{.alert} el formato y los matices ([Brown et al
 :::{.column width=50%}
 **La técnica**
 
-Pedir al modelo que [razone explícitamente]{.alert} antes de responder.
+Pedir al modelo que [razone explícitamente]{.alert} antes de responder
 
 ```
 Antes de clasificar, razoná paso a paso:
@@ -369,7 +373,7 @@ Clasificación: POSITIVO
 :::
 :::
 
-## Temperatura: balance entre creatividad y consistencia
+## Temperatura, creatividad y consistencia
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
@@ -398,7 +402,7 @@ Clasificación: POSITIVO
 | Escritura creativa | 0,7 - 1,0 |
 | Brainstorming | 0,8 - 1,2 |
 
-[Para investigación reproducible: temperatura 0 siempre que se pueda.]{.alert}
+[Para investigación reproducible: temperatura 0 siempre que se pueda]{.alert}
 :::
 :::
 :::
@@ -406,7 +410,7 @@ Clasificación: POSITIVO
 
 # Defensa 2: Salida estructurada {background-color="#2d4563"}
 
-## Pedir JSON: la idea
+## Pedir JSON
 
 :::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
@@ -468,7 +472,7 @@ de 2024."
     - [Structured Output]{.alert} de OpenAI: garantiza que la salida cumpla un esquema JSON
     - [Tool calling]{.alert} de Anthropic: el modelo "llama" a funciones con tipos
     - [Tipos de ellmer]{.alert}: el paquete R abstrae estas funcionalidades
-- Ventaja: tu código R recibe una estructura [validada]{.alert}, no texto a parsear
+- Ventaja: su código R recibe una estructura [validada]{.alert}, no texto a parsear
 - Lo aplicaremos en los labs (con `ellmer` y `quallmer`)
 :::
 
@@ -502,16 +506,16 @@ Resultado: una lista R lista para usar, sin parsear texto
 
 # Defensa 3: Grounding con RAG {background-color="#2d4563"}
 
-## El problema: el modelo no sabe lo que no entrenó
+## El modelo no sabe lo que no entrenó
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
 - Los LLMs tienen [conocimiento congelado]{.alert} en su fecha de corte de entrenamiento
 - No saben:
     - Eventos posteriores al entrenamiento
-    - Tus documentos privados o internos
-    - Tu corpus específico de investigación
+    - Sus documentos privados o internos
+    - Su corpus específico de investigación
 - Pero el modelo igual [intenta responder]{.alert}, y ahí aparece la alucinación
 
 **Ejemplo típico**
@@ -523,14 +527,12 @@ Preguntar a un LLM sobre un artículo académico que el usuario tiene como PDF:
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 22px;"}
+:::{style="font-size: 24px;"}
 **La solución**
 
-En lugar de confiar en lo que el modelo "recuerda", le damos [los documentos relevantes en el prompt]{.alert} y le pedimos que base la respuesta en ellos
-
-Eso se llama [RAG]{.alert}: Retrieval-Augmented Generation
-
-Combina la fluidez del LLM con la precisión de tus datos
+- En lugar de confiar en lo que el modelo "recuerda", le damos [los documentos relevantes en el prompt]{.alert} y le pedimos que base la respuesta en ellos
+- Eso se llama [RAG]{.alert}: Retrieval-Augmented Generation
+- Combina la fluidez del LLM con la precisión de sus datos
 :::
 :::
 :::
@@ -567,11 +569,11 @@ Combina la fluidez del LLM con la precisión de tus datos
 :::{.column width=50%}
 **Sí usar RAG cuando**
 
-- Tu corpus es [grande]{.alert} (cientos o miles de documentos)
-- Necesitás [actualizar]{.alert} la base de conocimiento sin reentrenar
-- Necesitás [trazabilidad]{.alert}: ¿de qué documento salió esta afirmación?
-- Trabajás con dominio [muy específico]{.alert} (papers, leyes, transcripciones)
-- Querés que el modelo [cite]{.alert} fuentes reales
+- Su corpus es [grande]{.alert} (cientos o miles de documentos)
+- Necesitan [actualizar]{.alert} la base de conocimiento sin reentrenar
+- Necesitan [trazabilidad]{.alert}: ¿de qué documento salió esta afirmación?
+- Trabajan con dominio [muy específico]{.alert} (papers, leyes, transcripciones)
+- Quieren que el modelo [cite]{.alert} fuentes reales
 :::
 
 :::{.column width=50%}
@@ -580,10 +582,10 @@ Combina la fluidez del LLM con la precisión de tus datos
 - El documento [entra en el prompt directamente]{.alert} (ventanas de 200K+ tokens permiten artículos completos)
 - La tarea es de [razonamiento general]{.alert}, no de recuperación factual
 - La tarea es [creativa]{.alert} (escribir, brainstormear)
-- No tenés base de conocimiento estable: querés que el modelo use su entrenamiento
+- No tienen base de conocimiento estable: quieren que el modelo use su entrenamiento
 
 :::{.callout-note}
-A veces "RAG" es exagerado. Si tu PDF entra en el contexto, podés pegarlo directamente.
+A veces "RAG" es exagerado. Si su PDF entra en el contexto, pueden pegarlo directamente.
 :::
 :::
 :::
@@ -593,16 +595,16 @@ A veces "RAG" es exagerado. Si tu PDF entra en el contexto, podés pegarlo direc
 
 ## Validación: comparar con gold standard
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
-- Antes de usar un LLM para anotar todo tu corpus, [validalo en una muestra]{.alert}
+- Antes de usar un LLM para anotar todo su corpus, [valídenlo en una muestra]{.alert}
 - El procedimiento estándar:
-    1. Anotá [a mano]{.alert} 50 a 200 documentos
-    2. Pasá los mismos documentos por el LLM
-    3. Comparalos con métricas del día 02 (precisión, recall, F1, kappa de Cohen)
-    4. Si la calidad es aceptable, [escalá al corpus completo]{.alert}
-- Si dos anotadores humanos hacen la mitad cada uno, podés calcular [acuerdo entre humanos]{.alert} y comparar con el acuerdo LLM-humano
+    1. Anoten [a mano]{.alert} 50 a 200 documentos
+    2. Pasen los mismos documentos por el LLM
+    3. Compárenlos con métricas de clasificación: precisión y recall (día 2), más F1 y kappa de Cohen (las veremos en el lab 8)
+    4. Si la calidad es aceptable, [escalen al corpus completo]{.alert}
+- Si dos anotadores humanos hacen la mitad cada uno, pueden calcular [acuerdo entre humanos]{.alert} y comparar con el acuerdo LLM-humano
 
 **¿Qué es "aceptable"?**
 
@@ -612,7 +614,7 @@ Depende de la tarea. Algunos benchmarks:
 :::
 
 :::{.column width=45%}
-:::{style="font-size: 20px;"}
+:::{style="font-size: 21px;"}
 **Ejemplo de tabla de validación**
 
 ```
@@ -651,7 +653,7 @@ supera métodos clásicos.
     - [Documentar]{.alert} modelo exacto, versión, fecha
     - [Guardar]{.alert} los prompts completos usados
     - Usar [temperatura 0]{.alert} cuando se pueda
-    - Guardar las [respuestas crudas]{.alert}, no sólo lo procesado
+    - Guardar las [respuestas crudas]{.alert}, no solo lo procesado
     - Para máxima reproducibilidad: [modelo local]{.alert} con versión fija
 :::
 
@@ -686,21 +688,21 @@ archivos_guardados:
 
 ## Anotación automática de texto
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - El uso más común en ciencias sociales: [clasificar texto a escala]{.alert}
 - Ayer usamos diccionarios, TF-IDF y LDA. Los LLMs hacen lo mismo [con mejor calidad]{.alert} en muchas tareas:
-    - Capturan [contexto y significado]{.alert}, no sólo palabras
+    - Capturan [contexto y significado]{.alert}, no solo palabras
     - Manejan [negaciones]{.alert} ("no es bueno" = negativo)
     - Manejan [ironía y sarcasmo]{.alert} mejor que diccionarios
     - Funcionan [multilingüe]{.alert} sin reentrenar
-- Evidencia: [Gilardi, Alizadeh y Kubli (2023)]{.alert} muestran que GPT-4 supera a anotadores humanos en muchas tareas de clasificación de tweets ([PNAS](https://doi.org/10.1073/pnas.2305016120))
+- Evidencia: [Gilardi, Alizadeh y Kubli (2023)](https://doi.org/10.1073/pnas.2305016120) muestran que ChatGPT supera a anotadores de crowdsourcing (MTurk) en varias tareas de clasificación de tweets
 - Costo: centavos por texto vs. dólares por anotador humano
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Ejemplo de prompt completo**
 
 ```
@@ -742,7 +744,7 @@ Respuesta: economia
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Ejemplo de prompt**
 
 ```
@@ -790,7 +792,7 @@ diversidad demográfica real.
 <br>
 
 :::{style="font-size: 24px;"}
-[Recomendación]{.alert}: para volúmenes grandes y tareas comunes, considerar [híbridos]{.alert}. Usar el LLM para etiquetar un subconjunto y entrenar un clasificador clásico con esas etiquetas. Mejor calidad que diccionarios, mucho más barato que LLM en todo el corpus.
+[Recomendación]{.alert}: para volúmenes grandes y tareas comunes, considerar [híbridos]{.alert}. Usar el LLM para etiquetar un subconjunto y entrenar un clasificador clásico con esas etiquetas. Mejor calidad que diccionarios, mucho más barato que LLM en todo el corpus
 :::
 :::
 
@@ -803,13 +805,13 @@ diversidad demográfica real.
 | Opción | Ventajas | Limitaciones | Cuándo usarla |
 |---|---|---|---|
 | [OpenRouter]{.alert} | Una API key para docenas de modelos; [tier gratuito]{.alert}; sin tarjeta para empezar | Rate limits en modelos `:free`; depende de un agregador externo | Empezar, prototipos, volúmenes pequeños |
-| [Ollama]{.alert} (local) | [Cero costo]{.alert}; los datos no salen de tu máquina; versión exacta queda fija | Necesita 8+ GB de RAM; modelos chicos son menos potentes | [Privacidad]{.alert}, reproducibilidad, corpus grande |
+| [Ollama]{.alert} (local) | [Cero costo]{.alert}; los datos no salen de su máquina; versión exacta queda fija | Necesita 8+ GB de RAM; modelos chicos son menos potentes | [Privacidad]{.alert}, reproducibilidad, corpus grande |
 | APIs comerciales (OpenAI, Anthropic) | Mejor calidad disponible; respuestas rápidas | Tarjeta de crédito; pago por uso; caja negra | Cuando la institución cubre el costo o el proyecto lo justifica |
 
 <br>
 
 :::{style="text-align: center; font-size: 22px;"}
-Con [ellmer]{.alert} podés cambiar de proveedor [sin reescribir tu código]{.alert}. En los labs lo vemos paso a paso
+Con [ellmer]{.alert} pueden cambiar de proveedor [sin reescribir su código]{.alert}. En los labs lo vemos paso a paso
 :::
 :::
 
@@ -873,16 +875,16 @@ chat$chat_structured(
     2. Bajar el modelo del curso:
 
     ```bash
-    ollama pull qwen3.5:4b
+    ollama pull granite4.1:3b
     ```
 
     3. Probarlo en la terminal:
 
     ```bash
-    ollama run qwen3.5:4b
+    ollama run granite4.1:3b
     ```
 
-- `qwen3.5:4b` ocupa ~3,4 GB y corre con 8 GB de RAM
+- `granite4.1:3b` ocupa ~2,1 GB y corre con 8 GB de RAM
 :::
 
 :::{.column width=45%}
@@ -892,7 +894,7 @@ chat$chat_structured(
 La descarga puede tardar varios minutos según la conexión. Si la dejan para el laboratorio, pierden tiempo de práctica
 
 :::{.callout-note}
-**Pista**: si su laptop tiene poca memoria, usen `qwen3.5:2b` (~2,7 GB). Funciona igual, con algo menos de calidad
+**Pista**: `granite4.1:3b` es el modelo más chico de su familia. Si su laptop no puede correrlo, no hay problema: el laboratorio también puede seguirse con OpenRouter, como en los labs 7 y 8
 :::
 
 Lo mismo que hoy hacemos con `ellmer` en la nube, mañana lo haremos en local
@@ -911,7 +913,7 @@ Lo mismo que hoy hacemos con `ellmer` en la nube, mañana lo haremos en local
 
 - [Defensa 1]{.alert}: buenos prompts (PTCF, system prompts, few-shot, CoT, temperatura baja)
 - [Defensa 2]{.alert}: salida estructurada (JSON con tipos estrictos)
-- [Defensa 3]{.alert}: grounding con RAG (cuando tu corpus no entra en el contexto)
+- [Defensa 3]{.alert}: grounding con RAG (cuando su corpus no entra en el contexto)
 - [Defensa 4]{.alert}: validación contra gold standard + reproducibilidad
 :::
 

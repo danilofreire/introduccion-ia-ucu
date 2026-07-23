@@ -44,7 +44,7 @@ MODELO_LOCAL <- "ollama/granite4.1:3b"
 
 ### Pregunta 1: Diseñar un codebook nominal
 
-Diseñá desde cero un codebook para clasificar el [motivo principal]{.alert} por el que cada persona no consultó, con las cinco categorías del CSV: `costo`, `estigma`, `desconfianza`, `falta_tiempo` y `autosuficiencia`. Definí cada categoría en las `instructions` e incluí al menos [dos reglas de decisión]{.alert} para casos límite (por ejemplo: ¿qué hacer cuando un relato menciona la plata y la falta de tiempo a la vez?). Nombrá el campo del schema `motivo`.
+Diseñen desde cero un codebook para clasificar el [motivo principal]{.alert} por el que cada persona no consultó, con las cinco categorías del CSV: `costo`, `estigma`, `desconfianza`, `falta_tiempo` y `autosuficiencia`. Definan cada categoría en las `instructions` e incluyan al menos [dos reglas de decisión]{.alert} para casos límite (por ejemplo: ¿qué hacer cuando un relato menciona la plata y la falta de tiempo a la vez?). Nombren el campo del schema `motivo`.
 
 *Pista:* el codebook del laboratorio es el molde, pero las definiciones y las reglas son de ustedes. Para categorías cerradas, `type_enum()`; el nivel es `"nominal"`.
 
@@ -57,9 +57,9 @@ Diseñá desde cero un codebook para clasificar el [motivo principal]{.alert} po
 
 ### Pregunta 2: Humano contra humano
 
-Antes de mirar al LLM: codificá vos. Elegí seis respuestas del corpus, leelas y asignales una categoría [sin mirar la columna]{.alert} `motivo_humano`. Recién después compará tus códigos con los del equipo: ¿en cuántas coinciden? ¿Dónde no, y por qué? El desacuerdo entre codificadores humanos también existe, y conviene conocerlo antes de exigirle perfección a un modelo.
+Antes de mirar al LLM: codifiquen ustedes. Elijan seis respuestas del corpus, léanlas y asígnenles una categoría [sin mirar la columna]{.alert} `motivo_humano`. Recién después comparen sus códigos con los del equipo: ¿en cuántas coinciden? ¿Dónde no, y por qué? El desacuerdo entre codificadores humanos también existe, y conviene conocerlo antes de exigirle perfección a un modelo.
 
-*Pista:* guardá tus códigos en un vector y compará con `consultas$motivo_humano` en esas filas; `mean(tus_codigos == ...)` da la proporción de acuerdo.
+*Pista:* guarden sus códigos en un vector y comparen con `consultas$motivo_humano` en esas filas; `mean(sus_codigos == ...)` da la proporción de acuerdo.
 
 ```{r p2}
 # Escriban su código aquí
@@ -70,7 +70,7 @@ Antes de mirar al LLM: codificá vos. Elegí seis respuestas del corpus, leelas 
 
 ### Pregunta 3: Codificar con el modelo local y validar
 
-Codificá las 18 respuestas con el modelo local y validá contra el gold del equipo (`motivo_humano`) a nivel nominal. Reportá la accuracy y el kappa. Con la referencia del curso (kappa ≥ 0,7), ¿confiarían en este codificador?
+Codifiquen las 18 respuestas con el modelo local y validen contra el gold del equipo (`motivo_humano`) a nivel nominal. Reporten la accuracy y el kappa. Con la referencia del curso (kappa ≥ 0,7), ¿confiarían en este codificador?
 
 *Pista:* `max_active = 1` y `params(temperature = 0)`, como en el laboratorio. El gold se construye con `qlm_humancoded()` y necesita una columna `.id` y una columna con el mismo nombre que el campo del schema.
 

@@ -78,7 +78,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::
 
 :::{style="margin-top: 20px; text-align: center; font-size: 24px;"}
-[Las dos partes son las dos caras de la ética de hoy: proteger los datos de las personas y verificar que nuestros modelos no las traten de forma desigual.]{.alert}
+[Las dos partes son las dos caras de la ética de hoy: proteger los datos de las personas y verificar que nuestros modelos no las traten de forma desigual]{.alert}
 :::
 :::
 
@@ -96,7 +96,7 @@ ollama --version
 ollama pull granite4.1:3b
 ```
 
-[IBM Granite](https://www.ibm.com/granite) (~2,1 GB) responde directo, [sin razonar antes]{.alert}, y está afinado para [salida estructurada]{.alert}. Para codificar es justo lo que queremos: rápido y estable.
+[IBM Granite](https://www.ibm.com/granite) (~2,1 GB) responde directo, [sin razonar antes]{.alert}, y está afinado para [salida estructurada]{.alert}. Para codificar es justo lo que queremos: rápido y estable
 
 **Probarlo en la terminal**
 
@@ -104,7 +104,7 @@ ollama pull granite4.1:3b
 ollama run granite4.1:3b
 ```
 
-Escribí un par de preguntas y salí con `/bye`.
+Escribí un par de preguntas y salí con `/bye`
 :::
 
 :::{.column width=48%}
@@ -117,7 +117,7 @@ Hay muchos modelos disponibles, incluso los *thinking models*, que razonan antes
 - En Ollama, apagarles el razonamiento suele romper la [salida estructurada]{.alert} que `quallmer` necesita
 
 :::{.callout-note}
-**Pista**: elegir el modelo correcto es parte del oficio. Un modelo con razonamiento para problemas difíciles; uno directo y afinado para salida estructurada, como Granite, para tareas repetitivas como la codificación.
+**Pista**: elegir el modelo correcto es parte del oficio. Un modelo con razonamiento para problemas difíciles; uno directo y afinado para salida estructurada, como Granite, para tareas repetitivas como la codificación
 :::
 :::
 :::
@@ -127,7 +127,7 @@ Hay muchos modelos disponibles, incluso los *thinking models*, que razonan antes
 ## Conectar desde R
 
 :::{style="margin-top: 30px; font-size: 22px;"}
-El mismo `ellmer` del lab 7, otro proveedor: `chat_ollama()` en lugar de `chat_openrouter()`. Sin API key, sin internet.
+El mismo `ellmer` del lab 7, otro proveedor: `chat_ollama()` en lugar de `chat_openrouter()`. Sin API key, sin internet
 
 ```{r}
 #| echo: true
@@ -146,7 +146,7 @@ chat$chat("¿Qué es una encuesta de victimización?")
 ```
 
 :::{style="margin-top: 15px;"}
-La primera llamada tarda unos segundos: el modelo se está cargando en memoria. Las siguientes son más rápidas.
+La primera llamada tarda unos segundos: el modelo se está cargando en memoria. Las siguientes son más rápidas
 :::
 :::
 
@@ -155,7 +155,7 @@ La primera llamada tarda unos segundos: el modelo se está cargando en memoria. 
 :::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
-- Un equipo entrevistó a [víctimas de delitos que no hicieron la denuncia]{.alert} (un problema clásico de las encuestas de victimización: la cifra negra)
+- Un equipo entrevistó a [víctimas de delitos que no hicieron la denuncia]{.alert} (un problema clásico de las encuestas de victimización)
 - Los fragmentos contienen [detalles identificables]{.alert}: barrios, rutinas, conflictos con vecinos
 - El consentimiento informado y el comité de ética [prohíben transferir]{.alert} el material a terceros, lo que incluye una API en la nube
 - Queremos codificar el [motivo principal]{.alert} por el que cada persona no denunció
@@ -184,10 +184,10 @@ entrevistas <- read_csv("datos/entrevistas_confianza.csv")
 entrevistas |> count(motivo_humano)
 ```
 
-`motivo_humano` es el gold standard: la codificación manual del equipo.
+`motivo_humano` es el gold standard: la codificación manual del equipo
 
 :::{.callout-warning}
-Los datos son simulados, pero el flujo de trabajo es exactamente el que usarían con entrevistas reales.
+Los datos son simulados, pero el flujo de trabajo es exactamente el que usarían con entrevistas reales
 :::
 :::
 :::
@@ -197,7 +197,7 @@ Los datos son simulados, pero el flujo de trabajo es exactamente el que usarían
 ## Paso 1: definir el codebook
 
 :::{style="margin-top: 20px; font-size: 20px;"}
-El mismo `qlm_codebook()` del lab 8. La diferencia: la variable es [nominal]{.alert} (categorías), no una escala de intervalo.
+El mismo `qlm_codebook()` del lab 8. La diferencia: la variable es [nominal]{.alert} (categorías), no una escala de intervalo
 
 ```{r}
 #| echo: true
@@ -231,7 +231,7 @@ codebook_motivos <- qlm_codebook(
 :::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
-El mismo `qlm_code()` de ayer. Lo único que cambia es el string del modelo: `"ollama/..."` en lugar de `"openrouter/..."`.
+El mismo `qlm_code()` de ayer. Lo único que cambia es el string del modelo: `"ollama/..."` en lugar de `"openrouter/..."`
 
 ```{r}
 #| echo: true
@@ -321,7 +321,7 @@ as_tibble(validacion) |> select(measure, value)
 - La referencia del lab 8 sigue valiendo: kappa ≥ 0,7 para confiar en el codificador
 
 :::{.callout-note appearance="simple" icon=false}
-**Pista**: si el modelo local rinde cerca del humano, ganamos un codificador gratuito, privado y reproducible. Si no, el ejercicio 1 muestra el primer remedio: mejorar el codebook.
+**Pista**: si el modelo local rinde cerca del humano, ganamos un codificador gratuito, privado y reproducible. Si no, el ejercicio 1 muestra el primer remedio: mejorar el codebook
 :::
 :::
 :::

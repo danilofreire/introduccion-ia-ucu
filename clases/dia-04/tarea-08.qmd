@@ -15,7 +15,7 @@ engine: knitr
 
 ## Instrucciones
 
-Esta tarea aplica los conceptos del Laboratorio 8 a una construcción [nueva]{.alert}: la retórica populista. En la clase medimos retórica liberal-iliberal con un codebook que ya venía dado; acá vas a [diseñar el tuyo desde cero]{.alert}, codificar a mano tu propio gold standard, validar, medir confiabilidad y auditar un sesgo. Responder cada pregunta escribiendo código R en los bloques indicados.
+Esta tarea aplica los conceptos del Laboratorio 8 a una construcción [nueva]{.alert}: la retórica populista. En la clase medimos retórica liberal-iliberal con un codebook que ya venía dado; acá van a [diseñar el suyo desde cero]{.alert}, codificar a mano su propio gold standard, validar, medir confiabilidad y auditar un sesgo. Responder cada pregunta escribiendo código R en los bloques indicados.
 
 **Para trabajar en esta tarea:**
 
@@ -47,9 +47,9 @@ MODELO <- "openrouter/nvidia/nemotron-3-super-120b-a12b:free"
 
 ### Pregunta 1: Diseñar un codebook para populismo
 
-Diseñá desde cero un codebook para medir [retórica populista]{.alert}: el grado en que un discurso apela al "pueblo" o "la gente común" en contra de una "élite", "casta" o "los de arriba". Usá una escala de 0 (nada populista) a 10 (muy populista). Escribí instrucciones claras de qué cuenta como populismo.
+Diseñen desde cero un codebook para medir [retórica populista]{.alert}: el grado en que un discurso apela al "pueblo" o "la gente común" en contra de una "élite", "casta" o "los de arriba". Usen una escala de 0 (nada populista) a 10 (muy populista). Escriban instrucciones claras de qué cuenta como populismo.
 
-*Pista:* mirá el codebook de la clase como molde, pero las `instructions` y la escala son tuyas. Un `type_integer` con `levels = list(... = "interval")`.
+*Pista:* miren el codebook de la clase como molde, pero las `instructions` y la escala son suyas. Un `type_integer` con `levels = list(... = "interval")`.
 
 ```{r p1}
 # Escriban su código aquí
@@ -58,11 +58,11 @@ Diseñá desde cero un codebook para medir [retórica populista]{.alert}: el gra
 
 **Respuesta:**
 
-### Pregunta 2: Codificar a mano tu propio gold
+### Pregunta 2: Codificar a mano su propio gold
 
-Antes de confiar en el LLM, codificá vos. Elegí seis discursos del corpus y asignales a mano un puntaje de populismo (0 a 10) según tu propio juicio y tu codebook. Construí el gold standard con `qlm_humancoded()`.
+Antes de confiar en el LLM, codifiquen ustedes. Elijan seis discursos del corpus y asígnenles a mano un puntaje de populismo (0 a 10) según su propio juicio y su codebook. Construyan el gold standard con `qlm_humancoded()`.
 
-*Pista:* el gold necesita una columna `.id` y tu columna de puntaje. Es la misma estructura que usaste para las etiquetas humanas en la clase.
+*Pista:* el gold necesita una columna `.id` y su columna de puntaje. Es la misma estructura que usaron para las etiquetas humanas en la clase.
 
 ```{r p2}
 # Escriban su código aquí
@@ -73,9 +73,9 @@ Antes de confiar en el LLM, codificá vos. Elegí seis discursos del corpus y as
 
 ### Pregunta 3: Codificar con el LLM y validar
 
-Codificá los mismos seis discursos con `qlm_code()` y validá contra tu gold con `qlm_validate()` a nivel de intervalo. Reportá la correlación de Pearson y el ICC. ¿El LLM coincide con tu juicio?
+Codifiquen los mismos seis discursos con `qlm_code()` y validen contra su gold con `qlm_validate()` a nivel de intervalo. Reporten la correlación de Pearson y el ICC. ¿El LLM coincide con su juicio?
 
-*Pista:* `qlm_validate(coded, gold = gold, by = "populismo", level = "interval")`. Mostralo como tabla con `as_tibble(...) |> select(measure, value)`.
+*Pista:* `qlm_validate(coded, gold = gold, by = "populismo", level = "interval")`. Muéstrenlo como tabla con `as_tibble(...) |> select(measure, value)`.
 
 ```{r p3}
 # Escriban su código aquí
@@ -88,7 +88,7 @@ Codificá los mismos seis discursos con `qlm_code()` y validá contra tu gold co
 
 ### Pregunta 4: Confiabilidad de dos formulaciones
 
-La confiabilidad no es sólo entre corridas: también importa si el resultado cambia al reformular el codebook. Escribí una segunda versión de tu codebook con instrucciones más breves (`codebook_breve`), codificá los mismos textos y compará las dos codificaciones con `qlm_compare()`. ¿Son estables?
+La confiabilidad no es solo entre corridas: también importa si el resultado cambia al reformular el codebook. Escriban una segunda versión de su codebook con instrucciones más breves (`codebook_breve`), codifiquen los mismos textos y comparen las dos codificaciones con `qlm_compare()`. ¿Son estables?
 
 *Pista:* `qlm_compare(coded1, coded2, by = "populismo", level = "interval", tolerance = 1)` da el alpha de Krippendorff.
 
@@ -101,9 +101,9 @@ La confiabilidad no es sólo entre corridas: también importa si el resultado ca
 
 ### Pregunta 5: LLM vs diccionario
 
-Compará el LLM con un método clásico. Armá un diccionario de palabras populistas (pueblo, gente, élite, casta, corruptos, privilegiados...) y contá cuántas aparecen en cada discurso. Correlacioná ese conteo con el puntaje del LLM. ¿Cuánto se parecen?
+Comparen el LLM con un método clásico. Armen un diccionario de palabras populistas (pueblo, gente, élite, casta, corruptos, privilegiados...) y cuenten cuántas aparecen en cada discurso. Correlacionen ese conteo con el puntaje del LLM. ¿Cuánto se parecen?
 
-*Pista:* tokenizá con `tidytext::unnest_tokens()`, contá las coincidencias por discurso y usá `cor()`.
+*Pista:* tokenicen con `tidytext::unnest_tokens()`, cuenten las coincidencias por discurso y usen `cor()`.
 
 ```{r p5}
 # Escriban su código aquí
@@ -116,9 +116,9 @@ Compará el LLM con un método clásico. Armá un diccionario de palabras populi
 
 ### Pregunta 6: Sesgo por etiqueta ideológica
 
-Auditá un sesgo distinto al del género. Pedile al modelo que describa las propuestas económicas de un político, variando sólo una etiqueta: "un político de izquierda" vs "un político de derecha". Codificá las dos descripciones con un codebook de tono (-5 a +5) y compará. ¿El modelo trata distinto a una etiqueta que a la otra?
+Auditen un sesgo distinto al del género. Pídanle al modelo que describa las propuestas económicas de un político, variando solo una etiqueta: "un político de izquierda" vs "un político de derecha". Codifiquen las dos descripciones con un codebook de tono (-5 a +5) y comparen. ¿El modelo trata distinto a una etiqueta que a la otra?
 
-*Pista:* mismo texto, sólo cambia la etiqueta. Es el patrón de la slide "Medir el sesgo", con etiquetas ideológicas en vez de nombres.
+*Pista:* mismo texto, solo cambia la etiqueta. Es el patrón de la slide "Medir el sesgo", con etiquetas ideológicas en vez de nombres.
 
 ```{r p6}
 # Escriban su código aquí
@@ -129,9 +129,9 @@ Auditá un sesgo distinto al del género. Pedile al modelo que describa las prop
 
 ### Pregunta 7: Viñetas sintéticas para un experimento
 
-Los LLMs sirven para generar estímulos de experimentos. Usá `chat_structured()` para generar cuatro viñetas cortas que describan a un candidato, variando una sola dimensión: su postura migratoria (restrictiva / abierta). Cada viñeta debe ser plausible y comparable. Mostralas.
+Los LLMs sirven para generar estímulos de experimentos. Usen `chat_structured()` para generar cuatro viñetas cortas que describan a un candidato, variando una sola dimensión: su postura migratoria (restrictiva / abierta). Cada viñeta debe ser plausible y comparable. Muéstrenlas.
 
-*Pista:* definí un `type_array` de `type_object` con un campo `postura` y un campo `texto`. Pedile viñetas equilibradas que sólo difieran en esa dimensión.
+*Pista:* definan un `type_array` de `type_object` con un campo `postura` y un campo `texto`. Pídanle viñetas equilibradas que solo difieran en esa dimensión.
 
 ```{r p7}
 # Escriban su código aquí

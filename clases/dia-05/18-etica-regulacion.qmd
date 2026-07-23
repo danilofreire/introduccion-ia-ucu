@@ -220,7 +220,7 @@ Una universidad decide admisiones. Hay dos opciones:
 
 **Opción A: un comité humano**
 
-- Sesgos [inconsistentes]{.alert}: dependen de quién lea tu carpeta, de su humor, de la hora
+- Sesgos [inconsistentes]{.alert}: dependen de quién lea su carpeta, de su humor, de la hora
 - Difíciles de detectar, imposibles de auditar a escala
 
 **Opción B: un algoritmo**
@@ -416,7 +416,7 @@ Fuente: [Fairness and Machine Learning Book](https://fairmlbook.org/)
 :::{style="margin-top: 25px; font-size: 24px; text-align: left;"}
 - No existe un [valor por defecto neutral]{.alert}
 - Quien elige la definición de equidad [determina quién se beneficia]{.alert}
-- Decir "sólo usamos los datos" es, en sí mismo, una elección
+- Decir "solo usamos los datos" es, en sí mismo, una elección
 - Es una [pregunta política y moral]{.alert}, no técnica
 :::
 
@@ -500,7 +500,7 @@ ggplot(aprob, aes(umbral, aprobacion, color = grupo)) +
 :::{.column width=50%}
 **Detectar: tres pasos**
 
-1. Definir los [grupos protegidos]{.alert} (género, etnicidad, edad...). A veces sólo hay proxies
+1. Definir los [grupos protegidos]{.alert} (género, etnicidad, edad...). A veces solo hay proxies
 2. Calcular métricas [por grupo]{.alert}: tasa positiva, TPR, FPR, valor predictivo
 3. [Comparar]{.alert} entre grupos. Regla del 80%: si un grupo recibe menos del 80% de la tasa del otro, hay disparidad
 
@@ -575,7 +575,7 @@ Fuente: [ProPublica (2016)](https://www.propublica.org/article/machine-bias-risk
 Tres cosas que antes no pasaban:
 
 - [Escala]{.alert}: recolectar y procesar datos de millones de personas cuesta casi nada
-- [Inferencia]{.alert}: el modelo deduce lo que nunca contaste. Los "me gusta" predicen orientación política; las compras, un embarazo; el celular, síntomas de depresión
+- [Inferencia]{.alert}: el modelo deduce lo que nunca contaron. Los "me gusta" predicen orientación política; las compras, un embarazo; el celular, síntomas de depresión
 - [Persistencia]{.alert}: lo que entró a un dataset o a un modelo entrenado es muy difícil de borrar. Los LLMs pueden [memorizar y filtrar]{.alert} texto de entrenamiento, incluyendo nombres y contactos ([Carlini et al., 2021](https://arxiv.org/abs/2012.07805))
 :::
 
@@ -586,14 +586,14 @@ Tres cosas que antes no pasaban:
 La cadena Target (EE.UU.) identificó el embarazo de una adolescente por sus [patrones de compra]{.alert} y mandó cupones de bebé a su casa, antes de que su padre lo supiera ([New York Times, 2012](https://www.nytimes.com/2012/02/19/magazine/shopping-habits.html)).
 
 :::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
-El problema no es sólo qué datos entregamos, sino [qué se puede inferir]{.alert} de ellos. El consentimiento que firmamos rara vez cubre eso.
+El problema no es solo qué datos entregamos, sino [qué se puede inferir]{.alert} de ellos. El consentimiento que firmamos rara vez cubre eso.
 :::
 :::
 :::
 :::
 :::
 
-## Clearview AI: tu cara ya está en la base
+## Clearview AI: su cara ya está en la base
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
@@ -609,7 +609,7 @@ El problema no es sólo qué datos entregamos, sino [qué se puede inferir]{.ale
 **Por qué importa para esta clase**
 
 - Es el sistema que cierra el círculo con [Robert Williams]{.alert}: el reconocimiento facial policial se alimenta de datos obtenidos así
-- Y muestra el límite de la autorregulación: la empresa sólo cambió cuando llegaron [demandas y multas]{.alert}
+- Y muestra el límite de la autorregulación: la empresa solo cambió cuando llegaron [demandas y multas]{.alert}
 
 :::{style="margin-top: 15px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
 "Estaba disponible públicamente" no es lo mismo que ["consentí este uso"]{.alert}. Eso aplica también a los datos que usamos en investigación.
@@ -626,7 +626,7 @@ El problema no es sólo qué datos entregamos, sino [qué se puede inferir]{.ale
 :::{.column width=50%}
 **El modelo europeo (GDPR, 2018)**
 
-- Principios: [minimización]{.alert} (recolectar sólo lo necesario), limitación de propósito, plazos de conservación
+- Principios: [minimización]{.alert} (recolectar solo lo necesario), limitación de propósito, plazos de conservación
 - Derechos: acceso, rectificación, [olvido]{.alert}, portabilidad, y a no ser objeto de [decisiones puramente automatizadas]{.alert} con efectos importantes (artículo 22)
 
 **Uruguay llegó antes que la región**
@@ -719,7 +719,7 @@ La autorregulación de la industria [no es suficiente]{.alert}: sin poder de apl
 **En su propia investigación**
 
 - [Documentar]{.alert} las limitaciones del modelo
-- [Reportar]{.alert} métricas por subgrupos, no sólo el promedio
+- [Reportar]{.alert} métricas por subgrupos, no solo el promedio
 - [Transparentar]{.alert} datos y código
 - [Considerar]{.alert} quién puede ser afectado
 - [Evitar]{.alert} claims exagerados de equidad
@@ -841,7 +841,7 @@ Cuando ciertos grupos están [subrepresentados]{.alert}, el modelo funciona mal 
 
 **Asistentes de voz**: entrenados con acentos angloamericanos, fallan más con hablantes no nativos y voces de mujeres.
 
-[Si no estás en los datos, el modelo no tiene nada que aprender sobre ti.]{.alert}
+[Si no están en los datos, el modelo no tiene nada que aprender sobre ustedes.]{.alert}
 :::
 
 :::{.column width=45%}
@@ -1041,7 +1041,7 @@ Elijan UNO:
 - ¿Cuál enfoque es "más justo"?
 - ¿Quién se beneficia y quién se perjudica con cada uno?
 - ¿Cambia su respuesta si la menor tasa del Grupo B se debe a discriminación, no a capacidad?
-- ¿El algoritmo debería [corregir]{.alert} la injusticia histórica, o sólo [no perpetuarla]{.alert}?
+- ¿El algoritmo debería [corregir]{.alert} la injusticia histórica, o solo [no perpetuarla]{.alert}?
 
 :::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
 Debatan en grupos de 3-4 y presenten su decisión.

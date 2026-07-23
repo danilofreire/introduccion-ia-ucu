@@ -1313,7 +1313,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <li>Cómo un <span class="alert">system prompt</span> cambia el comportamiento del modelo</li>
 <li>Cuándo el LLM gana y cuándo pierde frente a métodos clásicos</li>
 </ul>
-<p><span class="alert">Quien no tenga API key, le comparto una temporal en clase</span></p>
+<p><span class="alert">A quien no tenga API key, le comparto una temporal en clase</span></p>
 </div></div>
 </div>
 </section>
@@ -1373,7 +1373,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <span id="cb1-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;ellmer&quot;</span>, <span class="st">&quot;jsonlite&quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
-<li>En este laboratorio usamos <a href="https://openrouter.ai/">OpenRouter</a>, que tiene modelos gratuitos y no requieren instalar nada</li>
+<li>En este laboratorio usamos <a href="https://openrouter.ai/">OpenRouter</a>, que tiene modelos gratuitos y no requiere instalar nada</li>
 </ul>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">library</span>(tidyverse)</span>
@@ -1400,7 +1400,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </ol>
 <ul>
 <li><span class="alert">Modelos con sufijo <code>:free</code> no cuestan</span> (con límites de rate). Para este laboratorio basta con eso</li>
-<li>Para seleccionarlos, andá a <a href="https://openrouter.ai/models">openrouter.ai/models</a>, hacé clic en “Prompt Pricing” y ponelo en “Free”. Los nombres de los modelos son los que terminan en <code>:free</code></li>
+<li>Para seleccionarlos, vayan a <a href="https://openrouter.ai/models">openrouter.ai/models</a>, hagan clic en “Prompt Pricing” y pónganlo en “Free”. Los nombres de los modelos son los que terminan en <code>:free</code></li>
 </ul>
 <div class="callout callout-warning callout-titled callout-style-default">
 <div class="callout-body">
@@ -1431,7 +1431,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>openai/gpt-oss-120b:free</code></td>
+<td><code>openai/gpt-oss-20b:free</code></td>
 <td>Default del lab. Rápido y confiable</td>
 </tr>
 <tr class="even">
@@ -1458,12 +1458,12 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <div style="margin-top: 30px; font-size: 22px;">
 <p><code>ellmer</code> busca la key en una <span class="alert">variable de entorno</span>, no en el código. Hay dos formas de definirla:</p>
 <ul>
-<li><span class="alert">Opción 1 (rápida)</span>: <code>Sys.setenv()</code> la define sólo para esta sesión de R; al cerrar R se borra</li>
+<li><span class="alert">Opción 1 (rápida)</span>: <code>Sys.setenv()</code> la define solo para esta sesión de R; al cerrar R se borra</li>
 <li><span class="alert">Opción 2 (recomendada)</span>: guardarla en <code>.Renviron</code>, un archivo personal que R lee al arrancar, así queda disponible siempre</li>
-<li><code>usethis::edit_r_environ()</code> abre ese archivo: agregás la línea, guardás y reiniciás R</li>
+<li><code>usethis::edit_r_environ()</code> abre ese archivo: agregan la línea, guardan y reinician R</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Opción 1: sólo para esta sesión de R</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Opción 1: solo para esta sesión de R</span></span>
 <span id="cb4-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">Sys.setenv</span>(<span class="at">OPENROUTER_API_KEY =</span> <span class="st">&quot;sk-or-...&quot;</span>)</span>
 <span id="cb4-3"><a></a>R<span class="sc">&gt;</span> </span>
 <span id="cb4-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># Opción 2 (recomendada): guardar en .Renviron permanentemente</span></span>
@@ -1479,7 +1479,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <div class="callout callout-note no-icon callout-style-simple">
 <div class="callout-body">
 <div class="callout-content">
-<p><strong>Pista</strong>: la variable <code>OPENROUTER_API_KEY</code> es la que <code>ellmer</code> busca por defecto cuando llamás a <code>chat_openrouter()</code>. No hace falta pasarla como argumento</p>
+<p><strong>Pista</strong>: la variable <code>OPENROUTER_API_KEY</code> es la que <code>ellmer</code> busca por defecto cuando llaman a <code>chat_openrouter()</code>. No hace falta pasarla como argumento</p>
 </div>
 </div>
 </div>
@@ -1615,7 +1615,7 @@ las últimas dos décadas.</code></pre>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>R<span class="sc">&gt;</span> textos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;datos/textos_politicos.csv&quot;</span>,</span>
 <span id="cb11-2"><a></a><span class="sc">+</span>                    <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb11-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># Leé el archivo directo desde la web:</span></span>
+<span id="cb11-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># Lean el archivo directo desde la web:</span></span>
 <span id="cb11-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># textos &lt;- read_csv(&quot;https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/textos_politicos.csv&quot;, show_col_types = FALSE)</span></span>
 <span id="cb11-5"><a></a>R<span class="sc">&gt;</span> </span>
 <span id="cb11-6"><a></a>R<span class="sc">&gt;</span> <span class="fu">glimpse</span>(textos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1655,7 +1655,7 @@ $ texto &lt;chr&gt; &quot;El crecimiento económico del país ha sido sólido es
 <h2>Construir el clasificador (zero-shot)</h2>
 <div style="margin-top: 30px; font-size: 18px;">
 <ul>
-<li><span class="alert">Zero-shot</span>: pedimos la categoría sin dar ejemplos, sólo las reglas</li>
+<li><span class="alert">Zero-shot</span>: pedimos la categoría sin dar ejemplos, solo las reglas</li>
 <li>Creamos un chat nuevo por texto, así ninguno arrastra el historial del anterior</li>
 <li><code>trimws(tolower())</code> limpia la respuesta para poder compararla con la etiqueta real</li>
 </ul>
@@ -1729,7 +1729,7 @@ $ texto &lt;chr&gt; &quot;El crecimiento económico del país ha sido sólido es
 <p><strong>Advertencia</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Costo y rate limits</strong>: con modelos <code>:free</code> hay límites de peticiones por minuto. Si te bloquea, esperá 30 segundos. Para corpus grandes, pasar a modelos pagos</p>
+<p><strong>Costo y rate limits</strong>: con modelos <code>:free</code> hay límites de peticiones por minuto. Si los bloquea, esperen 30 segundos. Para corpus grandes, pasar a modelos pagos</p>
 </div>
 </div>
 </div>
@@ -1771,12 +1771,12 @@ real            economia educacion medioambiente salud seguridad
 # ℹ 3 variables: tema &lt;chr&gt;, tema_llm &lt;chr&gt;, n &lt;int&gt;</code></pre>
 </div>
 </div>
-<p><span class="alert">Anotá la accuracy obtenida. La vamos a comparar con LDA al final</span></p>
+<p><span class="alert">Anoten la accuracy obtenida. La vamos a comparar con LDA al final</span></p>
 </div>
 </section>
 <section id="few-shot-mejorar-con-ejemplos" class="slide level2">
 <h2>Few-shot: mejorar con ejemplos</h2>
-<div style="margin-top: 30px; font-size: 18px;">
+<div style="margin-top: 30px; font-size: 21px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>R<span class="sc">&gt;</span> clasificar_few <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
 <span id="cb29-2"><a></a><span class="sc">+</span>   chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
@@ -1804,7 +1804,6 @@ real            economia educacion medioambiente salud seguridad
 <pre><code>[1] 1</code></pre>
 </div>
 </div>
-<p>Pregunta: ¿cuánto mejora la accuracy con cinco ejemplos en el prompt? <span class="alert">¿Y por qué motivo?</span></p>
 </div>
 </section>
 <section id="qué-modelo-conviene" class="slide level2">
@@ -1852,7 +1851,7 @@ real            economia educacion medioambiente salud seguridad
 <p>Vamos a clasificar los <span class="alert">20 textos de la muestra</span> con tres métodos y comparar su accuracy contra las etiquetas reales (<code>tema</code>):</p>
 <ol type="1">
 <li><span class="alert">LDA</span> (Día 3): topic modeling <span class="alert">no supervisado</span></li>
-<li><span class="alert">gpt-oss-120b</span>: un LLM grande</li>
+<li><span class="alert">gpt-oss-20b</span>: un LLM más grande</li>
 <li><span class="alert">nemotron-nano-9b</span>: un LLM chico</li>
 </ol>
 <p><strong>Preguntas para responder</strong></p>
@@ -1861,7 +1860,7 @@ real            economia educacion medioambiente salud seguridad
 <li>¿El LLM chico se acerca al grande?</li>
 <li>¿Vale la pena el costo y la lentitud de los LLMs?</li>
 </ul>
-<p><span class="alert">Cada método tiene su propio chunk con <code>cache: true</code>: si te limitan, re-renderizá y sigue desde donde quedó</span></p>
+<p><span class="alert">Cada método tiene su propio chunk con <code>cache: true</code>: si los limitan, re-rendericen y sigue desde donde quedó</span></p>
 </div>
 </section>
 <section id="clasificador-1-lda-ajustado-en-60-medido-en-la-muestra" class="slide level2">
@@ -1914,7 +1913,7 @@ real            economia educacion medioambiente salud seguridad
 <span id="cb36-39"><a></a><span class="sc">+</span>   <span class="fu">left_join</span>(mapa, <span class="at">by =</span> <span class="st">&quot;topic&quot;</span>) <span class="sc">|&gt;</span></span>
 <span id="cb36-40"><a></a><span class="sc">+</span>   <span class="fu">left_join</span>(<span class="fu">select</span>(textos, id, tema), <span class="at">by =</span> <span class="st">&quot;id&quot;</span>)</span>
 <span id="cb36-41"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb36-42"><a></a>R<span class="sc">&gt;</span> <span class="co"># Medir sólo sobre los 20 textos de la muestra (mismo set que los LLMs)</span></span>
+<span id="cb36-42"><a></a>R<span class="sc">&gt;</span> <span class="co"># Medir solo sobre los 20 textos de la muestra (mismo set que los LLMs)</span></span>
 <span id="cb36-43"><a></a>R<span class="sc">&gt;</span> accuracy_lda <span class="ot">&lt;-</span> lda_pred <span class="sc">|&gt;</span></span>
 <span id="cb36-44"><a></a><span class="sc">+</span>   <span class="fu">filter</span>(id <span class="sc">%in%</span> muestra<span class="sc">$</span>id) <span class="sc">|&gt;</span></span>
 <span id="cb36-45"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(<span class="at">acc =</span> <span class="fu">mean</span>(tema <span class="sc">==</span> tema_lda)) <span class="sc">|&gt;</span></span>
@@ -1948,7 +1947,8 @@ real            economia educacion medioambiente salud seguridad
 </ul>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># resultados_zero (Parte 2) = gpt-oss-20b zero-shot sobre la muestra</span></span>
-<span id="cb38-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">mean</span>(resultados_zero<span class="sc">$</span>tema <span class="sc">==</span> resultados_zero<span class="sc">$</span>tema_llm)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb38-2"><a></a>R<span class="sc">&gt;</span> accuracy_gptoss <span class="ot">&lt;-</span> <span class="fu">mean</span>(resultados_zero<span class="sc">$</span>tema <span class="sc">==</span> resultados_zero<span class="sc">$</span>tema_llm)</span>
+<span id="cb38-3"><a></a>R<span class="sc">&gt;</span> accuracy_gptoss</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1</code></pre>
 </div>
@@ -1958,7 +1958,8 @@ real            economia educacion medioambiente salud seguridad
 <span id="cb40-2"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">tema_llm =</span> <span class="fu">map_chr</span>(texto, clasificar_con, <span class="st">&quot;nvidia/nemotron-nano-9b-v2:free&quot;</span>, <span class="at">.progress =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">mean</span>(clasif_nemotron<span class="sc">$</span>tema <span class="sc">==</span> clasif_nemotron<span class="sc">$</span>tema_llm)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>R<span class="sc">&gt;</span> accuracy_nemotron <span class="ot">&lt;-</span> <span class="fu">mean</span>(clasif_nemotron<span class="sc">$</span>tema <span class="sc">==</span> clasif_nemotron<span class="sc">$</span>tema_llm)</span>
+<span id="cb41-2"><a></a>R<span class="sc">&gt;</span> accuracy_nemotron</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.9</code></pre>
 </div>
@@ -1981,15 +1982,15 @@ real            economia educacion medioambiente salud seguridad
 <pre><code># A tibble: 3 × 4
   metodo               accuracy tiempo        costo 
   &lt;chr&gt;                   &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt; 
-1 gpt-oss-20b              1    ya en Parte 2 &lt;$0.01
-2 nemotron-nano-9b         0.95 ~30 seg       &lt;$0.01
-3 LDA (no supervisado)     0.3  ~2 seg        $0    </code></pre>
+1 gpt-oss-20b               1   ya en Parte 2 &lt;$0.01
+2 nemotron-nano-9b          0.9 ~30 seg       &lt;$0.01
+3 LDA (no supervisado)      0.3 ~2 seg        $0    </code></pre>
 </div>
 </div>
 <div class="callout callout-note no-icon callout-style-simple">
 <div class="callout-body">
 <div class="callout-content">
-<p><strong>Lección</strong>: el LLM, que <span class="alert">conoce las categorías</span>, supera por lejos a LDA, que sólo agrupa palabras. El modelo chico suele acercarse al grande a una fracción del costo</p>
+<p><strong>Lección</strong>: el LLM, que <span class="alert">conoce las categorías</span>, supera por lejos a LDA, que solo agrupa palabras. El modelo chico suele acercarse al grande a una fracción del costo</p>
 </div>
 </div>
 </div>
@@ -2058,7 +2059,7 @@ real            economia educacion medioambiente salud seguridad
 <section id="sec:exercise01" class="slide level2">
 <h2>Ejercicio 1: variar el system prompt</h2>
 <div style="margin-top: 30px; font-size: 20px;">
-<p><strong>Tarea (5 min):</strong> completá los tres system prompts con personalidades distintas y compará sus respuestas a la misma pregunta</p>
+<p><strong>Tarea (5 min):</strong> completen los tres system prompts con personalidades distintas y comparen sus respuestas a la misma pregunta</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a></a>academico <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(</span>
 <span id="cb45-2"><a></a>  <span class="at">model =</span> <span class="st">&quot;openai/gpt-oss-20b:free&quot;</span>,</span>
@@ -2081,7 +2082,7 @@ real            economia educacion medioambiente salud seguridad
 <div class="callout callout-note no-icon callout-style-simple">
 <div class="callout-body">
 <div class="callout-content">
-<p><strong>Pista</strong>: sólo cambia el <code>system_prompt</code> de cada chat; el modelo y la pregunta son los mismos</p>
+<p><strong>Pista</strong>: solo cambia el <code>system_prompt</code> de cada chat; el modelo y la pregunta son los mismos</p>
 </div>
 </div>
 </div>
@@ -2091,7 +2092,7 @@ real            economia educacion medioambiente salud seguridad
 <section id="sec:exercise02" class="slide level2">
 <h2>Ejercicio 2: resumir un texto largo con gpt-oss</h2>
 <div style="margin-top: 30px; font-size: 18px;">
-<p><strong>Tarea (5 min):</strong> los textos del corpus tienen una sola oración, así que acá hay dos párrafos más largos. Escribí una función <code>resumir()</code> que le pida a gpt-oss un resumen de una oración bien corta, y aplicala a los dos párrafos</p>
+<p><strong>Tarea (5 min):</strong> los textos del corpus tienen una sola oración, así que acá hay dos párrafos más largos. Escriban una función <code>resumir()</code> que le pida a gpt-oss un resumen de una oración bien corta, y aplíquenla a los dos párrafos</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a></a>parrafo1 <span class="ot">&lt;-</span> <span class="st">&quot;El gobierno anunció un paquete de medidas económicas que combina</span></span>
 <span id="cb46-2"><a></a><span class="st">recortes en el gasto público con incentivos a la inversión privada. La oposición</span></span>

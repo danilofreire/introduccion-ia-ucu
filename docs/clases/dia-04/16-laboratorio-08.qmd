@@ -115,7 +115,7 @@ if (!requireNamespace("quallmer", quietly = TRUE)) {
 - Tradicionalmente lo hacen personas, leyendo y etiquetando: es rico, pero lento y caro
 - Dos codificadores rara vez coinciden al 100%: medimos el acuerdo con [Cohen's kappa](https://en.wikipedia.org/wiki/Cohen%27s_kappa) o el [alpha de Krippendorff](https://en.wikipedia.org/wiki/Krippendorff%27s_alpha)
 - [quallmer]{.alert} ([quallmer.github.io](https://quallmer.github.io/quallmer/)) aplica esa misma lógica usando un LLM como codificador
-- Construido sobre [ellmer](https://ellmer.github.io/): usa los mismos proveedores (OpenRouter, Ollama, etc.)
+- Construido sobre [ellmer](https://ellmer.tidyverse.org/): usa los mismos proveedores (OpenRouter, Ollama, etc.)
 - Pensado para investigación: trae [validación, confiabilidad y trazabilidad]{.alert} incorporadas
 :::
 
@@ -163,7 +163,7 @@ library(tidyverse)
 Sys.getenv("OPENROUTER_API_KEY") != ""
 
 discursos <- read_csv("datos/discursos_ideologia.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # discursos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/discursos_ideologia.csv", show_col_types = FALSE)
 
 head(discursos)
@@ -261,7 +261,7 @@ codificado
 ```
 
 :::{.callout-warning}
-Con `max_active` alto, los modelos `:free` devuelven errores `400`. Bajalo a 2-3, usá muestras chicas, o pasá a un modelo de pago. Para corpus grandes conviene un modelo local (Ollama, día 5)
+Con `max_active` alto, los modelos `:free` devuelven errores `400`. Bájenlo a 2-3, usen muestras chicas, o pasen a un modelo de pago. Para corpus grandes conviene un modelo local (Ollama, día 5)
 :::
 :::
 
@@ -283,7 +283,7 @@ tibble(
 )
 ```
 
-Miren la diferencia: el LLM tiende a ser [más conservador]{.alert}, sus puntajes se acercan al centro (0). Capta bien el [orden]{.alert} (quién es más iliberal que quién), pero comprime la [magnitud]{.alert}. Esto es justo lo que [la validación va a cuantificar]{.alert}
+Miren la diferencia: el LLM tiende a ser [más conservador]{.alert}, sus puntajes se acercan al centro (0). Capta bien el [orden]{.alert} (quién es más iliberal que quién), pero comprime la [magnitud]{.alert}. Esto es justo lo que [la validación va a cuantificar]{.alert}. Los `NA` son llamadas que fallaron contra el modelo `:free` (el callout anterior); en un estudio real se re-codifican esos casos
 :::
 
 ## Paso 3: validar contra humanos
@@ -364,11 +364,11 @@ trail
 :::{.columns}
 :::{.column width=55%}
 - `qlm_trail()` sigue la idea de [Lincoln y Guba (1985)](https://books.google.com.br/books?id=2oA9aWlNeooC&printsec=frontcover&redir_esc=y#v=onepage&q&f=false) sobre confiabilidad en investigación cualitativa
-- Guarda en un `.rds` todo lo necesario para que otra persona [replique]{.alert} tu codificación
+- Guarda en un `.rds` todo lo necesario para que otra persona [replique]{.alert} su codificación
 :::
 
 :::{.column width=45%}
-- Es la [defensa 4]{.alert} de la lecture 14 (validación y reproducibilidad), automatizada
+- Es la [defensa 4]{.alert} de la sesión 4.2 (validación y reproducibilidad), automatizada
 - Va como material suplementario del paper
 :::
 :::
@@ -462,7 +462,7 @@ respuestas_genero <- nombres |>
 respuestas_genero
 ```
 
-[Mismo cargo, sólo cambia el nombre. ¿Cambian las palabras que el modelo usa según el género?]{.alert}
+[Mismo cargo, solo cambia el nombre. ¿Cambian las palabras que el modelo usa según el género?]{.alert}
 :::
 
 ## Medir el sesgo: un LLM como codificador
@@ -505,7 +505,7 @@ respuestas_genero |>
             n = sum(!is.na(tono)))
 ```
 
-[Convertimos el texto en una medida comparable: ahora el sesgo es un número, no una impresión. Con tres nombres por género es sólo una demostración; para un estudio real harían falta más nombres y otras dimensiones (por ejemplo, competencia vs calidez)]{.alert}
+[Convertimos el texto en una medida comparable: ahora el sesgo es un número, no una impresión. Con tres nombres por género es solo una demostración; para un estudio real harían falta más nombres y otras dimensiones (por ejemplo, competencia vs calidez)]{.alert}
 :::
 
 ## Documentar los hallazgos
@@ -515,7 +515,7 @@ respuestas_genero |>
 :::{.column width=50%}
 **Qué documentar siempre**
 
-- Modelo exacto y versión (`nvidia/nemotron-3-super-120b`, fecha de uso)
+- Modelo exacto y versión (`nvidia/nemotron-3-super-120b-a12b`, fecha de uso)
 - Proveedor y endpoint (OpenRouter)
 - Temperatura y otros parámetros
 - Los prompts completos
@@ -641,8 +641,8 @@ mean(datos_sinteticos$educacion == "universitaria")
 :::{.column width=50%}
 **Lo que aprendimos**
 
-- Cómo funcionan los LLMs (lecture 13)
-- Las cuatro defensas para usarlos en investigación (lecture 14)
+- Cómo funcionan los LLMs (sesión 4.1)
+- Las cuatro defensas para usarlos en investigación (sesión 4.2)
 - `ellmer` con OpenRouter (Lab 7)
 - Codificación, validación, confiabilidad y auditoría de sesgos (Lab 8)
 :::
@@ -669,7 +669,7 @@ mean(datos_sinteticos$educacion == "universitaria")
 
 :::{style="margin-top: 30px; font-size: 17px;"}
 
-**Tarea (8 min):** ampliá el codebook para que, además del `score`, identifique la `dimension` retórica dominante (nacionalismo / seguridad / derechos / pluralismo / economia). Recodificá los discursos y mostrá una tabla cruzada de `dimension` por signo del `score`
+**Tarea (8 min):** amplíen el codebook para que, además del `score`, identifique la `dimension` retórica dominante (nacionalismo / seguridad / derechos / pluralismo / economia). Recodifiquen los discursos y muestren una tabla cruzada de `dimension` por signo del `score`
 
 ```{r}
 #| label: ej1-skeleton
@@ -710,7 +710,7 @@ codificado_amplio |>
 
 :::{style="margin-top: 30px; font-size: 17px;"}
 
-**Tarea (8 min):** usá un LLM como [clasificador]{.alert}. Tenés un dataset con frases de dos partidos ficticios. Definí un codebook que puntúe la orientación económica de cada frase (de -5 estatista a +5 promercado), codificá las frases y compará el puntaje medio por partido. ¿El modelo separa a los dos partidos?
+**Tarea (8 min):** usen un LLM como [clasificador]{.alert}. Tienen un dataset con frases de dos partidos ficticios. Definan un codebook que puntúe la orientación económica de cada frase (de -5 estatista a +5 promercado), codifiquen las frases y comparen el puntaje medio por partido. ¿El modelo separa a los dos partidos?
 
 ```{r}
 #| label: ej2-skeleton
@@ -854,9 +854,9 @@ frases_partidos |>
 
 1. Elegir un corpus de textos cortos (discursos, tuits, titulares)
 2. Definir una construcción y su escala (ej. populismo, polarización, tono) en un `qlm_codebook()`
-3. Codificar a mano una muestra de 15-20 textos (tu gold standard)
+3. Codificar a mano una muestra de 15-20 textos (su gold standard)
 4. Codificar los mismos textos con `qlm_code()`
-5. Validar contra tu codificación humana con `qlm_validate()`
+5. Validar contra su codificación humana con `qlm_validate()`
 6. Replicar con `qlm_replicate()` y medir confiabilidad con `qlm_compare()`
 7. Guardar el `qlm_trail()` y documentar todo en un `.qmd` reproducible
 
@@ -872,7 +872,7 @@ frases_partidos |>
 #| eval: false
 #| echo: true
 
-# 1. Datos: tu corpus con una columna de texto y tu puntaje humano
+# 1. Datos: su corpus con una columna de texto y su puntaje humano
 discursos <- read_csv("datos/discursos_ideologia.csv", show_col_types = FALSE)
 
 # 2. Codebook (tu construcción y su escala)
@@ -883,7 +883,7 @@ codificado <- qlm_code(discursos$texto, codebook_ideologia,
                        model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
                        max_active = 2)
 
-# 4. Validar contra tu codificación humana
+# 4. Validar contra su codificación humana
 gold <- qlm_humancoded(
   tibble(.id = seq_len(nrow(discursos)), score = discursos$score_humano),
   name = "humano", codebook = codebook_ideologia)

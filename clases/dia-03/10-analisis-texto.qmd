@@ -84,7 +84,7 @@ suppressPackageStartupMessages({
 - Topic Modeling (LDA)
 - Introducción a embeddings
 - Word2Vec y representaciones densas
-- Aplicaciones en América Latina
+- Aplicaciones en política y medios
 - Limitaciones y próximos pasos
 :::
 :::
@@ -137,9 +137,9 @@ Las computadoras trabajan con [números]{.alert}, pero el texto son [palabras]{.
 
 ## El pipeline de análisis de texto
 
-:::{style="margin-top: 30px; font-size: 21px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 21px;"}
 [![Pipeline de análisis de texto](figures/pipeline-texto.png){width="50%"}](#){data-modal-type="image" data-modal-url="figures/pipeline-texto.png"}
 :::
 
@@ -382,7 +382,7 @@ características]{.alert} de cada tema: _económico, educación, biodiversidad_,
     - "crecimiento", "mejora" → positivo; "crisis", "pobreza" → negativo
 - Se cuentan palabras positivas y negativas y se comparan
 - [Limitaciones]{.alert}: no captura [negaciones]{.alert} ("no es bueno" cuenta como positivo) ni ironía; los diccionarios son [dependientes del dominio]{.alert}
-- Aún así, [funciona razonablemente bien]{.alert} a gran escala
+- Aun así, [funciona razonablemente bien]{.alert} a gran escala
 :::
 
 :::{.column width=45%}
@@ -476,7 +476,7 @@ El modelo fue ajustado sobre [`r nrow(corpus)` documentos]{.alert} y [`r ncol(dt
 :::{.column width=50%}
 **Lo que LDA nos da**
 
-- Las [K palabras más probables]{.alert} de cada tema
+- Las [palabras más probables]{.alert} de cada tema
 - La [proporción de cada tema]{.alert} en cada documento
 - Podemos [etiquetar]{.alert} los temas según las palabras más frecuentes
 
@@ -510,7 +510,7 @@ tidy(modelo_lda, matrix = "beta") |>
 
 ## De representaciones dispersas a densas
 
-:::{style="margin-top: 20px; font-size: 22px;"}
+:::{style="margin-top: 20px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
 - Bag-of-words y TF-IDF son [representaciones dispersas]{.alert} (sparse): cada palabra es una dimensión independiente y no capturan [significado]{.alert}
@@ -522,7 +522,7 @@ tidy(modelo_lda, matrix = "beta") |>
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 22px;"}
+:::{style="text-align: center; font-size: 28px;"}
 **Disperso vs. denso**
 
 ```
@@ -535,7 +535,7 @@ Embedding (denso):
   (300 dims, todas con valores)
 
 El embedding codifica
-SIGNIFICADO en cada dimensión.
+SIGNIFICADO en cada dimensión
 ```
 :::
 :::
@@ -644,14 +644,14 @@ En el apéndice construimos mini-embeddings con LSA (SVD sobre TF-IDF) y buscamo
 |---------------------------|--------------------|---------|
 | Contar palabras y frases comunes | [Bag-of-words]{.alert} | Simple, interpretable, rápido |
 | Identificar términos [distintivos]{.alert} de un grupo | [TF-IDF]{.alert} | Pondera por rareza en el corpus |
-| Descubrir [temas latentes]{.alert} sin etiquetas | [LDA]{.alert} | No supervisado, útil si no sabes qué temas buscas |
+| Descubrir [temas latentes]{.alert} sin etiquetas | [LDA]{.alert} | No supervisado, útil si no saben qué temas buscan |
 | Medir el [tono]{.alert} de un texto | [Diccionarios]{.alert} de sentimiento | Transparente y validable |
-| Medir [similitud semántica]{.alert} entre textos | [Embeddings]{.alert} (Word2Vec, LSA) | Capturan significado, no sólo palabras |
+| Medir [similitud semántica]{.alert} entre textos | [Embeddings]{.alert} (Word2Vec, LSA) | Capturan significado, no solo palabras |
 | Extraer [entidades]{.alert} (personas, lugares, partidos) | [NER]{.alert} (paquetes `spacyr`, `cleanNLP`) | Identifica menciones específicas en el texto |
 | Clasificar, resumir, extraer información compleja | [LLMs]{.alert} (Día 4) | Estado del arte en casi todas las tareas |
 
 :::{style="text-align: center; font-size: 20px; margin-top: 30px;"}
-Regla práctica: [empezar simple]{.alert}, validar contra lectura manual y escalar a métodos complejos sólo si el simple falla
+Regla práctica: [empezar simple]{.alert}, validar contra lectura manual y escalar a métodos complejos solo si el simple falla
 :::
 :::
 
@@ -699,7 +699,7 @@ Mañana veremos cómo BERT, GPT y otros modelos revolucionan el análisis de tex
 - [Sentimiento]{.alert} con diccionarios
 - [LDA]{.alert}: temas latentes
 - [Embeddings]{.alert}: representaciones densas
-- [Caso integrado]{.alert} sobre encuesta abierta
+- [Caso integrado]{.alert} sobre encuesta abierta (apéndice)
 
 Los métodos clásicos son el [fundamento]{.alert} del análisis de texto. Entenderlos es la base para usar bien los LLMs
 :::
@@ -807,7 +807,7 @@ Los documentos más cercanos al primero (tema [economía]{.alert}) son otros del
 - Pipeline simple en dos pasos:
   - tokenizar y quitar stopwords; ver las palabras más frecuentes
   - clasificar por tema con un [diccionario de palabras clave]{.alert} y medir el tono
-- Todo el análisis usa sólo verbos de tidyverse que ya conocemos
+- Todo el análisis usa funciones que ya conocemos
 :::
 
 :::{.column width=55%}
@@ -915,4 +915,4 @@ clasificacion |>
 :::
 :::
 
-# Nos vemos en el laboratorio! 🤓 {background-color="#2d4563"}
+# ¡Nos vemos en el laboratorio! 🤓 {background-color="#2d4563"}

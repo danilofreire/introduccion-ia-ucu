@@ -300,14 +300,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(id, <span class="at">name =</span> <span class="st">"n_tokens"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Texto más corto</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>mas_corto <span class="ot">&lt;-</span> longitudes <span class="sc">|&gt;</span> <span class="fu">slice_min</span>(n_tokens, <span class="at">n =</span> <span class="dv">1</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>mas_corto <span class="ot">&lt;-</span> longitudes <span class="sc">|&gt;</span> <span class="fu">slice_min</span>(n_tokens, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>mas_corto</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 2
+<pre><code># A tibble: 1 × 2
      id n_tokens
   &lt;dbl&gt;    &lt;int&gt;
-1    45       10
-2    56       10</code></pre>
+1    45       10</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Texto más largo</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>mas_largo <span class="ot">&lt;-</span> longitudes <span class="sc">|&gt;</span> <span class="fu">slice_max</span>(n_tokens, <span class="at">n =</span> <span class="dv">1</span>)</span>
@@ -321,15 +320,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Contenido de ambos</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>textos <span class="sc">|&gt;</span> <span class="fu">filter</span>(id <span class="sc">%in%</span> <span class="fu">c</span>(mas_corto<span class="sc">$</span>id, mas_largo<span class="sc">$</span>id)) <span class="sc">|&gt;</span> <span class="fu">select</span>(id, tema, texto)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-     id tema          texto                                                     
-  &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt;                                                     
-1     1 economia      El crecimiento económico del país ha sido sólido este año…
-2    45 salud         Los trabajadores de salud enfrentan condiciones precarias…
-3    56 medioambiente La transición energética requiere inversiones significati…</code></pre>
+<pre><code># A tibble: 2 × 3
+     id tema     texto                                                          
+  &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;                                                          
+1     1 economia El crecimiento económico del país ha sido sólido este año grac…
+2    45 salud    Los trabajadores de salud enfrentan condiciones precarias y sa…</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El texto más corto tiene 10 palabras (tokens) y el más largo 20; la variación es moderada. Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).</p>
+<p><strong>Respuesta:</strong> El texto más corto tiene 10 palabras (tokens) y el más largo 20; la variación es moderada (hay un empate en el mínimo, con dos textos de 10 palabras; <code>with_ties = FALSE</code> se queda con uno solo para la comparación). Para análisis con corpora reales (artículos, discursos completos), la diferencia sería de órdenes de magnitud y habría que normalizar (TF-IDF ya lo hace por su construcción).</p>
 </section>
 <section id="pregunta-3-bigramas-más-frecuentes" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-bigramas-más-frecuentes"><span class="header-section-number">2.3</span> Pregunta 3: Bigramas más frecuentes</h3>
@@ -362,7 +360,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 10 alcanzado coberturas              1</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> En este corpus pequeño casi ningún bigrama se repite mucho: los más frecuentes aparecen solo 2 veces (<strong>“crecimiento económico”</strong>, <strong>“comunidades indígenas”</strong>, <strong>“implementado programas”</strong>, <strong>“alcanzado niveles”</strong>). Aun así ilustran la ventaja de los bigramas: recuperan colocaciones (palabras que van juntas con significado conjunto, como “crecimiento económico”) que las palabras sueltas pierden. Con un corpus más grande, estas colocaciones se repetirían lo suficiente como para ser muy informativas.</p>
+<p><strong>Respuesta:</strong> En este corpus pequeño casi ningún bigrama se repite mucho: los más frecuentes aparecen solo 2 veces (<strong>“crecimiento económico”</strong>, <strong>“comunidades indígenas”</strong>, <strong>“implementado programas”</strong>, <strong>“alcanzado niveles”</strong>, <strong>“necesita mayor”</strong>). Aun así ilustran la ventaja de los bigramas: recuperan colocaciones (palabras que van juntas con significado conjunto, como “crecimiento económico”) que las palabras sueltas pierden. Con un corpus más grande, estas colocaciones se repetirían lo suficiente como para ser muy informativas.</p>
 </section>
 </section>
 <section id="tf-idf" class="level2" data-number="3">
@@ -415,7 +413,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 # ℹ 72 more rows</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La lista por frecuencia bruta está dominada por palabras genéricas que aparecen en muchos temas: <strong>región, programas, sigue, comunidades, año</strong>. Son frecuentes pero no distinguen un tema de otro. En la lista de TF-IDF esas palabras genéricas desaparecen y emergen términos específicos de cada tema (económico, estudiantes, biodiversidad, etc.). La razón es el factor IDF: una palabra que aparece en muchos grupos tiene IDF bajo (el logaritmo se acerca a cero), así que su TF-IDF se hunde por más frecuente que sea. Esta es justamente la razón de ser de TF-IDF: la frecuencia no es lo mismo que la capacidad de distinguir.</p>
+<p><strong>Respuesta:</strong> La lista por frecuencia bruta está dominada por palabras genéricas que aparecen en muchos temas: <strong>región, programas, sigue, comunidades, representan</strong>. Son frecuentes pero no distinguen un tema de otro. En la lista de TF-IDF esas palabras genéricas desaparecen y emergen términos específicos de cada tema (económico, estudiantes, biodiversidad, etc.). La razón es el factor IDF: una palabra que aparece en muchos grupos tiene IDF bajo (el logaritmo se acerca a cero), así que su TF-IDF se hunde por más frecuente que sea. Esta es justamente la razón de ser de TF-IDF: la frecuencia no es lo mismo que la capacidad de distinguir.</p>
 </section>
 <section id="pregunta-5-cuándo-informa-el-tf-idf-por-grupo" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-cuándo-informa-el-tf-idf-por-grupo"><span class="header-section-number">3.2</span> Pregunta 5: ¿Cuándo informa el TF-IDF por grupo?</h3>
@@ -592,7 +590,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 1     1 economia México  2020 El crecimiento económico del país ha sido sólido …</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El texto más positivo suele estar en los temas <strong>economía</strong> o <strong>educación</strong>, con palabras como crecimiento, mejora, sólido, oportunidad. El método capta bien el tono explícitamente positivo. Lo que NO capta: matices, condicionales (“podríamos crecer si…”), o palabras positivas específicas al dominio que no están en el diccionario (p.&nbsp;ej. “renacimiento”, “auge”).</p>
+<p><strong>Respuesta:</strong> El texto más positivo es el id 1 (tema <strong>economía</strong>, México, 2020), con palabras como crecimiento, económico, sólido. El método capta bien el tono explícitamente positivo. Lo que NO capta: matices, condicionales (“podríamos crecer si…”), o palabras positivas específicas al dominio que no están en el diccionario (p.&nbsp;ej. “renacimiento”, “auge”).</p>
 </section>
 <section id="pregunta-10-heatmap-sentimiento-por-tema-y-año" class="level3" data-number="4.4">
 <h3 data-number="4.4" class="anchored" data-anchor-id="pregunta-10-heatmap-sentimiento-por-tema-y-año"><span class="header-section-number">4.4</span> Pregunta 10: Heatmap sentimiento por tema y año</h3>

@@ -52,7 +52,7 @@ mundo |>
   arrange(desc(pib_mediano))
 ```
 
-**Respuesta:** Ninguna región domina los tres indicadores a la vez. [América del Norte]{.alert} tiene el PIB mediano más alto (~USD 66.000), pero su mortalidad infantil mediana (~4,7) es casi el doble que la de Europa (~2,6), arrastrada por Estados Unidos. Oceanía (que acá es sólo Australia) combina PIB alto con la mejor esperanza de vida. En el otro extremo, África queda última en los tres indicadores. El caso interesante es [Medio Oriente]{.alert}: un PIB mediano alto (~USD 21.000, por el peso de Arabia Saudita) pero salud apenas intermedia. El ingreso y el bienestar van juntos en general, pero no son lo mismo.
+**Respuesta:** Ninguna región domina los tres indicadores a la vez. [América del Norte]{.alert} tiene el PIB mediano más alto (~USD 66.000), pero su mortalidad infantil mediana (~4,7) es casi el doble que la de Europa (~2,6), arrastrada por Estados Unidos. Oceanía (que acá es solo Australia) combina PIB alto con la mejor esperanza de vida. En el otro extremo, África queda última en los tres indicadores. El caso interesante es [Medio Oriente]{.alert}: un PIB mediano alto (~USD 21.000, por el peso de Arabia Saudita) pero salud apenas intermedia. El ingreso y el bienestar van juntos en general, pero no son lo mismo.
 
 ### Pregunta 2: ¿El PIB lo explica todo?
 
@@ -61,7 +61,7 @@ mundo |> slice_max(pib_per_capita, n = 5) |> select(pais, pib_per_capita)
 mundo |> slice_min(mortalidad_infantil, n = 5) |> select(pais, mortalidad_infantil)
 ```
 
-**Respuesta:** Las dos listas se solapan pero no coinciden. Entre los cinco más ricos están Noruega, Estados Unidos, Australia, Canadá y Alemania; entre los cinco con menor mortalidad infantil aparecen [Japón, España y Corea del Sur]{.alert}, que no están en el top de PIB. El caso más llamativo es [Estados Unidos]{.alert}: segundo en PIB per cápita pero con una mortalidad infantil (~5,7 por mil) más alta que la de España o Polonia, países con la mitad o menos de su ingreso. La relación ingreso-salud es fuerte pero no determinista: la organización del sistema de salud importa, no sólo el dinero disponible.
+**Respuesta:** Las dos listas se solapan pero no coinciden. Entre los cinco más ricos están Noruega, Estados Unidos, Australia, Canadá y Alemania; entre los cinco con menor mortalidad infantil aparecen [Japón, España y Corea del Sur]{.alert}, que no están en el top de PIB. El caso más llamativo es [Estados Unidos]{.alert}: segundo en PIB per cápita pero con una mortalidad infantil (~5,7 por mil) más alta que la de España o Polonia, países con la mitad o menos de su ingreso. La relación ingreso-salud es fuerte pero no determinista: la organización del sistema de salud importa, no solo el dinero disponible.
 
 ### Pregunta 3: Correlaciones
 
@@ -123,7 +123,7 @@ metricas_k |>
   theme_minimal()
 ```
 
-**Respuesta:** Los dos criterios no gritan un único ganador. La silueta es máxima en [K=2]{.alert} (~0,39) pero K=3 queda muy cerca (~0,37); el codo del WSS se ve alrededor de [K=3]{.alert} (la caída de 2 a 3 es grande, después se suaviza). Con una diferencia de silueta tan chica, conviene decidir por interpretabilidad: K=2 sólo separa "desarrollados vs el resto", mientras que K=3 distingue además a los países de ingreso medio de los de ingreso bajo, una distinción sustantiva real. Elegimos K=3. La lección: los criterios numéricos acotan las opciones razonables, pero la decisión final es del investigador.
+**Respuesta:** Los dos criterios no gritan un único ganador. La silueta es máxima en [K=2]{.alert} (~0,39) pero K=3 queda muy cerca (~0,37); el codo del WSS se ve alrededor de [K=3]{.alert} (la caída de 2 a 3 es grande, después se suaviza). Con una diferencia de silueta tan chica, conviene decidir por interpretabilidad: K=2 solo separa "desarrollados vs el resto", mientras que K=3 distingue además a los países de ingreso medio de los de ingreso bajo, una distinción sustantiva real. Elegimos K=3. La lección: los criterios numéricos acotan las opciones razonables, pero la decisión final es del investigador.
 
 ### Pregunta 5: ¿Geografía o nivel de ingreso?
 
@@ -152,7 +152,7 @@ mundo |>
   )
 ```
 
-**Respuesta:** Los tres perfiles son nítidos (los números de cluster pueden variar entre corridas, pero los grupos son los mismos). Un cluster de [alto desarrollo]{.alert}: PIB ~USD 50.000, esperanza de vida ~82 años, mortalidad ~3 por mil y democracias consolidadas (~8,4). Un cluster de [ingreso medio]{.alert}: PIB ~USD 11.000, esperanza ~74, mortalidad ~13, regímenes mixtos (~4,7). Y un cluster de [ingreso bajo]{.alert}: PIB ~USD 2.000, esperanza ~64, mortalidad ~35. Etiquetas razonables: "desarrollo alto", "ingreso medio" y "desarrollo bajo".
+**Respuesta:** Los tres perfiles son nítidos (los números de cluster pueden variar entre corridas, pero los grupos son los mismos). Un cluster de [alto desarrollo]{.alert}: PIB ~USD 50.000, esperanza de vida ~82 años, mortalidad ~3 por mil y democracias consolidadas (~8,4). Un cluster de [ingreso medio]{.alert}: PIB ~USD 11.000, esperanza ~74, mortalidad ~13, regímenes mixtos (~4,7). Y un cluster de [ingreso bajo]{.alert}: PIB ~USD 2.300, esperanza ~64, mortalidad ~37. Etiquetas razonables: "desarrollo alto", "ingreso medio" y "desarrollo bajo".
 
 ## Clustering jerárquico
 
@@ -168,7 +168,7 @@ plot(hc_ward, hang = -1, cex = 0.8,
 rect.hclust(hc_ward, k = 3, border = c("#2d4563", "#c0392b", "#27ae60"))
 ```
 
-**Respuesta:** Los dos grandes bloques que se unen al final separan a los [países de ingreso alto]{.alert} (de Noruega a Corea del Sur) del resto del mundo: esa es la división más profunda de los datos. Dentro de los bloques, los países más "solitarios" son [Sudáfrica]{.alert} y Arabia Saudita, que se unen a sus grupos bastante tarde. Tiene sentido: Sudáfrica combina indicadores de ingreso medio con la desigualdad más alta del dataset (Gini ~63), y Arabia Saudita combina ingreso alto con un índice de democracia bajísimo. Son los híbridos que ningún grupo describe del todo bien.
+**Respuesta:** Los dos grandes bloques que se unen al final separan a los [países de ingreso alto]{.alert} (de Noruega a Corea del Sur) del resto del mundo: esa es la división más profunda de los datos. Dentro de los bloques, los países más "solitarios" son [Sudáfrica]{.alert} y Nigeria, que se unen a sus grupos bastante más tarde que el resto (alturas de fusión ~4,8 y ~4,5, frente a ~1,5-2 para la mayoría). Tiene sentido: Sudáfrica combina indicadores de ingreso medio con la desigualdad más alta del dataset (Gini ~63), y Nigeria tiene una mortalidad infantil (~71 por mil) muy por encima de sus pares de ingreso bajo (India, Bangladés, Kenia y Etiopía rondan 23-34). Son los híbridos/outliers que ningún grupo describe del todo bien.
 
 ### Pregunta 8: ¿K-means y jerárquico cuentan la misma historia?
 
@@ -237,7 +237,7 @@ split(mundo$pais, km3_raw$cluster)
 table(escalado = km3$cluster, sin_escalar = km3_raw$cluster)
 ```
 
-**Respuesta:** Sin escalar, la solución la dicta el [PIB per cápita]{.alert}, cuya varianza (del orden de 10^8^) es millones de veces mayor que la de las demás variables. Los "clusters" pasan a ser bandas de ingreso puras: un grupo de PIB altísimo, otro de PIB medio y otro con todo el resto. El caso revelador es [Arabia Saudita]{.alert}, que queda agrupada con España, Polonia, Japón y Corea del Sur sólo porque su PIB es parecido, aunque su índice de democracia (~2) y su perfil social sean completamente distintos. La mortalidad infantil, el Gini y la democracia se vuelven irrelevantes para la distancia. Por eso escalar no es un detalle técnico: define qué pregunta le estamos haciendo a los datos.
+**Respuesta:** Sin escalar, la solución la dicta el [PIB per cápita]{.alert}, cuya varianza (del orden de 10^8^) es millones de veces mayor que la de las demás variables. Los "clusters" pasan a ser bandas de ingreso puras: un grupo de PIB altísimo, otro de PIB medio y otro con todo el resto. El caso revelador es [Arabia Saudita]{.alert}, que queda agrupada con España, Polonia, Japón y Corea del Sur solo porque su PIB es parecido, aunque su índice de democracia (~2) y su perfil social sean completamente distintos. La mortalidad infantil, el Gini y la democracia se vuelven irrelevantes para la distancia. Por eso escalar no es un detalle técnico: define qué pregunta le estamos haciendo a los datos.
 
 ### Pregunta 13: Reflexión
 

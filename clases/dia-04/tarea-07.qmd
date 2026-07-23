@@ -72,7 +72,7 @@ Usando el mismo objeto `chat` de la Pregunta 1, hacer una segunda pregunta que *
 
 ### Pregunta 3: El system prompt como barrera
 
-Los asistentes que se usan en investigación suelen estar restringidos a su dominio. Crear un chat cuyo system prompt lo limite a responder [sólo preguntas sobre política latinoamericana]{.alert} y a rechazar amablemente cualquier otro tema. Probarlo con dos preguntas: una sobre política latinoamericana y otra claramente fuera de tema (por ejemplo, una receta de cocina). ¿El modelo respetó la barrera? Propongan además una pregunta "fronteriza" (mitad dentro, mitad fuera del dominio) y comenten qué hizo el modelo con ella.
+Los asistentes que se usan en investigación suelen estar restringidos a su dominio. Crear un chat cuyo system prompt lo limite a responder [solo preguntas sobre política latinoamericana]{.alert} y a rechazar amablemente cualquier otro tema. Probarlo con dos preguntas: una sobre política latinoamericana y otra claramente fuera de tema (por ejemplo, una receta de cocina). ¿El modelo respetó la barrera? Propongan además una pregunta "fronteriza" (mitad dentro, mitad fuera del dominio) y comenten qué hizo el modelo con ella.
 
 ```{r p3}
 # Escriban su código aquí
@@ -126,9 +126,9 @@ Los LLMs no son deterministas: la misma pregunta puede dar respuestas distintas.
 
 ### Pregunta 7: Sensibilidad al prompt
 
-El resultado depende de cómo se escribe el prompt. Escribir dos versiones del system prompt para clasificar por tema: una **breve** (sólo las cinco categorías de `textos_politicos.csv`) y una **detallada** (con una regla extra, por ejemplo "si el texto toca dos temas, elegí el más concreto"). Aplicar ambas a los mismos cinco textos y mostrar en qué textos difieren.
+El resultado depende de cómo se escribe el prompt. Escribir dos versiones del system prompt para clasificar por tema: una **breve** (solo las cinco categorías de `textos_politicos.csv`) y una **detallada** (con una regla extra, por ejemplo "si el texto toca dos temas, elegí el más concreto"). Aplicar ambas a los mismos cinco textos y mostrar en qué textos difieren.
 
-*Pista:* definir dos funciones que sólo cambien en el `system_prompt`, y `filter()` las filas donde las dos clasificaciones no coinciden.
+*Pista:* definir dos funciones que solo cambien en el `system_prompt`, y `filter()` las filas donde las dos clasificaciones no coinciden.
 
 ```{r p7}
 # Escriban su código aquí
@@ -167,9 +167,9 @@ Usar `chat_structured()` para extraer entidades nombradas de un texto político.
 
 ### Pregunta 10: Razonamiento paso a paso
 
-Tomar un texto ambiguo y clasificarlo de dos formas: (a) directa (sólo la categoría) y (b) con cadena de pensamiento, pidiéndole al modelo que explique su razonamiento en una o dos oraciones ANTES de dar la categoría. ¿Cambia la respuesta? ¿Cuándo conviene pedir el razonamiento paso a paso?
+Tomar un texto ambiguo y clasificarlo de dos formas: (a) directa (solo la categoría) y (b) con cadena de pensamiento, pidiéndole al modelo que explique su razonamiento en una o dos oraciones ANTES de dar la categoría. ¿Cambia la respuesta? ¿Cuándo conviene pedir el razonamiento paso a paso?
 
-*Pista:* la diferencia está sólo en el system prompt: en (b) pedile que razone primero y termine con una línea del tipo `Categoría: <categoria>`.
+*Pista:* la diferencia está solo en el system prompt: en (b) pídanle que razone primero y termine con una línea del tipo `Categoría: <categoria>`.
 
 ```{r p10}
 # Escriban su código aquí

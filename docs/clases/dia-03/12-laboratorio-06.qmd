@@ -82,7 +82,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Estructura del laboratorio
 
-:::{style="margin-top: 40px; font-size: 28px;"}
+:::{style="margin-top: 40px; font-size: 30px;"}
 
 | Parte | Contenido | Duración |
 |-------|-----------|----------|
@@ -100,7 +100,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Cargar paquetes
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 25px;"}
 
 ```{r}
 #| label: cargar-paquetes
@@ -132,7 +132,7 @@ set.seed(2026)
 
 # Cargar textos políticos
 textos <- read_csv("datos/textos_politicos.csv")
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # textos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/textos_politicos.csv")
 
 # Explorar estructura
@@ -146,7 +146,7 @@ textos |>
 
 ## Ver un texto de ejemplo
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r}
 #| label: ejemplo-texto
@@ -255,7 +255,7 @@ tokens_limpios |>
 
 ## ¿Qué es TF-IDF?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 
 - [TF]{.alert} (Term Frequency): frecuencia del término en el documento
 - [IDF]{.alert} (Inverse Document Frequency): penaliza palabras muy comunes
@@ -306,7 +306,7 @@ tfidf |>
 # Top 6 palabras por tema
 tfidf |>
   group_by(tema) |>
-  slice_max(tf_idf, n = 6) |>
+  slice_max(tf_idf, n = 6, with_ties = FALSE) |>
   ungroup() |>
   mutate(palabra = reorder_within(palabra, tf_idf, tema)) |>
   ggplot(aes(x = tf_idf, y = palabra, fill = tema)) +
@@ -326,11 +326,13 @@ tfidf |>
 :::{.column width=50%}
 **¿Las palabras tienen sentido?**
 
-- Economía: crecimiento, exportaciones, fiscal
-- Educación: estudiantes, escolar, académico
-- Salud: salud, sistema, biomédica
-- Seguridad: violencia, justicia, social
+- Economía: económico, crecimiento, exportaciones, fiscal
+- Educación: educación, estudiantes, escolar, académico
+- Salud: salud, acceso, sistema, biomédica
+- Seguridad: seguridad, violencia, justicia
 - Medioambiente: biodiversidad, sostenible, agua
+
+Ojo: "país" aparece alto en economía. Palabras genéricas pueden colarse; por eso a veces conviene ampliar las stopwords
 :::
 
 :::{.column width=50%}
@@ -367,7 +369,7 @@ tfidf_pais <- tokens_limpios |>
 # Top 5 palabras distintivas por país
 tfidf_pais |>
   group_by(___) |>                # TODO
-  slice_max(tf_idf, n = 5) |>
+  slice_max(tf_idf, n = 5, with_ties = FALSE) |>
   arrange(pais, desc(tf_idf))
 ```
 
@@ -382,7 +384,7 @@ tfidf_pais |>
 
 ## ¿Qué es el análisis de sentimiento?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 
 - [Análisis de sentimiento]{.alert}: clasificar un texto por su tono — positivo, negativo o neutro
 - Método más simple: **diccionarios de valencia** — listas de palabras pre-clasificadas
@@ -390,12 +392,12 @@ tfidf_pais |>
     - `crisis`, `violencia`, `pobreza` → negativo
 - Cada documento recibe un **score** = (palabras positivas) − (palabras negativas)
 - [Limitaciones]{.alert}: no captura negaciones ("no es bueno" cuenta como positivo), ironía, ni contexto. Los diccionarios son [dependientes del dominio]{.alert} (un diccionario médico no sirve para política)
-- Aún así, [es transparente y fácil de validar]{.alert} a gran escala
+- Aun así, [es transparente y fácil de validar]{.alert} a gran escala
 :::
 
 ## Construir diccionarios pos/neg
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r}
 #| label: dict-sentimiento
@@ -544,7 +546,7 @@ textos |>
 
 [Combinadas, las dos herramientas construyen una narrativa:]{.alert} "Los textos sobre **seguridad** (TF-IDF) tienen un tono marcadamente **negativo** (sentimiento)." Una herramienta sola rara vez alcanza.
 
-[Regla práctica:]{.alert} antes de creerle a un método automático, leé una muestra de textos y validá que el análisis cuadra con tu lectura
+[Regla práctica:]{.alert} antes de creerle a un método automático, lean una muestra de textos y validen que el análisis cuadra con su lectura
 :::
 
 ## Resumen del laboratorio
@@ -568,7 +570,7 @@ textos |>
 - `anti_join()`: eliminar stopwords
 - `bind_tf_idf()`: calcular TF-IDF
 - `case_when()`: asignar valencia
-- `summarise(.by = grupo)`: agregar por grupo
+- `group_by()` + `summarise()`: agregar por grupo
 
 :::{style="margin-top: 30px;"}
 :::
@@ -601,12 +603,13 @@ tfidf_pais <- tokens_limpios |>
 # Top 5 palabras distintivas por país
 tfidf_pais |>
   group_by(pais) |>
-  slice_max(tf_idf, n = 5) |>
+  slice_max(tf_idf, n = 5, with_ties = FALSE) |>
   arrange(pais, desc(tf_idf))
 ```
 
 - Aparecen palabras locales (nombres de instituciones, ciudades) y términos políticos específicos
 - Los TF-IDF más altos suelen ser palabras que solo aparecen en un país
+- ¿Quieren ver [todas]{.alert} las palabras? Dos cosas recortan la salida: el `slice_max()` deja cinco por país y las tibbles muestran diez filas por defecto. Saquen el `slice_max()` y agreguen `print(n = Inf)`: `tfidf_pais |> arrange(pais, desc(tf_idf)) |> print(n = Inf)`. Como la tabla es larga, en RStudio suele ser más cómodo `View(tfidf_pais)`
 
 [[Volver al ejercicio]{.button}](#sec:ejercicio-tfidf-pais)
 :::

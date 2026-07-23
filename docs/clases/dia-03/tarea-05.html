@@ -267,7 +267,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mundo <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/indicadores_mundo.csv"</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>A diferencia del dataset del laboratorio, este tiene una columna de texto extra: <code>region</code>. Tenganla presente, porque va a aparecer varias veces en la tarea.</p>
+<p>A diferencia del dataset del laboratorio, este tiene una columna de texto extra: <code>region</code>. Ténganla presente, porque va a aparecer varias veces en la tarea.</p>
 </section>
 </section>
 <section id="exploración" class="level2" data-number="2">
@@ -292,7 +292,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="pregunta-3-correlaciones" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
 <p>Calculen la matriz de correlaciones de las variables numéricas y visualícenla con <code>corrplot()</code>. ¿Cuál par de variables tiene la correlación positiva más fuerte? ¿Cuál tiene la negativa más fuerte? Hagan además un scatterplot de PIB per cápita contra esperanza de vida: ¿la relación parece lineal o se “aplana” en los países ricos?</p>
-<p><em>Pista:</em> para la matriz hay que quedarse sólo con las columnas numéricas (<code>select()</code> ayuda a sacar <code>pais</code> y <code>region</code>).</p>
+<p><em>Pista:</em> para la matriz hay que quedarse solo con las columnas numéricas (<code>select()</code> ayuda a sacar <code>pais</code> y <code>region</code>).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -377,7 +377,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="6" class="anchored" data-anchor-id="síntesis"><span class="header-section-number">6</span> Síntesis</h2>
 <section id="pregunta-12-qué-pasa-si-no-escalamos" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-12-qué-pasa-si-no-escalamos"><span class="header-section-number">6.1</span> Pregunta 12: ¿Qué pasa si no escalamos?</h3>
-<p>Repitan K-means con K=3 pero sobre los datos <span class="alert">sin escalar</span> (sólo saquen <code>region</code> y muevan <code>pais</code> a rownames). Comparen los clusters con los de la pregunta 5. ¿Qué variable domina ahora la solución? Busquen un país que quede agrupado con países muy distintos en democracia o desigualdad, y expliquen por qué terminó ahí.</p>
+<p>Repitan K-means con K=3 pero sobre los datos <span class="alert">sin escalar</span> (solo saquen <code>region</code> y muevan <code>pais</code> a rownames). Comparen los clusters con los de la pregunta 5. ¿Qué variable domina ahora la solución? Busquen un país que quede agrupado con países muy distintos en democracia o desigualdad, y expliquen por qué terminó ahí.</p>
 <p><em>Pista:</em> miren las unidades de cada variable. ¿Cuál tiene la varianza más grande, por lejos, cuando no escalamos?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Escriban su código aquí</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>

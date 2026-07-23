@@ -73,7 +73,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 - Cómo un [system prompt]{.alert} cambia el comportamiento del modelo
 - Cuándo el LLM gana y cuándo pierde frente a métodos clásicos
 
-[Quien no tenga API key, le comparto una temporal en clase]{.alert}
+[A quien no tenga API key, le comparto una temporal en clase]{.alert}
 :::
 :::
 :::
@@ -113,7 +113,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 install.packages(c("ellmer", "jsonlite"))
 ```
 
-- En este laboratorio usamos [OpenRouter](https://openrouter.ai/), que tiene modelos gratuitos y no requieren instalar nada
+- En este laboratorio usamos [OpenRouter](https://openrouter.ai/), que tiene modelos gratuitos y no requiere instalar nada
 ```{r}
 #| label: cargar-paquetes
 #| eval: true
@@ -139,7 +139,7 @@ packageVersion("ellmer")
 4. Copiar y [guardar la key]{.alert} (empieza con `sk-or-...`): se muestra una sola vez
 
 - [Modelos con sufijo `:free` no cuestan]{.alert} (con límites de rate). Para este laboratorio basta con eso
-- Para seleccionarlos, andá a [openrouter.ai/models](https://openrouter.ai/models), hacé clic en "Prompt Pricing" y ponelo en "Free". Los nombres de los modelos son los que terminan en `:free`
+- Para seleccionarlos, vayan a [openrouter.ai/models](https://openrouter.ai/models), hagan clic en "Prompt Pricing" y pónganlo en "Free". Los nombres de los modelos son los que terminan en `:free`
 
 :::{.callout-warning}
 **Nunca** pegar la API key en un script que se sube a GitHub. Usar variables de entorno
@@ -152,7 +152,7 @@ packageVersion("ellmer")
 
 | Modelo | Para qué |
 |---|---|
-| `openai/gpt-oss-120b:free` | Default del lab. Rápido y confiable |
+| `openai/gpt-oss-20b:free` | Default del lab. Rápido y confiable |
 | `google/gemma-4-31b-it:free` | Buen español; ideal para salida estructurada (Lab 8) |
 | `nvidia/nemotron-3-super-120b-a12b:free` | Potente, con buenos límites de NVIDIA |
 | `nvidia/nemotron-nano-9b-v2:free` | Chico y veloz |
@@ -169,9 +169,9 @@ Para producción, modelos pagos baratos (Claude Haiku 4.5, GPT-5 mini) cuestan c
 
 `ellmer` busca la key en una [variable de entorno]{.alert}, no en el código. Hay dos formas de definirla:
 
-- [Opción 1 (rápida)]{.alert}: `Sys.setenv()` la define sólo para esta sesión de R; al cerrar R se borra
+- [Opción 1 (rápida)]{.alert}: `Sys.setenv()` la define solo para esta sesión de R; al cerrar R se borra
 - [Opción 2 (recomendada)]{.alert}: guardarla en `.Renviron`, un archivo personal que R lee al arrancar, así queda disponible siempre
-- `usethis::edit_r_environ()` abre ese archivo: agregás la línea, guardás y reiniciás R
+- `usethis::edit_r_environ()` abre ese archivo: agregan la línea, guardan y reinician R
 
 ```{r}
 #| label: configurar-api
@@ -179,7 +179,7 @@ Para producción, modelos pagos baratos (Claude Haiku 4.5, GPT-5 mini) cuestan c
 #| echo: true
 #| cache: true
 
-# Opción 1: sólo para esta sesión de R
+# Opción 1: solo para esta sesión de R
 Sys.setenv(OPENROUTER_API_KEY = "sk-or-...")
 
 # Opción 2 (recomendada): guardar en .Renviron permanentemente
@@ -194,7 +194,7 @@ Sys.getenv("OPENROUTER_API_KEY") != ""   # TRUE si está bien
 ```
 
 :::{.callout-note appearance="simple" icon=false}
-**Pista**: la variable `OPENROUTER_API_KEY` es la que `ellmer` busca por defecto cuando llamás a `chat_openrouter()`. No hace falta pasarla como argumento
+**Pista**: la variable `OPENROUTER_API_KEY` es la que `ellmer` busca por defecto cuando llaman a `chat_openrouter()`. No hace falta pasarla como argumento
 :::
 :::
 
@@ -265,7 +265,7 @@ analista$chat("¿Cuáles son los principales desafíos democráticos de Uruguay 
 
 textos <- read_csv("datos/textos_politicos.csv",
                    show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # textos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/textos_politicos.csv", show_col_types = FALSE)
 
 glimpse(textos)
@@ -288,7 +288,7 @@ muestra |> count(tema)
 
 :::{style="margin-top: 30px; font-size: 18px;"}
 
-- [Zero-shot]{.alert}: pedimos la categoría sin dar ejemplos, sólo las reglas
+- [Zero-shot]{.alert}: pedimos la categoría sin dar ejemplos, solo las reglas
 - Creamos un chat nuevo por texto, así ninguno arrastra el historial del anterior
 - `trimws(tolower())` limpia la respuesta para poder compararla con la etiqueta real
 
@@ -351,7 +351,7 @@ resultados_zero |>
 ```
 
 :::{.callout-warning}
-**Costo y rate limits**: con modelos `:free` hay límites de peticiones por minuto. Si te bloquea, esperá 30 segundos. Para corpus grandes, pasar a modelos pagos
+**Costo y rate limits**: con modelos `:free` hay límites de peticiones por minuto. Si los bloquea, esperen 30 segundos. Para corpus grandes, pasar a modelos pagos
 :::
 :::
 
@@ -383,12 +383,12 @@ evaluacion |>
   count(tema, tema_llm, sort = TRUE)
 ```
 
-[Anotá la accuracy obtenida. La vamos a comparar con LDA al final]{.alert}
+[Anoten la accuracy obtenida. La vamos a comparar con LDA al final]{.alert}
 :::
 
 ## Few-shot: mejorar con ejemplos
 
-:::{style="margin-top: 30px; font-size: 18px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 
 ```{r}
 #| label: clasificador-few
@@ -426,8 +426,6 @@ resultados_few <- muestra |>
 
 mean(resultados_few$tema == resultados_few$tema_llm)
 ```
-
-Pregunta: ¿cuánto mejora la accuracy con cinco ejemplos en el prompt? [¿Y por qué motivo?]{.alert}
 :::
 
 ## ¿Qué modelo conviene?
@@ -485,7 +483,7 @@ write_csv(prueba, "clasificacion_lab7.csv")
 Vamos a clasificar los [20 textos de la muestra]{.alert} con tres métodos y comparar su accuracy contra las etiquetas reales (`tema`):
 
 1. [LDA]{.alert} (Día 3): topic modeling [no supervisado]{.alert}
-2. [gpt-oss-120b]{.alert}: un LLM grande
+2. [gpt-oss-20b]{.alert}: un LLM más grande
 3. [nemotron-nano-9b]{.alert}: un LLM chico
 
 **Preguntas para responder**
@@ -494,7 +492,7 @@ Vamos a clasificar los [20 textos de la muestra]{.alert} con tres métodos y com
 - ¿El LLM chico se acerca al grande?
 - ¿Vale la pena el costo y la lentitud de los LLMs?
 
-[Cada método tiene su propio chunk con `cache: true`: si te limitan, re-renderizá y sigue desde donde quedó]{.alert}
+[Cada método tiene su propio chunk con `cache: true`: si los limitan, re-rendericen y sigue desde donde quedó]{.alert}
 :::
 
 ## Clasificador 1: LDA (ajustado en 60, medido en la muestra)
@@ -552,7 +550,7 @@ lda_pred <- doc_topic |>
   left_join(mapa, by = "topic") |>
   left_join(select(textos, id, tema), by = "id")
 
-# Medir sólo sobre los 20 textos de la muestra (mismo set que los LLMs)
+# Medir solo sobre los 20 textos de la muestra (mismo set que los LLMs)
 accuracy_lda <- lda_pred |>
   filter(id %in% muestra$id) |>
   summarise(acc = mean(tema == tema_lda)) |>
@@ -579,7 +577,8 @@ accuracy_lda
 #| cache: true
 
 # resultados_zero (Parte 2) = gpt-oss-20b zero-shot sobre la muestra
-mean(resultados_zero$tema == resultados_zero$tema_llm)
+accuracy_gptoss <- mean(resultados_zero$tema == resultados_zero$tema_llm)
+accuracy_gptoss
 ```
 
 ```{r}
@@ -599,7 +598,8 @@ clasif_nemotron <- muestra |>
 #| echo: true
 #| cache: true
 
-mean(clasif_nemotron$tema == clasif_nemotron$tema_llm)
+accuracy_nemotron <- mean(clasif_nemotron$tema == clasif_nemotron$tema_llm)
+accuracy_nemotron
 ```
 :::
 
@@ -624,7 +624,7 @@ comparacion |> arrange(desc(accuracy))
 ```
 
 :::{.callout-note appearance="simple" icon=false}
-**Lección**: el LLM, que [conoce las categorías]{.alert}, supera por lejos a LDA, que sólo agrupa palabras. El modelo chico suele acercarse al grande a una fracción del costo
+**Lección**: el LLM, que [conoce las categorías]{.alert}, supera por lejos a LDA, que solo agrupa palabras. El modelo chico suele acercarse al grande a una fracción del costo
 :::
 :::
 
@@ -692,7 +692,7 @@ comparacion |> arrange(desc(accuracy))
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
-**Tarea (5 min):** completá los tres system prompts con personalidades distintas y compará sus respuestas a la misma pregunta
+**Tarea (5 min):** completen los tres system prompts con personalidades distintas y comparen sus respuestas a la misma pregunta
 
 ```{r}
 #| label: ej1-skeleton
@@ -720,7 +720,7 @@ activista$chat(pregunta)
 ```
 
 :::{.callout-note appearance="simple" icon=false}
-**Pista**: sólo cambia el `system_prompt` de cada chat; el modelo y la pregunta son los mismos
+**Pista**: solo cambia el `system_prompt` de cada chat; el modelo y la pregunta son los mismos
 :::
 
 [[Apéndice: Solución]{.button}](#sec:appendix01)
@@ -730,7 +730,7 @@ activista$chat(pregunta)
 
 :::{style="margin-top: 30px; font-size: 18px;"}
 
-**Tarea (5 min):** los textos del corpus tienen una sola oración, así que acá hay dos párrafos más largos. Escribí una función `resumir()` que le pida a gpt-oss un resumen de una oración bien corta, y aplicala a los dos párrafos
+**Tarea (5 min):** los textos del corpus tienen una sola oración, así que acá hay dos párrafos más largos. Escriban una función `resumir()` que le pida a gpt-oss un resumen de una oración bien corta, y aplíquenla a los dos párrafos
 
 ```{r}
 #| label: ej2-skeleton

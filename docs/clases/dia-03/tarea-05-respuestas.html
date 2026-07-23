@@ -295,7 +295,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 7 África                 5       3086               62.2               29.1</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Ninguna región domina los tres indicadores a la vez. <span class="alert">América del Norte</span> tiene el PIB mediano más alto (~USD 66.000), pero su mortalidad infantil mediana (~4,7) es casi el doble que la de Europa (~2,6), arrastrada por Estados Unidos. Oceanía (que acá es sólo Australia) combina PIB alto con la mejor esperanza de vida. En el otro extremo, África queda última en los tres indicadores. El caso interesante es <span class="alert">Medio Oriente</span>: un PIB mediano alto (~USD 21.000, por el peso de Arabia Saudita) pero salud apenas intermedia. El ingreso y el bienestar van juntos en general, pero no son lo mismo.</p>
+<p><strong>Respuesta:</strong> Ninguna región domina los tres indicadores a la vez. <span class="alert">América del Norte</span> tiene el PIB mediano más alto (~USD 66.000), pero su mortalidad infantil mediana (~4,7) es casi el doble que la de Europa (~2,6), arrastrada por Estados Unidos. Oceanía (que acá es solo Australia) combina PIB alto con la mejor esperanza de vida. En el otro extremo, África queda última en los tres indicadores. El caso interesante es <span class="alert">Medio Oriente</span>: un PIB mediano alto (~USD 21.000, por el peso de Arabia Saudita) pero salud apenas intermedia. El ingreso y el bienestar van juntos en general, pero no son lo mismo.</p>
 </section>
 <section id="pregunta-2-el-pib-lo-explica-todo" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-el-pib-lo-explica-todo"><span class="header-section-number">2.2</span> Pregunta 2: ¿El PIB lo explica todo?</h3>
@@ -323,7 +323,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 5 Australia                     2.8</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Las dos listas se solapan pero no coinciden. Entre los cinco más ricos están Noruega, Estados Unidos, Australia, Canadá y Alemania; entre los cinco con menor mortalidad infantil aparecen <span class="alert">Japón, España y Corea del Sur</span>, que no están en el top de PIB. El caso más llamativo es <span class="alert">Estados Unidos</span>: segundo en PIB per cápita pero con una mortalidad infantil (~5,7 por mil) más alta que la de España o Polonia, países con la mitad o menos de su ingreso. La relación ingreso-salud es fuerte pero no determinista: la organización del sistema de salud importa, no sólo el dinero disponible.</p>
+<p><strong>Respuesta:</strong> Las dos listas se solapan pero no coinciden. Entre los cinco más ricos están Noruega, Estados Unidos, Australia, Canadá y Alemania; entre los cinco con menor mortalidad infantil aparecen <span class="alert">Japón, España y Corea del Sur</span>, que no están en el top de PIB. El caso más llamativo es <span class="alert">Estados Unidos</span>: segundo en PIB per cápita pero con una mortalidad infantil (~5,7 por mil) más alta que la de España o Polonia, países con la mitad o menos de su ingreso. La relación ingreso-salud es fuerte pero no determinista: la organización del sistema de salud importa, no solo el dinero disponible.</p>
 </section>
 <section id="pregunta-3-correlaciones" class="level3" data-number="2.3">
 <h3 data-number="2.3" class="anchored" data-anchor-id="pregunta-3-correlaciones"><span class="header-section-number">2.3</span> Pregunta 3: Correlaciones</h3>
@@ -427,7 +427,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los dos criterios no gritan un único ganador. La silueta es máxima en <span class="alert">K=2</span> (~0,39) pero K=3 queda muy cerca (~0,37); el codo del WSS se ve alrededor de <span class="alert">K=3</span> (la caída de 2 a 3 es grande, después se suaviza). Con una diferencia de silueta tan chica, conviene decidir por interpretabilidad: K=2 sólo separa “desarrollados vs el resto”, mientras que K=3 distingue además a los países de ingreso medio de los de ingreso bajo, una distinción sustantiva real. Elegimos K=3. La lección: los criterios numéricos acotan las opciones razonables, pero la decisión final es del investigador.</p>
+<p><strong>Respuesta:</strong> Los dos criterios no gritan un único ganador. La silueta es máxima en <span class="alert">K=2</span> (~0,39) pero K=3 queda muy cerca (~0,37); el codo del WSS se ve alrededor de <span class="alert">K=3</span> (la caída de 2 a 3 es grande, después se suaviza). Con una diferencia de silueta tan chica, conviene decidir por interpretabilidad: K=2 solo separa “desarrollados vs el resto”, mientras que K=3 distingue además a los países de ingreso medio de los de ingreso bajo, una distinción sustantiva real. Elegimos K=3. La lección: los criterios numéricos acotan las opciones razonables, pero la decisión final es del investigador.</p>
 </section>
 <section id="pregunta-5-geografía-o-nivel-de-ingreso" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-geografía-o-nivel-de-ingreso"><span class="header-section-number">3.2</span> Pregunta 5: ¿Geografía o nivel de ingreso?</h3>
@@ -487,7 +487,7 @@ cluster Oceanía
 3       3    10 10936      74.3       12.7        4.7</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los tres perfiles son nítidos (los números de cluster pueden variar entre corridas, pero los grupos son los mismos). Un cluster de <span class="alert">alto desarrollo</span>: PIB ~USD 50.000, esperanza de vida ~82 años, mortalidad ~3 por mil y democracias consolidadas (~8,4). Un cluster de <span class="alert">ingreso medio</span>: PIB ~USD 11.000, esperanza ~74, mortalidad ~13, regímenes mixtos (~4,7). Y un cluster de <span class="alert">ingreso bajo</span>: PIB ~USD 2.000, esperanza ~64, mortalidad ~35. Etiquetas razonables: “desarrollo alto”, “ingreso medio” y “desarrollo bajo”.</p>
+<p><strong>Respuesta:</strong> Los tres perfiles son nítidos (los números de cluster pueden variar entre corridas, pero los grupos son los mismos). Un cluster de <span class="alert">alto desarrollo</span>: PIB ~USD 50.000, esperanza de vida ~82 años, mortalidad ~3 por mil y democracias consolidadas (~8,4). Un cluster de <span class="alert">ingreso medio</span>: PIB ~USD 11.000, esperanza ~74, mortalidad ~13, regímenes mixtos (~4,7). Y un cluster de <span class="alert">ingreso bajo</span>: PIB ~USD 2.300, esperanza ~64, mortalidad ~37. Etiquetas razonables: “desarrollo alto”, “ingreso medio” y “desarrollo bajo”.</p>
 </section>
 </section>
 <section id="clustering-jerárquico" class="level2" data-number="4">
@@ -508,7 +508,7 @@ cluster Oceanía
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Los dos grandes bloques que se unen al final separan a los <span class="alert">países de ingreso alto</span> (de Noruega a Corea del Sur) del resto del mundo: esa es la división más profunda de los datos. Dentro de los bloques, los países más “solitarios” son <span class="alert">Sudáfrica</span> y Arabia Saudita, que se unen a sus grupos bastante tarde. Tiene sentido: Sudáfrica combina indicadores de ingreso medio con la desigualdad más alta del dataset (Gini ~63), y Arabia Saudita combina ingreso alto con un índice de democracia bajísimo. Son los híbridos que ningún grupo describe del todo bien.</p>
+<p><strong>Respuesta:</strong> Los dos grandes bloques que se unen al final separan a los <span class="alert">países de ingreso alto</span> (de Noruega a Corea del Sur) del resto del mundo: esa es la división más profunda de los datos. Dentro de los bloques, los países más “solitarios” son <span class="alert">Sudáfrica</span> y Nigeria, que se unen a sus grupos bastante más tarde que el resto (alturas de fusión ~4,8 y ~4,5, frente a ~1,5-2 para la mayoría). Tiene sentido: Sudáfrica combina indicadores de ingreso medio con la desigualdad más alta del dataset (Gini ~63), y Nigeria tiene una mortalidad infantil (~71 por mil) muy por encima de sus pares de ingreso bajo (India, Bangladés, Kenia y Etiopía rondan 23-34). Son los híbridos/outliers que ningún grupo describe del todo bien.</p>
 </section>
 <section id="pregunta-8-k-means-y-jerárquico-cuentan-la-misma-historia" class="level3" data-number="4.2">
 <h3 data-number="4.2" class="anchored" data-anchor-id="pregunta-8-k-means-y-jerárquico-cuentan-la-misma-historia"><span class="header-section-number">4.2</span> Pregunta 8: ¿K-means y jerárquico cuentan la misma historia?</h3>
@@ -656,7 +656,7 @@ escalado 1 2 3
        3 9 0 1</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Sin escalar, la solución la dicta el <span class="alert">PIB per cápita</span>, cuya varianza (del orden de 10<sup>8</sup>) es millones de veces mayor que la de las demás variables. Los “clusters” pasan a ser bandas de ingreso puras: un grupo de PIB altísimo, otro de PIB medio y otro con todo el resto. El caso revelador es <span class="alert">Arabia Saudita</span>, que queda agrupada con España, Polonia, Japón y Corea del Sur sólo porque su PIB es parecido, aunque su índice de democracia (~2) y su perfil social sean completamente distintos. La mortalidad infantil, el Gini y la democracia se vuelven irrelevantes para la distancia. Por eso escalar no es un detalle técnico: define qué pregunta le estamos haciendo a los datos.</p>
+<p><strong>Respuesta:</strong> Sin escalar, la solución la dicta el <span class="alert">PIB per cápita</span>, cuya varianza (del orden de 10<sup>8</sup>) es millones de veces mayor que la de las demás variables. Los “clusters” pasan a ser bandas de ingreso puras: un grupo de PIB altísimo, otro de PIB medio y otro con todo el resto. El caso revelador es <span class="alert">Arabia Saudita</span>, que queda agrupada con España, Polonia, Japón y Corea del Sur solo porque su PIB es parecido, aunque su índice de democracia (~2) y su perfil social sean completamente distintos. La mortalidad infantil, el Gini y la democracia se vuelven irrelevantes para la distancia. Por eso escalar no es un detalle técnico: define qué pregunta le estamos haciendo a los datos.</p>
 </section>
 <section id="pregunta-13-reflexión" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-13-reflexión"><span class="header-section-number">6.2</span> Pregunta 13: Reflexión</h3>

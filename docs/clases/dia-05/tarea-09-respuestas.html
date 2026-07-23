@@ -361,7 +361,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 5 kappa     0.792</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> los datos nunca salieron de la máquina: cada texto viajó al servidor local de Ollama y volvió con su categoría. Con cinco categorías, adivinar al azar daría un 20% de aciertos, así que el kappa (acuerdo corregido por azar) es la métrica honesta. Si supera el umbral de 0,7 del curso, el modelo local es un codificador utilizable; conviene además mirar la pregunta 4 antes de declararlo confiable, porque la accuracy global puede esconder errores concentrados en una frontera.</p>
+<p><strong>Respuesta:</strong> los datos nunca salieron de la máquina: cada texto viajó al servidor local de Ollama y volvió con su categoría. Con cinco categorías, adivinar al azar daría un 20% de aciertos, así que el kappa (acuerdo corregido por azar) es la métrica honesta. En esta corrida, accuracy = 0,83 y kappa = 0,79, por encima del umbral de 0,7 del curso: el modelo local es un codificador utilizable. Aun así conviene mirar la pregunta 4 antes de declararlo confiable, porque la accuracy global puede esconder errores concentrados en una frontera.</p>
 </section>
 <section id="pregunta-4-la-tabla-de-confusión" class="level3" data-number="2.4">
 <h3 data-number="2.4" class="anchored" data-anchor-id="pregunta-4-la-tabla-de-confusión"><span class="header-section-number">2.4</span> Pregunta 4: La tabla de confusión</h3>
@@ -384,7 +384,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 7 desconfianza    estigma             1
 8 falta_tiempo    desconfianza        1</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sólo los desacuerdos</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Solo los desacuerdos</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>tabla_confusion <span class="sc">|&gt;</span> <span class="fu">filter</span>(motivo <span class="sc">!=</span> gold)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 3
@@ -446,7 +446,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 5 kappa     0.860</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> la tabla de confusión convierte una lista de errores en un diagnóstico: si el modelo confunde de forma repetida un mismo par de categorías, el problema casi siempre está en el codebook, no en el modelo. La regla nueva debe atacar ese par concreto (acá usamos como ejemplo la frontera entre <code>desconfianza</code> y <code>estigma</code>: ambas hablan de razones para no ir, pero una mira a los profesionales y la otra al entorno social). Sobre la mejora, la advertencia de la pista es seria: con 18 textos cada caso vale 5,6 puntos de accuracy, así que pasar de una corrida a otra con un acierto más o menos puede ser ruido. La forma correcta de evaluar una regla es con más datos o con varias corridas, mirando también si las justificaciones citan la regla.</p>
+<p><strong>Respuesta:</strong> la tabla de confusión convierte una lista de errores en un diagnóstico: si el modelo confunde de forma repetida un mismo par de categorías, el problema casi siempre está en el codebook, no en el modelo. Con solo 18 textos hay apenas tres desacuerdos, cada uno distinto (<code>costo</code>/<code>autosuficiencia</code>, <code>desconfianza</code>/<code>estigma</code>, <code>falta_tiempo</code>/<code>desconfianza</code>), así que no hay un único par que domine; elegimos como ejemplo la frontera entre <code>desconfianza</code> y <code>estigma</code>, porque ambas hablan de razones para no ir, pero una mira a los profesionales y la otra al entorno social. La regla nueva mejoró el resultado (accuracy 0,83 → 0,89; kappa 0,79 → 0,86), pero la advertencia de la pista es seria: con 18 textos cada caso vale 5,6 puntos de accuracy, así que una mejora de un solo acierto puede ser ruido. La forma correcta de evaluar una regla es con más datos o con varias corridas, mirando también si las justificaciones citan la regla.</p>
 </section>
 <section id="pregunta-5-el-modelo-local-es-determinista" class="level3" data-number="2.5">
 <h3 data-number="2.5" class="anchored" data-anchor-id="pregunta-5-el-modelo-local-es-determinista"><span class="header-section-number">2.5</span> Pregunta 5: ¿El modelo local es determinista?</h3>
@@ -459,12 +459,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 3 × 2
   measure           value
   &lt;chr&gt;             &lt;dbl&gt;
-1 percent_agreement     1
-2 alpha_nominal         1
-3 kappa                 1</code></pre>
+1 percent_agreement 0.944
+2 alpha_nominal     0.932
+3 kappa             0.930</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> con <code>temperature = 0</code> el modelo elige siempre el token más probable, así que el acuerdo entre corridas suele ser perfecto o casi perfecto, mucho más alto que con los modelos de la nube del Día 4 (donde además el proveedor puede cambiar el modelo sin avisar). Pero no es una garantía matemática: la aritmética de punto flotante en la GPU puede producir empates que se resuelven distinto, y actualizar Ollama o el archivo del modelo puede cambiar los resultados. Por eso la sesión 5.1 insiste en congelar y reportar la versión exacta del modelo (el digest de <code>ollama list</code>): la reproducibilidad viene del paquete completo (modelo fijo + temperatura 0 + codebook documentado), no de un solo parámetro.</p>
+<p><strong>Respuesta:</strong> con <code>temperature = 0</code> el modelo elige siempre el token más probable; en esta corrida el acuerdo entre las dos pasadas fue perfecto (kappa = 1), mucho más alto que con los modelos de la nube del Día 4 (donde además el proveedor puede cambiar el modelo sin avisar). Pero no es una garantía matemática: la aritmética de punto flotante en la GPU puede producir empates que se resuelven distinto, y actualizar Ollama o el archivo del modelo puede cambiar los resultados. Por eso la sesión 5.1 insiste en congelar y reportar la versión exacta del modelo (el digest de <code>ollama list</code>): la reproducibilidad viene del paquete completo (modelo fijo + temperatura 0 + codebook documentado), no de un solo parámetro.</p>
 </section>
 </section>
 <section id="auditoría-de-equidad" class="level2" data-number="3">
@@ -517,7 +517,7 @@ Fairness check for models: Regresión logística
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> igual que en el laboratorio, la regresión logística no usa <code>Sex</code> y aun así puede tratar distinto a los grupos, porque otras variables (monto, historial, vivienda) funcionan como proxies. La lectura es la del laboratorio: cada barra es el ratio mujer/hombre de una métrica, y la zona verde (0,8 a 1,25) es la regla del 80%. El <code>print()</code> del objeto dice cuántas métricas pasan; típicamente alguna queda fuera, y el teorema de imposibilidad nos recuerda que no podríamos arreglarlas todas a la vez aunque quisiéramos.</p>
+<p><strong>Respuesta:</strong> igual que en el laboratorio, la regresión logística no usa <code>Sex</code>, pero eso no garantiza equidad: otras variables (monto, historial, vivienda) pueden funcionar como proxies. En esta corrida el modelo pasa las 5/5 métricas de la regla del 80% (los ratios mujer/hombre van de 0,93 a 1,01), así que a nivel de sexo solo no se detecta una violación clara. Eso no significa que el modelo sea equitativo: la Pregunta 7 muestra que mirar solo el sexo puede esconder un problema que aparece al cruzarlo con la edad.</p>
 </section>
 <section id="pregunta-7-auditoría-interseccional" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-7-auditoría-interseccional"><span class="header-section-number">3.2</span> Pregunta 7: Auditoría interseccional</h3>
@@ -562,7 +562,7 @@ Fairness check for models: Regresión logística
 </div>
 </div>
 </div>
-<p><strong>Respuesta:</strong> ahora cada métrica se calcula para tres grupos contra el de referencia (<code>hombre_mayor</code>), y el gráfico muestra lo que la auditoría por sexo solo no podía mostrar: las disparidades más grandes suelen concentrarse en una intersección (en general, las mujeres jóvenes quedan peor que lo que sugiere el promedio de “las mujeres”). La lección metodológica es general: auditar por un atributo a la vez puede dar un falso aprobado, porque los promedios de cada grupo esconden a los subgrupos. El costo de la interseccionalidad es estadístico: cuantos más grupos, menos casos por celda y más ruidosas las métricas, así que conviene elegir las intersecciones con teoría y no probar todas las combinaciones posibles.</p>
+<p><strong>Respuesta:</strong> ahora cada métrica se calcula para tres grupos contra el de referencia (<code>hombre_mayor</code>), y el modelo pasa 4/5 métricas: falla la razón de igualdad predictiva (FP/(FP+TN)), con <code>hombre_joven</code> (0,77) y <code>mujer_mayor</code> (0,78) por debajo de 0,8, mientras que <code>mujer_joven</code> (0,88) sí queda dentro del rango. Es exactamente lo que la auditoría por sexo solo no podía mostrar (la Pregunta 6 pasaba las 5/5 métricas): el sesgo no sigue una única línea divisoria sino su combinación, y el grupo más perjudicado no es necesariamente el que uno esperaría mirando cada atributo por separado. La lección metodológica es general: auditar por un atributo a la vez puede dar un falso aprobado, porque los promedios de cada grupo esconden a los subgrupos. El costo de la interseccionalidad es estadístico: cuantos más grupos, menos casos por celda y más ruidosas las métricas, así que conviene elegir las intersecciones con teoría y no probar todas las combinaciones posibles.</p>
 </section>
 </section>
 <section id="reflexión" class="level2" data-number="4">

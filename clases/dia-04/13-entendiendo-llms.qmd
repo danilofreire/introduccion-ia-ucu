@@ -69,7 +69,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::{.column width=50%}
 **Hoy: extendemos esa idea**
 
-Word2Vec ya hacía algo notable: [aprender que palabras similares tienen vectores cercanos]{.alert}, sin etiquetas, sólo prediciendo contexto
+Word2Vec ya hacía algo notable: [aprender que palabras similares tienen vectores cercanos]{.alert}, sin etiquetas, solo prediciendo contexto
 
 Los [LLMs]{.alert} hacen [lo mismo, a escala masiva]{.alert}:
 
@@ -170,7 +170,7 @@ Fuente: [Jay Alammar](https://jalammar.github.io/illustrated-transformer/)
 
 Sin búsqueda, sin razonamiento explícito, sin "comprensión" como la entendemos los humanos
 
-Sólo [estadísticas sobre tokens]{.alert}, computadas con una arquitectura muy potente, sobre datos masivos
+Solo [estadísticas sobre tokens]{.alert}, computadas con una arquitectura muy potente, sobre datos masivos
 
 :::{.callout-note}
 Cuando ChatGPT genera una respuesta de 200 palabras, está haciendo esta predicción [unas 300 veces seguidas]{.alert}
@@ -209,15 +209,15 @@ Cuando ChatGPT genera una respuesta de 200 palabras, está haciendo esta predicc
 
 ## Tokens: ni letras ni palabras
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - Los LLMs no leen letras ni palabras: leen [tokens]{.alert}, que son [subpalabras]{.alert}
 - Algoritmo más común: [BPE]{.alert} (Byte Pair Encoding; [Sennrich, Haddow y Birch, 2016](https://arxiv.org/abs/1508.07909))
-- Vocabulario [finito]{.alert} (típicamente 50.000 a 200.000 tokens) que puede representar [cualquier texto]{.alert}
+- Vocabulario [finito]{.alert} (típicamente 50.000 a 200.000 tokens) que puede representar casi [cualquier texto]{.alert}
 - Palabras comunes son un solo token; palabras raras o largas se descomponen
 
-**Ejemplos en GPT-4o**
+**Ejemplos (tokenizador de OpenAI)**
 
 - "hola" → 1 token
 - "ChatGPT" → 3 tokens (`Chat`, `G`, `PT`)
@@ -291,7 +291,7 @@ El vocabulario de BPE se aprende sobre el corpus de entrenamiento. Si el corpus 
 [![Costo por token](figures/token-cost.png){width="80%"}](#){data-modal-type="image" data-modal-url="figures/token-cost.png"}
 
 :::{style="font-size: 22px;"}
-Si tu corpus es grande y en español, el costo se acumula rápido. Mediciones tempranas evitan sorpresas
+Si su corpus es grande y en español, el costo se acumula rápido. Mediciones tempranas evitan sorpresas
 :::
 :::
 :::
@@ -310,7 +310,7 @@ Si tu corpus es grande y en español, el costo se acumula rápido. Mediciones te
 :::{style="font-size: 22px;"}
 | Modelo | Ventana | Equivalente en español |
 |--------|---------|------------------------|
-| GPT-3 (2020) | 4K | ~2.000 palabras |
+| GPT-3 (2020) | 2K | ~1.000 palabras |
 | GPT-3.5 (2022) | 16K | ~9.000 palabras |
 | GPT-4o (2024) | 128K | ~70.000 palabras |
 | Claude Sonnet 4.6, GPT-5.5 (2026) | 1M | ~550.000 palabras |
@@ -462,7 +462,7 @@ Para entender a qué se refiere [ella]{.alert}, el modelo computa atención:
 
 Fuente: [Jay Alammar](https://jalammar.github.io/illustrated-transformer/)
 
-Cada celda muestra cuánto un token presta atención a otro!
+Cada celda muestra cuánto un token presta atención a otro
 :::
 :::
 :::
@@ -473,7 +473,7 @@ Cada celda muestra cuánto un token presta atención a otro!
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- Una sola cabeza de atención sólo captura un tipo de relación a la vez
+- Una sola cabeza de atención solo captura un tipo de relación a la vez
 - Los transformers usan [atención multi-cabeza]{.alert}: varias capas de atención en paralelo
 - Cada cabeza aprende un patrón distinto:
     - Una cabeza puede aprender [sintaxis]{.alert} (sujeto-verbo)
@@ -557,7 +557,7 @@ Un [parámetro]{.alert} es como un coeficiente de regresión: un número que el 
 - El salto de Word2Vec a GPT-3 fue de [tres órdenes de magnitud]{.alert} en parámetros
 - El salto de GPT-3 a GPT-4 fue de [otro orden de magnitud]{.alert}
 - A cada escala emergen [capacidades nuevas]{.alert} que no estaban en el modelo más pequeño
-- Sólo las grandes empresas (OpenAI, Google, Anthropic, Meta, xAI) pueden entrenar modelos de frontera. [Nosotros usamos los modelos pre-entrenados]{.alert}
+- Solo las grandes empresas (OpenAI, Google, Anthropic, Meta, xAI) pueden entrenar modelos de frontera. [Nosotros usamos los modelos pre-entrenados]{.alert}
 :::
 :::
 
@@ -566,7 +566,7 @@ Un [parámetro]{.alert} es como un coeficiente de regresión: un número que el 
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- A escalas pequeñas, los modelos sólo predicen tokens sensatamente
+- A escalas pequeñas, los modelos solo predicen tokens sensatamente
 - A escalas suficientemente grandes, [aparecen capacidades nuevas]{.alert}:
     - [Traducción]{.alert} entre idiomas sin entrenamiento específico
     - [Resumen]{.alert} de textos largos
@@ -575,7 +575,7 @@ Un [parámetro]{.alert} es como un coeficiente de regresión: un número que el 
     - [Programación]{.alert} en muchos lenguajes
     - [Conversación]{.alert} coherente y útil
 - No hay un punto fijo: cada capacidad emerge a una escala distinta
-- Esto se llama [emergencia]{.alert} y es debatido: ¿es real o artefacto de medición? ([Schaeffer et al., 2024](https://arxiv.org/abs/2304.15004))
+- Esto se llama [emergencia]{.alert} y es debatido: ¿es real o artefacto de medición? ([Schaeffer et al., 2023](https://arxiv.org/abs/2304.15004))
 :::
 
 :::{.column width=45%}
@@ -584,7 +584,7 @@ Un [parámetro]{.alert} es como un coeficiente de regresión: un número que el 
 
 [In-context learning]{.alert}: el modelo "aprende" de los ejemplos que le damos en el prompt, sin actualizar sus pesos
 
-Esto sólo funciona a escala suficiente. Modelos pequeños no lo logran
+Esto solo funciona a escala suficiente. Modelos pequeños no lo logran
 
 Lo veremos a continuación 😉
 :::
@@ -609,7 +609,7 @@ Traduce al inglés:
 - libro →
 ```
 
-[Sin entrenamiento, sin actualizar pesos.]{.alert} Sólo le pasamos los ejemplos en el contexto. El modelo continúa el patrón:
+[Sin entrenamiento, sin actualizar pesos.]{.alert} Solo le pasamos los ejemplos en el contexto. El modelo continúa el patrón:
 
 ```
 - libro → book
@@ -640,7 +640,7 @@ Traduce al inglés:
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- Recordá lo que el modelo optimiza:
+- Recuerden lo que el modelo optimiza:
 
 $$P(\text{próximo token} \mid \text{contexto previo})$$
 
@@ -648,7 +648,7 @@ $$P(\text{próximo token} \mid \text{contexto previo})$$
 
 $$P(\text{afirmación verdadera})$$
 
-- El modelo no tiene acceso a [hechos]{.alert}, sólo a [patrones estadísticos del texto de entrenamiento]{.alert}
+- El modelo no tiene acceso a [hechos]{.alert}, solo a [patrones estadísticos del texto de entrenamiento]{.alert}
 - Si una secuencia de palabras suena plausible (un nombre, una fecha, una cita), el modelo la genera, [aunque sea falsa]{.alert}
 - Las alucinaciones son comunes en:
     - [Citas académicas, estadísticas, hechos históricos]{.alert}, etc
@@ -656,10 +656,14 @@ $$P(\text{afirmación verdadera})$$
 
 :::{.column width=45%}
 :::{style="text-align: center;"}
-[![Tasas de alucinación por modelo](figures/hallucination-rates.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/hallucination-rates.png"}
+[![Tasas de alucinación de los 25 modelos con mejor desempeño](figures/hallucination-rates-vectara.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/hallucination-rates-vectara.png"}
 
-:::{style="font-size: 22px;"}
-[Las alucinaciones son una consecuencia mecánica del modelo, no un bug]{.alert}
+:::{style="font-size: 18px; color: #555;"}
+Fuente: [Vectara Hallucination Leaderboard](https://github.com/vectara/hallucination-leaderboard) (julio de 2026)
+:::
+
+:::{style="font-size: 20px; margin-top: 15px;"}
+El modelo resume un documento que le dan, y se cuenta cuántas veces [agrega datos que no están en ese documento]{.alert}. Aun con la fuente a la vista, del 2% al 7% de los resúmenes inventan algo
 :::
 :::
 :::
@@ -718,7 +722,7 @@ Precios y versiones de junio de 2026; el mercado cambia rápido, conviene verifi
 
 :::{style="font-size: 23px;"}
 - [Pros]{.alert}: mejor calidad disponible, contexto grande, multimodal, no requieren hardware propio
-- [Cons]{.alert}: cuestan dinero, requieren tarjeta de crédito, son [cajas negras]{.alert} (no podés inspeccionarlos), pueden cambiar entre versiones
+- [Cons]{.alert}: cuestan dinero, requieren tarjeta de crédito, son [cajas negras]{.alert} (no pueden inspeccionarlos), pueden cambiar entre versiones
 - Para investigación reproducible: [registrar siempre el modelo y la fecha]{.alert}
 :::
 :::
@@ -730,7 +734,7 @@ Precios y versiones de junio de 2026; el mercado cambia rápido, conviene verifi
 :::{.column width=55%}
 - Modelos con [pesos disponibles]{.alert}: cualquiera puede descargarlos y correrlos
 - Pueden ejecutarse [localmente]{.alert} en una computadora con suficiente RAM
-- Buena herramienta: [Ollama]{.alert} (`ollama pull qwen3` y listo)
+- Buena herramienta: [Ollama]{.alert} (`ollama pull granite4.1:3b` y listo)
 
 **Principales modelos abiertos**
 
@@ -757,7 +761,7 @@ Precios y versiones de junio de 2026; el mercado cambia rápido, conviene verifi
 
 **Por qué caben igual**
 
-- [MoE]{.alert}: activan sólo parte de sus parámetros por token
+- [MoE]{.alert}: activan solo parte de sus parámetros por token
 - [Cuantización]{.alert}: menos precisión (16→4 bits) baja la RAM
 
 [Volveremos a Ollama mañana, en la sesión de aplicaciones]{.alert}
@@ -857,7 +861,7 @@ Siete ideas para llevarse:
     - Comparación con los métodos clásicos del día 3
 
 :::{style="margin-top: 20px;"}
-[Nos vemos en la próxima sesión!]{.alert} 🤓
+[¡Nos vemos en la próxima sesión!]{.alert} 🤓
 :::
 :::
 

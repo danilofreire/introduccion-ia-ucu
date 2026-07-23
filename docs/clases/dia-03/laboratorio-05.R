@@ -30,7 +30,7 @@ set.seed(2026)
 
 # Cargar indicadores de 18 países latinoamericanos
 paises <- read_csv("datos/indicadores_paises.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # paises <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/indicadores_paises.csv", show_col_types = FALSE)
 
 glimpse(paises)
@@ -60,8 +60,9 @@ corrplot(cor_matrix, method = "color", type = "upper",
 
 paises |>
   filter(pais %in% c("Uruguay", "Honduras")) |>
-  select(pais, pib_per_capita, esperanza_vida, anios_educacion,
-         acceso_internet, indice_gini, indice_democracia)
+  select(pais, pib = pib_per_capita, internet = acceso_internet,
+         democracia = indice_democracia, urban = urbanizacion,
+         gini = indice_gini)
 
 # Lecciones:
 # - Uruguay tiene PIB per cápita más de 6 veces mayor que Honduras
@@ -207,7 +208,8 @@ loadings
 
 # Interpretación:
 # - PC1 (52%): PIB, internet, democracia, urbanización, esperanza de vida,
-#   educación cargan juntas. → eje de desarrollo general
+#   educación cargan juntas (todas con signo negativo: un país con PC1 muy
+#   negativo tiene más desarrollo). → eje de desarrollo general
 # - PC2 (20%): Gini, esperanza de vida, gasto en salud altas; urbanización,
 #   educación bajas. → contraste desigualdad vs. desarrollo urbano
 
@@ -224,7 +226,8 @@ pca$x[, 1:2] |>
 # - Valores más negativos de PC1: Uruguay, Chile, Argentina, Costa Rica
 #   (los más "desarrollados" en este conjunto)
 # - Valores más positivos: Honduras, Nicaragua, Guatemala (menos desarrollados)
-# - Venezuela aparece "alta" en PC2 por su desigualdad
+# - Venezuela tiene el PC2 más bajo (-2.99): combina alta urbanización y
+#   educación con el menor gasto en salud y la democracia más baja
 
 
 # --- Biplot --------------------------------------------------

@@ -259,7 +259,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">Sys.getenv</span>(<span class="st">"OPENROUTER_API_KEY"</span>) <span class="sc">!=</span> <span class="st">""</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>textos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../dia-03/datos/textos_politicos.csv"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>textos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/textos_politicos.csv"</span>,</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>MODELO <span class="ot">&lt;-</span> <span class="st">"nvidia/nemotron-3-super-120b-a12b:free"</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
@@ -392,7 +392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>clasificar_breve <span class="ot">&lt;-</span> <span class="cf">function</span>(texto) {</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá en: economia, educacion, seguridad, salud,</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">    medioambiente. Respondé sólo con la categoría."</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">    medioambiente. Respondé solo con la categoría."</span>)</span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
@@ -400,7 +400,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  chat <span class="ot">&lt;-</span> <span class="fu">chat_openrouter</span>(<span class="at">model =</span> MODELO,</span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">system_prompt =</span> <span class="st">"Clasificá en: economia, educacion, seguridad, salud,</span></span>
 <span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="st">    medioambiente. Regla: si el texto toca dos temas, elegí el más concreto</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="st">    y central. Respondé sólo con la categoría, en minúsculas y sin tildes."</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="st">    y central. Respondé solo con la categoría, en minúsculas y sin tildes."</span>)</span>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
@@ -479,7 +479,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>entidades <span class="ot">&lt;-</span> chat<span class="sc">$</span><span class="fu">chat_structured</span>(texto, <span class="at">type =</span> tipo_entidades)</span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>entidades</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Respuesta:</strong> la extracción de entidades nombradas (NER) tradicionalmente requería un modelo entrenado por idioma; un LLM lo hace zero-shot con sólo un esquema. <code>type_array(type_string())</code> maneja un número variable de entidades (cero, una o varias). Sirve para armar redes de actores (quién se reunió con quién), bases de eventos o índices de organizaciones. Como con la clasificación, hay que validar: el modelo puede inventar una entidad o pasar por alto otra.</p>
+<p><strong>Respuesta:</strong> la extracción de entidades nombradas (NER) tradicionalmente requería un modelo entrenado por idioma; un LLM lo hace zero-shot con solo un esquema. <code>type_array(type_string())</code> maneja un número variable de entidades (cero, una o varias). Sirve para armar redes de actores (quién se reunió con quién), bases de eventos o índices de organizaciones. Como con la clasificación, hay que validar: el modelo puede inventar una entidad o pasar por alto otra.</p>
 </section>
 <section id="pregunta-10-razonamiento-paso-a-paso" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-razonamiento-paso-a-paso"><span class="header-section-number">5.2</span> Pregunta 10: Razonamiento paso a paso</h3>
@@ -501,7 +501,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>directa</span>
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(con_cot)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><strong>Respuesta:</strong> en textos claros, la cadena de pensamiento rara vez cambia la respuesta y es gasto extra. En textos ambiguos o que tocan dos temas, pedir el razonamiento puede cambiar (y mejorar) la decisión, y deja una justificación que se puede auditar. El costo es más tokens y más tiempo. La idea de la lecture 14: el razonamiento paso a paso ayuda en tareas que requieren inferencia, no en clasificaciones simples donde el modelo ya “sabe” la respuesta.</p>
+<p><strong>Respuesta:</strong> en textos claros, la cadena de pensamiento rara vez cambia la respuesta y es gasto extra. En textos ambiguos o que tocan dos temas, pedir el razonamiento puede cambiar (y mejorar) la decisión, y deja una justificación que se puede auditar. El costo es más tokens y más tiempo. La idea de la clase 14 (“Chain-of-thought: pensar paso a paso”): el razonamiento paso a paso ayuda en tareas que requieren inferencia, no en clasificaciones simples donde el modelo ya “sabe” la respuesta.</p>
 </section>
 </section>
 <section id="reflexión" class="level2" data-number="6">
@@ -523,7 +523,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>[1] 0.0108</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El costo aproximado es de USD 0,01 para los 60 textos (un centavo). Esto es órdenes de magnitud más barato que un anotador humano (~USD 0,10 por texto en plataformas tipo Mechanical Turk, ~USD 1 por texto si es un investigador). Para 5.000 textos, el costo escalaría a ~USD 1, todavía trivial.</p>
+<p><strong>Respuesta:</strong> El costo aproximado es de USD 0,01 para los 60 textos (un centavo). Esto es órdenes de magnitud más barato que un anotador humano (~USD 0,10 por texto en plataformas tipo Mechanical Turk, ~USD 1 por texto si es un investigador). Para 5.000 textos, el costo escalaría a ~USD 0,90, todavía trivial.</p>
 </section>
 <section id="pregunta-12-recomendación-para-una-investigación-real" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-12-recomendación-para-una-investigación-real"><span class="header-section-number">6.2</span> Pregunta 12: Recomendación para una investigación real</h3>

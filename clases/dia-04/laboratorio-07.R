@@ -62,7 +62,7 @@ packageVersion("ellmer")
 
 # --- configurar-api ------------------------------------------
 
-# Opción 1: sólo para esta sesión de R
+# Opción 1: solo para esta sesión de R
 # Sys.setenv(OPENROUTER_API_KEY = "sk-or-...")
 
 # Opción 2 (recomendada): guardar en .Renviron permanentemente
@@ -103,7 +103,7 @@ analista$chat("¿Cuáles son los principales desafíos democráticos de Uruguay 
 
 textos <- read_csv("datos/textos_politicos.csv",
                    show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # textos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/textos_politicos.csv", show_col_types = FALSE)
 
 glimpse(textos)
@@ -272,7 +272,7 @@ lda_pred <- doc_topic |>
   left_join(mapa, by = "topic") |>
   left_join(select(textos, id, tema), by = "id")
 
-# Medir sólo sobre los 20 textos de la muestra (mismo set que los LLMs)
+# Medir solo sobre los 20 textos de la muestra (mismo set que los LLMs)
 accuracy_lda <- lda_pred |>
   filter(id %in% muestra$id) |>
   summarise(acc = mean(tema == tema_lda)) |>
@@ -283,7 +283,8 @@ accuracy_lda
 # --- clasif-gptoss-corpus ------------------------------------
 
 # resultados_zero (Parte 2) = gpt-oss-20b zero-shot sobre la muestra
-mean(resultados_zero$tema == resultados_zero$tema_llm)
+accuracy_gptoss <- mean(resultados_zero$tema == resultados_zero$tema_llm)
+accuracy_gptoss
 
 
 # --- clasif-nemotron-corpus ----------------------------------
@@ -294,7 +295,8 @@ clasif_nemotron <- muestra |>
 
 # --- clasif-nemotron-corpus-mostrar --------------------------
 
-mean(clasif_nemotron$tema == clasif_nemotron$tema_llm)
+accuracy_nemotron <- mean(clasif_nemotron$tema == clasif_nemotron$tema_llm)
+accuracy_nemotron
 
 
 # --- comparar ------------------------------------------------

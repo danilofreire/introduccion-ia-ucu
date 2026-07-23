@@ -99,7 +99,7 @@ suppressPackageStartupMessages({
 - Reducción de dimensionalidad: PCA
 - ¿Cuántos componentes conservar?
 - Interpretación de loadings y biplot
-- Aplicaciones en América Latina
+- Aplicaciones en ciencias sociales
 :::
 :::
 :::
@@ -111,7 +111,7 @@ suppressPackageStartupMessages({
 :::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-- En aprendizaje supervisado teníamos [respuestas correctas]{.alert} (etiquetas). [Acá no las hay!]{.alert}
+- En aprendizaje supervisado teníamos [respuestas correctas]{.alert} (etiquetas). [¡Acá no las hay!]{.alert}
 - El modelo descubre [patrones ocultos]{.alert} por sí mismo
 - ¿Por qué usarlo?
     - Las etiquetas son [costosas]{.alert} o [no existen]{.alert} ("¿cuántos tipos de votantes hay?")
@@ -171,7 +171,7 @@ Fuente: [Machine Learning CoBan](https://machinelearningcoban.com/2017/01/01/kme
     - [Silueta]{.alert}: qué tan bien cada punto encaja en su cluster (cerca de 1 es bueno)
     - [Conocimiento del dominio]{.alert}: ¿cuántos grupos tienen sentido teóricamente?
 - En ciencias sociales, el [contexto teórico]{.alert} suele pesar más que las métricas
-- Ejemplo: ¿cuántos "tipos" de regímenes políticos hay? ¿3? ¿5? ¿7? Depende de la teoría
+- Ejemplo: ¿cuántos "tipos" de regímenes políticos hay? ¿3? ¿5? ¿7? [Depende de la teoría]{.alert}
 :::
 
 :::{.column width=45%}
@@ -193,7 +193,7 @@ Fuente: [Machine Learning CoBan](https://machinelearningcoban.com/2017/01/01/kme
 :::{.column width=50%}
 **Supuestos que hace**
 
-- Los clusters son [esféricos]{.alert} (todos del mismo tamaño)
+- Los clusters son [esféricos]{.alert} y de tamaño similar (bolas alrededor de cada centroide, no alargadas ni curvas)
 - Cada punto pertenece a [un solo cluster]{.alert}
 - Sensible a la [escala]{.alert} de las variables (siempre normalizar antes)
 - Sensible a los [valores iniciales]{.alert} (ejecutar varias veces)
@@ -218,7 +218,7 @@ Fuente: [Machine Learning CoBan](https://machinelearningcoban.com/2017/01/01/kme
 
 ## Coeficiente de silueta
 
-:::{style="margin-top: 20px; font-size: 21px;"}
+:::{style="margin-top: 20px; font-size: 19px;"}
 :::{.columns}
 :::{.column width=55%}
 - El [coeficiente de silueta]{.alert} mide qué tan bien cada observación encaja en su cluster
@@ -228,6 +228,8 @@ Fuente: [Machine Learning CoBan](https://machinelearningcoban.com/2017/01/01/kme
 
 $$s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}$$
 
+- El numerador $b(i) - a(i)$ es la [brecha]{.alert} entre separación ($b$) y cohesión ($a$): positivo y grande = bien ubicado; negativo = más cerca de otro cluster
+- El denominador $\max(a, b)$ [normaliza]{.alert} esa brecha: mantiene $s(i)$ en $[-1, +1]$ e independiente de la escala de las distancias
 - Valores de $s(i)$: cerca de [+1]{.alert} (bien clasificado), [0]{.alert} (en el borde) o [-1]{.alert} (cluster equivocado)
 - Promediando $s(i)$ sobre todos los puntos obtenemos una medida de calidad para [elegir K]{.alert}: el K con mayor silueta indica clusters mejor definidos
 :::
@@ -255,7 +257,7 @@ A diferencia del codo, la silueta mide [separación]{.alert}, no solo compacidad
 
 :::{style="margin-top: 20px; font-size: 22px;"}
 
-Simulamos [90 "países"]{.alert} organizados en 3 tipos de desarrollo (alto, medio, bajo), con 4 indicadores estandarizados y correlacionados entre sí
+Simulamos [90 "países"]{.alert} organizados en 3 tipos de desarrollo (alto, medio, bajo), con 4 indicadores en escala comparable y correlacionados entre sí
 
 ```{r kmeans-sim, echo=TRUE, eval=TRUE}
 #| message: false
@@ -276,7 +278,7 @@ datos <- bind_rows(
 
 :::{.columns}
 :::{.column width=45%}
-**Variables** (todas en z-score):
+**Variables** (sin unidades; las escalamos antes de agrupar):
 
 - `pib`: producto interno bruto per cápita
 - `educ`: años promedio de escolaridad
@@ -368,7 +370,7 @@ fviz_nbclust(datos_scaled, kmeans, method = "silhouette", nstart = 25) +
     - [Aglomerativo]{.alert} (bottom-up): empieza con cada punto como cluster y fusiona los más cercanos
     - [Divisivo]{.alert} (top-down): empieza con todos los puntos juntos y los va dividiendo
 - El resultado se visualiza como un [dendrograma]{.alert}
-- El usuario "corta" el dendrograma al nivel deseado para obtener K clusters
+- [El usuario "corta" el dendrograma al nivel deseado]{.alert} para leer una agrupación en K clusters (el árbol ya las contiene todas)
 - Tomamos [3 países de cada grupo]{.alert} de los datos simulados para ilustrar:
 :::
 
@@ -443,12 +445,15 @@ grupos_hc <- cutree(hc, k = 3)
 # ¿Recuperó los grupos reales?
 table(real = datos$grupo_real, cluster = grupos_hc)
 
-# Dendrograma con los 3 cortes resaltados
+# Dendrograma con los 3 cortes resaltados.
+# hang = -1 alinea todas las hojas en la base (altura 0), en vez de dejarlas
+# colgando desde su punto de unión. Es solo cosmético: no cambia los clusters
 plot(hc, hang = -1, labels = FALSE, main = "", xlab = "", sub = "", ylab = "Altura")
 rect.hclust(hc, k = 3, border = c("#2d4563", "#b85450", "#6b8e23"))
 ```
 
 - La tabla confirma que [Ward recupera los 3 grupos]{.alert} casi perfectamente. El dendrograma permite explorar otros cortes (2, 4, 5, ...) sin reajustar el modelo
+- [`cutree()` no re-ejecuta el clustering]{.alert}: `hclust()` ya construyó todo el árbol sin fijar K; `cutree()` y `rect.hclust()` solo cortan y dibujan el corte en 3
 :::
 
 ## K-means vs. Jerárquico
@@ -471,8 +476,8 @@ rect.hclust(hc, k = 3, border = c("#2d4563", "#b85450", "#6b8e23"))
 <br>
 
 :::{style="font-size: 22px;"}
-- Use [K-means]{.alert} para datasets grandes cuando tiene una idea del número de grupos
-- Use [jerárquico]{.alert} para explorar la estructura de los datos y visualizar relaciones entre observaciones
+- Usen [K-means]{.alert} para datasets grandes cuando tienen una idea del número de grupos
+- Usen [jerárquico]{.alert} para explorar la estructura de los datos y visualizar relaciones entre observaciones
 :::
 :::
 
@@ -530,7 +535,7 @@ Fuente: [Medium](https://muhammadtaha01.medium.com/dimensionality-reduction-in-m
 
 :::{style="margin-top: 15px; font-size: 22px;"}
 
-- PCA produce [tantos componentes como variables originales]{.alert}. Criterios para conservar los primeros: [varianza acumulada ~70-80%]{.alert}, [método del codo]{.alert}, [regla de Kaiser]{.alert} (eigenvalue > 1)
+- PCA produce [tantos componentes como variables originales]{.alert}. Criterios para conservar los primeros: [varianza acumulada ~70-80%]{.alert}, [método del codo]{.alert}, [regla de Kaiser]{.alert}
 
 :::{.columns}
 :::{.column width=50%}
@@ -567,7 +572,7 @@ fviz_eig(pca, addlabels = TRUE) +
 
 ## Interpretación de los loadings
 
-:::{style="margin-top: 20px; font-size: 22px;"}
+:::{style="margin-top: 20px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=45%}
 **Idea intuitiva:** cada componente es una [receta]{.alert} que combina las variables originales. Los [loadings]{.alert} son la cantidad de cada ingrediente
@@ -576,7 +581,7 @@ fviz_eig(pca, addlabels = TRUE) +
 - [Cerca de cero]{.alert}: la variable casi no aparece
 - [Mismo signo]{.alert} dentro de un PC: las variables suben y bajan juntas
 - [Signos opuestos]{.alert}: van en direcciones contrarias
-- El signo global del PC es arbitrario: si lo invertimos, el resultado es equivalente
+- [El signo global del PC es arbitrario]{.alert}: si lo invertimos, el resultado es equivalente
 :::
 
 :::{.column width=55%}
@@ -588,11 +593,10 @@ round(pca$rotation, 2)
 summary(pca)$importance |> round(2)
 ```
 
-**Leyendo nuestros resultados:**
-
 - [PC1]{.alert}: PIB, educación e internet pesan casi igual ([~-0.57]{.alert} cada uno); desigualdad casi no pesa. PC1 resume el [desarrollo general]{.alert} del país
 - [PC2]{.alert}: desigualdad pesa casi todo ([-0.99]{.alert}) y las demás casi nada. PC2 captura solo la [desigualdad]{.alert}
 - Entre PC1 y PC2 explican el [95%]{.alert} de la varianza
+- [PC3 y PC4]{.alert} son lo que sobra, y con ~5% de la varianza entre ambos, no conviene buscarles nombre. El nombre de un componente lo pone la [teoría]{.alert}, no el algoritmo
 :::
 :::
 :::
@@ -639,11 +643,11 @@ fviz_pca_biplot(pca,
 :::{.column width=50%}
 **Limitaciones**
 
-- Sólo captura relaciones [lineales]{.alert}
+- Solo captura relaciones [lineales]{.alert}
 - Los componentes son [difíciles de interpretar]{.alert} (son combinaciones de muchas variables)
 - Sensible a la [escala]{.alert}: siempre normalizar antes
 - No es un modelo causal: no dice [por qué]{.alert} las variables están correlacionadas
-- ¿Cuántos componentes conservar? Regla general: los que explican [~80% de la varianza]{.alert}
+- ¿Cuántos componentes conservar? Regla general: los que explican [~70-80% de la varianza]{.alert}
 :::
 :::
 :::
@@ -681,6 +685,35 @@ fviz_pca_biplot(pca,
 [En el laboratorio (Sesión 3.3) aplicaremos estas técnicas a datos simulados de países latinoamericanos]{.alert}
 :::
 
+## PCA vs. análisis factorial {#sec:apendice-fa}
+
+:::{style="margin-top: 20px; font-size: 22px;"}
+
+Muchos índices que usamos en ciencias sociales (bienestar, confianza institucional, autoritarismo) parecen PCA pero son [análisis factorial]{.alert}. Son parientes cercanos que responden a preguntas distintas
+
+:::{.columns}
+:::{.column width=50%}
+**PCA**
+
+- No asume un modelo: busca [ejes que explican varianza]{.alert}
+- Los componentes son sumas ponderadas de las variables observadas
+- Cada PC intenta captar la máxima varianza posible, sin separar "error"
+- Pregunta: [¿cómo resumo estos datos?]{.alert}
+:::
+
+:::{.column width=50%}
+**Análisis factorial**
+
+- Asume un [modelo]{.alert}: variables observadas = factores latentes + error
+- Los factores son causas hipotéticas que generan las correlaciones
+- Estima por separado la varianza común y la específica de cada variable
+- Pregunta: [¿qué constructos latentes explican estas variables?]{.alert}
+:::
+:::
+
+[Regla práctica:]{.alert} si van a reportar un índice como "medida de X" (un constructo o actitud), quieren análisis factorial. Si solo necesitan reducir dimensiones para visualizar, PCA alcanza
+:::
+
 ## Resumen de la sesión {#sec:resumen-3-1}
 
 :::{style="margin-top: 30px; font-size: 24px;"}
@@ -712,7 +745,7 @@ fviz_pca_biplot(pca,
 [Son herramientas de exploración: generan hipótesis, no las confirman]{.alert}
 
 :::{style="margin-top: 12px; text-align: center; font-size: 18px;"}
-Apéndices: [[caracterizar clusters]{.button}](#sec:apendice-cluster) · [[PCA vs. análisis factorial]{.button}](#sec:apendice-fa)
+Apéndices: [[caracterizar clusters]{.button}](#sec:apendice-cluster)
 :::
 :::
 
@@ -755,7 +788,7 @@ datos |>
 :::
 
 :::{.column width=45%}
-**2. Validación externa:** cruzar con variables [no usadas]{.alert} en el clustering (región, partido, año). Si los grupos separan esas variables, tenés evidencia de estructura real
+**2. Validación externa:** cruzar con variables [no usadas]{.alert} en el clustering (región, partido, año). Si los grupos separan esas variables, tienen evidencia de estructura real
 
 **3. Nombrar los clusters:** etiquetas sustantivas ("alto desarrollo", "ingreso medio", "bajo desarrollo") en lugar de "1, 2, 3"
 
@@ -768,37 +801,4 @@ datos |>
 :::
 :::
 
-## PCA vs. análisis factorial {#sec:apendice-fa}
-
-:::{style="margin-top: 20px; font-size: 22px;"}
-
-Muchos índices que usamos en ciencias sociales (bienestar, confianza institucional, autoritarismo) parecen PCA pero son [análisis factorial]{.alert}. Son parientes cercanos que responden a preguntas distintas
-
-:::{.columns}
-:::{.column width=50%}
-**PCA**
-
-- No asume un modelo: busca [ejes que explican varianza]{.alert}
-- Los componentes son sumas ponderadas de las variables observadas
-- Cada PC intenta captar la máxima varianza posible, sin separar "error"
-- Pregunta: [¿cómo resumo estos datos?]{.alert}
-:::
-
-:::{.column width=50%}
-**Análisis factorial**
-
-- Asume un [modelo]{.alert}: variables observadas = factores latentes + error
-- Los factores son causas hipotéticas que generan las correlaciones
-- Estima por separado la varianza común y la específica de cada variable
-- Pregunta: [¿qué constructos latentes explican estas variables?]{.alert}
-:::
-:::
-
-[Regla práctica:]{.alert} si vas a reportar un índice como "medida de X" (un constructo o actitud), querés análisis factorial. Si solo necesitás reducir dimensiones para visualizar, PCA alcanza
-
-:::{style="text-align: center; margin-top: 10px;"}
-[[Volver al resumen]{.button}](#sec:resumen-3-1)
-:::
-:::
-
-# Nos vemos en la sesión de análisis de texto! {background-color="#2d4563"}
+# ¡Nos vemos en la sesión de análisis de texto! {background-color="#2d4563"}

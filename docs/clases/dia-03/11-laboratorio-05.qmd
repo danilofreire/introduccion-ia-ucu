@@ -124,7 +124,7 @@ set.seed(2026)
 
 # Cargar indicadores por país
 paises <- read_csv("datos/indicadores_paises.csv")
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # paises <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-03/datos/indicadores_paises.csv")
 
 # Vista general
@@ -134,7 +134,7 @@ glimpse(paises)
 
 ## Variables del dataset
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 26px;"}
 
 | Variable | Descripción |
 |----------|-------------|
@@ -147,7 +147,9 @@ glimpse(paises)
 | `urbanizacion` | % de población urbana |
 | `indice_democracia` | Índice de democracia (0-10) |
 
+:::{style="text-align: center;"}
 [Todas las variables son numéricas. Ideal para clustering y PCA]{.alert}
+:::
 :::
 
 ## Estadísticas descriptivas
@@ -229,7 +231,7 @@ Los países más desiguales tienden a ser menos urbanos y con menor acceso a int
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-Elige dos países del dataset que te interesen (por ejemplo, Uruguay vs. Honduras, Chile vs. Bolivia, o Argentina vs. Venezuela). Compara sus valores en las 8 variables.
+Elijan dos países del dataset que les interesen (por ejemplo, Uruguay vs. Honduras, Chile vs. Bolivia, o Argentina vs. Venezuela). Comparen sus valores en las 8 variables.
 
 **Preguntas:**
 
@@ -413,7 +415,7 @@ fviz_nbclust(datos_scaled, kmeans,
   theme_minimal()
 ```
 
-[El pico está en K=2 (silueta ≈ 0.29). Codo y silueta coinciden: dos grupos es la solución más defendible]{.alert}
+[El pico está en K=2. Codo y silueta coinciden: dos grupos es la solución más defendible]{.alert}
 :::
 
 ## Interpretación de la silueta
@@ -448,9 +450,9 @@ Están mal clasificadas (más cerca del otro cluster)
 
 | Valor | Significado |
 |-------|-------------|
-| > 0.7 | Fuerte |
-| 0.5 - 0.7 | Razonable |
-| 0.25 - 0.5 | Débil |
+| 0.71 - 1.00 | Fuerte |
+| 0.51 - 0.70 | Razonable |
+| 0.26 - 0.50 | Débil |
 | < 0.25 | Sin estructura |
 :::
 
@@ -465,13 +467,13 @@ Están mal clasificadas (más cerca del otro cluster)
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-Codo y silueta apuntan a K=2, pero K=3 está muy cerca. Prueba a dividir los países en 3 grupos y compara.
+Codo y silueta apuntan a K=2, pero K=3 está muy cerca. Prueben dividir los países en 3 grupos y comparen.
 
 **Instrucciones:**
 
-1. Ejecuta `kmeans(datos_scaled, centers = 3, nstart = 25)` y guárdalo en `km3`
-2. Calcula la silueta promedio con `silhouette(km3$cluster, dist(datos_scaled))`
-3. Compara con la silueta de K=2 (≈ 0.29)
+1. Ejecuten `kmeans(datos_scaled, centers = 3, nstart = 25)` y guárdenlo en `km3`
+2. Calculen la silueta promedio con `silhouette(km3$cluster, dist(datos_scaled))`
+3. Comparen con la silueta de K=2 (≈ 0.29)
 
 **Preguntas:**
 
@@ -566,15 +568,15 @@ loadings
 :::{.column width=50%}
 **PC1 (52% varianza):**
 
-Cargas altas (en valor absoluto) en:
+Cargas altas (todas negativas) en:
 
-- PIB (0.44), internet (0.44)
-- Democracia (0.40), urbanización (0.38)
-- Esperanza de vida (0.37), educación (0.32)
+- PIB (-0.44), internet (-0.44)
+- Democracia (-0.40), urbanización (-0.38)
+- Esperanza de vida (-0.37), educación (-0.32)
 
 → [Eje de desarrollo general]{.alert}
 
-Todas estas variables cargan en la misma dirección. Un país "alto" en PC1 es un país con más PIB, más democracia y más acceso a internet
+Todas estas variables cargan en la misma dirección (negativa): un país con PC1 muy negativo tiene más PIB, democracia e internet. El signo es arbitrario; lo que importa es que van juntas
 :::
 
 :::{.column width=50%}
@@ -601,18 +603,18 @@ Separa países desiguales pero con buena salud de países más urbanos y educado
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-Ordena los países por su valor en PC1 para identificar los más "desarrollados" y los menos, según esta medida resumen.
+Ordenen los países por su valor en PC1 para identificar los más "desarrollados" y los menos, según esta medida resumen.
 
 **Instrucciones:**
 
-1. Extrae las coordenadas PC1 y PC2 desde `pca$x[, 1:2]`
-2. Convierte a `data.frame` y agrega los nombres de países con `rownames_to_column("pais")`
-3. Ordena por PC1 con `arrange(PC1)`
+1. Extraigan las coordenadas PC1 y PC2 desde `pca$x[, 1:2]`
+2. Conviertan a `data.frame` y agreguen los nombres de países con `rownames_to_column("pais")`
+3. Ordenen por PC1 con `arrange(PC1)`
 
 **Preguntas:**
 
-- ¿Coincide el ranking con tu intuición sobre el desarrollo latinoamericano?
-- ¿Qué país te sorprende más (arriba o abajo)?
+- ¿Coincide el ranking con su intuición sobre el desarrollo latinoamericano?
+- ¿Qué país les sorprende más (arriba o abajo)?
 - ¿Qué países están cerca de PC1 = 0, en el "medio"?
 
 [Tómense 3 minutos para experimentar]{.alert}
@@ -684,8 +686,9 @@ fviz_pca_biplot(pca,
 
 paises |>
   filter(pais %in% c("Uruguay", "Honduras")) |>
-  select(pais, pib_per_capita, esperanza_vida, anios_educacion,
-         acceso_internet, indice_gini, indice_democracia)
+  select(pais, pib = pib_per_capita, internet = acceso_internet,
+         democracia = indice_democracia, urban = urbanizacion,
+         gini = indice_gini)
 ```
 
 - Uruguay tiene PIB per cápita [más de seis veces mayor]{.alert} que Honduras (17 185 vs. 2 658)
@@ -740,7 +743,7 @@ pca$x[, 1:2] |>
 
 - Los valores más negativos de PC1 (Uruguay, Chile, Argentina, Costa Rica, Panamá) son los países más "desarrollados" en este conjunto
 - Los valores más positivos (Honduras, Nicaragua, Guatemala) son los menos desarrollados
-- [Sorpresas posibles:]{.alert} Venezuela aparece relativamente "alta" en PC2 por su desigualdad; México sorprende por estar cerca del medio pese a su PIB
+- [Sorpresas posibles:]{.alert} Venezuela tiene el PC2 más bajo (-2.99): combina alta urbanización y educación con el menor gasto en salud y la democracia más baja; México sorprende por estar cerca del medio pese a su PIB
 
 [[Volver al ejercicio]{.button}](#sec:ejercicio-pc1)
 :::

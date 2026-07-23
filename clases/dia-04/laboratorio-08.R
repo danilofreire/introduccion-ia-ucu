@@ -74,7 +74,7 @@ library(tidyverse)
 Sys.getenv("OPENROUTER_API_KEY") != ""
 
 discursos <- read_csv("datos/discursos_ideologia.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # discursos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/discursos_ideologia.csv", show_col_types = FALSE)
 
 head(discursos)
@@ -343,7 +343,7 @@ frases_partidos |>
 
 # --- pipeline ---------------------------------------------
 
-# # 1. Datos: tu corpus con una columna de texto y tu puntaje humano
+# # 1. Datos: su corpus con una columna de texto y su puntaje humano
 # discursos <- read_csv("datos/discursos_ideologia.csv", show_col_types = FALSE)
 #
 # # 2. Codebook (tu construcción y su escala)
@@ -354,7 +354,7 @@ frases_partidos |>
 #                        model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
 #                        max_active = 2)
 #
-# # 4. Validar contra tu codificación humana
+# # 4. Validar contra su codificación humana
 # gold <- qlm_humancoded(
 #   tibble(.id = seq_len(nrow(discursos)), score = discursos$score_humano),
 #   name = "humano", codebook = codebook_ideologia)

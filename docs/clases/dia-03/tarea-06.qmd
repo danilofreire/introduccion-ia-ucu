@@ -181,7 +181,7 @@ Construyan una tabla cruzada de score promedio de sentimiento por tema y año. V
 
 Construyan un clasificador simple por diccionario de palabras clave: para cada tema, definan 5-10 palabras "ancla" y asignen a cada texto el tema con más palabras-ancla presentes. Comparen con el tema real (matriz de confusión). ¿Qué accuracy obtienen?
 
-*Pista:* el lecture 10 tiene un ejemplo cercano (caso integrado).
+*Pista:* la [clase 10](10-analisis-texto.html#sec:apendice-caso) tiene un ejemplo cercano ("Caso integrado").
 
 ```{r p11}
 # Escriban su código aquí
