@@ -18,12 +18,26 @@ library(tidymodels)
 library(tidyverse)
 library(rpart)  # Motor de árbol de decisión
 
+# O de una forma más automatizada. Si les falta algún paquete, corran
+# este bloque en lugar de las tres líneas de arriba
+paquetes <- c("tidymodels", "tidyverse", "rpart")
+
+# require(): intenta cargar el paquete y devuelve TRUE/FALSE
+# Si no está instalado (FALSE), lo instala y carga
+# character.only = TRUE: pkg es una variable; sin esto, R buscaría un paquete llamado "pkg"
+for (pkg in paquetes) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+
 # Tema de ggplot
 theme_set(theme_minimal(base_size = 14))
 
 # Cargar el dataset (mismo del lab 1)
 datos <- read_csv("datos/indicadores_mundiales.csv")
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/indicadores_mundiales.csv")
 glimpse(datos)
 
@@ -163,6 +177,9 @@ formula_basica <- crecimiento_alto ~ gasto_educacion + acceso_internet +
 
 # --- Evaluar el modelo logístico -----------------------------
 
+# Las tres métricas juntas en un objeto que vamos a reusar todo el lab
+mis_metricas <- metric_set(precision, recall, roc_auc)
+
 # Validación cruzada en 5 folds. Usamos precision, recall y roc_auc en
 # lugar de accuracy: con clases desbalanceadas, accuracy puede engañar.
 #
@@ -177,7 +194,7 @@ formula_basica <- crecimiento_alto ~ gasto_educacion + acceso_internet +
 eval_logistico <- fit_resamples(
   modelo_logistico, formula_basica,
   resamples = folds,
-  metrics = metric_set(precision, recall, roc_auc),
+  metrics = mis_metricas,
   control = control_resamples(event_level = "second")   # "si" es la clase positiva
 ) |>
   collect_metrics() |>
@@ -192,7 +209,7 @@ eval_logistico
 eval_arbol <- fit_resamples(
   modelo_arbol, formula_basica,
   resamples = folds,
-  metrics = metric_set(precision, recall, roc_auc),
+  metrics = mis_metricas,
   control = control_resamples(event_level = "second")
 ) |>
   collect_metrics() |>
@@ -201,9 +218,10 @@ eval_arbol <- fit_resamples(
 # Combinar y mostrar la comparación
 resultados <- bind_rows(eval_logistico, eval_arbol)
 
+# Una fila por modelo y métrica, ordenadas para comparar de a pares
 resultados |>
   select(modelo, .metric, mean, std_err) |>
-  pivot_wider(names_from = .metric, values_from = c(mean, std_err))
+  arrange(.metric, modelo)
 
 
 # --- ¿Qué pasa si extendemos la fórmula? ---------------------
@@ -219,7 +237,7 @@ formula_ext <- crecimiento_alto ~ gasto_educacion + acceso_internet +
 
 eval_log_ext <- fit_resamples(
   modelo_logistico, formula_ext, resamples = folds,
-  metrics = metric_set(precision, recall, roc_auc),
+  metrics = mis_metricas,
   control = control_resamples(event_level = "second")
 ) |>
   collect_metrics() |> mutate(modelo = "Logístico (ext)")
@@ -227,7 +245,7 @@ eval_log_ext <- fit_resamples(
 # Comparar el logístico básico vs. el extendido
 bind_rows(eval_logistico, eval_log_ext) |>
   select(modelo, .metric, mean, std_err) |>
-  pivot_wider(names_from = .metric, values_from = c(mean, std_err))
+  arrange(.metric, modelo)
 
 # Lección: no todo feature engineering mejora el modelo. Cuando el
 # predictor original ya capta la información, agregarle (o reemplazarlo
@@ -267,10 +285,12 @@ ajuste_final <- modelo_logistico |>
 # Añade las columnas .pred_class, .pred_no y .pred_si.
 pred_test <- ajuste_final |> augment(datos_test)
 
-# Métricas finales (las mismas que usamos en validación cruzada)
-pred_test |> precision(truth = crecimiento_alto, estimate = .pred_class, event_level = "second")
-pred_test |> recall(truth = crecimiento_alto, estimate = .pred_class, event_level = "second")
-pred_test |> roc_auc(truth = crecimiento_alto, .pred_si, event_level = "second")
+# Métricas finales: el mismo mis_metricas de la validación cruzada.
+# Necesita las dos cosas: estimate = .pred_class para precision y recall,
+# y .pred_si (la probabilidad) para el roc_auc.
+pred_test |>
+  mis_metricas(truth = crecimiento_alto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 
 # ============================================================
@@ -300,16 +320,7 @@ datos |>
 # descriptivas porque tiene cola larga: la media (≈ 12.7) es mayor que
 # la mediana (≈ 11.7), con países de hasta ~37% que estiran el promedio.
 
-datos |>
-  summarise(
-    media   = mean(inflacion),
-    mediana = median(inflacion),
-    sd      = sd(inflacion),
-    p25     = quantile(inflacion, 0.25),
-    p75     = quantile(inflacion, 0.75),
-    min     = min(inflacion),
-    max     = max(inflacion)
-  )
+summary(datos$inflacion)
 
 # Histograma (muestra la cola larga)
 ggplot(datos, aes(x = inflacion)) +
@@ -417,7 +428,7 @@ formula_int <- crecimiento_alto ~ gasto_educacion + acceso_internet +
 # Evaluar el logístico (reusamos los mismos folds del cuerpo del lab)
 eval_log_int <- fit_resamples(
   modelo_logistico, formula_int, resamples = folds,
-  metrics = metric_set(precision, recall, roc_auc),
+  metrics = mis_metricas,
   control = control_resamples(event_level = "second")
 ) |>
   collect_metrics() |> mutate(modelo = "Logístico (interacción)")
@@ -425,7 +436,7 @@ eval_log_int <- fit_resamples(
 # Evaluar el árbol con la misma fórmula
 eval_arb_int <- fit_resamples(
   modelo_arbol, formula_int, resamples = folds,
-  metrics = metric_set(precision, recall, roc_auc),
+  metrics = mis_metricas,
   control = control_resamples(event_level = "second")
 ) |>
   collect_metrics() |> mutate(modelo = "Árbol (interacción)")
@@ -438,9 +449,10 @@ bind_rows(eval_logistico, eval_log_int, eval_arbol, eval_arb_int) |>
 # La interacción mejora un poco el ROC-AUC de ambos modelos: capta el efecto
 # conjunto de dos variables que se refuerzan, algo que las variables por
 # separado no expresan (la mejora es chica, dentro del error estándar). El
-# contraste con internet_grupos (que no ayudó) deja la moraleja: discretizar
-# una variable que ya está en el modelo suele ser redundante, mientras que
-# una interacción o una transformación no lineal sí puede aportar información.
+# contraste con alto_desempleo (que no ayudó) deja la moraleja: reemplazar
+# una variable continua por su versión discretizada suele ser redundante,
+# mientras que una interacción o una transformación no lineal sí puede
+# aportar información.
 
 
 # --- Apéndice 7: Visualizar la comparación de modelos --------

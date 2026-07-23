@@ -21,7 +21,7 @@ library(tidyverse)
 
 # Cargar los datos
 datos <- read_csv("datos/indicadores_mundiales.csv")
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/indicadores_mundiales.csv")
 
 # Ver las primeras filas
@@ -102,7 +102,7 @@ ajuste <- modelo_log |>
 tidy(ajuste)
 
 # Predecir clases en los datos de prueba.
-# .pred_class es la columna que tidymodels crea por ti;
+# .pred_class es la columna que tidymodels crea por ustedes;
 # el punto al principio evita chocar con columnas del usuario.
 predicciones <- ajuste |>
   predict(datos_test) |>
@@ -270,9 +270,8 @@ cv_results <- modelo_log |>
 # collect_metrics() devuelve la media y el error estándar por métrica
 collect_metrics(cv_results)
 
-# Comparar con las métricas de la división única
-predicciones |>
-  metrics(truth = crecimiento_alto, estimate = .pred_class)
+# Comparar con la accuracy de la división única
+accuracy(predicciones, truth = crecimiento_alto, estimate = .pred_class)
 
 
 # --- Apéndice 7: Interpretar los coeficientes ----------------

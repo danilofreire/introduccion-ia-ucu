@@ -24,7 +24,7 @@ library(tidymodels)
 library(tidyverse)
 
 satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # satisfaccion <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/satisfaccion_democracia.csv")
 
 satisfaccion <- satisfaccion |>
@@ -53,7 +53,7 @@ prop_pais <- satisfaccion |>
 prop_pais
 ```
 
-**Respuesta:** La proporción de satisfechos varía entre países, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educación, etc.) en cada país. Las diferencias entre países son en parte producto de la simulación aleatoria, pero se observa variabilidad que podría existir en datos reales de Latinobarómetro.
+**Respuesta:** **México** tiene la proporción más alta de satisfechos (~0.90) y **Guatemala** la más baja (~0.57). La proporción varía bastante entre países, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educación, etc.) en cada país. Las diferencias entre países son en parte producto de la simulación aleatoria, pero se observa variabilidad que podría existir en datos reales de Latinobarómetro.
 
 ### Pregunta 2: Confianza y satisfacción
 
@@ -64,7 +64,7 @@ ggplot(satisfaccion, aes(x = satisfecho, y = confianza_gobierno, fill = satisfec
   geom_boxplot(alpha = 0.7) +
   scale_fill_manual(values = c("#e74c3c", "#27ae60")) +
   labs(
-    title = "Confianza en el gobierno por nivel de satisfaccion",
+    title = "Confianza en el gobierno por nivel de satisfacción",
     x = "Satisfecho con la democracia",
     y = "Confianza en el gobierno (1-10)"
   ) +
@@ -248,7 +248,7 @@ cat("Total de errores:", errores, "de", nrow(datos_test), "observaciones\n")
 cat("Tasa de error:", round(errores / nrow(datos_test), 3), "\n")
 ```
 
-**Respuesta:** La matriz de confusión muestra que el modelo comete errores tanto de falsos positivos como de falsos negativos. El total de errores indica que el modelo clasifica correctamente la mayoría de las observaciones, aunque no es perfecto. Los errores son esperables dado que la satisfacción democrática depende de muchos factores que no están en el modelo.
+**Respuesta:** El modelo comete **37 errores en las 126 observaciones** del conjunto de prueba (tasa de error ≈ 0.29), repartidos entre falsos positivos y falsos negativos. Clasifica correctamente la mayoría de las observaciones, aunque no es perfecto. Los errores son esperables dado que la satisfacción democrática depende de muchos factores que no están en el modelo.
 
 ### Pregunta 10: Precisión, recall y AUC
 
@@ -276,7 +276,7 @@ cat("Recall:", round(rec$.estimate, 3), "\n")
 cat("AUC:", round(auc$.estimate, 3), "\n")
 ```
 
-**Respuesta:** El AUC permite evaluar la capacidad discriminativa del modelo. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente. Para un modelo con variables sociodemográficas como las nuestras, un AUC en el rango aceptable-bueno es un resultado razonable, dado que la satisfacción democrática es un fenómeno complejo que depende de muchos factores no observados.
+**Respuesta:** La precisión es **≈0.72**, el recall **≈0.94** y el AUC **≈0.70**. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente: el nuestro queda justo en el límite de lo aceptable. Para un modelo con variables sociodemográficas como las nuestras es un resultado razonable, dado que la satisfacción democrática es un fenómeno complejo que depende de muchos factores no observados. La Pregunta 14 vuelve sobre qué tan bueno es realmente este modelo.
 
 ### Pregunta 11: Curva ROC
 
@@ -299,9 +299,9 @@ coefs |>
   select(term, estimate, std.error, p.value, odds_ratio)
 ```
 
-**Respuesta:** La variable con el efecto más fuerte es `confianza_gobierno`, con un odds ratio que indica un aumento considerable en las chances de satisfacción por cada punto adicional de confianza. Las variables con efectos más débiles (p-valores altos) son las que tienen menos relación con la satisfacción democrática. El orden de importancia de los predictores tiene sentido teórico: la confianza en el gobierno es el predictor más directo de la satisfacción con la democracia.
+**Respuesta:** La variable con el efecto más fuerte es `confianza_gobierno` (p < 0.001, odds ratio ≈ 1.29): cada punto adicional de confianza multiplica las chances de satisfacción por ~1.29. Las más débiles son `educacion_anos` e `ingreso_hogar` (p > 0.2, odds ratios ≈ 1), que no muestran relación clara con la satisfacción una vez controladas las demás variables. El orden de importancia de los predictores tiene sentido teórico: la confianza en el gobierno es el predictor más directo de la satisfacción con la democracia.
 
-## Reflexion
+## Reflexión
 
 ### Pregunta 13: Árbol vs. logística
 
@@ -321,7 +321,7 @@ coefs |>
 - Funciona bien con variables categóricas sin necesidad de crear dummies
 - Preferible cuando la estructura de los datos es jerárquica (por ejemplo, la edad importa solo para personas con baja educación)
 
-En este laboratorio, la regresión logística funciona igual o mejor que el árbol porque la relación entre los predictores y la satisfacción es aproximadamente lineal. El árbol tiende a sobreajustar (cortes arbitrarios) con datasets de este tamaño. Para un organismo que necesita recomendaciones claras de política, la regresión logística es preferible porque los coeficientes indican directamente qué factores modificar.
+En esta tarea, la regresión logística funciona igual o mejor que el árbol porque la relación entre los predictores y la satisfacción es aproximadamente lineal. El árbol tiende a sobreajustar (cortes arbitrarios) con datasets de este tamaño. Para un organismo que necesita recomendaciones claras de política, la regresión logística es preferible porque los coeficientes indican directamente qué factores modificar.
 
 ### Pregunta 14: Una accuracy que engaña
 

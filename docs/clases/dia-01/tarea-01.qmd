@@ -31,7 +31,7 @@ library(tidymodels)
 library(tidyverse)
 
 datos <- read_csv("datos/desarrollo_municipios.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/desarrollo_municipios.csv", show_col_types = FALSE)
 
 datos <- datos |>

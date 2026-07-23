@@ -206,7 +206,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#feature-engineering" id="toc-feature-engineering" class="nav-link" data-scroll-target="#feature-engineering"><span class="header-section-number">3</span> Feature engineering</a></li>
   <li><a href="#modelos" id="toc-modelos" class="nav-link" data-scroll-target="#modelos"><span class="header-section-number">4</span> Modelos</a></li>
   <li><a href="#evaluación" id="toc-evaluación" class="nav-link" data-scroll-target="#evaluación"><span class="header-section-number">5</span> Evaluación</a></li>
-  <li><a href="#reflexion" id="toc-reflexion" class="nav-link" data-scroll-target="#reflexion"><span class="header-section-number">6</span> Reflexion</a></li>
+  <li><a href="#reflexión" id="toc-reflexión" class="nav-link" data-scroll-target="#reflexión"><span class="header-section-number">6</span> Reflexión</a></li>
   </ul>
 <div class="toc-actions"><ul class="collapse"><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/issues/new" class="toc-action"><i class="bi bi-github"></i>Informar sobre problema</a></li><li><a href="https://github.com/danilofreire/introduccion-ia-ucu/blob/main/clases/dia-01/tarea-02-respuestas.qmd" class="toc-action"><i class="bi empty"></i>Ver el código</a></li></ul></div></nav>
     </div>
@@ -255,7 +255,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"datos/satisfaccion_democracia.csv"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Leé el archivo directo desde la web:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Lean el archivo directo desde la web:</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># satisfaccion &lt;- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/satisfaccion_democracia.csv")</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>satisfaccion <span class="ot">&lt;-</span> satisfaccion <span class="sc">|&gt;</span></span>
@@ -307,7 +307,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 18 Guatemala            si            17 0.567</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La proporción de satisfechos varía entre países, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educación, etc.) en cada país. Las diferencias entre países son en parte producto de la simulación aleatoria, pero se observa variabilidad que podría existir en datos reales de Latinobarómetro.</p>
+<p><strong>Respuesta:</strong> <strong>México</strong> tiene la proporción más alta de satisfechos (~0.90) y <strong>Guatemala</strong> la más baja (~0.57). La proporción varía bastante entre países, lo cual refleja las diferencias en los factores subyacentes (confianza en el gobierno, educación, etc.) en cada país. Las diferencias entre países son en parte producto de la simulación aleatoria, pero se observa variabilidad que podría existir en datos reales de Latinobarómetro.</p>
 </section>
 <section id="pregunta-2-confianza-y-satisfacción" class="level3" data-number="2.2">
 <h3 data-number="2.2" class="anchored" data-anchor-id="pregunta-2-confianza-y-satisfacción"><span class="header-section-number">2.2</span> Pregunta 2: Confianza y satisfacción</h3>
@@ -317,7 +317,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#e74c3c"</span>, <span class="st">"#27ae60"</span>)) <span class="sc">+</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Confianza en el gobierno por nivel de satisfaccion"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Confianza en el gobierno por nivel de satisfacción"</span>,</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Satisfecho con la democracia"</span>,</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Confianza en el gobierno (1-10)"</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
@@ -606,7 +606,7 @@ Prediction no si
 <pre><code>Tasa de error: 0.294 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La matriz de confusión muestra que el modelo comete errores tanto de falsos positivos como de falsos negativos. El total de errores indica que el modelo clasifica correctamente la mayoría de las observaciones, aunque no es perfecto. Los errores son esperables dado que la satisfacción democrática depende de muchos factores que no están en el modelo.</p>
+<p><strong>Respuesta:</strong> El modelo comete <strong>37 errores en las 126 observaciones</strong> del conjunto de prueba (tasa de error ≈ 0.29), repartidos entre falsos positivos y falsos negativos. Clasifica correctamente la mayoría de las observaciones, aunque no es perfecto. Los errores son esperables dado que la satisfacción democrática depende de muchos factores que no están en el modelo.</p>
 </section>
 <section id="pregunta-10-precisión-recall-y-auc" class="level3" data-number="5.2">
 <h3 data-number="5.2" class="anchored" data-anchor-id="pregunta-10-precisión-recall-y-auc"><span class="header-section-number">5.2</span> Pregunta 10: Precisión, recall y AUC</h3>
@@ -642,7 +642,7 @@ Prediction no si
 <pre><code>AUC: 0.701 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> El AUC permite evaluar la capacidad discriminativa del modelo. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente. Para un modelo con variables sociodemográficas como las nuestras, un AUC en el rango aceptable-bueno es un resultado razonable, dado que la satisfacción democrática es un fenómeno complejo que depende de muchos factores no observados.</p>
+<p><strong>Respuesta:</strong> La precisión es <strong>≈0.72</strong>, el recall <strong>≈0.94</strong> y el AUC <strong>≈0.70</strong>. Un AUC entre 0.70 y 0.80 se considera aceptable, entre 0.80 y 0.90 bueno, y superior a 0.90 excelente: el nuestro queda justo en el límite de lo aceptable. Para un modelo con variables sociodemográficas como las nuestras es un resultado razonable, dado que la satisfacción democrática es un fenómeno complejo que depende de muchos factores no observados. La Pregunta 14 vuelve sobre qué tan bueno es realmente este modelo.</p>
 </section>
 <section id="pregunta-11-curva-roc" class="level3" data-number="5.3">
 <h3 data-number="5.3" class="anchored" data-anchor-id="pregunta-11-curva-roc"><span class="header-section-number">5.3</span> Pregunta 11: Curva ROC</h3>
@@ -684,11 +684,11 @@ Prediction no si
 8 educacion_anos         -0.0329    0.0305   0.281          0.968</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La variable con el efecto más fuerte es <code>confianza_gobierno</code>, con un odds ratio que indica un aumento considerable en las chances de satisfacción por cada punto adicional de confianza. Las variables con efectos más débiles (p-valores altos) son las que tienen menos relación con la satisfacción democrática. El orden de importancia de los predictores tiene sentido teórico: la confianza en el gobierno es el predictor más directo de la satisfacción con la democracia.</p>
+<p><strong>Respuesta:</strong> La variable con el efecto más fuerte es <code>confianza_gobierno</code> (p &lt; 0.001, odds ratio ≈ 1.29): cada punto adicional de confianza multiplica las chances de satisfacción por ~1.29. Las más débiles son <code>educacion_anos</code> e <code>ingreso_hogar</code> (p &gt; 0.2, odds ratios ≈ 1), que no muestran relación clara con la satisfacción una vez controladas las demás variables. El orden de importancia de los predictores tiene sentido teórico: la confianza en el gobierno es el predictor más directo de la satisfacción con la democracia.</p>
 </section>
 </section>
-<section id="reflexion" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="reflexion"><span class="header-section-number">6</span> Reflexion</h2>
+<section id="reflexión" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="reflexión"><span class="header-section-number">6</span> Reflexión</h2>
 <section id="pregunta-13-árbol-vs.-logística" class="level3" data-number="6.1">
 <h3 data-number="6.1" class="anchored" data-anchor-id="pregunta-13-árbol-vs.-logística"><span class="header-section-number">6.1</span> Pregunta 13: Árbol vs.&nbsp;logística</h3>
 <p><strong>Respuesta:</strong> La regresión logística y los árboles de decisión tienen fortalezas complementarias:</p>
@@ -706,7 +706,7 @@ Prediction no si
 <li>Funciona bien con variables categóricas sin necesidad de crear dummies</li>
 <li>Preferible cuando la estructura de los datos es jerárquica (por ejemplo, la edad importa solo para personas con baja educación)</li>
 </ul>
-<p>En este laboratorio, la regresión logística funciona igual o mejor que el árbol porque la relación entre los predictores y la satisfacción es aproximadamente lineal. El árbol tiende a sobreajustar (cortes arbitrarios) con datasets de este tamaño. Para un organismo que necesita recomendaciones claras de política, la regresión logística es preferible porque los coeficientes indican directamente qué factores modificar.</p>
+<p>En esta tarea, la regresión logística funciona igual o mejor que el árbol porque la relación entre los predictores y la satisfacción es aproximadamente lineal. El árbol tiende a sobreajustar (cortes arbitrarios) con datasets de este tamaño. Para un organismo que necesita recomendaciones claras de política, la regresión logística es preferible porque los coeficientes indican directamente qué factores modificar.</p>
 </section>
 <section id="pregunta-14-una-accuracy-que-engaña" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-14-una-accuracy-que-engaña"><span class="header-section-number">6.2</span> Pregunta 14: Una accuracy que engaña</h3>

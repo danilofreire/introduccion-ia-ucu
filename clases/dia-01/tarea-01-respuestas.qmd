@@ -24,7 +24,7 @@ library(tidymodels)
 library(tidyverse)
 
 datos <- read_csv("datos/desarrollo_municipios.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/desarrollo_municipios.csv", show_col_types = FALSE)
 
 datos <- datos |>
@@ -326,7 +326,7 @@ bind_rows(
 
 ¿Por qué `acceso_electricidad` y `poblacion` correlacionan con el outcome pero no son significativas en el modelo multivariado?
 
-**Respuesta:** Porque la correlación bivariada y el efecto multivariado responden preguntas distintas. `acceso_electricidad` correlaciona con `desarrollo_alto` (~0,4) porque ambos comparten causas: los municipios con más ingreso y mejor infraestructura general también tienen más electricidad. Pero una vez que el modelo ya conoce el ingreso, el agua y el empleo formal, saber además la electricidad casi no agrega información: su coeficiente queda cerca de cero y no significativo. El modelo multivariado estima el efecto de cada variable [manteniendo las demás constantes]{.alert}, y ahí la electricidad no tiene nada propio que decir. Ejemplo de la vida real: el número de libros en el hogar correlaciona con el rendimiento escolar de los hijos, pero al controlar por educación e ingreso de los padres el "efecto libros" casi desaparece: los libros eran un síntoma del entorno, no la causa.
+**Respuesta:** Porque la correlación bivariada y el efecto multivariado responden preguntas distintas. `acceso_electricidad` correlaciona positivamente con `desarrollo_alto` porque ambos comparten causas: los municipios con más ingreso y mejor infraestructura general también tienen más electricidad. Pero una vez que el modelo ya conoce el ingreso, el agua y el empleo formal, saber además la electricidad casi no agrega información: su coeficiente queda cerca de cero y no significativo. El modelo multivariado estima el efecto de cada variable [manteniendo las demás constantes]{.alert}, y ahí la electricidad no tiene nada propio que decir. Ejemplo de la vida real: el número de libros en el hogar correlaciona con el rendimiento escolar de los hijos, pero al controlar por educación e ingreso de los padres el "efecto libros" casi desaparece: los libros eran un síntoma del entorno, no la causa.
 
 ### Pregunta 14: ¿Recomendarían este modelo?
 

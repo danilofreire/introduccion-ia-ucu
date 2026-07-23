@@ -138,7 +138,7 @@ Vamos a trabajar con un dataset de indicadores socioeconómicos de países de to
 ```{r lab-cargar, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
 # Cargar los datos
 datos <- read_csv("datos/indicadores_mundiales.csv")
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/indicadores_mundiales.csv")
 
 # Ver las primeras filas
@@ -223,7 +223,7 @@ datos |>                # 4. correlaciones entre predictores
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-Convertimos la variable de resultado a factor y descartamos las columnas que no usaremos como predictores ([`pais`]{.alert} tiene 179 valores únicos y rompería al modelo; [`continente`]{.alert} la dejamos fuera para mantenernos en predictores numéricos):
+Convertimos la variable de resultado a factor y descartamos las columnas que no usaremos como predictores ([`pais`]{.alert} tiene 179 valores únicos y rompería el modelo; [`continente`]{.alert} la dejamos fuera para mantenernos en predictores numéricos):
 
 ```{r lab-preparar, prompt=FALSE, echo=TRUE}
 datos_modelo <- datos |>
@@ -358,7 +358,7 @@ tidy(ajuste)
 :::{style="margin-top: 30px; font-size: 22px;"}
 
 - Generamos predicciones en los datos de prueba
-- `.pred_class` es la clase predicha por el modelo. El punto al principio es la convención de [tidymodels]{.alert} para columnas que el paquete crea por ti (evita chocar con columnas del usuario)
+- `.pred_class` es la clase predicha por el modelo. El punto al principio es la convención de [tidymodels]{.alert} para columnas que el paquete crea por ustedes (evita chocar con columnas del usuario)
 - Comparamos con `crecimiento_alto` (la verdad)
 
 ```{r lab-predecir, prompt=FALSE, echo=TRUE}
@@ -410,7 +410,7 @@ predicciones |>
   summary(event_level = "second")
 ```
 
-[Recordatorio:]{.alert} `accuracy` = de todas las predicciones, cuántas acertó; `precision` (también aparece como `ppv`) = de las que predijo "sí", cuántas eran "sí"; `recall` (también `sens`) = de los "sí" reales, cuántos detectó. [¿Cuál de las tres les parece más relevante para este problema?]{.alert} 🤓
+[Recordatorio:]{.alert} `accuracy` = de todas las predicciones, cuántas acertó; `precision` (también aparece como `ppv`) = de las que predijo "sí", cuántas eran "sí"; `recall` (también `sens`) = de los "sí" reales, cuántos detectó
 :::
 
 ## Ejercicio 2: Interpretación {#sec:exercise02}
@@ -457,11 +457,15 @@ pred_probs |> select(crecimiento_alto, .pred_no, .pred_si) |> head(5)
 
 ## Curva ROC y AUC {#sec:exercise07}
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 20px; font-size: 20px;"}
 
-La curva ROC resume el rendimiento [en todos los umbrales a la vez]{.alert}:
+[La curva ROC](https://es.wikipedia.org/wiki/Curva_ROC) resume el rendimiento [en todos los umbrales a la vez]{.alert}: cada punto de la curva es un umbral distinto
 
-```{r roc-demo, prompt=FALSE, fig.width=6, fig.height=3.5, echo=TRUE}
+- [Sensibilidad]{.alert} (eje Y) = VP / (VP + FN): de los países que sí crecieron, ¿cuántos detecta el modelo? Es el [recall]{.alert} de la sesión anterior
+- [1 - especificidad]{.alert} (eje X) = FP / (FP + VN): de los países que no crecieron, ¿cuántos marcamos por error? Es la [tasa de falsas alarmas]{.alert}
+- Bajar el umbral nos mueve hacia [arriba y a la derecha]{.alert}: detectamos más casos reales, pero pagamos con más falsas alarmas. La [diagonal]{.alert} es el azar
+
+```{r roc-demo, prompt=FALSE, fig.width=8, fig.height=4.5, out.width="45%", echo=TRUE}
 pred_probs |>
   roc_curve(truth = crecimiento_alto, .pred_si, event_level = "second") |>
   autoplot()
@@ -614,7 +618,7 @@ predicciones |>
 
 - Si el [costo de perder un caso]{.alert} es alto (p. ej., decisiones de inversión): prioricen [recall]{.alert}
 - Si el [costo de una falsa alarma]{.alert} es alto (p. ej., asignar recursos mal): prioricen [precisión]{.alert}
-- Sin preferencia clara: usen [F1]{.alert}, el promedio armónico de ambas
+- Sin preferencia clara: usen [F-Measure/F-Score]{.alert} (`f_meas`), el promedio armónico de ambas
 
 [No hay respuesta universal.]{.alert} El contexto define la métrica correcta
 :::
@@ -681,7 +685,7 @@ pred_umbrales |>
 
 Este es el [compromiso precisión-recall]{.alert} en acción. El umbral óptimo depende del problema
 
-[[Volver]{.button}](#sec:masalla)
+[[Volver]{.button}](#sec:exercise04)
 :::
 
 ## Apéndice 5: Validación cruzada {#sec:appendix05}
@@ -705,9 +709,8 @@ cv_results <- modelo_log |>
 # collect_metrics() devuelve media y error estándar de cada métrica
 collect_metrics(cv_results)
 
-# Comparar con las métricas de la división única
-predicciones |>
-  metrics(truth = crecimiento_alto, estimate = .pred_class)
+# Comparar con la accuracy de la división única
+accuracy(predicciones, truth = crecimiento_alto, estimate = .pred_class)
 ```
 
 - `collect_metrics()` devuelve la [media]{.alert} de cada métrica sobre los 5 folds junto con su error estándar (`std_err`)

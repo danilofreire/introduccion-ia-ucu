@@ -31,7 +31,7 @@ library(tidymodels)
 library(tidyverse)
 
 satisfaccion <- read_csv("datos/satisfaccion_democracia.csv")
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # satisfaccion <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-01/datos/satisfaccion_democracia.csv")
 
 satisfaccion <- satisfaccion |>
@@ -189,7 +189,7 @@ Usen el modelo logístico para esta pregunta (los coeficientes de un árbol no s
 
 ### Pregunta 13: Árbol vs. logística
 
-Los árboles de decisión y la regresión logística tienen ventajas y desventajas distintas. Basándose en los resultados del laboratorio, discutan en qué situaciones preferirían un árbol de decisión sobre una regresión logística, y viceversa. Consideren al menos dos criterios (por ejemplo, interpretabilidad, rendimiento, tipo de datos).
+Los árboles de decisión y la regresión logística tienen ventajas y desventajas distintas. Basándose en los resultados de esta tarea, discutan en qué situaciones preferirían un árbol de decisión sobre una regresión logística, y viceversa. Consideren al menos dos criterios (por ejemplo, interpretabilidad, rendimiento, tipo de datos).
 
 **Respuesta:**
 

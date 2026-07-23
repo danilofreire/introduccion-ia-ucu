@@ -67,7 +67,6 @@ if (!require("fontawesome", character.only = TRUE)) {
 **Segunda parte**
 
 - Sobreajuste y sesgo-varianza
-- Regularización
 - Métricas de evaluación
 - Selección de modelos
 - Reproducibilidad en ML
@@ -77,7 +76,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::{style="text-align: center; margin-top: 30px;"}
 [![Elegir la métrica correcta](figures/metrics-tradeoffs.png){width="95%"}](#){data-modal-type="image" data-modal-url="figures/metrics-tradeoffs.png"}
 
-Fuente: [Medium](https://aws.plainenglish.io/model-performance-optimization-understanding-machine-learning-evaluation-metrics-30f199ac6a23)
+Fuente: [AWS in Plain English](https://aws.plainenglish.io/model-performance-optimization-understanding-machine-learning-evaluation-metrics-30f199ac6a23)
 :::
 :::
 :::
@@ -139,16 +138,16 @@ En la práctica, [el proceso es iterativo]{.alert}: volvemos a pasos anteriores 
 
 ```
 Datos crudos:
-  país     | pib    | edu  | internet
-  Uruguay  | 17,020 | 4.9  | 87.7
-  Bolivia  | NA     | 6.5  | 48.2
-  Chile    | 15,346 | 5.4  | NA
+  país     | pib   | edu  | internet
+  Uruguay  | 17020 | 4.9  | 87.7
+  Bolivia  | NA    | 6.5  | 48.2
+  Chile    | 15346 | 5.4  | NA
 
 Después de preprocesar:
-  país     | pib    | edu  | internet
-  Uruguay  | 17,020 | 4.9  | 87.7
-  Bolivia  | 10,500 | 6.5  | 48.2   ← imputado
-  Chile    | 15,346 | 5.4  | 72.3   ← imputado
+  país     | pib   | edu  | internet
+  Uruguay  | 17020 | 4.9  | 87.7
+  Bolivia  | 10500 | 6.5  | 48.2   ← imputado
+  Chile    | 15346 | 5.4  | 72.3   ← imputado
 ```
 
 El preprocesamiento es [la mayor parte del trabajo]{.alert} en un proyecto real de ML
@@ -283,7 +282,7 @@ tendencia_reciente       ← ¿aumenta o baja?
 
 :::{.column width=45%}
 :::{style="text-align: center; font-size: 20px;"}
-[![División train/test](figures/train-test.png){width="80%"}](#){data-modal-type="image" data-modal-url="figures/train-val-test.png"}
+[![División train/test](figures/train-test.png){width="80%"}](#){data-modal-type="image" data-modal-url="figures/train-test.png"}
 :::
 :::
 :::
@@ -474,7 +473,7 @@ Piénsenlo 30 segundos...
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; margin-top: -30px;"}
+:::{style="text-align: center; margin-top: -30px; font-size: 25px;"}
 [![Visualización de la matriz de confusión](figures/confusion-matrix.gif){width="70%"}](#){data-modal-type="image" data-modal-url="figures/confusion-matrix.gif"}
 :::
 :::
@@ -483,31 +482,37 @@ Piénsenlo 30 segundos...
 
 ## Precisión y recall
 
-:::{style="margin-top: 20px; font-size: 25px;"}
+:::{style="margin-top: 20px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=50%}
-**[Precision](https://es.wikipedia.org/wiki/Precisi%C3%B3n_y_exhaustividad)** = VP / (VP + FP)
+**[Precisión](https://es.wikipedia.org/wiki/Precisi%C3%B3n_y_exhaustividad)** = VP / (VP + [FP]{.alert})
 
-- De las predicciones "sí" del modelo, [¿cuántas son correctas?]{.alert}
-- Alta precisión = [pocas falsas alarmas]{.alert}
-- Importa cuando los **falsos positivos** son costosos (spam, fraude)
+- De todo lo que el modelo marcó como "sí", ¿qué parte era "sí" de verdad?
+- Mide la [confianza en la alarma]{.alert}: alta precisión, pocas falsas alarmas
+- Importa cuando [un falso positivo cuesta caro]{.alert} (spam, moderación de contenido)
 
-**[Recall](https://es.wikipedia.org/wiki/Precisi%C3%B3n_y_exhaustividad)** = VP / (VP + FN)
+**[Recall](https://es.wikipedia.org/wiki/Precisi%C3%B3n_y_exhaustividad)** = VP / (VP + [FN]{.alert})
 
-- De los positivos reales, [¿cuántos encontramos?]{.alert}
-- Alto recall = [no se nos escapan positivos]{.alert}
-- Importa cuando los **falsos negativos** son costosos (enfermedades, seguridad)
-
+- De todo lo que era "sí" de verdad, ¿qué parte encontró el modelo?
+- Mide la [cobertura]{.alert}: alto recall, no se nos escapa casi nada
+- Importa cuando [un falso negativo cuesta caro]{.alert} (enfermedades, seguridad)
 :::
 
 :::{.column width=50%}
-:::{style="text-align: center;"}
-[![El trade-off entre precisión y recall](figures/precision-recall-tradeoff.gif){width="90%"}](#){data-modal-type="image" data-modal-url="figures/precision-recall-tradeoff.gif"}
+:::{style="text-align: center; font-size: 18px;"}
+[![El trade-off entre precisión y recall](figures/precision-recall-tradeoff.gif){width="80%"}](#){data-modal-type="image" data-modal-url="figures/precision-recall-tradeoff.gif"}
 
 Fuente: [Analytics Vidhya](https://www.analyticsvidhya.com/blog/2020/10/how-to-choose-evaluation-metrics-for-classification-model/)
 :::
 
-Los clasificadores devuelven una [puntuación de probabilidad]{.alert}. Mover el umbral cambia el equilibrio entre precisión y recall, y [no se pueden maximizar ambos]{.alert}
+:::{style="margin-top: 10px; font-size: 19px;"}
+**Un ejemplo**: de 1.000 pacientes, 10 están enfermos. El modelo marca a 8 personas y acierta en 6
+
+- Precisión = 6/8 = [75%]{.alert}: de cada cuatro alarmas, tres son reales
+- Recall = 6/10 = [60%]{.alert}: encontró 6 enfermos, y [se le escaparon 4]{.alert}
+
+Si bajamos el [umbral]{.alert}, el modelo marca a más gente: sube el recall y baja la precisión. [No se pueden maximizar ambos]{.alert}
+:::
 :::
 :::
 :::
@@ -557,7 +562,7 @@ Los clasificadores devuelven una [puntuación de probabilidad]{.alert}. Mover el
 
 ## ¿Por qué importa la reproducibilidad?
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - [Reproducibilidad:]{.alert} poder obtener los mismos resultados con los mismos datos y código
@@ -623,7 +628,7 @@ Los clasificadores devuelven una [puntuación de probabilidad]{.alert}. Mover el
 :::
 
 :::{.column width=50%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 23px;"}
 **Ejemplo: estructura de proyecto reproducible**
 
 ```
@@ -668,7 +673,7 @@ mi_proyecto/
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
+:::{style="text-align: center; font-size: 24px;"}
 ```
 tidymodels
 ├── rsample    → dividir datos
@@ -679,7 +684,7 @@ tidymodels
 └── yardstick  → evaluar
 ```
 
-<br>
+:::{style="margin-top: 30px; font-size: 21px;"}
 
 El flujo de trabajo en código:
 
@@ -699,6 +704,7 @@ ajuste <- fit(modelo, formula,
 predicciones <- predict(ajuste,
                         testing(datos_split))
 ```
+:::
 :::
 :::
 :::
@@ -751,7 +757,7 @@ folds <- vfold_cv(
 :::{.column width=48%}
 Todo modelo se define con [tres verbos]{.alert}:
 
-- El [tipo de modelo]{.alert}: `logistic_reg()`, `decision_tree()`, `rand_forest()`, `linear_reg()`
+- El [tipo de modelo]{.alert}: `logistic_reg()`, `decision_tree()`, `rand_forest()`, `linear_reg()`, etc.
 - [`set_engine()`]{.alert}: qué paquete de R hace el cálculo por detrás (`glm`, `rpart`, `ranger`)
 - [`set_mode()`]{.alert}: `"classification"` o `"regression"`
 
@@ -790,12 +796,13 @@ Especificar el modelo y ajustarlo son [pasos separados]{.alert}: podemos definir
 
 ## yardstick: evaluar el modelo
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=48%}
 - [`augment()`]{.alert} agrega las predicciones (clase y probabilidades) al conjunto de prueba en una sola línea
 - [`conf_mat()`]{.alert} arma la matriz de confusión que vimos antes
 - [`metric_set()`]{.alert} junta varias métricas. En los labs usamos `precision`, `recall` y `roc_auc` en lugar de accuracy
+- [`roc_auc`]{.alert} es el área bajo la curva ROC: mide qué tan bien separa el modelo las dos clases (0,5 = azar, 1 = perfecto)
 - [`event_level = "second"`]{.alert} le indica cuál es la clase positiva, porque R ordena los niveles alfabéticamente y deja `"si"` en segundo lugar
 - Para la versión con validación cruzada: [`fit_resamples()`]{.alert} entrena sobre los folds y [`collect_metrics()`]{.alert} promedia los resultados
 :::
@@ -812,12 +819,10 @@ conf_mat(pred_test,
 
 # La misma evaluación, pero con
 # validación cruzada sobre los folds
-fit_resamples(
-  modelo_log,
+fit_resamples(modelo_log,
   crecimiento_alto ~ .,
   resamples = folds,
-  metrics = metric_set(precision,
-                       recall, roc_auc),
+  metrics = metric_set(precision, recall, roc_auc),
   control = control_resamples(
     event_level = "second")
 ) |>
@@ -848,9 +853,7 @@ Hoy pasamos la fórmula directamente a `fit()`. [Mañana]{.alert} la vamos a ree
 **Problemas y soluciones:**
 
 - El [sobreajuste]{.alert} ocurre cuando el modelo memoriza en lugar de aprender
-- La [regularización]{.alert} controla la complejidad del modelo
 - La [accuracy no es suficiente]{.alert}: necesitamos precisión y recall
-- Los [hiperparámetros]{.alert} se ajustan con validación, no con test
 - La [reproducibilidad]{.alert} es necesaria para verificar y colaborar
 :::
 :::

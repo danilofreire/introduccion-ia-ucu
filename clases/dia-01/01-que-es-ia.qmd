@@ -66,7 +66,7 @@ if (!require("fontawesome", character.only = TRUE)) {
     - De Turing y Dartmouth a ChatGPT
 4. [Tipos de aprendizaje automático]{.alert}
     - Supervisado, no supervisado, por refuerzo
-5. [Ética y regulación]{.alert}
+5. [Ética de la IA]{.alert}
     - Sesgos, alucinaciones
 :::
 
@@ -680,7 +680,7 @@ Siempre mantengan el pensamiento crítico 😉
 - [Limitaciones:]{.alert} razonamiento causal, contexto amplio, adaptación a situaciones
 - [Historia:]{.alert} ciclos de entusiasmo y decepción, cada uno con avances reales
 - [Tres tipos de ML:]{.alert} supervisado, no supervisado y por refuerzo
-- [Problemas reales:]{.alert} sesgo, alucinaciones, regulación incompleta
+- [Problemas reales:]{.alert} sesgo y alucinaciones
 :::
 
 ## Próximo: Fundamentos de Machine Learning
