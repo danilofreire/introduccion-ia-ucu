@@ -1313,7 +1313,6 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <li>Cómo un <span class="alert">system prompt</span> cambia el comportamiento del modelo</li>
 <li>Cuándo el LLM gana y cuándo pierde frente a métodos clásicos</li>
 </ul>
-<p><span class="alert">A quien no tenga API key, le comparto una temporal en clase</span></p>
 </div></div>
 </div>
 </section>
@@ -1613,12 +1612,11 @@ las últimas dos décadas.</code></pre>
 <li><code>set.seed()</code> hace la muestra reproducible: siempre la misma</li>
 </ul>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>R<span class="sc">&gt;</span> textos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;datos/textos_politicos.csv&quot;</span>,</span>
-<span id="cb11-2"><a></a><span class="sc">+</span>                    <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb11-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># Lean el archivo directo desde la web:</span></span>
-<span id="cb11-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># textos &lt;- read_csv(&quot;https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/textos_politicos.csv&quot;, show_col_types = FALSE)</span></span>
-<span id="cb11-5"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb11-6"><a></a>R<span class="sc">&gt;</span> <span class="fu">glimpse</span>(textos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>R<span class="sc">&gt;</span> textos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;datos/textos_politicos.csv&quot;</span>)</span>
+<span id="cb11-2"><a></a>R<span class="sc">&gt;</span> <span class="co"># Lean el archivo directo desde la web:</span></span>
+<span id="cb11-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># textos &lt;- read_csv(&quot;https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/textos_politicos.csv&quot;, show_col_types = FALSE)</span></span>
+<span id="cb11-4"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb11-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">glimpse</span>(textos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 60
 Columns: 5
@@ -1671,7 +1669,7 @@ $ texto &lt;chr&gt; &quot;El crecimiento económico del país ha sido sólido es
 <span id="cb15-9"><a></a><span class="st">+     - Sin tildes, sin puntuación, sin explicación</span></span>
 <span id="cb15-10"><a></a><span class="st">+     - Si dudás, elegir la categoría más probable&quot;</span></span>
 <span id="cb15-11"><a></a><span class="sc">+</span>   )</span>
-<span id="cb15-12"><a></a><span class="sc">+</span>   <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto)))</span>
+<span id="cb15-12"><a></a><span class="sc">+</span>   <span class="fu">trimws</span>(<span class="fu">tolower</span>(chat<span class="sc">$</span><span class="fu">chat</span>(texto))) <span class="co"># trim whitespaces, converter para minúsculas</span></span>
 <span id="cb15-13"><a></a><span class="sc">+</span> }</span>
 <span id="cb15-14"><a></a>R<span class="sc">&gt;</span> </span>
 <span id="cb15-15"><a></a>R<span class="sc">&gt;</span> <span class="co"># Probar con un texto</span></span>
@@ -1694,13 +1692,15 @@ $ texto &lt;chr&gt; &quot;El crecimiento económico del país ha sido sólido es
 <h2>Clasificar la muestra</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <ul>
-<li><code>map_chr()</code> aplica la función a cada texto y junta las respuestas en un vector</li>
-<li><code>.progress = TRUE</code> muestra una barra de avance (son 20 llamadas, ~1-2 min)</li>
+<li><code>map_chr()</code> aplica la función a cada texto y junta las respuestas en un vector
+<ul>
+<li><code>map_chr()</code> es de <a href="https://purrr.tidyverse.org/reference/map.html"><code>purrr</code></a>, parte del tidyverse, la syntaxis es <code>map_tipo(vector, función)</code></li>
+</ul></li>
+<li><code>mutate()</code> agrega ese vector como una nueva columna al dataset</li>
 </ul>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Clasificar los 20 textos de la muestra balanceada</span></span>
-<span id="cb20-2"><a></a>R<span class="sc">&gt;</span> resultados_zero <span class="ot">&lt;-</span> muestra <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">tema_llm =</span> <span class="fu">map_chr</span>(texto, clasificar_zero, <span class="at">.progress =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-2"><a></a>R<span class="sc">&gt;</span> resultados_zero <span class="ot">&lt;-</span> muestra <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">tema_llm =</span> <span class="fu">map_chr</span>(texto, clasificar_zero))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a></a>R<span class="sc">&gt;</span> resultados_zero <span class="sc">|&gt;</span></span>
@@ -1893,32 +1893,26 @@ real            economia educacion medioambiente salud seguridad
 <span id="cb36-19"><a></a>R<span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
 <span id="cb36-20"><a></a>R<span class="sc">&gt;</span> modelo_lda <span class="ot">&lt;-</span> <span class="fu">LDA</span>(dtm, <span class="at">k =</span> <span class="dv">5</span>, <span class="at">control =</span> <span class="fu">list</span>(<span class="at">seed =</span> <span class="dv">123</span>))</span>
 <span id="cb36-21"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb36-22"><a></a>R<span class="sc">&gt;</span> <span class="co"># 3. Tópico dominante de cada documento (gamma)</span></span>
+<span id="cb36-22"><a></a>R<span class="sc">&gt;</span> <span class="co"># 3. Tópico dominante de cada documento, con su tema real al lado</span></span>
 <span id="cb36-23"><a></a>R<span class="sc">&gt;</span> doc_topic <span class="ot">&lt;-</span> <span class="fu">tidy</span>(modelo_lda, <span class="at">matrix =</span> <span class="st">&quot;gamma&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-24"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(document) <span class="sc">|&gt;</span></span>
-<span id="cb36-25"><a></a><span class="sc">+</span>   <span class="fu">slice_max</span>(gamma, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-26"><a></a><span class="sc">+</span>   <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb36-27"><a></a><span class="sc">+</span>   <span class="fu">transmute</span>(<span class="at">id =</span> <span class="fu">as.integer</span>(document), topic)</span>
+<span id="cb36-24"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">as.integer</span>(document)) <span class="sc">|&gt;</span></span>
+<span id="cb36-25"><a></a><span class="sc">+</span>   <span class="fu">slice_max</span>(gamma, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">by =</span> id, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-26"><a></a><span class="sc">+</span>   <span class="fu">left_join</span>(<span class="fu">select</span>(textos, id, tema), <span class="at">by =</span> <span class="st">&quot;id&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-27"><a></a><span class="sc">+</span>   <span class="fu">select</span>(id, topic, tema)</span>
 <span id="cb36-28"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb36-29"><a></a>R<span class="sc">&gt;</span> <span class="co"># 4. Mapear cada tópico al tema real más frecuente (para medir accuracy)</span></span>
+<span id="cb36-29"><a></a>R<span class="sc">&gt;</span> <span class="co"># 4. Cada tópico se mapea al tema real más frecuente</span></span>
 <span id="cb36-30"><a></a>R<span class="sc">&gt;</span> mapa <span class="ot">&lt;-</span> doc_topic <span class="sc">|&gt;</span></span>
-<span id="cb36-31"><a></a><span class="sc">+</span>   <span class="fu">left_join</span>(<span class="fu">select</span>(textos, id, tema), <span class="at">by =</span> <span class="st">&quot;id&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-32"><a></a><span class="sc">+</span>   <span class="fu">count</span>(topic, tema) <span class="sc">|&gt;</span></span>
-<span id="cb36-33"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(topic) <span class="sc">|&gt;</span></span>
-<span id="cb36-34"><a></a><span class="sc">+</span>   <span class="fu">slice_max</span>(n, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-35"><a></a><span class="sc">+</span>   <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb36-36"><a></a><span class="sc">+</span>   <span class="fu">select</span>(topic, <span class="at">tema_lda =</span> tema)</span>
-<span id="cb36-37"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb36-38"><a></a>R<span class="sc">&gt;</span> lda_pred <span class="ot">&lt;-</span> doc_topic <span class="sc">|&gt;</span></span>
-<span id="cb36-39"><a></a><span class="sc">+</span>   <span class="fu">left_join</span>(mapa, <span class="at">by =</span> <span class="st">&quot;topic&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb36-40"><a></a><span class="sc">+</span>   <span class="fu">left_join</span>(<span class="fu">select</span>(textos, id, tema), <span class="at">by =</span> <span class="st">&quot;id&quot;</span>)</span>
-<span id="cb36-41"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb36-42"><a></a>R<span class="sc">&gt;</span> <span class="co"># Medir solo sobre los 20 textos de la muestra (mismo set que los LLMs)</span></span>
-<span id="cb36-43"><a></a>R<span class="sc">&gt;</span> accuracy_lda <span class="ot">&lt;-</span> lda_pred <span class="sc">|&gt;</span></span>
-<span id="cb36-44"><a></a><span class="sc">+</span>   <span class="fu">filter</span>(id <span class="sc">%in%</span> muestra<span class="sc">$</span>id) <span class="sc">|&gt;</span></span>
-<span id="cb36-45"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(<span class="at">acc =</span> <span class="fu">mean</span>(tema <span class="sc">==</span> tema_lda)) <span class="sc">|&gt;</span></span>
-<span id="cb36-46"><a></a><span class="sc">+</span>   <span class="fu">pull</span>(acc)</span>
-<span id="cb36-47"><a></a>R<span class="sc">&gt;</span> accuracy_lda</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb36-31"><a></a><span class="sc">+</span>   <span class="fu">count</span>(topic, tema, <span class="at">name =</span> <span class="st">&quot;casos&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-32"><a></a><span class="sc">+</span>   <span class="fu">slice_max</span>(casos, <span class="at">n =</span> <span class="dv">1</span>, <span class="at">by =</span> topic, <span class="at">with_ties =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-33"><a></a><span class="sc">+</span>   <span class="fu">select</span>(topic, <span class="at">tema_lda =</span> tema)</span>
+<span id="cb36-34"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb36-35"><a></a>R<span class="sc">&gt;</span> <span class="co"># 5. Accuracy sobre los 20 textos de la muestra (mismo set que los LLMs)</span></span>
+<span id="cb36-36"><a></a>R<span class="sc">&gt;</span> accuracy_lda <span class="ot">&lt;-</span> doc_topic <span class="sc">|&gt;</span></span>
+<span id="cb36-37"><a></a><span class="sc">+</span>   <span class="fu">left_join</span>(mapa, <span class="at">by =</span> <span class="st">&quot;topic&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-38"><a></a><span class="sc">+</span>   <span class="fu">filter</span>(id <span class="sc">%in%</span> muestra<span class="sc">$</span>id) <span class="sc">|&gt;</span></span>
+<span id="cb36-39"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(<span class="at">acc =</span> <span class="fu">mean</span>(tema <span class="sc">==</span> tema_lda)) <span class="sc">|&gt;</span></span>
+<span id="cb36-40"><a></a><span class="sc">+</span>   <span class="fu">pull</span>(acc)</span>
+<span id="cb36-41"><a></a>R<span class="sc">&gt;</span> accuracy_lda</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.3</code></pre>
 </div>
@@ -1932,7 +1926,7 @@ real            economia educacion medioambiente salud seguridad
 <p><strong>Nota</strong></p>
 </div>
 <div class="callout-content">
-<p><strong>Ojo</strong>: como LDA no conoce las categorías, suele <span class="alert">colapsar dos temas en uno</span> y dejar otros sin tópico. Por eso su accuracy es baja</p>
+<p>Como LDA no conoce las categorías, suele <span class="alert">colapsar dos temas en uno</span> y dejar otros sin tópico. Por eso su accuracy es baja</p>
 </div>
 </div>
 </div>
@@ -1955,7 +1949,7 @@ real            economia educacion medioambiente salud seguridad
 </div>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>R<span class="sc">&gt;</span> clasif_nemotron <span class="ot">&lt;-</span> muestra <span class="sc">|&gt;</span></span>
-<span id="cb40-2"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">tema_llm =</span> <span class="fu">map_chr</span>(texto, clasificar_con, <span class="st">&quot;nvidia/nemotron-nano-9b-v2:free&quot;</span>, <span class="at">.progress =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb40-2"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">tema_llm =</span> <span class="fu">map_chr</span>(texto, clasificar_con, <span class="st">&quot;nvidia/nemotron-nano-9b-v2:free&quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>R<span class="sc">&gt;</span> accuracy_nemotron <span class="ot">&lt;-</span> <span class="fu">mean</span>(clasif_nemotron<span class="sc">$</span>tema <span class="sc">==</span> clasif_nemotron<span class="sc">$</span>tema_llm)</span>
@@ -1973,18 +1967,18 @@ real            economia educacion medioambiente salud seguridad
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a>R<span class="sc">&gt;</span> comparacion <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
 <span id="cb43-2"><a></a><span class="sc">+</span>   <span class="er">~</span>metodo,                 <span class="sc">~</span>accuracy,          <span class="sc">~</span>tiempo,         <span class="sc">~</span>costo,</span>
 <span id="cb43-3"><a></a><span class="sc">+</span>   <span class="st">&quot;LDA (no supervisado)&quot;</span>,  accuracy_lda,       <span class="st">&quot;~2 seg&quot;</span>,        <span class="st">&quot;$0&quot;</span>,</span>
-<span id="cb43-4"><a></a><span class="sc">+</span>   <span class="st">&quot;gpt-oss-20b&quot;</span>,           accuracy_gptoss,    <span class="st">&quot;ya en Parte 2&quot;</span>, <span class="st">&quot;&lt;$0.01&quot;</span>,</span>
-<span id="cb43-5"><a></a><span class="sc">+</span>   <span class="st">&quot;nemotron-nano-9b&quot;</span>,      accuracy_nemotron,  <span class="st">&quot;~30 seg&quot;</span>,       <span class="st">&quot;&lt;$0.01&quot;</span></span>
+<span id="cb43-4"><a></a><span class="sc">+</span>   <span class="st">&quot;gpt-oss-20b&quot;</span>,           accuracy_gptoss,    <span class="st">&quot;~2 minutos&quot;</span>,    <span class="st">&quot;&lt;$0.01&quot;</span>,</span>
+<span id="cb43-5"><a></a><span class="sc">+</span>   <span class="st">&quot;nemotron-nano-9b&quot;</span>,      accuracy_nemotron,  <span class="st">&quot;~2 minutos&quot;</span>,    <span class="st">&quot;&lt;$0.01&quot;</span></span>
 <span id="cb43-6"><a></a><span class="sc">+</span> )</span>
 <span id="cb43-7"><a></a>R<span class="sc">&gt;</span> </span>
 <span id="cb43-8"><a></a>R<span class="sc">&gt;</span> comparacion <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(accuracy))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 4
-  metodo               accuracy tiempo        costo 
-  &lt;chr&gt;                   &lt;dbl&gt; &lt;chr&gt;         &lt;chr&gt; 
-1 gpt-oss-20b               1   ya en Parte 2 &lt;$0.01
-2 nemotron-nano-9b          0.9 ~30 seg       &lt;$0.01
-3 LDA (no supervisado)      0.3 ~2 seg        $0    </code></pre>
+  metodo               accuracy tiempo     costo 
+  &lt;chr&gt;                   &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt; 
+1 gpt-oss-20b               1   ~2 minutos &lt;$0.01
+2 nemotron-nano-9b          0.9 ~2 minutos &lt;$0.01
+3 LDA (no supervisado)      0.3 ~2 seg     $0    </code></pre>
 </div>
 </div>
 <div class="callout callout-note no-icon callout-style-simple">

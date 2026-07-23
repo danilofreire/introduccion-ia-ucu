@@ -234,37 +234,16 @@ plot(fobject)
 
 # --- interpretar-las-metricas ----------------------------------
 
-# Ratios de cada métrica (1,0 = igualdad perfecta)
+# Cada ratio: métrica del grupo no privilegiado ÷ la del privilegiado
 fobject$fairness_check_data |>
   select(metric, score) |>
   mutate(score = round(score, 3))
 
-# --- metricas-detalladas-por-grupo -----------------------------
-
-# Calcular métricas crudas por grupo
-group_metrics <- test_data |>
-  mutate(pred = pred_class) |>
-  group_by(Sex) |>
-  summarise(
-    n = n(),
-    accuracy = mean(pred == Risk),
-    tpr = sum(pred == "good" & Risk == "good") / sum(Risk == "good"),
-    fpr = sum(pred == "good" & Risk == "bad") / sum(Risk == "bad"),
-    positive_rate = mean(pred == "good"),
-    .groups = "drop"
-  )
-
-group_metrics |>
-  mutate(across(where(is.numeric), ~round(., 3)))
-
 # --- mitigacion-umbrales-diferenciados -------------------------
 
-# Umbral 0.5 para hombres, 0.45 para mujeres
-mitigated_pred <- ifelse(
-  test_data$Sex == "male",
-  ifelse(pred_probs > 0.5, "good", "bad"),
-  ifelse(pred_probs > 0.45, "good", "bad")
-)
+# Un umbral por grupo: 0.5 para hombres, 0.4 para mujeres
+umbral <- ifelse(test_data$Sex == "male", 0.5, 0.4)
+mitigated_pred <- ifelse(pred_probs > umbral, "good", "bad")
 
 test_data |>
   mutate(orig = pred_class, mitig = mitigated_pred) |>

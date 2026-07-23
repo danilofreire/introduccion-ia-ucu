@@ -1308,7 +1308,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </div><div class="column" style="width:50%;">
 <p><strong>Parte 2: auditoría de equidad (sesión 5.2)</strong></p>
 <ol start="4" type="1">
-<li>Auditar un modelo de crédito con <span class="alert">fairmodels</span></li>
+<li>Auditar un modelo de crédito con <a href="https://modeloriented.github.io/fairmodels/index.html"><code>fairmodels</code></a></li>
 <li>Calcular e interpretar <span class="alert">métricas de equidad</span> por grupo</li>
 <li>Discutir <span class="alert">mitigación</span> y sus trade-offs</li>
 </ol>
@@ -1659,7 +1659,7 @@ evalúan la ocurrencia de tales eventos en un período determinado.</code></pre>
 </div><div class="column" style="width:50%;">
 <div style="font-size: 23px;">
 <p><strong>El caso de estudio</strong></p>
-<p>El dataset <span class="alert">German Credit</span>, un clásico en estudios de sesgo algorítmico:</p>
+<p>El dataset <a href="https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data">German Credit</a>, un clásico en estudios de sesgo algorítmico:</p>
 <ul>
 <li>1000 solicitudes de crédito</li>
 <li>Variable objetivo: buen/mal pagador</li>
@@ -1670,8 +1670,8 @@ evalúan la ocurrencia de tales eventos en un período determinado.</code></pre>
 </div></div>
 </div>
 </section>
-<section id="preparación-del-entorno" class="slide level2">
-<h2>Preparación del entorno</h2>
+<section id="preparación" class="slide level2">
+<h2>Preparación</h2>
 <div style="margin-top: 30px; font-size: 24px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Instalar paquetes si no están disponibles</span></span>
@@ -1683,14 +1683,15 @@ evalúan la ocurrencia de tales eventos en un período determinado.</code></pre>
 <span id="cb15-7"><a></a>R<span class="sc">&gt;</span> <span class="fu">library</span>(fairmodels)</span>
 <span id="cb15-8"><a></a>R<span class="sc">&gt;</span> <span class="fu">library</span>(DALEX)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><span class="alert">fairmodels</span> usa explicadores de DALEX para auditar modelos. Funciona con cualquier modelo de clasificación.</p>
+<p><a href="https://modeloriented.github.io/fairmodels/index.html"><code>fairmodels</code></a> usa explicadores de DALEX para auditar modelos. Funciona con cualquier modelo de clasificación</p>
+<p>Para más informaciones, ver la <span class="alert">documentación oficial</span> y el <span class="alert">artículo oficial</span>: <a href="https://modeloriented.github.io/fairmodels/articles/fairmodels.html" class="uri">https://modeloriented.github.io/fairmodels/articles/fairmodels.html</a> y <a href="https://arxiv.org/abs/2104.00507" class="uri">https://arxiv.org/abs/2104.00507</a></p>
 </div>
 </section>
 <section id="el-dataset-german-credit" class="slide level2">
 <h2>El dataset German Credit</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="columns">
-<div class="column" style="width:55%;">
+<div class="column" style="width:50%;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Cargar datos incluidos en fairmodels</span></span>
 <span id="cb16-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">data</span>(<span class="st">&quot;german&quot;</span>, <span class="at">package =</span> <span class="st">&quot;fairmodels&quot;</span>)</span>
@@ -1712,7 +1713,7 @@ $ Purpose          &lt;fct&gt; radio/TV, radio/TV, education, furniture/equipmen
 $ Age              &lt;int&gt; 67, 22, 49, 45, 53, 35, 53, 35, 61, 28, 25, 24, 22, 6…</code></pre>
 </div>
 </div>
-</div><div class="column" style="width:45%;">
+</div><div class="column" style="width:50%;">
 <p><strong>Variables clave:</strong></p>
 <ul>
 <li><code>Risk</code>: variable objetivo (good/bad)</li>
@@ -1720,7 +1721,7 @@ $ Age              &lt;int&gt; 67, 22, 49, 45, 53, 35, 53, 35, 61, 28, 25, 24, 2
 <li><code>Age</code>: otro atributo sensible</li>
 <li>Variables de crédito: monto, duración, historial</li>
 </ul>
-<p>El dataset es de los años 1990 y tiene <span class="alert">sesgos históricos conocidos</span>.</p>
+<p>El dataset es de los años 1990 y tiene <span class="alert">sesgos históricos conocidos</span>. Documentación completa: <a href="https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data" class="uri">https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data</a></p>
 </div></div>
 </div>
 </section>
@@ -1749,7 +1750,7 @@ $ Age              &lt;int&gt; 67, 22, 49, 45, 53, 35, 53, 35, 61, 28, 25, 24, 2
 </div>
 </div>
 <div style="margin-top: 10px;">
-<p>Las <span class="alert">tasas base</span> son similares entre grupos, lo que facilita la comparación de métricas.</p>
+<p>Las <span class="alert">tasas base</span> son similares entre grupos, lo que facilita la comparación de métricas</p>
 </div>
 </div>
 </section>
@@ -1772,7 +1773,7 @@ $ Age              &lt;int&gt; 67, 22, 49, 45, 53, 35, 53, 35, 61, 28, 25, 24, 2
 <pre><code>Test: 301 filas</code></pre>
 </div>
 </div>
-<p>Usaremos el conjunto de <span class="alert">test</span> para evaluar equidad, ya que representa datos no vistos.</p>
+<p>Usaremos el conjunto de <span class="alert">test</span> para evaluar equidad, ya que representa datos no vistos</p>
 </div>
 </section>
 <section id="entrenar-una-regresión-logística" class="slide level2">
@@ -1798,7 +1799,7 @@ $ Age              &lt;int&gt; 67, 22, 49, 45, 53, 35, 53, 35, 61, 28, 25, 24, 2
 <pre><code>Accuracy global: 0.691 </code></pre>
 </div>
 </div>
-<p><span class="alert">El modelo no usa Sex como variable</span>, pero ¿eso garantiza que sea justo? La sesión 5.2 sugiere que no: los proxies existen.</p>
+<p><span class="alert">El modelo no usa Sex como variable</span>, pero ¿eso garantiza que sea justo? La sesión 5.2 sugiere que no: los proxies existen</p>
 </div>
 </section>
 <section id="crear-el-explicador-dalex" class="slide level2">
@@ -1816,6 +1817,7 @@ $ Age              &lt;int&gt; 67, 22, 49, 45, 53, 35, 53, 35, 61, 28, 25, 24, 2
 <span id="cb25-7"><a></a><span class="sc">+</span>   <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
 <span id="cb25-8"><a></a><span class="sc">+</span> )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Ver <a href="https://arxiv.org/abs/2104.00507">Wiśniewski y Biecek (2022)</a> para más detalles sobre los métodos de clasificación de sesgos</p>
 </div><div class="column" style="width:45%;">
 <div style="font-size: 22px;">
 <p>Un <span class="alert">explicador</span> es un objeto que envuelve todo lo que fairmodels necesita para auditar:</p>
@@ -1824,8 +1826,8 @@ $ Age              &lt;int&gt; 67, 22, 49, 45, 53, 35, 53, 35, 61, 28, 25, 24, 2
 <li>Los datos de test</li>
 <li>La variable objetivo (0/1)</li>
 </ul>
-<p>Para un <code>glm</code>, DALEX ya sabe cómo pedir las predicciones: no hace falta una <span class="alert">función a medida</span>.</p>
-<p>Es el paso intermedio: modelo → explicador → auditoría.</p>
+<p>Para un <code>glm</code>, DALEX ya sabe cómo pedir las predicciones: no hace falta una <span class="alert">función a medida</span></p>
+<p>Es el paso intermedio: modelo → explicador → auditoría</p>
 </div>
 </div></div>
 </div>
@@ -1840,11 +1842,20 @@ $ Age              &lt;int&gt; 67, 22, 49, 45, 53, 35, 53, 35, 61, 28, 25, 24, 2
 <span id="cb26-4"><a></a><span class="sc">+</span>   <span class="at">protected =</span> test_data<span class="sc">$</span>Sex,</span>
 <span id="cb26-5"><a></a><span class="sc">+</span>   <span class="at">privileged =</span> <span class="st">&quot;male&quot;</span>,  <span class="co"># grupo de referencia</span></span>
 <span id="cb26-6"><a></a><span class="sc">+</span>   <span class="at">cutoff =</span> <span class="fl">0.5</span>,         <span class="co"># umbral de decisión</span></span>
-<span id="cb26-7"><a></a><span class="sc">+</span>   <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb26-8"><a></a><span class="sc">+</span> )</span>
-<span id="cb26-9"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb26-10"><a></a>R<span class="sc">&gt;</span> <span class="co"># Ver resumen</span></span>
-<span id="cb26-11"><a></a>R<span class="sc">&gt;</span> <span class="fu">print</span>(fobject)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb26-7"><a></a><span class="sc">+</span>   <span class="at">verbose =</span> <span class="cn">TRUE</span></span>
+<span id="cb26-8"><a></a><span class="sc">+</span> )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Creating fairness classification object
+-&gt; Privileged subgroup      : character ([32m Ok [39m )
+-&gt; Protected variable       : factor ([32m Ok [39m ) 
+-&gt; Cutoff values for explainers : 0.5 ( for all subgroups )
+-&gt; Fairness objects     : 0 objects 
+-&gt; Checking explainers      : 1 in total ( [32m compatible [39m )
+-&gt; Metric calculation       : 13/13 metrics calculated for all models
+[32m Fairness object created succesfully [39m </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Ver resumen</span></span>
+<span id="cb28-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">print</span>(fobject)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Fairness check for models: Regresión logística 
@@ -1853,15 +1864,15 @@ Fairness check for models: Regresión logística
 [39mTotal loss :  0.4831363 </code></pre>
 </div>
 </div>
-<p>El grupo <span class="alert">privilegiado</span> es el de referencia. Las métricas comparan otros grupos con este.</p>
+<p>El grupo <span class="alert">privilegiado</span> es el de referencia. Las métricas comparan otros grupos con este</p>
 </div>
 </section>
 <section id="visualizar-métricas-de-equidad" class="slide level2">
 <h2>Visualizar métricas de equidad</h2>
 <div style="margin-top: 30px; font-size: 22px;">
-<p>La zona verde es la <span class="alert">regla del 80%</span> de la sesión 5.2: un ratio entre 0,8 y 1,25 se considera aceptable. Fuera de ella hay disparidad.</p>
+<p>La zona verde es la <span class="alert">regla del 80%</span> de la sesión 5.2: un ratio entre 0,8 y 1,25 se considera aceptable. Fuera de ella hay disparidad</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">plot</span>(fobject)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">plot</span>(fobject)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -1874,129 +1885,92 @@ Fairness check for models: Regresión logística
 </section>
 <section id="sec:interpretar-metricas" class="slide level2">
 <h2>Interpretar las métricas</h2>
-<div style="margin-top: 30px; font-size: 20px;">
-<div class="columns">
-<div class="column" style="width:40%;">
-<p><strong>¿Qué significan las métricas?</strong></p>
+<div style="margin-top: 20px; font-size: 20px;">
+<p>Cada fila de la salida (y cada barra del gráfico anterior) es un <span class="alert">ratio entre grupos</span> (mujeres ÷ hombres): 1,0 es igualdad perfecta y la zona verde (0,8 a 1,25) es la regla del 80%. El resultado “positivo” acá es <span class="alert">recibir el crédito</span> (que el modelo prediga <code>good</code>)</p>
 <table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Métrica</th>
-<th>Significado</th>
+<th>Nombre en la salida</th>
+<th>Fórmula</th>
+<th>Qué pregunta, en crédito</th>
+<th>En una frase</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td>TPR</td>
-<td>Tasa de verdaderos positivos</td>
+<td><span class="alert">Accuracy equality</span> (ACC)</td>
+<td>(TP+TN)/total</td>
+<td>¿Acierta con la misma frecuencia en cada grupo?</td>
+<td>Mismo nivel de aciertos</td>
 </tr>
 <tr class="even">
-<td>FPR</td>
-<td>Tasa de falsos positivos</td>
+<td><span class="alert">Equal opportunity</span> (TPR)</td>
+<td>TP/(TP+FN)</td>
+<td>De quienes <span class="alert">sí</span> pagarían, ¿qué proporción recibe el crédito?</td>
+<td>Igualdad de oportunidades</td>
 </tr>
 <tr class="odd">
-<td>PPV</td>
-<td>Valor predictivo positivo</td>
+<td><span class="alert">Predictive equality</span> (FPR)</td>
+<td>FP/(FP+TN)</td>
+<td>De quienes <span class="alert">no</span> pagarían, ¿qué proporción se aprueba por error?</td>
+<td>Mismo nivel de errores costosos</td>
 </tr>
 <tr class="even">
-<td>ACC</td>
-<td>Accuracy</td>
+<td><span class="alert">Predictive parity</span> (PPV)</td>
+<td>TP/(TP+FP)</td>
+<td>De quienes el modelo <span class="alert">aprueba</span>, ¿qué proporción sí paga?</td>
+<td>Calibración: “aprobado” significa lo mismo</td>
 </tr>
 <tr class="odd">
-<td>STP</td>
-<td>Tasa de resultados positivos (paridad)</td>
+<td><span class="alert">Statistical parity</span> (STP)</td>
+<td>(TP+FP)/total</td>
+<td>¿Qué proporción de cada grupo recibe un “aprobado”?</td>
+<td>Paridad demográfica</td>
 </tr>
 </tbody>
 </table>
-<p>Un ratio de 1,0 significa <span class="alert">igualdad perfecta</span> entre grupos.</p>
-<p>Conexión con la sesión 5.2: <span class="alert">STP</span> ≈ paridad demográfica, <span class="alert">TPR</span> ≈ igualdad de oportunidades, <span class="alert">PPV</span> se relaciona con la calibración.</p>
-<p><a href="#/sec:metricas-glosario"><span class="button">Glosario: qué significa cada métrica</span></a></p>
-</div><div class="column" style="width:60%;">
-<p><strong>En nuestro caso:</strong></p>
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Ratios de cada métrica (1,0 = igualdad perfecta)</span></span>
-<span id="cb29-2"><a></a>R<span class="sc">&gt;</span> fobject<span class="sc">$</span>fairness_check_data <span class="sc">|&gt;</span></span>
-<span id="cb29-3"><a></a><span class="sc">+</span>   <span class="fu">select</span>(metric, score) <span class="sc">|&gt;</span></span>
-<span id="cb29-4"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">score =</span> <span class="fu">round</span>(score, <span class="dv">3</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                                                    metric score
-1 Accuracy equality ratio    (TP + TN)/(TP + FP + TN + FN) 0.988
-2                 Predictive parity ratio     TP/(TP + FP) 0.947
-3                 Predictive equality ratio   FP/(FP + TN) 0.740
-4                 Equal opportunity ratio     TP/(TP + FN) 0.965
-5 Statistical parity ratio   (TP + FP)/(TP + FP + TN + FN) 0.876</code></pre>
+<div style="margin-top: 10px;">
+<p>La tabla de confusión, en crédito: <span class="alert">TP</span> aprobado y paga · <span class="alert">FP</span> aprobado y no paga · <span class="alert">TN</span> rechazado y no pagaría · <span class="alert">FN</span> rechazado pero sí pagaría</p>
 </div>
-</div>
-<div style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 12px; border-radius: 10px;">
-<p>Recordar el <span class="alert">teorema de imposibilidad</span>: no se puede estar en la zona verde en todas las métricas a la vez si las tasas base difieren.</p>
-</div>
-</div></div>
-</div>
-</section>
-<section id="métricas-detalladas-por-grupo" class="slide level2">
-<h2>Métricas detalladas por grupo</h2>
-<div style="margin-top: 30px; font-size: 22px;">
-<div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Calcular métricas crudas por grupo</span></span>
-<span id="cb31-2"><a></a>R<span class="sc">&gt;</span> group_metrics <span class="ot">&lt;-</span> test_data <span class="sc">|&gt;</span></span>
-<span id="cb31-3"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">pred =</span> pred_class) <span class="sc">|&gt;</span></span>
-<span id="cb31-4"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(Sex) <span class="sc">|&gt;</span></span>
-<span id="cb31-5"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(</span>
-<span id="cb31-6"><a></a><span class="sc">+</span>     <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb31-7"><a></a><span class="sc">+</span>     <span class="at">accuracy =</span> <span class="fu">mean</span>(pred <span class="sc">==</span> Risk),</span>
-<span id="cb31-8"><a></a><span class="sc">+</span>     <span class="at">tpr =</span> <span class="fu">sum</span>(pred <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;good&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;good&quot;</span>),</span>
-<span id="cb31-9"><a></a><span class="sc">+</span>     <span class="at">fpr =</span> <span class="fu">sum</span>(pred <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>),</span>
-<span id="cb31-10"><a></a><span class="sc">+</span>     <span class="at">positive_rate =</span> <span class="fu">mean</span>(pred <span class="sc">==</span> <span class="st">&quot;good&quot;</span>),</span>
-<span id="cb31-11"><a></a><span class="sc">+</span>     <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb31-12"><a></a><span class="sc">+</span>   )</span>
-<span id="cb31-13"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb31-14"><a></a>R<span class="sc">&gt;</span> group_metrics <span class="sc">|&gt;</span></span>
-<span id="cb31-15"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 6
-  Sex        n accuracy   tpr   fpr positive_rate
-  &lt;fct&gt;  &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;
-1 female    89    0.685 0.821 0.545         0.719
-2 male     212    0.693 0.852 0.737         0.821</code></pre>
-</div>
-</div>
-<p>Estas son las métricas <span class="alert">absolutas</span>. fairmodels calcula los ratios entre grupos.</p>
 </div>
 </section>
 <section id="sec:mitigacion" class="slide level2">
 <h2>Mitigación: umbrales diferenciados</h2>
-<div style="margin-top: 30px; font-size: 21px;">
+<div style="margin-top: 30px; font-size: 20px;">
 <div class="columns">
-<div class="column" style="width:55%;">
-<p>Una estrategia de <span class="alert">post-procesamiento</span> (sesión 5.2): umbrales distintos por grupo para igualar un tipo de error.</p>
+<div class="column" style="width:70%;">
+<p>Una estrategia de <span class="alert">post-procesamiento</span> (sesión 5.2): umbrales distintos por grupo para igualar un tipo de error</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Umbral 0.5 para hombres, 0.45 para mujeres</span></span>
-<span id="cb33-2"><a></a>R<span class="sc">&gt;</span> mitigated_pred <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
-<span id="cb33-3"><a></a><span class="sc">+</span>   test_data<span class="sc">$</span>Sex <span class="sc">==</span> <span class="st">&quot;male&quot;</span>,</span>
-<span id="cb33-4"><a></a><span class="sc">+</span>   <span class="fu">ifelse</span>(pred_probs <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">&quot;good&quot;</span>, <span class="st">&quot;bad&quot;</span>),</span>
-<span id="cb33-5"><a></a><span class="sc">+</span>   <span class="fu">ifelse</span>(pred_probs <span class="sc">&gt;</span> <span class="fl">0.45</span>, <span class="st">&quot;good&quot;</span>, <span class="st">&quot;bad&quot;</span>)</span>
-<span id="cb33-6"><a></a><span class="sc">+</span> )</span>
-<span id="cb33-7"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb33-8"><a></a>R<span class="sc">&gt;</span> test_data <span class="sc">|&gt;</span></span>
-<span id="cb33-9"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">orig =</span> pred_class, <span class="at">mitig =</span> mitigated_pred) <span class="sc">|&gt;</span></span>
-<span id="cb33-10"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(Sex) <span class="sc">|&gt;</span></span>
-<span id="cb33-11"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(</span>
-<span id="cb33-12"><a></a><span class="sc">+</span>     <span class="at">fpr_orig =</span> <span class="fu">sum</span>(orig <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>),</span>
-<span id="cb33-13"><a></a><span class="sc">+</span>     <span class="at">fpr_mitig =</span> <span class="fu">sum</span>(mitig <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>),</span>
-<span id="cb33-14"><a></a><span class="sc">+</span>     <span class="at">acc_orig =</span> <span class="fu">mean</span>(orig <span class="sc">==</span> Risk),</span>
-<span id="cb33-15"><a></a><span class="sc">+</span>     <span class="at">acc_mitig =</span> <span class="fu">mean</span>(mitig <span class="sc">==</span> Risk),</span>
-<span id="cb33-16"><a></a><span class="sc">+</span>     <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb33-17"><a></a><span class="sc">+</span>   ) <span class="sc">|&gt;</span></span>
-<span id="cb33-18"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Un umbral por grupo: 0.5 para hombres, 0.4 para mujeres</span></span>
+<span id="cb31-2"><a></a>R<span class="sc">&gt;</span> umbral <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(test_data<span class="sc">$</span>Sex <span class="sc">==</span> <span class="st">&quot;male&quot;</span>, <span class="fl">0.5</span>, <span class="fl">0.4</span>)</span>
+<span id="cb31-3"><a></a>R<span class="sc">&gt;</span> mitigated_pred <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pred_probs <span class="sc">&gt;</span> umbral, <span class="st">&quot;good&quot;</span>, <span class="st">&quot;bad&quot;</span>)</span>
+<span id="cb31-4"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb31-5"><a></a>R<span class="sc">&gt;</span> test_data <span class="sc">|&gt;</span></span>
+<span id="cb31-6"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="at">orig =</span> pred_class, <span class="at">mitig =</span> mitigated_pred) <span class="sc">|&gt;</span></span>
+<span id="cb31-7"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(Sex) <span class="sc">|&gt;</span></span>
+<span id="cb31-8"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(</span>
+<span id="cb31-9"><a></a><span class="sc">+</span>     <span class="at">fpr_orig =</span> <span class="fu">sum</span>(orig <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>),</span>
+<span id="cb31-10"><a></a><span class="sc">+</span>     <span class="at">fpr_mitig =</span> <span class="fu">sum</span>(mitig <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>),</span>
+<span id="cb31-11"><a></a><span class="sc">+</span>     <span class="at">acc_orig =</span> <span class="fu">mean</span>(orig <span class="sc">==</span> Risk),</span>
+<span id="cb31-12"><a></a><span class="sc">+</span>     <span class="at">acc_mitig =</span> <span class="fu">mean</span>(mitig <span class="sc">==</span> Risk),</span>
+<span id="cb31-13"><a></a><span class="sc">+</span>     <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb31-14"><a></a><span class="sc">+</span>   ) <span class="sc">|&gt;</span></span>
+<span id="cb31-15"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 5
   Sex    fpr_orig fpr_mitig acc_orig acc_mitig
   &lt;fct&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-1 female    0.545     0.667    0.685     0.685
+1 female    0.545     0.667    0.685     0.708
 2 male      0.737     0.737    0.693     0.693</code></pre>
 </div>
 </div>
-</div><div class="column" style="width:45%;">
+</div><div class="column" style="width:30%;">
 <div style="font-size: 21px;">
 <p><strong>Consideraciones</strong></p>
 <ul>
@@ -2004,7 +1978,7 @@ Fairness check for models: Regresión logística
 <li>La mitigación <span class="alert">mueve</span> el problema: mejora una métrica y empeora otra</li>
 </ul>
 <div style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;">
-<p><span class="alert">La decisión de usar umbrales diferenciados es política, no técnica.</span></p>
+<p><span class="alert">La decisión de usar umbrales diferenciados es política, no técnica</span></p>
 </div>
 <p><a href="#/sec:apendice-umbrales"><span class="button">Apéndice: explorar umbrales en detalle</span></a></p>
 </div>
@@ -2022,16 +1996,16 @@ Fairness check for models: Regresión logística
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><strong>Escenario:</strong></p>
-<p>Son consultores de un banco uruguayo que quiere implementar un modelo de scoring crediticio.</p>
+<p>Son consultores de un banco uruguayo que quiere implementar un modelo de scoring crediticio</p>
 <p>El análisis muestra que el modelo tiene:</p>
 <ul>
 <li><span class="alert">FPR más alto para mujeres</span>: más mujeres buenas pagadoras son rechazadas</li>
 <li><span class="alert">Accuracy similar</span> entre grupos</li>
 <li><span class="alert">Calibración correcta</span>: las probabilidades significan lo mismo</li>
 </ul>
-<p>El banco les pide una recomendación.</p>
+<p>El banco les pide una recomendación</p>
 </div><div class="column" style="width:50%;">
-<p><strong>Preguntas para discutir (15 min):</strong></p>
+<p><strong>Preguntas para discutir (5 min):</strong></p>
 <ol type="1">
 <li>¿Deberían usar <span class="alert">umbrales diferenciados</span> por sexo?</li>
 <li>Si lo hacen, ¿es <span class="alert">discriminación positiva</span> o simplemente <span class="alert">corrección de sesgo</span>?</li>
@@ -2040,7 +2014,7 @@ Fairness check for models: Regresión logística
 <li>¿La ley uruguaya permite trato diferenciado por sexo en decisiones de crédito?</li>
 </ol>
 <div style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;">
-<p><strong>Divídanse en grupos de 4. Cada grupo presentará su recomendación (3 min).</strong></p>
+<p><strong>Divídanse en grupos de 4</strong></p>
 </div>
 </div></div>
 </div>
@@ -2056,7 +2030,7 @@ Fairness check for models: Regresión logística
 <div class="columns">
 <div class="column" style="width:55%;">
 <p><strong>Tarea (5 min):</strong></p>
-<p>Vimos que los errores del modelo se concentran en fronteras entre categorías. Mejoren el codebook con <span class="alert">reglas de decisión explícitas</span> y midan si la validación mejora.</p>
+<p>Vimos que los errores del modelo se concentran en fronteras entre categorías. Mejoren el codebook con <span class="alert">reglas de decisión explícitas</span> y midan si la validación mejora</p>
 <ol type="1">
 <li>Copien <code>codebook_motivos</code> y agreguen a <code>instructions</code> reglas para los casos límite. Por ejemplo: si hay amenazas o temor a represalias, es <code>miedo</code> aunque también haya desconfianza</li>
 <li>Re-codifiquen con <code>qlm_code()</code> y el modelo local</li>
@@ -2069,9 +2043,6 @@ Fairness check for models: Regresión logística
 <li>Las reglas de decisión y el orden de prioridad entre categorías son práctica estándar en codebooks cualitativos. El LLM las aprovecha igual que un asistente humano</li>
 <li>Revisen los errores de la diapositiva “¿Dónde se equivoca?” para decidir qué reglas escribir</li>
 </ul>
-<div style="margin-top: 20px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;">
-<p><strong>Tiempo:</strong> 10 minutos, en parejas</p>
-</div>
 <p><a href="#/sec:appendix01"><span class="button">Solución</span></a></p>
 </div>
 </div></div>
@@ -2091,24 +2062,24 @@ Fairness check for models: Regresión logística
 </ol>
 <p><strong>Código inicial:</strong></p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>R<span class="sc">&gt;</span> test_data <span class="ot">&lt;-</span> test_data <span class="sc">|&gt;</span></span>
-<span id="cb35-2"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(</span>
-<span id="cb35-3"><a></a><span class="sc">+</span>     <span class="at">Age_group =</span> <span class="fu">case_when</span>(</span>
-<span id="cb35-4"><a></a><span class="sc">+</span>       Age <span class="sc">&lt;</span> <span class="dv">30</span> <span class="sc">~</span> <span class="st">&quot;joven&quot;</span>,</span>
-<span id="cb35-5"><a></a><span class="sc">+</span>       Age <span class="sc">&lt;</span> <span class="dv">50</span> <span class="sc">~</span> <span class="st">&quot;adulto&quot;</span>,</span>
-<span id="cb35-6"><a></a><span class="sc">+</span>       <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;mayor&quot;</span></span>
-<span id="cb35-7"><a></a><span class="sc">+</span>     )</span>
-<span id="cb35-8"><a></a><span class="sc">+</span>   )</span>
-<span id="cb35-9"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb35-10"><a></a>R<span class="sc">&gt;</span> fobject_age <span class="ot">&lt;-</span> <span class="fu">fairness_check</span>(</span>
-<span id="cb35-11"><a></a><span class="sc">+</span>   explainer,</span>
-<span id="cb35-12"><a></a><span class="sc">+</span>   <span class="at">protected =</span> test_data<span class="sc">$</span>Age_group,</span>
-<span id="cb35-13"><a></a><span class="sc">+</span>   <span class="at">privileged =</span> <span class="st">&quot;adulto&quot;</span>,</span>
-<span id="cb35-14"><a></a><span class="sc">+</span>   <span class="at">cutoff =</span> <span class="fl">0.5</span>,</span>
-<span id="cb35-15"><a></a><span class="sc">+</span>   <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb35-16"><a></a><span class="sc">+</span> )</span>
-<span id="cb35-17"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb35-18"><a></a>R<span class="sc">&gt;</span> <span class="fu">plot</span>(fobject_age)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a></a>R<span class="sc">&gt;</span> test_data <span class="ot">&lt;-</span> test_data <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(</span>
+<span id="cb33-3"><a></a><span class="sc">+</span>     <span class="at">Age_group =</span> <span class="fu">case_when</span>(</span>
+<span id="cb33-4"><a></a><span class="sc">+</span>       Age <span class="sc">&lt;</span> <span class="dv">30</span> <span class="sc">~</span> <span class="st">&quot;joven&quot;</span>,</span>
+<span id="cb33-5"><a></a><span class="sc">+</span>       Age <span class="sc">&lt;</span> <span class="dv">50</span> <span class="sc">~</span> <span class="st">&quot;adulto&quot;</span>,</span>
+<span id="cb33-6"><a></a><span class="sc">+</span>       <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;mayor&quot;</span></span>
+<span id="cb33-7"><a></a><span class="sc">+</span>     )</span>
+<span id="cb33-8"><a></a><span class="sc">+</span>   )</span>
+<span id="cb33-9"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb33-10"><a></a>R<span class="sc">&gt;</span> fobject_age <span class="ot">&lt;-</span> <span class="fu">fairness_check</span>(</span>
+<span id="cb33-11"><a></a><span class="sc">+</span>   explainer,</span>
+<span id="cb33-12"><a></a><span class="sc">+</span>   <span class="at">protected =</span> test_data<span class="sc">$</span>Age_group,</span>
+<span id="cb33-13"><a></a><span class="sc">+</span>   <span class="at">privileged =</span> <span class="st">&quot;adulto&quot;</span>,</span>
+<span id="cb33-14"><a></a><span class="sc">+</span>   <span class="at">cutoff =</span> <span class="fl">0.5</span>,</span>
+<span id="cb33-15"><a></a><span class="sc">+</span>   <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb33-16"><a></a><span class="sc">+</span> )</span>
+<span id="cb33-17"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb33-18"><a></a>R<span class="sc">&gt;</span> <span class="fu">plot</span>(fobject_age)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div><div class="column" style="width:45%;">
 <p><strong>Preguntas a responder:</strong></p>
@@ -2119,8 +2090,7 @@ Fairness check for models: Regresión logística
 <li><p>¿Cómo se compara el sesgo por edad con el sesgo por sexo?</p></li>
 </ol>
 <div style="margin-top: 20px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;">
-<p><strong>Tiempo:</strong> 5 minutos</p>
-<p>Trabajen individualmente o en parejas. Pueden consultar la documentación de fairmodels.</p>
+<p>Trabajen individualmente o en parejas. Pueden consultar la documentación de fairmodels</p>
 </div>
 <p><a href="#/sec:appendix02"><span class="button">Solución</span></a></p>
 </div></div>
@@ -2160,34 +2130,34 @@ Fairness check for models: Regresión logística
 <div style="margin-top: 20px; font-size: 19px;">
 <p>Un codebook con reglas de decisión para los casos límite:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a></a>R<span class="sc">&gt;</span> codebook_motivos_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
-<span id="cb36-2"><a></a><span class="sc">+</span>   <span class="at">name =</span> <span class="st">&quot;motivos_no_denuncia_v2&quot;</span>,</span>
-<span id="cb36-3"><a></a><span class="sc">+</span>   <span class="at">instructions =</span> <span class="st">&quot;Leé el fragmento de entrevista. La persona fue víctima de un delito</span></span>
-<span id="cb36-4"><a></a><span class="st">+   y no hizo la denuncia. Clasificá el MOTIVO PRINCIPAL en una de estas categorías:</span></span>
-<span id="cb36-5"><a></a><span class="st">+   - desconfianza: no cree que la policía o la justicia investiguen o resuelvan nada</span></span>
-<span id="cb36-6"><a></a><span class="st">+   - miedo: teme represalias del agresor o de su entorno</span></span>
-<span id="cb36-7"><a></a><span class="st">+   - costo: el trámite implica demasiado tiempo, viajes o burocracia</span></span>
-<span id="cb36-8"><a></a><span class="st">+   - poca_gravedad: considera que el hecho no fue suficientemente grave</span></span>
-<span id="cb36-9"><a></a><span class="st">+   - resolucion_propia: resolvió el problema por su cuenta o por otra vía</span></span>
-<span id="cb36-10"><a></a><span class="st">+   Reglas de decisión, en orden de prioridad:</span></span>
-<span id="cb36-11"><a></a><span class="st">+   1. Si menciona amenazas, represalias o temor por su seguridad o la de su familia,</span></span>
-<span id="cb36-12"><a></a><span class="st">+      es &#39;miedo&#39;, aunque también exprese desconfianza en la policía.</span></span>
-<span id="cb36-13"><a></a><span class="st">+   2. Si el problema ya se resolvió por otra vía (acuerdo, devolución, gestión propia),</span></span>
-<span id="cb36-14"><a></a><span class="st">+      es &#39;resolucion_propia&#39;, aunque el hecho fuera menor.</span></span>
-<span id="cb36-15"><a></a><span class="st">+   3. Si el obstáculo es el trámite (tiempo, distancia, burocracia, sistemas caídos),</span></span>
-<span id="cb36-16"><a></a><span class="st">+      es &#39;costo&#39;, aunque el monto perdido sea chico.</span></span>
-<span id="cb36-17"><a></a><span class="st">+   4. &#39;poca_gravedad&#39; sólo cuando el argumento central es que el hecho no era serio.</span></span>
-<span id="cb36-18"><a></a><span class="st">+   Elegí UNA sola categoría.&quot;</span>,</span>
-<span id="cb36-19"><a></a><span class="sc">+</span>   <span class="at">schema =</span> <span class="fu">type_object</span>(</span>
-<span id="cb36-20"><a></a><span class="sc">+</span>     <span class="at">motivo =</span> <span class="fu">type_enum</span>(</span>
-<span id="cb36-21"><a></a><span class="sc">+</span>       <span class="fu">c</span>(<span class="st">&quot;desconfianza&quot;</span>, <span class="st">&quot;miedo&quot;</span>, <span class="st">&quot;costo&quot;</span>, <span class="st">&quot;poca_gravedad&quot;</span>, <span class="st">&quot;resolucion_propia&quot;</span>),</span>
-<span id="cb36-22"><a></a><span class="sc">+</span>       <span class="st">&quot;El motivo principal por el que no denunció&quot;</span></span>
-<span id="cb36-23"><a></a><span class="sc">+</span>     ),</span>
-<span id="cb36-24"><a></a><span class="sc">+</span>     <span class="at">justificacion =</span> <span class="fu">type_string</span>(<span class="st">&quot;Una oración que justifique la categoría elegida&quot;</span>)</span>
-<span id="cb36-25"><a></a><span class="sc">+</span>   ),</span>
-<span id="cb36-26"><a></a><span class="sc">+</span>   <span class="at">role =</span> <span class="st">&quot;Sos un investigador experto en criminología y encuestas de victimización.&quot;</span>,</span>
-<span id="cb36-27"><a></a><span class="sc">+</span>   <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">motivo =</span> <span class="st">&quot;nominal&quot;</span>, <span class="at">justificacion =</span> <span class="st">&quot;nominal&quot;</span>)</span>
-<span id="cb36-28"><a></a><span class="sc">+</span> )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a></a>R<span class="sc">&gt;</span> codebook_motivos_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
+<span id="cb34-2"><a></a><span class="sc">+</span>   <span class="at">name =</span> <span class="st">&quot;motivos_no_denuncia_v2&quot;</span>,</span>
+<span id="cb34-3"><a></a><span class="sc">+</span>   <span class="at">instructions =</span> <span class="st">&quot;Leé el fragmento de entrevista. La persona fue víctima de un delito</span></span>
+<span id="cb34-4"><a></a><span class="st">+   y no hizo la denuncia. Clasificá el MOTIVO PRINCIPAL en una de estas categorías:</span></span>
+<span id="cb34-5"><a></a><span class="st">+   - desconfianza: no cree que la policía o la justicia investiguen o resuelvan nada</span></span>
+<span id="cb34-6"><a></a><span class="st">+   - miedo: teme represalias del agresor o de su entorno</span></span>
+<span id="cb34-7"><a></a><span class="st">+   - costo: el trámite implica demasiado tiempo, viajes o burocracia</span></span>
+<span id="cb34-8"><a></a><span class="st">+   - poca_gravedad: considera que el hecho no fue suficientemente grave</span></span>
+<span id="cb34-9"><a></a><span class="st">+   - resolucion_propia: resolvió el problema por su cuenta o por otra vía</span></span>
+<span id="cb34-10"><a></a><span class="st">+   Reglas de decisión, en orden de prioridad:</span></span>
+<span id="cb34-11"><a></a><span class="st">+   1. Si menciona amenazas, represalias o temor por su seguridad o la de su familia,</span></span>
+<span id="cb34-12"><a></a><span class="st">+      es &#39;miedo&#39;, aunque también exprese desconfianza en la policía.</span></span>
+<span id="cb34-13"><a></a><span class="st">+   2. Si el problema ya se resolvió por otra vía (acuerdo, devolución, gestión propia),</span></span>
+<span id="cb34-14"><a></a><span class="st">+      es &#39;resolucion_propia&#39;, aunque el hecho fuera menor.</span></span>
+<span id="cb34-15"><a></a><span class="st">+   3. Si el obstáculo es el trámite (tiempo, distancia, burocracia, sistemas caídos),</span></span>
+<span id="cb34-16"><a></a><span class="st">+      es &#39;costo&#39;, aunque el monto perdido sea chico.</span></span>
+<span id="cb34-17"><a></a><span class="st">+   4. &#39;poca_gravedad&#39; sólo cuando el argumento central es que el hecho no era serio.</span></span>
+<span id="cb34-18"><a></a><span class="st">+   Elegí UNA sola categoría.&quot;</span>,</span>
+<span id="cb34-19"><a></a><span class="sc">+</span>   <span class="at">schema =</span> <span class="fu">type_object</span>(</span>
+<span id="cb34-20"><a></a><span class="sc">+</span>     <span class="at">motivo =</span> <span class="fu">type_enum</span>(</span>
+<span id="cb34-21"><a></a><span class="sc">+</span>       <span class="fu">c</span>(<span class="st">&quot;desconfianza&quot;</span>, <span class="st">&quot;miedo&quot;</span>, <span class="st">&quot;costo&quot;</span>, <span class="st">&quot;poca_gravedad&quot;</span>, <span class="st">&quot;resolucion_propia&quot;</span>),</span>
+<span id="cb34-22"><a></a><span class="sc">+</span>       <span class="st">&quot;El motivo principal por el que no denunció&quot;</span></span>
+<span id="cb34-23"><a></a><span class="sc">+</span>     ),</span>
+<span id="cb34-24"><a></a><span class="sc">+</span>     <span class="at">justificacion =</span> <span class="fu">type_string</span>(<span class="st">&quot;Una oración que justifique la categoría elegida&quot;</span>)</span>
+<span id="cb34-25"><a></a><span class="sc">+</span>   ),</span>
+<span id="cb34-26"><a></a><span class="sc">+</span>   <span class="at">role =</span> <span class="st">&quot;Sos un investigador experto en criminología y encuestas de victimización.&quot;</span>,</span>
+<span id="cb34-27"><a></a><span class="sc">+</span>   <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">motivo =</span> <span class="st">&quot;nominal&quot;</span>, <span class="at">justificacion =</span> <span class="st">&quot;nominal&quot;</span>)</span>
+<span id="cb34-28"><a></a><span class="sc">+</span> )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
@@ -2195,23 +2165,23 @@ Fairness check for models: Regresión logística
 <h2>Solución Ejercicio 1 (continuación)</h2>
 <div style="margin-top: 30px; font-size: 21px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a>R<span class="sc">&gt;</span> codificado_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(</span>
-<span id="cb37-2"><a></a><span class="sc">+</span>   entrevistas<span class="sc">$</span>texto,</span>
-<span id="cb37-3"><a></a><span class="sc">+</span>   codebook_motivos_v2,</span>
-<span id="cb37-4"><a></a><span class="sc">+</span>   <span class="at">model =</span> <span class="st">&quot;ollama/granite4.1:3b&quot;</span>,</span>
-<span id="cb37-5"><a></a><span class="sc">+</span>   <span class="at">max_active =</span> <span class="dv">1</span>,</span>
-<span id="cb37-6"><a></a><span class="sc">+</span>   <span class="at">params =</span> <span class="fu">params</span>(<span class="at">temperature =</span> <span class="dv">0</span>),</span>
-<span id="cb37-7"><a></a><span class="sc">+</span>   <span class="at">name =</span> <span class="st">&quot;granite_local_v2&quot;</span></span>
-<span id="cb37-8"><a></a><span class="sc">+</span> )</span>
-<span id="cb37-9"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb37-10"><a></a>R<span class="sc">&gt;</span> validacion_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_validate</span>(</span>
-<span id="cb37-11"><a></a><span class="sc">+</span>   codificado_v2,</span>
-<span id="cb37-12"><a></a><span class="sc">+</span>   <span class="at">gold =</span> gold,</span>
-<span id="cb37-13"><a></a><span class="sc">+</span>   <span class="at">by =</span> <span class="st">&quot;motivo&quot;</span>,</span>
-<span id="cb37-14"><a></a><span class="sc">+</span>   <span class="at">level =</span> <span class="st">&quot;nominal&quot;</span></span>
-<span id="cb37-15"><a></a><span class="sc">+</span> )</span>
-<span id="cb37-16"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb37-17"><a></a>R<span class="sc">&gt;</span> <span class="fu">as_tibble</span>(validacion_v2) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a></a>R<span class="sc">&gt;</span> codificado_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_code</span>(</span>
+<span id="cb35-2"><a></a><span class="sc">+</span>   entrevistas<span class="sc">$</span>texto,</span>
+<span id="cb35-3"><a></a><span class="sc">+</span>   codebook_motivos_v2,</span>
+<span id="cb35-4"><a></a><span class="sc">+</span>   <span class="at">model =</span> <span class="st">&quot;ollama/granite4.1:3b&quot;</span>,</span>
+<span id="cb35-5"><a></a><span class="sc">+</span>   <span class="at">max_active =</span> <span class="dv">1</span>,</span>
+<span id="cb35-6"><a></a><span class="sc">+</span>   <span class="at">params =</span> <span class="fu">params</span>(<span class="at">temperature =</span> <span class="dv">0</span>),</span>
+<span id="cb35-7"><a></a><span class="sc">+</span>   <span class="at">name =</span> <span class="st">&quot;granite_local_v2&quot;</span></span>
+<span id="cb35-8"><a></a><span class="sc">+</span> )</span>
+<span id="cb35-9"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb35-10"><a></a>R<span class="sc">&gt;</span> validacion_v2 <span class="ot">&lt;-</span> <span class="fu">qlm_validate</span>(</span>
+<span id="cb35-11"><a></a><span class="sc">+</span>   codificado_v2,</span>
+<span id="cb35-12"><a></a><span class="sc">+</span>   <span class="at">gold =</span> gold,</span>
+<span id="cb35-13"><a></a><span class="sc">+</span>   <span class="at">by =</span> <span class="st">&quot;motivo&quot;</span>,</span>
+<span id="cb35-14"><a></a><span class="sc">+</span>   <span class="at">level =</span> <span class="st">&quot;nominal&quot;</span></span>
+<span id="cb35-15"><a></a><span class="sc">+</span> )</span>
+<span id="cb35-16"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb35-17"><a></a>R<span class="sc">&gt;</span> <span class="fu">as_tibble</span>(validacion_v2) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 2
   measure   value
@@ -2225,7 +2195,7 @@ Fairness check for models: Regresión logística
 </div>
 <div style="margin-top: 15px;">
 <ul>
-<li>Comparen con la validación original. Ojo: con 16 textos, cada caso vale <span class="alert">6 puntos</span> de accuracy, así que la mejora puede ser chica o nula en esta muestra. El efecto de las reglas se nota en corpus grandes y en la <span class="alert">estabilidad</span> entre corridas</li>
+<li>Comparen con la validación original. Con 16 textos, cada caso vale <span class="alert">6 puntos</span> de accuracy, así que la mejora puede ser chica o nula en esta muestra. El efecto de las reglas se nota en corpus grandes y en la <span class="alert">estabilidad</span> entre corridas</li>
 <li>La lección metodológica: cuando el codificador falla, el primer sospechoso es el <span class="alert">codebook</span>, no el modelo</li>
 </ul>
 </div>
@@ -2236,27 +2206,27 @@ Fairness check for models: Regresión logística
 <h2>Solución Ejercicio 2</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Crear grupos de edad</span></span>
-<span id="cb39-2"><a></a>R<span class="sc">&gt;</span> test_data <span class="ot">&lt;-</span> test_data <span class="sc">|&gt;</span></span>
-<span id="cb39-3"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(</span>
-<span id="cb39-4"><a></a><span class="sc">+</span>     <span class="at">Age_group =</span> <span class="fu">case_when</span>(</span>
-<span id="cb39-5"><a></a><span class="sc">+</span>       Age <span class="sc">&lt;</span> <span class="dv">30</span> <span class="sc">~</span> <span class="st">&quot;joven&quot;</span>,</span>
-<span id="cb39-6"><a></a><span class="sc">+</span>       Age <span class="sc">&lt;</span> <span class="dv">50</span> <span class="sc">~</span> <span class="st">&quot;adulto&quot;</span>,</span>
-<span id="cb39-7"><a></a><span class="sc">+</span>       <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;mayor&quot;</span></span>
-<span id="cb39-8"><a></a><span class="sc">+</span>     )</span>
-<span id="cb39-9"><a></a><span class="sc">+</span>   )</span>
-<span id="cb39-10"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb39-11"><a></a>R<span class="sc">&gt;</span> <span class="co"># Crear objeto fairness por edad</span></span>
-<span id="cb39-12"><a></a>R<span class="sc">&gt;</span> fobject_age <span class="ot">&lt;-</span> <span class="fu">fairness_check</span>(</span>
-<span id="cb39-13"><a></a><span class="sc">+</span>   explainer,</span>
-<span id="cb39-14"><a></a><span class="sc">+</span>   <span class="at">protected =</span> test_data<span class="sc">$</span>Age_group,</span>
-<span id="cb39-15"><a></a><span class="sc">+</span>   <span class="at">privileged =</span> <span class="st">&quot;adulto&quot;</span>,</span>
-<span id="cb39-16"><a></a><span class="sc">+</span>   <span class="at">cutoff =</span> <span class="fl">0.5</span>,</span>
-<span id="cb39-17"><a></a><span class="sc">+</span>   <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
-<span id="cb39-18"><a></a><span class="sc">+</span> )</span>
-<span id="cb39-19"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb39-20"><a></a>R<span class="sc">&gt;</span> <span class="co"># Visualizar</span></span>
-<span id="cb39-21"><a></a>R<span class="sc">&gt;</span> <span class="fu">plot</span>(fobject_age)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Crear grupos de edad</span></span>
+<span id="cb37-2"><a></a>R<span class="sc">&gt;</span> test_data <span class="ot">&lt;-</span> test_data <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(</span>
+<span id="cb37-4"><a></a><span class="sc">+</span>     <span class="at">Age_group =</span> <span class="fu">case_when</span>(</span>
+<span id="cb37-5"><a></a><span class="sc">+</span>       Age <span class="sc">&lt;</span> <span class="dv">30</span> <span class="sc">~</span> <span class="st">&quot;joven&quot;</span>,</span>
+<span id="cb37-6"><a></a><span class="sc">+</span>       Age <span class="sc">&lt;</span> <span class="dv">50</span> <span class="sc">~</span> <span class="st">&quot;adulto&quot;</span>,</span>
+<span id="cb37-7"><a></a><span class="sc">+</span>       <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;mayor&quot;</span></span>
+<span id="cb37-8"><a></a><span class="sc">+</span>     )</span>
+<span id="cb37-9"><a></a><span class="sc">+</span>   )</span>
+<span id="cb37-10"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb37-11"><a></a>R<span class="sc">&gt;</span> <span class="co"># Crear objeto fairness por edad</span></span>
+<span id="cb37-12"><a></a>R<span class="sc">&gt;</span> fobject_age <span class="ot">&lt;-</span> <span class="fu">fairness_check</span>(</span>
+<span id="cb37-13"><a></a><span class="sc">+</span>   explainer,</span>
+<span id="cb37-14"><a></a><span class="sc">+</span>   <span class="at">protected =</span> test_data<span class="sc">$</span>Age_group,</span>
+<span id="cb37-15"><a></a><span class="sc">+</span>   <span class="at">privileged =</span> <span class="st">&quot;adulto&quot;</span>,</span>
+<span id="cb37-16"><a></a><span class="sc">+</span>   <span class="at">cutoff =</span> <span class="fl">0.5</span>,</span>
+<span id="cb37-17"><a></a><span class="sc">+</span>   <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb37-18"><a></a><span class="sc">+</span> )</span>
+<span id="cb37-19"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb37-20"><a></a>R<span class="sc">&gt;</span> <span class="co"># Visualizar</span></span>
+<span id="cb37-21"><a></a>R<span class="sc">&gt;</span> <span class="fu">plot</span>(fobject_age)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2272,28 +2242,28 @@ Fairness check for models: Regresión logística
 <h2>Apéndice: explorar umbrales en detalle</h2>
 <div style="margin-top: 30px; font-size: 21px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Función para calcular métricas con umbral personalizado</span></span>
-<span id="cb40-2"><a></a>R<span class="sc">&gt;</span> calc_metrics_threshold <span class="ot">&lt;-</span> <span class="cf">function</span>(data, probs, threshold) {</span>
-<span id="cb40-3"><a></a><span class="sc">+</span>   pred <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(probs <span class="sc">&gt;</span> threshold, <span class="st">&quot;good&quot;</span>, <span class="st">&quot;bad&quot;</span>)</span>
-<span id="cb40-4"><a></a><span class="sc">+</span>   data <span class="sc">|&gt;</span></span>
-<span id="cb40-5"><a></a><span class="sc">+</span>     <span class="fu">mutate</span>(<span class="at">pred =</span> pred) <span class="sc">|&gt;</span></span>
-<span id="cb40-6"><a></a><span class="sc">+</span>     <span class="fu">group_by</span>(Sex) <span class="sc">|&gt;</span></span>
-<span id="cb40-7"><a></a><span class="sc">+</span>     <span class="fu">summarise</span>(</span>
-<span id="cb40-8"><a></a><span class="sc">+</span>       <span class="at">threshold =</span> threshold,</span>
-<span id="cb40-9"><a></a><span class="sc">+</span>       <span class="at">accuracy =</span> <span class="fu">mean</span>(pred <span class="sc">==</span> Risk),</span>
-<span id="cb40-10"><a></a><span class="sc">+</span>       <span class="at">tpr =</span> <span class="fu">sum</span>(pred <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;good&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;good&quot;</span>),</span>
-<span id="cb40-11"><a></a><span class="sc">+</span>       <span class="at">fpr =</span> <span class="fu">sum</span>(pred <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>),</span>
-<span id="cb40-12"><a></a><span class="sc">+</span>       <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb40-13"><a></a><span class="sc">+</span>     )</span>
-<span id="cb40-14"><a></a><span class="sc">+</span> }</span>
-<span id="cb40-15"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb40-16"><a></a>R<span class="sc">&gt;</span> <span class="co"># Probar varios umbrales</span></span>
-<span id="cb40-17"><a></a>R<span class="sc">&gt;</span> thresholds <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span>, <span class="fl">0.7</span>)</span>
-<span id="cb40-18"><a></a>R<span class="sc">&gt;</span> results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(thresholds, <span class="sc">~</span><span class="fu">calc_metrics_threshold</span>(test_data, pred_probs, .x))</span>
-<span id="cb40-19"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb40-20"><a></a>R<span class="sc">&gt;</span> results <span class="sc">|&gt;</span></span>
-<span id="cb40-21"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(Sex, threshold) <span class="sc">|&gt;</span></span>
-<span id="cb40-22"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Función para calcular métricas con umbral personalizado</span></span>
+<span id="cb38-2"><a></a>R<span class="sc">&gt;</span> calc_metrics_threshold <span class="ot">&lt;-</span> <span class="cf">function</span>(data, probs, threshold) {</span>
+<span id="cb38-3"><a></a><span class="sc">+</span>   pred <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(probs <span class="sc">&gt;</span> threshold, <span class="st">&quot;good&quot;</span>, <span class="st">&quot;bad&quot;</span>)</span>
+<span id="cb38-4"><a></a><span class="sc">+</span>   data <span class="sc">|&gt;</span></span>
+<span id="cb38-5"><a></a><span class="sc">+</span>     <span class="fu">mutate</span>(<span class="at">pred =</span> pred) <span class="sc">|&gt;</span></span>
+<span id="cb38-6"><a></a><span class="sc">+</span>     <span class="fu">group_by</span>(Sex) <span class="sc">|&gt;</span></span>
+<span id="cb38-7"><a></a><span class="sc">+</span>     <span class="fu">summarise</span>(</span>
+<span id="cb38-8"><a></a><span class="sc">+</span>       <span class="at">threshold =</span> threshold,</span>
+<span id="cb38-9"><a></a><span class="sc">+</span>       <span class="at">accuracy =</span> <span class="fu">mean</span>(pred <span class="sc">==</span> Risk),</span>
+<span id="cb38-10"><a></a><span class="sc">+</span>       <span class="at">tpr =</span> <span class="fu">sum</span>(pred <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;good&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;good&quot;</span>),</span>
+<span id="cb38-11"><a></a><span class="sc">+</span>       <span class="at">fpr =</span> <span class="fu">sum</span>(pred <span class="sc">==</span> <span class="st">&quot;good&quot;</span> <span class="sc">&amp;</span> Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>) <span class="sc">/</span> <span class="fu">sum</span>(Risk <span class="sc">==</span> <span class="st">&quot;bad&quot;</span>),</span>
+<span id="cb38-12"><a></a><span class="sc">+</span>       <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb38-13"><a></a><span class="sc">+</span>     )</span>
+<span id="cb38-14"><a></a><span class="sc">+</span> }</span>
+<span id="cb38-15"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb38-16"><a></a>R<span class="sc">&gt;</span> <span class="co"># Probar varios umbrales</span></span>
+<span id="cb38-17"><a></a>R<span class="sc">&gt;</span> thresholds <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.4</span>, <span class="fl">0.5</span>, <span class="fl">0.6</span>, <span class="fl">0.7</span>)</span>
+<span id="cb38-18"><a></a>R<span class="sc">&gt;</span> results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(thresholds, <span class="sc">~</span><span class="fu">calc_metrics_threshold</span>(test_data, pred_probs, .x))</span>
+<span id="cb38-19"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb38-20"><a></a>R<span class="sc">&gt;</span> results <span class="sc">|&gt;</span></span>
+<span id="cb38-21"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(Sex, threshold) <span class="sc">|&gt;</span></span>
+<span id="cb38-22"><a></a><span class="sc">+</span>   <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 5
    Sex    threshold accuracy   tpr   fpr
@@ -2311,22 +2281,23 @@ Fairness check for models: Regresión logística
 </div>
 </div>
 </div>
+<p><a href="#/sec:mitigacion"><span class="button">Volver a mitigación</span></a></p>
 </section>
 <section id="apéndice-visualizar-el-trade-off" class="slide level2">
 <h2>Apéndice: visualizar el trade-off</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a></a>R<span class="sc">&gt;</span> results <span class="sc">|&gt;</span></span>
-<span id="cb42-2"><a></a><span class="sc">+</span>   <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(accuracy, tpr, fpr), <span class="at">names_to =</span> <span class="st">&quot;metric&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb42-3"><a></a><span class="sc">+</span>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(threshold), <span class="at">y =</span> value, <span class="at">color =</span> Sex, <span class="at">group =</span> Sex)) <span class="sc">+</span></span>
-<span id="cb42-4"><a></a><span class="sc">+</span>   <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb42-5"><a></a><span class="sc">+</span>   <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb42-6"><a></a><span class="sc">+</span>   <span class="fu">facet_wrap</span>(<span class="sc">~</span>metric, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
-<span id="cb42-7"><a></a><span class="sc">+</span>   <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;female&quot;</span> <span class="ot">=</span> <span class="st">&quot;#e63946&quot;</span>, <span class="st">&quot;male&quot;</span> <span class="ot">=</span> <span class="st">&quot;#2d4563&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb42-8"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Efecto del umbral en métricas por grupo&quot;</span>,</span>
-<span id="cb42-9"><a></a><span class="sc">+</span>        <span class="at">x =</span> <span class="st">&quot;Umbral&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Valor&quot;</span>) <span class="sc">+</span></span>
-<span id="cb42-10"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
-<span id="cb42-11"><a></a><span class="sc">+</span>   <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a></a>R<span class="sc">&gt;</span> results <span class="sc">|&gt;</span></span>
+<span id="cb40-2"><a></a><span class="sc">+</span>   <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(accuracy, tpr, fpr), <span class="at">names_to =</span> <span class="st">&quot;metric&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;value&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a></a><span class="sc">+</span>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(threshold), <span class="at">y =</span> value, <span class="at">color =</span> Sex, <span class="at">group =</span> Sex)) <span class="sc">+</span></span>
+<span id="cb40-4"><a></a><span class="sc">+</span>   <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb40-5"><a></a><span class="sc">+</span>   <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb40-6"><a></a><span class="sc">+</span>   <span class="fu">facet_wrap</span>(<span class="sc">~</span>metric, <span class="at">scales =</span> <span class="st">&quot;free_y&quot;</span>) <span class="sc">+</span></span>
+<span id="cb40-7"><a></a><span class="sc">+</span>   <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;female&quot;</span> <span class="ot">=</span> <span class="st">&quot;#e63946&quot;</span>, <span class="st">&quot;male&quot;</span> <span class="ot">=</span> <span class="st">&quot;#2d4563&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb40-8"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Efecto del umbral en métricas por grupo&quot;</span>,</span>
+<span id="cb40-9"><a></a><span class="sc">+</span>        <span class="at">x =</span> <span class="st">&quot;Umbral&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Valor&quot;</span>) <span class="sc">+</span></span>
+<span id="cb40-10"><a></a><span class="sc">+</span>   <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb40-11"><a></a><span class="sc">+</span>   <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure>
@@ -2336,7 +2307,7 @@ Fairness check for models: Regresión logística
 </div>
 </div>
 <div style="margin-top: 10px;">
-<p><span class="alert">Diferentes umbrales afectan a los grupos de manera diferente.</span> En crédito: un falso positivo es un préstamo que no se paga; un falso negativo, un buen cliente rechazado.</p>
+<p><span class="alert">Diferentes umbrales afectan a los grupos de manera diferente.</span> En crédito: un falso positivo es un préstamo que no se paga; un falso negativo, un buen cliente rechazado</p>
 </div>
 <p><a href="#/sec:mitigacion"><span class="button">Volver a mitigación</span></a></p>
 </div>
@@ -2348,22 +2319,22 @@ Fairness check for models: Regresión logística
 <div class="column" style="width:55%;">
 <p>Si los datos <span class="alert">no fueran</span> sensibles, podríamos comparar el codificador local contra uno de la nube. <code>qlm_replicate()</code> acepta un modelo distinto:</p>
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a></a>R<span class="sc">&gt;</span> codificado_nube <span class="ot">&lt;-</span> <span class="fu">qlm_replicate</span>(</span>
-<span id="cb43-2"><a></a><span class="sc">+</span>   codificado,</span>
-<span id="cb43-3"><a></a><span class="sc">+</span>   <span class="at">model =</span> <span class="st">&quot;openrouter/nvidia/nemotron-3-super-120b-a12b:free&quot;</span>,</span>
-<span id="cb43-4"><a></a><span class="sc">+</span>   <span class="at">max_active =</span> <span class="dv">3</span>,</span>
-<span id="cb43-5"><a></a><span class="sc">+</span>   <span class="at">name =</span> <span class="st">&quot;nemotron_nube&quot;</span></span>
-<span id="cb43-6"><a></a><span class="sc">+</span> )</span>
-<span id="cb43-7"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb43-8"><a></a>R<span class="sc">&gt;</span> <span class="fu">qlm_compare</span>(</span>
-<span id="cb43-9"><a></a><span class="sc">+</span>   codificado, codificado_nube,</span>
-<span id="cb43-10"><a></a><span class="sc">+</span>   <span class="at">by =</span> <span class="st">&quot;motivo&quot;</span>, <span class="at">level =</span> <span class="st">&quot;nominal&quot;</span></span>
-<span id="cb43-11"><a></a><span class="sc">+</span> )</span>
-<span id="cb43-12"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb43-13"><a></a>R<span class="sc">&gt;</span> <span class="fu">qlm_validate</span>(</span>
-<span id="cb43-14"><a></a><span class="sc">+</span>   codificado_nube,</span>
-<span id="cb43-15"><a></a><span class="sc">+</span>   <span class="at">gold =</span> gold, <span class="at">by =</span> <span class="st">&quot;motivo&quot;</span>, <span class="at">level =</span> <span class="st">&quot;nominal&quot;</span></span>
-<span id="cb43-16"><a></a><span class="sc">+</span> )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a></a>R<span class="sc">&gt;</span> codificado_nube <span class="ot">&lt;-</span> <span class="fu">qlm_replicate</span>(</span>
+<span id="cb41-2"><a></a><span class="sc">+</span>   codificado,</span>
+<span id="cb41-3"><a></a><span class="sc">+</span>   <span class="at">model =</span> <span class="st">&quot;openrouter/nvidia/nemotron-3-super-120b-a12b:free&quot;</span>,</span>
+<span id="cb41-4"><a></a><span class="sc">+</span>   <span class="at">max_active =</span> <span class="dv">3</span>,</span>
+<span id="cb41-5"><a></a><span class="sc">+</span>   <span class="at">name =</span> <span class="st">&quot;nemotron_nube&quot;</span></span>
+<span id="cb41-6"><a></a><span class="sc">+</span> )</span>
+<span id="cb41-7"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb41-8"><a></a>R<span class="sc">&gt;</span> <span class="fu">qlm_compare</span>(</span>
+<span id="cb41-9"><a></a><span class="sc">+</span>   codificado, codificado_nube,</span>
+<span id="cb41-10"><a></a><span class="sc">+</span>   <span class="at">by =</span> <span class="st">&quot;motivo&quot;</span>, <span class="at">level =</span> <span class="st">&quot;nominal&quot;</span></span>
+<span id="cb41-11"><a></a><span class="sc">+</span> )</span>
+<span id="cb41-12"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb41-13"><a></a>R<span class="sc">&gt;</span> <span class="fu">qlm_validate</span>(</span>
+<span id="cb41-14"><a></a><span class="sc">+</span>   codificado_nube,</span>
+<span id="cb41-15"><a></a><span class="sc">+</span>   <span class="at">gold =</span> gold, <span class="at">by =</span> <span class="st">&quot;motivo&quot;</span>, <span class="at">level =</span> <span class="st">&quot;nominal&quot;</span></span>
+<span id="cb41-16"><a></a><span class="sc">+</span> )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div><div class="column" style="width:45%;">
 <div style="font-size: 21px;">
@@ -2388,64 +2359,6 @@ Fairness check for models: Regresión logística
 </div>
 </div></div>
 </div>
-</section>
-<section id="sec:metricas-glosario" class="slide level2">
-<h2>Apéndice: qué significa cada métrica</h2>
-<div style="margin-top: 20px; font-size: 21px;">
-<p>Cada barra del gráfico es un <span class="alert">ratio entre grupos</span> (mujeres ÷ hombres): 1,0 es igualdad perfecta y la zona verde (0,8 a 1,25) es la regla del 80%. El resultado “positivo” acá es <span class="alert">recibir el crédito</span> (que el modelo prediga <code>good</code>).</p>
-<table class="caption-top">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Métrica</th>
-<th>Fórmula</th>
-<th>Qué pregunta, en crédito</th>
-<th>En una frase</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><span class="alert">Accuracy equality</span></td>
-<td>(TP+TN) / total</td>
-<td>¿El modelo acierta con la misma frecuencia en cada grupo?</td>
-<td>Mismo nivel de aciertos</td>
-</tr>
-<tr class="even">
-<td><span class="alert">Equal opportunity</span> (TPR)</td>
-<td>TP / (TP+FN)</td>
-<td>De quienes <span class="alert">sí</span> pagarían, ¿qué proporción recibe el crédito?</td>
-<td>Igualdad de oportunidades</td>
-</tr>
-<tr class="odd">
-<td><span class="alert">Predictive equality</span> (FPR)</td>
-<td>FP / (FP+TN)</td>
-<td>De quienes <span class="alert">no</span> pagarían, ¿qué proporción es aprobada por error?</td>
-<td>Mismo nivel de errores costosos</td>
-</tr>
-<tr class="even">
-<td><span class="alert">Predictive parity</span> (PPV)</td>
-<td>TP / (TP+FP)</td>
-<td>De quienes el modelo <span class="alert">aprueba</span>, ¿qué proporción realmente paga?</td>
-<td>Calibración: “aprobado” significa lo mismo</td>
-</tr>
-<tr class="odd">
-<td><span class="alert">Statistical parity</span> (STP)</td>
-<td>(TP+FP) / total</td>
-<td>¿Qué proporción de cada grupo recibe un “aprobado”, pague o no?</td>
-<td>Paridad demográfica</td>
-</tr>
-</tbody>
-</table>
-<div style="margin-top: 12px; font-size: 21px;">
-<p>La tabla de confusión, en crédito: <span class="alert">TP</span> aprobado y paga · <span class="alert">FP</span> aprobado y no paga (préstamo malo) · <span class="alert">TN</span> rechazado y no pagaría · <span class="alert">FN</span> rechazado pero sí pagaría (buen cliente perdido)</p>
-</div>
-</div>
-<p><a href="#/sec:interpretar-metricas"><span class="button">Volver a interpretar las métricas</span></a></p>
 </section></section>
 <section id="nos-vemos-en-la-sesión-5.4" class="title-slide slide level1 center" data-background-color="#2d4563">
 <h1>Nos vemos en la sesión 5.4 😊</h1>

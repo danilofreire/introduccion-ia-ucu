@@ -101,8 +101,7 @@ analista$chat("¿Cuáles son los principales desafíos democráticos de Uruguay 
 
 # --- cargar-textos -------------------------------------------
 
-textos <- read_csv("datos/textos_politicos.csv",
-                   show_col_types = FALSE)
+textos <- read_csv("datos/textos_politicos.csv")
 # Lean el archivo directo desde la web:
 # textos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-04/datos/textos_politicos.csv", show_col_types = FALSE)
 
@@ -132,7 +131,7 @@ clasificar_zero <- function(texto) {
     - Sin tildes, sin puntuación, sin explicación
     - Si dudás, elegir la categoría más probable"
   )
-  trimws(tolower(chat$chat(texto)))
+  trimws(tolower(chat$chat(texto))) # trim whitespaces, converter para minúsculas
 }
 
 # Probar con un texto
@@ -144,7 +143,7 @@ clasificar_zero(muestra$texto[1])
 
 # Clasificar los 20 textos de la muestra balanceada
 resultados_zero <- muestra |>
-  mutate(tema_llm = map_chr(texto, clasificar_zero, .progress = TRUE))
+  mutate(tema_llm = map_chr(texto, clasificar_zero))
 
 
 # --- clasificar-batch-mostrar --------------------------------
@@ -252,28 +251,22 @@ dtm <- tokens_limpios |> count(id, palabra) |> cast_dtm(id, palabra, n)
 set.seed(123)
 modelo_lda <- LDA(dtm, k = 5, control = list(seed = 123))
 
-# 3. Tópico dominante de cada documento (gamma)
+# 3. Tópico dominante de cada documento, con su tema real al lado
 doc_topic <- tidy(modelo_lda, matrix = "gamma") |>
-  group_by(document) |>
-  slice_max(gamma, n = 1, with_ties = FALSE) |>
-  ungroup() |>
-  transmute(id = as.integer(document), topic)
-
-# 4. Mapear cada tópico al tema real más frecuente (para medir accuracy)
-mapa <- doc_topic |>
+  mutate(id = as.integer(document)) |>
+  slice_max(gamma, n = 1, by = id, with_ties = FALSE) |>
   left_join(select(textos, id, tema), by = "id") |>
-  count(topic, tema) |>
-  group_by(topic) |>
-  slice_max(n, n = 1, with_ties = FALSE) |>
-  ungroup() |>
+  select(id, topic, tema)
+
+# 4. Cada tópico se mapea al tema real más frecuente
+mapa <- doc_topic |>
+  count(topic, tema, name = "casos") |>
+  slice_max(casos, n = 1, by = topic, with_ties = FALSE) |>
   select(topic, tema_lda = tema)
 
-lda_pred <- doc_topic |>
+# 5. Accuracy sobre los 20 textos de la muestra (mismo set que los LLMs)
+accuracy_lda <- doc_topic |>
   left_join(mapa, by = "topic") |>
-  left_join(select(textos, id, tema), by = "id")
-
-# Medir solo sobre los 20 textos de la muestra (mismo set que los LLMs)
-accuracy_lda <- lda_pred |>
   filter(id %in% muestra$id) |>
   summarise(acc = mean(tema == tema_lda)) |>
   pull(acc)
@@ -290,7 +283,7 @@ accuracy_gptoss
 # --- clasif-nemotron-corpus ----------------------------------
 
 clasif_nemotron <- muestra |>
-  mutate(tema_llm = map_chr(texto, clasificar_con, "nvidia/nemotron-nano-9b-v2:free", .progress = TRUE))
+  mutate(tema_llm = map_chr(texto, clasificar_con, "nvidia/nemotron-nano-9b-v2:free"))
 
 
 # --- clasif-nemotron-corpus-mostrar --------------------------

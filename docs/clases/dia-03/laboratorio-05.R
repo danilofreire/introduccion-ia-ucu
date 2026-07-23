@@ -15,12 +15,11 @@
 # --- Cargar paquetes -----------------------------------------
 
 # Si algún paquete falta:
-# install.packages(c("tidyverse", "cluster", "factoextra", "dendextend", "corrplot"))
+# install.packages(c("tidyverse", "cluster", "factoextra", "corrplot"))
 
 library(tidyverse)
 library(cluster)      # silhouette()
 library(factoextra)   # fviz_cluster(), fviz_pca_*(), fviz_nbclust()
-library(dendextend)   # dendrogramas
 library(corrplot)     # matriz de correlación
 
 set.seed(2026)
@@ -109,8 +108,6 @@ fviz_cluster(km2, data = datos_scaled,
 # --- ¿Qué países en cada cluster? ----------------------------
 
 paises |>
-  select(pais, cluster_km2) |>
-  arrange(cluster_km2) |>
   group_by(cluster_km2) |>
   summarise(paises = paste(pais, collapse = ", "))
 

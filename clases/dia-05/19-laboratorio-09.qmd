@@ -71,7 +71,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::{.column width=50%}
 **Parte 2: auditoría de equidad (sesión 5.2)**
 
-4. Auditar un modelo de crédito con [fairmodels]{.alert}
+4. Auditar un modelo de crédito con [`fairmodels`](https://modeloriented.github.io/fairmodels/index.html)
 5. Calcular e interpretar [métricas de equidad]{.alert} por grupo
 6. Discutir [mitigación]{.alert} y sus trade-offs
 :::
@@ -367,7 +367,7 @@ Auditar la [equidad]{.alert} de un clasificador como los de los días 1 y 2: ¿a
 :::{style="font-size: 23px;"}
 **El caso de estudio**
 
-El dataset [German Credit]{.alert}, un clásico en estudios de sesgo algorítmico:
+El dataset [German Credit](https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data), un clásico en estudios de sesgo algorítmico:
 
 - 1000 solicitudes de crédito
 - Variable objetivo: buen/mal pagador
@@ -378,7 +378,7 @@ El dataset [German Credit]{.alert}, un clásico en estudios de sesgo algorítmic
 :::
 :::
 
-## Preparación del entorno
+## Preparación
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
@@ -396,14 +396,16 @@ library(fairmodels)
 library(DALEX)
 ```
 
-[fairmodels]{.alert} usa explicadores de DALEX para auditar modelos. Funciona con cualquier modelo de clasificación.
+[`fairmodels`](https://modeloriented.github.io/fairmodels/index.html) usa explicadores de DALEX para auditar modelos. Funciona con cualquier modelo de clasificación
+
+Para más informaciones, ver la [documentación oficial]{.alert} y el [artículo oficial]{.alert}: <https://modeloriented.github.io/fairmodels/articles/fairmodels.html> y <https://arxiv.org/abs/2104.00507>
 :::
 
 ## El dataset German Credit
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
-:::{.column width=55%}
+:::{.column width=50%}
 ```{r}
 #| echo: true
 #| eval: true
@@ -416,7 +418,7 @@ glimpse(german)
 ```
 :::
 
-:::{.column width=45%}
+:::{.column width=50%}
 **Variables clave:**
 
 - `Risk`: variable objetivo (good/bad)
@@ -424,7 +426,7 @@ glimpse(german)
 - `Age`: otro atributo sensible
 - Variables de crédito: monto, duración, historial
 
-El dataset es de los años 1990 y tiene [sesgos históricos conocidos]{.alert}.
+El dataset es de los años 1990 y tiene [sesgos históricos conocidos]{.alert}. Documentación completa: <https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data>
 :::
 :::
 :::
@@ -455,7 +457,7 @@ german |>
 ```
 
 :::{style="margin-top: 10px;"}
-Las [tasas base]{.alert} son similares entre grupos, lo que facilita la comparación de métricas.
+Las [tasas base]{.alert} son similares entre grupos, lo que facilita la comparación de métricas
 :::
 :::
 
@@ -478,7 +480,7 @@ cat("Entrenamiento:", nrow(train_data), "filas\n")
 cat("Test:", nrow(test_data), "filas\n")
 ```
 
-Usaremos el conjunto de [test]{.alert} para evaluar equidad, ya que representa datos no vistos.
+Usaremos el conjunto de [test]{.alert} para evaluar equidad, ya que representa datos no vistos
 :::
 
 ## Entrenar una regresión logística
@@ -507,7 +509,7 @@ accuracy <- mean(pred_class == test_data$Risk)
 cat("Accuracy global:", round(accuracy, 3), "\n")
 ```
 
-[El modelo no usa Sex como variable]{.alert}, pero ¿eso garantiza que sea justo? La sesión 5.2 sugiere que no: los proxies existen.
+[El modelo no usa Sex como variable]{.alert}, pero ¿eso garantiza que sea justo? La sesión 5.2 sugiere que no: los proxies existen
 :::
 
 ## Crear el explicador DALEX
@@ -529,6 +531,8 @@ explainer <- DALEX::explain(
   verbose = FALSE
 )
 ```
+
+Ver [Wiśniewski y Biecek (2022)](https://arxiv.org/abs/2104.00507) para más detalles sobre los métodos de clasificación de sesgos
 :::
 
 :::{.column width=45%}
@@ -539,9 +543,9 @@ Un [explicador]{.alert} es un objeto que envuelve todo lo que fairmodels necesit
 - Los datos de test
 - La variable objetivo (0/1)
 
-Para un `glm`, DALEX ya sabe cómo pedir las predicciones: no hace falta una [función a medida]{.alert}.
+Para un `glm`, DALEX ya sabe cómo pedir las predicciones: no hace falta una [función a medida]{.alert}
 
-Es el paso intermedio: modelo → explicador → auditoría.
+Es el paso intermedio: modelo → explicador → auditoría
 :::
 :::
 :::
@@ -562,20 +566,20 @@ fobject <- fairness_check(
   protected = test_data$Sex,
   privileged = "male",  # grupo de referencia
   cutoff = 0.5,         # umbral de decisión
-  verbose = FALSE
+  verbose = TRUE
 )
 
 # Ver resumen
 print(fobject)
 ```
 
-El grupo [privilegiado]{.alert} es el de referencia. Las métricas comparan otros grupos con este.
+El grupo [privilegiado]{.alert} es el de referencia. Las métricas comparan otros grupos con este
 :::
 
 ## Visualizar métricas de equidad
 
 :::{style="margin-top: 30px; font-size: 22px;"}
-La zona verde es la [regla del 80%]{.alert} de la sesión 5.2: un ratio entre 0,8 y 1,25 se considera aceptable. Fuera de ella hay disparidad.
+La zona verde es la [regla del 80%]{.alert} de la sesión 5.2: un ratio entre 0,8 y 1,25 se considera aceptable. Fuera de ella hay disparidad
 
 ```{r}
 #| echo: true
@@ -590,94 +594,37 @@ plot(fobject)
 
 ## Interpretar las métricas {#sec:interpretar-metricas}
 
-:::{style="margin-top: 30px; font-size: 20px;"}
-:::{.columns}
-:::{.column width=40%}
-**¿Qué significan las métricas?**
+:::{style="margin-top: 20px; font-size: 20px;"}
+Cada fila de la salida (y cada barra del gráfico anterior) es un [ratio entre grupos]{.alert} (mujeres ÷ hombres): 1,0 es igualdad perfecta y la zona verde (0,8 a 1,25) es la regla del 80%. El resultado "positivo" acá es [recibir el crédito]{.alert} (que el modelo prediga `good`)
 
-| Métrica | Significado |
-|---------|-------------|
-| TPR | Tasa de verdaderos positivos |
-| FPR | Tasa de falsos positivos |
-| PPV | Valor predictivo positivo |
-| ACC | Accuracy |
-| STP | Tasa de resultados positivos (paridad) |
+| Nombre en la salida | Fórmula | Qué pregunta, en crédito | En una frase |
+|---|---|---|---|
+| [Accuracy equality]{.alert} (ACC) | (TP+TN)/total | ¿Acierta con la misma frecuencia en cada grupo? | Mismo nivel de aciertos |
+| [Equal opportunity]{.alert} (TPR) | TP/(TP+FN) | De quienes [sí]{.alert} pagarían, ¿qué proporción recibe el crédito? | Igualdad de oportunidades |
+| [Predictive equality]{.alert} (FPR) | FP/(FP+TN) | De quienes [no]{.alert} pagarían, ¿qué proporción se aprueba por error? | Mismo nivel de errores costosos |
+| [Predictive parity]{.alert} (PPV) | TP/(TP+FP) | De quienes el modelo [aprueba]{.alert}, ¿qué proporción sí paga? | Calibración: "aprobado" significa lo mismo |
+| [Statistical parity]{.alert} (STP) | (TP+FP)/total | ¿Qué proporción de cada grupo recibe un "aprobado"? | Paridad demográfica |
 
-Un ratio de 1,0 significa [igualdad perfecta]{.alert} entre grupos.
-
-Conexión con la sesión 5.2: [STP]{.alert} ≈ paridad demográfica, [TPR]{.alert} ≈ igualdad de oportunidades, [PPV]{.alert} se relaciona con la calibración.
-
-[[Glosario: qué significa cada métrica]{.button}](#sec:metricas-glosario)
+:::{style="margin-top: 10px;"}
+La tabla de confusión, en crédito: [TP]{.alert} aprobado y paga · [FP]{.alert} aprobado y no paga · [TN]{.alert} rechazado y no pagaría · [FN]{.alert} rechazado pero sí pagaría
 :::
-
-:::{.column width=60%}
-**En nuestro caso:**
-
-```{r}
-#| echo: true
-#| eval: true
-#| cache: true
-
-# Ratios de cada métrica (1,0 = igualdad perfecta)
-fobject$fairness_check_data |>
-  select(metric, score) |>
-  mutate(score = round(score, 3))
-```
-
-:::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 12px; border-radius: 10px;"}
-Recordar el [teorema de imposibilidad]{.alert}: no se puede estar en la zona verde en todas las métricas a la vez si las tasas base difieren.
-:::
-:::
-:::
-:::
-
-## Métricas detalladas por grupo
-
-:::{style="margin-top: 30px; font-size: 22px;"}
-
-```{r}
-#| echo: true
-#| eval: true
-#| cache: true
-
-# Calcular métricas crudas por grupo
-group_metrics <- test_data |>
-  mutate(pred = pred_class) |>
-  group_by(Sex) |>
-  summarise(
-    n = n(),
-    accuracy = mean(pred == Risk),
-    tpr = sum(pred == "good" & Risk == "good") / sum(Risk == "good"),
-    fpr = sum(pred == "good" & Risk == "bad") / sum(Risk == "bad"),
-    positive_rate = mean(pred == "good"),
-    .groups = "drop"
-  )
-
-group_metrics |>
-  mutate(across(where(is.numeric), ~round(., 3)))
-```
-
-Estas son las métricas [absolutas]{.alert}. fairmodels calcula los ratios entre grupos.
 :::
 
 ## Mitigación: umbrales diferenciados {#sec:mitigacion}
 
-:::{style="margin-top: 30px; font-size: 21px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 :::{.columns}
-:::{.column width=55%}
-Una estrategia de [post-procesamiento]{.alert} (sesión 5.2): umbrales distintos por grupo para igualar un tipo de error.
+:::{.column width=70%}
+Una estrategia de [post-procesamiento]{.alert} (sesión 5.2): umbrales distintos por grupo para igualar un tipo de error
 
 ```{r}
 #| echo: true
 #| eval: true
 #| cache: true
 
-# Umbral 0.5 para hombres, 0.45 para mujeres
-mitigated_pred <- ifelse(
-  test_data$Sex == "male",
-  ifelse(pred_probs > 0.5, "good", "bad"),
-  ifelse(pred_probs > 0.45, "good", "bad")
-)
+# Un umbral por grupo: 0.5 para hombres, 0.4 para mujeres
+umbral <- ifelse(test_data$Sex == "male", 0.5, 0.4)
+mitigated_pred <- ifelse(pred_probs > umbral, "good", "bad")
 
 test_data |>
   mutate(orig = pred_class, mitig = mitigated_pred) |>
@@ -693,7 +640,7 @@ test_data |>
 ```
 :::
 
-:::{.column width=45%}
+:::{.column width=30%}
 :::{style="font-size: 21px;"}
 **Consideraciones**
 
@@ -701,7 +648,7 @@ test_data |>
 - La mitigación [mueve]{.alert} el problema: mejora una métrica y empeora otra
 
 :::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
-[La decisión de usar umbrales diferenciados es política, no técnica.]{.alert}
+[La decisión de usar umbrales diferenciados es política, no técnica]{.alert}
 :::
 
 [[Apéndice: explorar umbrales en detalle]{.button}](#sec:apendice-umbrales)
@@ -719,7 +666,7 @@ test_data |>
 :::{.column width=50%}
 **Escenario:**
 
-Son consultores de un banco uruguayo que quiere implementar un modelo de scoring crediticio.
+Son consultores de un banco uruguayo que quiere implementar un modelo de scoring crediticio
 
 El análisis muestra que el modelo tiene:
 
@@ -727,11 +674,11 @@ El análisis muestra que el modelo tiene:
 - [Accuracy similar]{.alert} entre grupos
 - [Calibración correcta]{.alert}: las probabilidades significan lo mismo
 
-El banco les pide una recomendación.
+El banco les pide una recomendación
 :::
 
 :::{.column width=50%}
-**Preguntas para discutir (15 min):**
+**Preguntas para discutir (5 min):**
 
 1. ¿Deberían usar [umbrales diferenciados]{.alert} por sexo?
 2. Si lo hacen, ¿es [discriminación positiva]{.alert} o simplemente [corrección de sesgo]{.alert}?
@@ -740,7 +687,7 @@ El banco les pide una recomendación.
 5. ¿La ley uruguaya permite trato diferenciado por sexo en decisiones de crédito?
 
 :::{style="margin-top: 15px; background: rgba(45, 69, 99, 0.1); padding: 15px; border-radius: 10px;"}
-**Divídanse en grupos de 4. Cada grupo presentará su recomendación (3 min).**
+**Divídanse en grupos de 4**
 :::
 :::
 :::
@@ -755,7 +702,7 @@ El banco les pide una recomendación.
 :::{.column width=55%}
 **Tarea (5 min):**
 
-Vimos que los errores del modelo se concentran en fronteras entre categorías. Mejoren el codebook con [reglas de decisión explícitas]{.alert} y midan si la validación mejora.
+Vimos que los errores del modelo se concentran en fronteras entre categorías. Mejoren el codebook con [reglas de decisión explícitas]{.alert} y midan si la validación mejora
 
 1. Copien `codebook_motivos` y agreguen a `instructions` reglas para los casos límite. Por ejemplo: si hay amenazas o temor a represalias, es `miedo` aunque también haya desconfianza
 2. Re-codifiquen con `qlm_code()` y el modelo local
@@ -768,10 +715,6 @@ Vimos que los errores del modelo se concentran en fronteras entre categorías. M
 
 - Las reglas de decisión y el orden de prioridad entre categorías son práctica estándar en codebooks cualitativos. El LLM las aprovecha igual que un asistente humano
 - Revisen los errores de la diapositiva "¿Dónde se equivoca?" para decidir qué reglas escribir
-
-:::{style="margin-top: 20px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
-**Tiempo:** 10 minutos, en parejas
-:::
 
 [[Solución]{.button}](#sec:appendix01)
 :::
@@ -831,9 +774,7 @@ plot(fobject_age)
 4. ¿Cómo se compara el sesgo por edad con el sesgo por sexo?
 
 :::{style="margin-top: 20px; background: rgba(230, 57, 70, 0.1); padding: 15px; border-radius: 10px;"}
-**Tiempo:** 5 minutos
-
-Trabajen individualmente o en parejas. Pueden consultar la documentación de fairmodels.
+Trabajen individualmente o en parejas. Pueden consultar la documentación de fairmodels
 :::
 
 [[Solución]{.button}](#sec:appendix02)
@@ -937,7 +878,7 @@ as_tibble(validacion_v2) |> select(measure, value)
 ```
 
 :::{style="margin-top: 15px;"}
-- Comparen con la validación original. Ojo: con 16 textos, cada caso vale [6 puntos]{.alert} de accuracy, así que la mejora puede ser chica o nula en esta muestra. El efecto de las reglas se nota en corpus grandes y en la [estabilidad]{.alert} entre corridas
+- Comparen con la validación original. Con 16 textos, cada caso vale [6 puntos]{.alert} de accuracy, así que la mejora puede ser chica o nula en esta muestra. El efecto de las reglas se nota en corpus grandes y en la [estabilidad]{.alert} entre corridas
 - La lección metodológica: cuando el codificador falla, el primer sospechoso es el [codebook]{.alert}, no el modelo
 :::
 
@@ -1013,6 +954,8 @@ results |>
 ```
 :::
 
+[[Volver a mitigación]{.button}](#sec:mitigacion)
+
 ## Apéndice: visualizar el trade-off
 
 :::{style="margin-top: 30px; font-size: 22px;"}
@@ -1037,7 +980,7 @@ results |>
 ```
 
 :::{style="margin-top: 10px;"}
-[Diferentes umbrales afectan a los grupos de manera diferente.]{.alert} En crédito: un falso positivo es un préstamo que no se paga; un falso negativo, un buen cliente rechazado.
+[Diferentes umbrales afectan a los grupos de manera diferente.]{.alert} En crédito: un falso positivo es un préstamo que no se paga; un falso negativo, un buen cliente rechazado
 :::
 
 [[Volver a mitigación]{.button}](#sec:mitigacion)
@@ -1087,25 +1030,5 @@ Requiere la API key de OpenRouter del lab 7, por eso no se ejecuta en estas diap
 :::
 :::
 :::
-
-## Apéndice: qué significa cada métrica {#sec:metricas-glosario}
-
-:::{style="margin-top: 20px; font-size: 21px;"}
-Cada barra del gráfico es un [ratio entre grupos]{.alert} (mujeres ÷ hombres): 1,0 es igualdad perfecta y la zona verde (0,8 a 1,25) es la regla del 80%. El resultado "positivo" acá es [recibir el crédito]{.alert} (que el modelo prediga `good`).
-
-| Métrica | Fórmula | Qué pregunta, en crédito | En una frase |
-|---|---|---|---|
-| [Accuracy equality]{.alert} | (TP+TN) / total | ¿El modelo acierta con la misma frecuencia en cada grupo? | Mismo nivel de aciertos |
-| [Equal opportunity]{.alert} (TPR) | TP / (TP+FN) | De quienes [sí]{.alert} pagarían, ¿qué proporción recibe el crédito? | Igualdad de oportunidades |
-| [Predictive equality]{.alert} (FPR) | FP / (FP+TN) | De quienes [no]{.alert} pagarían, ¿qué proporción es aprobada por error? | Mismo nivel de errores costosos |
-| [Predictive parity]{.alert} (PPV) | TP / (TP+FP) | De quienes el modelo [aprueba]{.alert}, ¿qué proporción realmente paga? | Calibración: "aprobado" significa lo mismo |
-| [Statistical parity]{.alert} (STP) | (TP+FP) / total | ¿Qué proporción de cada grupo recibe un "aprobado", pague o no? | Paridad demográfica |
-
-:::{style="margin-top: 12px; font-size: 21px;"}
-La tabla de confusión, en crédito: [TP]{.alert} aprobado y paga · [FP]{.alert} aprobado y no paga (préstamo malo) · [TN]{.alert} rechazado y no pagaría · [FN]{.alert} rechazado pero sí pagaría (buen cliente perdido)
-:::
-:::
-
-[[Volver a interpretar las métricas]{.button}](#sec:interpretar-metricas)
 
 # Nos vemos en la sesión 5.4 😊 {background-color="#2d4563"}

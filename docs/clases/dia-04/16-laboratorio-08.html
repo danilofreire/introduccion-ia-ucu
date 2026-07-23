@@ -1472,23 +1472,21 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a></a>R<span class="sc">&gt;</span> codebook_ideologia <span class="ot">&lt;-</span> <span class="fu">qlm_codebook</span>(</span>
 <span id="cb8-2"><a></a><span class="sc">+</span>   <span class="at">name =</span> <span class="st">&quot;retorica_liberal&quot;</span>,</span>
-<span id="cb8-3"><a></a><span class="sc">+</span>   <span class="at">instructions =</span> <span class="fu">paste</span>(</span>
-<span id="cb8-4"><a></a><span class="sc">+</span>     <span class="st">&quot;Analizá el estilo retórico de este fragmento de discurso político latinoamericano.&quot;</span>,</span>
-<span id="cb8-5"><a></a><span class="sc">+</span>     <span class="st">&quot;Retórica ILIBERAL (puntajes negativos): nacionalismo, apelaciones al orden y la&quot;</span>,</span>
-<span id="cb8-6"><a></a><span class="sc">+</span>     <span class="st">&quot;seguridad, tradición, mano dura, distinción entre &#39;nosotros&#39; y &#39;ellos&#39;, rechazo al pluralismo.&quot;</span>,</span>
-<span id="cb8-7"><a></a><span class="sc">+</span>     <span class="st">&quot;Retórica LIBERAL (puntajes positivos): derechos individuales, tolerancia, pluralismo,&quot;</span>,</span>
-<span id="cb8-8"><a></a><span class="sc">+</span>     <span class="st">&quot;libertades civiles, derechos de las minorías, Estado de derecho, sociedad abierta.&quot;</span>,</span>
-<span id="cb8-9"><a></a><span class="sc">+</span>     <span class="st">&quot;Un puntaje de 0 indica retórica neutral o mixta.&quot;</span>,</span>
-<span id="cb8-10"><a></a><span class="sc">+</span>     <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>),</span>
-<span id="cb8-11"><a></a><span class="sc">+</span>   <span class="at">schema =</span> <span class="fu">type_object</span>(</span>
-<span id="cb8-12"><a></a><span class="sc">+</span>     <span class="at">score =</span> <span class="fu">type_integer</span>(<span class="st">&quot;Puntaje de -10 (iliberal) a +10 (liberal)&quot;</span>),</span>
-<span id="cb8-13"><a></a><span class="sc">+</span>     <span class="at">explicacion =</span> <span class="fu">type_string</span>(<span class="st">&quot;Breve justificación del puntaje&quot;</span>)</span>
-<span id="cb8-14"><a></a><span class="sc">+</span>   ),</span>
-<span id="cb8-15"><a></a><span class="sc">+</span>   <span class="at">role =</span> <span class="st">&quot;Sos un cientista político experto en analizar retórica política.&quot;</span>,</span>
-<span id="cb8-16"><a></a><span class="sc">+</span>   <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">score =</span> <span class="st">&quot;interval&quot;</span>, <span class="at">explicacion =</span> <span class="st">&quot;nominal&quot;</span>)</span>
-<span id="cb8-17"><a></a><span class="sc">+</span> )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-3"><a></a><span class="sc">+</span>   <span class="at">instructions =</span> <span class="st">&quot;Analizá el estilo retórico de este fragmento de discurso político latinoamericano.</span></span>
+<span id="cb8-4"><a></a><span class="st">+ Retórica ILIBERAL (puntajes negativos): nacionalismo, apelaciones al orden y la</span></span>
+<span id="cb8-5"><a></a><span class="st">+ seguridad, tradición, mano dura, distinción entre &#39;nosotros&#39; y &#39;ellos&#39;, rechazo al pluralismo.</span></span>
+<span id="cb8-6"><a></a><span class="st">+ Retórica LIBERAL (puntajes positivos): derechos individuales, tolerancia, pluralismo,</span></span>
+<span id="cb8-7"><a></a><span class="st">+ libertades civiles, derechos de las minorías, Estado de derecho, sociedad abierta.</span></span>
+<span id="cb8-8"><a></a><span class="st">+ Un puntaje de 0 indica retórica neutral o mixta.&quot;</span>,</span>
+<span id="cb8-9"><a></a><span class="sc">+</span>   <span class="at">schema =</span> <span class="fu">type_object</span>(</span>
+<span id="cb8-10"><a></a><span class="sc">+</span>     <span class="at">score =</span> <span class="fu">type_integer</span>(<span class="st">&quot;Puntaje de -10 (iliberal) a +10 (liberal)&quot;</span>),</span>
+<span id="cb8-11"><a></a><span class="sc">+</span>     <span class="at">explicacion =</span> <span class="fu">type_string</span>(<span class="st">&quot;Breve justificación del puntaje&quot;</span>)</span>
+<span id="cb8-12"><a></a><span class="sc">+</span>   ),</span>
+<span id="cb8-13"><a></a><span class="sc">+</span>   <span class="at">role =</span> <span class="st">&quot;Sos un cientista político experto en analizar retórica política.&quot;</span>,</span>
+<span id="cb8-14"><a></a><span class="sc">+</span>   <span class="at">levels =</span> <span class="fu">list</span>(<span class="at">score =</span> <span class="st">&quot;interval&quot;</span>, <span class="at">explicacion =</span> <span class="st">&quot;nominal&quot;</span>)</span>
+<span id="cb8-15"><a></a><span class="sc">+</span> )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>El <code>schema</code> usa los tipos de <code>ellmer</code> (Lab 7). <code>type_integer()</code> pide un número entero; <code>levels</code> le dice a <code>quallmer</code> que <code>score</code> es una variable de <span class="alert">intervalo</span>, para calcular las métricas correctas</p>
+<p>El <code>schema</code> usa los tipos de <code>ellmer</code> (Lab 7). <code>type_integer()</code> pide un número entero; <code>levels</code> le dice a <code>quallmer</code> que <code>score</code> es una variable de <span class="alert">intervalo</span>, para calcular las métricas correctas. Más información en <a href="https://quallmer.github.io/quallmer/reference/qlm_codebook.html" class="uri">https://quallmer.github.io/quallmer/reference/qlm_codebook.html</a></p>
 </div>
 </section>
 <section id="paso-2-codificar-los-discursos" class="slide level2">
@@ -1499,7 +1497,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <span id="cb9-2"><a></a><span class="sc">+</span>   discursos<span class="sc">$</span>texto,</span>
 <span id="cb9-3"><a></a><span class="sc">+</span>   codebook_ideologia,</span>
 <span id="cb9-4"><a></a><span class="sc">+</span>   <span class="at">model =</span> <span class="st">&quot;openrouter/nvidia/nemotron-3-super-120b-a12b:free&quot;</span>,</span>
-<span id="cb9-5"><a></a><span class="sc">+</span>   <span class="at">max_active =</span> <span class="dv">3</span>,   <span class="co"># pocas peticiones a la vez: los modelos :free se saturan</span></span>
+<span id="cb9-5"><a></a><span class="sc">+</span>   <span class="at">max_active =</span> <span class="dv">1</span>,   <span class="co"># pocas peticiones a la vez: los modelos :free se saturan</span></span>
 <span id="cb9-6"><a></a><span class="sc">+</span>   <span class="at">name =</span> <span class="st">&quot;nemotron&quot;</span></span>
 <span id="cb9-7"><a></a><span class="sc">+</span> )</span>
 <span id="cb9-8"><a></a>R<span class="sc">&gt;</span> </span>
@@ -1511,24 +1509,24 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 # Model:    openrouter/nvidia/nemotron-3-super-120b-a12b:free
 # Units:    15
 
-# A tibble: 15 × 4
-     .id score explicacion                                            .error    
- * &lt;int&gt; &lt;int&gt; &lt;chr&gt;                                                  &lt;list&gt;    
- 1     1    NA  &lt;NA&gt;                                                  &lt;httr2_fl&gt;
- 2     2    -8 &quot;El fragmento muestra una fuerte retórica iliberal: e… &lt;NULL&gt;    
- 3     3    -3 &quot;El fragmento promueve un líder fuerte, pide orden y … &lt;NULL&gt;    
- 4     4    -3 &quot;El fragmento exhibe retórica ILIBERAL con los siguie… &lt;NULL&gt;    
- 5     5    -3 &quot;El fragmento enfatiza estabilidad, seguridad y orden… &lt;NULL&gt;    
- 6     6    NA  &lt;NA&gt;                                                  &lt;httr2_fl&gt;
- 7     7     2 &quot;El fragmento muestra una retórica favorable al diálo… &lt;NULL&gt;    
- 8     8    NA  &lt;NA&gt;                                                  &lt;httr2_fl&gt;
- 9     9     2 &quot;El fragmento enfatiza el respeto igualitario ante la… &lt;NULL&gt;    
-10    10     2 &quot;El fragmento enfatiza el acceso igualitario a la edu… &lt;NULL&gt;    
-11    11     3 &quot;El fragmento enfatiza libertades individuales, toler… &lt;NULL&gt;    
-12    12     3 &quot;El fragmento destaca la defensa de instituciones dem… &lt;NULL&gt;    
-13    13     3 &quot;El fragmento destaca valores centrales de la retóric… &lt;NULL&gt;    
-14    14    NA  &lt;NA&gt;                                                  &lt;NULL&gt;    
-15    15    NA  &lt;NA&gt;                                                  &lt;NULL&gt;    </code></pre>
+# A tibble: 15 × 3
+     .id score explicacion                                                      
+ * &lt;int&gt; &lt;int&gt; &lt;chr&gt;                                                            
+ 1     1    -3 &quot;El fragmento presenta múltiples componentes de retórica ilibera…
+ 2     2    -3 &quot;El fragmento enfatiza una visión excluyente del pueblo, identif…
+ 3     3    -3 &quot;El fragmento presenta una retórica claramente illiberal. Se enf…
+ 4     4    -2 &quot;El fragmento enfatiza la protección de la identidad nacional y …
+ 5     5    -4 &quot;El discurso enfatiza la estabilidad, la seguridad y el orden, i…
+ 6     6     2 &quot;El fragmento enfatiza la necesidad de equilibrar el orden públi…
+ 7     7     2 &quot;El fragmento enfatiza evidencia, diálogo amplio y soluciones pr…
+ 8     8     3 &quot;El fragmento enfatiza explícitamente valores liberales: &#39;libert…
+ 9     9     2 &quot;El fragmento destaca el respeto igualitario ante la ley sin imp…
+10    10     3 &quot;El fragmento enfatiza el acceso igualitario a la educación (der…
+11    11     2 &quot;El fragmento exhibe claramente retórica LIBERAL. Defiende explí…
+12    12     2 &quot;El fragmento enfatiza instituciones democráticas, independencia…
+13    13     2 &quot;El fragmento presenta una retórica claramente liberal según los…
+14    14     3 &quot;El fragmento enfatiza libertades civiles, igualdad ante la ley,…
+15    15    -3 &quot;El fragmento exhibe retórica claramente iliberal, con múltiples…</code></pre>
 </div>
 </div>
 <div class="callout callout-warning callout-titled callout-style-default">
@@ -1550,7 +1548,7 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <h2>Inspeccionar la codificación</h2>
 <div style="margin-top: 30px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Comparar el puntaje del LLM con el humano, lado a lado</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Comparar el puntaje del LLM con el humano</span></span>
 <span id="cb11-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">tibble</span>(</span>
 <span id="cb11-3"><a></a><span class="sc">+</span>   <span class="at">orador       =</span> discursos<span class="sc">$</span>orador,</span>
 <span id="cb11-4"><a></a><span class="sc">+</span>   <span class="at">score_humano =</span> discursos<span class="sc">$</span>score_humano,</span>
@@ -1560,24 +1558,24 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <pre><code># A tibble: 15 × 3
    orador   score_humano score_llm
    &lt;chr&gt;           &lt;dbl&gt;     &lt;int&gt;
- 1 Orador A           -9        NA
- 2 Orador B           -8        -8
+ 1 Orador A           -9        -3
+ 2 Orador B           -8        -3
  3 Orador C           -7        -3
- 4 Orador D           -5        -3
- 5 Orador E           -4        -3
- 6 Orador F           -1        NA
+ 4 Orador D           -5        -2
+ 5 Orador E           -4        -4
+ 6 Orador F           -1         2
  7 Orador G            0         2
- 8 Orador H            1        NA
+ 8 Orador H            1         3
  9 Orador I            4         2
-10 Orador J            5         2
-11 Orador K            6         3
-12 Orador L            7         3
-13 Orador M            8         3
-14 Orador N            9        NA
-15 Orador O           -8        NA</code></pre>
+10 Orador J            5         3
+11 Orador K            6         2
+12 Orador L            7         2
+13 Orador M            8         2
+14 Orador N            9         3
+15 Orador O           -8        -3</code></pre>
 </div>
 </div>
-<p>Miren la diferencia: el LLM tiende a ser <span class="alert">más conservador</span>, sus puntajes se acercan al centro (0). Capta bien el <span class="alert">orden</span> (quién es más iliberal que quién), pero comprime la <span class="alert">magnitud</span>. Esto es justo lo que <span class="alert">la validación va a cuantificar</span>. Los <code>NA</code> son llamadas que fallaron contra el modelo <code>:free</code> (el callout anterior); en un estudio real se re-codifican esos casos</p>
+<p>Miren la diferencia: el LLM tiende a ser <span class="alert">más conservador</span>, sus puntajes se acercan al centro (0). Capta bien el <span class="alert">orden</span> (quién es más iliberal que quién), pero comprime la <span class="alert">magnitud</span>. Esto es justo lo que <span class="alert">la validación va a cuantificar</span></p>
 </div>
 </section>
 <section id="paso-3-validar-contra-humanos" class="slide level2">
@@ -1592,17 +1590,17 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <span id="cb13-6"><a></a><span class="sc">+</span> )</span>
 <span id="cb13-7"><a></a>R<span class="sc">&gt;</span> </span>
 <span id="cb13-8"><a></a>R<span class="sc">&gt;</span> <span class="co"># ¿Qué tan cerca está el LLM del juicio humano?</span></span>
-<span id="cb13-9"><a></a>R<span class="sc">&gt;</span> <span class="co"># qlm_validate devuelve un tibble; lo mostramos como tabla</span></span>
+<span id="cb13-9"><a></a>R<span class="sc">&gt;</span> <span class="co"># qlm_validate devuelve un tibble; lo mostramos como una tabla</span></span>
 <span id="cb13-10"><a></a>R<span class="sc">&gt;</span> validacion <span class="ot">&lt;-</span> <span class="fu">qlm_validate</span>(codificado, <span class="at">gold =</span> gold, <span class="at">by =</span> <span class="st">&quot;score&quot;</span>, <span class="at">level =</span> <span class="st">&quot;interval&quot;</span>)</span>
 <span id="cb13-11"><a></a>R<span class="sc">&gt;</span> <span class="fu">as_tibble</span>(validacion) <span class="sc">|&gt;</span> <span class="fu">select</span>(measure, value)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 2
   measure value
   &lt;chr&gt;   &lt;dbl&gt;
-1 r       0.925
-2 mae     2.6  
-3 rmse    2.97 
-4 icc     0.831</code></pre>
+1 r       0.873
+2 mae     3.67 
+3 rmse    4.07 
+4 icc     0.650</code></pre>
 </div>
 </div>
 <ul>

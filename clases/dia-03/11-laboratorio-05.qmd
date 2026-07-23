@@ -93,21 +93,19 @@ if (!require("fontawesome", character.only = TRUE)) {
 #| message: false
 #| warning: false
 
-# Instalar si es necesario
-paquetes <- c("tidyverse", "cluster", "factoextra", "dendextend", "corrplot")
-
+# Instala los que falten y los carga
+paquetes <- c(
+  "tidyverse",
+  "cluster",      # silhouette()
+  "factoextra",   # fviz_cluster(), fviz_nbclust(), fviz_pca(), ...
+  "corrplot"      # matriz de correlación
+)
 for (pkg in paquetes) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dependencies = TRUE)
     library(pkg, character.only = TRUE)
   }
 }
-
-library(tidyverse)
-library(cluster)      # Para silhouette()
-library(factoextra)   # Para fviz_cluster() y fviz_pca()
-library(dendextend)   # Para dendrogramas bonitos
-library(corrplot)     # Para matriz de correlación
 
 set.seed(2026)
 ```
@@ -337,8 +335,6 @@ fviz_cluster(km2, data = datos_scaled,
 
 # Listar países por cluster
 paises |>
-  select(pais, cluster_km2) |>
-  arrange(cluster_km2) |>
   group_by(cluster_km2) |>
   summarise(paises = paste(pais, collapse = ", "))
 ```

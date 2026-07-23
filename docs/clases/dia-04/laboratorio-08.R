@@ -91,14 +91,12 @@ discursos |>
 
 codebook_ideologia <- qlm_codebook(
   name = "retorica_liberal",
-  instructions = paste(
-    "Analizá el estilo retórico de este fragmento de discurso político latinoamericano.",
-    "Retórica ILIBERAL (puntajes negativos): nacionalismo, apelaciones al orden y la",
-    "seguridad, tradición, mano dura, distinción entre 'nosotros' y 'ellos', rechazo al pluralismo.",
-    "Retórica LIBERAL (puntajes positivos): derechos individuales, tolerancia, pluralismo,",
-    "libertades civiles, derechos de las minorías, Estado de derecho, sociedad abierta.",
-    "Un puntaje de 0 indica retórica neutral o mixta.",
-    sep = "\n"),
+  instructions = "Analizá el estilo retórico de este fragmento de discurso político latinoamericano.
+Retórica ILIBERAL (puntajes negativos): nacionalismo, apelaciones al orden y la
+seguridad, tradición, mano dura, distinción entre 'nosotros' y 'ellos', rechazo al pluralismo.
+Retórica LIBERAL (puntajes positivos): derechos individuales, tolerancia, pluralismo,
+libertades civiles, derechos de las minorías, Estado de derecho, sociedad abierta.
+Un puntaje de 0 indica retórica neutral o mixta.",
   schema = type_object(
     score = type_integer("Puntaje de -10 (iliberal) a +10 (liberal)"),
     explicacion = type_string("Breve justificación del puntaje")
@@ -114,7 +112,7 @@ codificado <- qlm_code(
   discursos$texto,
   codebook_ideologia,
   model = "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
-  max_active = 3,   # pocas peticiones a la vez: los modelos :free se saturan
+  max_active = 1,   # pocas peticiones a la vez: los modelos :free se saturan
   name = "nemotron"
 )
 
@@ -123,7 +121,7 @@ codificado
 
 # --- inspeccionar -----------------------------------------
 
-# Comparar el puntaje del LLM con el humano, lado a lado
+# Comparar el puntaje del LLM con el humano
 tibble(
   orador       = discursos$orador,
   score_humano = discursos$score_humano,

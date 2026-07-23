@@ -1329,23 +1329,21 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <h2>Cargar paquetes</h2>
 <div style="margin-top: 30px; font-size: 24px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Instalar si es necesario</span></span>
-<span id="cb1-2"><a></a>R<span class="sc">&gt;</span> paquetes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;tidyverse&quot;</span>, <span class="st">&quot;cluster&quot;</span>, <span class="st">&quot;factoextra&quot;</span>, <span class="st">&quot;dendextend&quot;</span>, <span class="st">&quot;corrplot&quot;</span>)</span>
-<span id="cb1-3"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb1-4"><a></a>R<span class="sc">&gt;</span> <span class="cf">for</span> (pkg <span class="cf">in</span> paquetes) {</span>
-<span id="cb1-5"><a></a><span class="sc">+</span>   <span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(pkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb1-6"><a></a><span class="sc">+</span>     <span class="fu">install.packages</span>(pkg, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-7"><a></a><span class="sc">+</span>     <span class="fu">library</span>(pkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-8"><a></a><span class="sc">+</span>   }</span>
-<span id="cb1-9"><a></a><span class="sc">+</span> }</span>
-<span id="cb1-10"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb1-11"><a></a>R<span class="sc">&gt;</span> <span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-12"><a></a>R<span class="sc">&gt;</span> <span class="fu">library</span>(cluster)      <span class="co"># Para silhouette()</span></span>
-<span id="cb1-13"><a></a>R<span class="sc">&gt;</span> <span class="fu">library</span>(factoextra)   <span class="co"># Para fviz_cluster() y fviz_pca()</span></span>
-<span id="cb1-14"><a></a>R<span class="sc">&gt;</span> <span class="fu">library</span>(dendextend)   <span class="co"># Para dendrogramas bonitos</span></span>
-<span id="cb1-15"><a></a>R<span class="sc">&gt;</span> <span class="fu">library</span>(corrplot)     <span class="co"># Para matriz de correlación</span></span>
-<span id="cb1-16"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb1-17"><a></a>R<span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">2026</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Instala los que falten y los carga</span></span>
+<span id="cb1-2"><a></a>R<span class="sc">&gt;</span> paquetes <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-3"><a></a><span class="sc">+</span>   <span class="st">&quot;tidyverse&quot;</span>,</span>
+<span id="cb1-4"><a></a><span class="sc">+</span>   <span class="st">&quot;cluster&quot;</span>,      <span class="co"># silhouette()</span></span>
+<span id="cb1-5"><a></a><span class="sc">+</span>   <span class="st">&quot;factoextra&quot;</span>,   <span class="co"># fviz_cluster(), fviz_nbclust(), fviz_pca(), ...</span></span>
+<span id="cb1-6"><a></a><span class="sc">+</span>   <span class="st">&quot;corrplot&quot;</span>      <span class="co"># matriz de correlación</span></span>
+<span id="cb1-7"><a></a><span class="sc">+</span> )</span>
+<span id="cb1-8"><a></a>R<span class="sc">&gt;</span> <span class="cf">for</span> (pkg <span class="cf">in</span> paquetes) {</span>
+<span id="cb1-9"><a></a><span class="sc">+</span>   <span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(pkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb1-10"><a></a><span class="sc">+</span>     <span class="fu">install.packages</span>(pkg, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-11"><a></a><span class="sc">+</span>     <span class="fu">library</span>(pkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-12"><a></a><span class="sc">+</span>   }</span>
+<span id="cb1-13"><a></a><span class="sc">+</span> }</span>
+<span id="cb1-14"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb1-15"><a></a>R<span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">2026</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
@@ -1624,10 +1622,8 @@ República Dominicana              Uruguay            Venezuela
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Listar países por cluster</span></span>
 <span id="cb13-2"><a></a>R<span class="sc">&gt;</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb13-3"><a></a><span class="sc">+</span>   <span class="fu">select</span>(pais, cluster_km2) <span class="sc">|&gt;</span></span>
-<span id="cb13-4"><a></a><span class="sc">+</span>   <span class="fu">arrange</span>(cluster_km2) <span class="sc">|&gt;</span></span>
-<span id="cb13-5"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(cluster_km2) <span class="sc">|&gt;</span></span>
-<span id="cb13-6"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(<span class="at">paises =</span> <span class="fu">paste</span>(pais, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-3"><a></a><span class="sc">+</span>   <span class="fu">group_by</span>(cluster_km2) <span class="sc">|&gt;</span></span>
+<span id="cb13-4"><a></a><span class="sc">+</span>   <span class="fu">summarise</span>(<span class="at">paises =</span> <span class="fu">paste</span>(pais, <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   cluster_km2 paises                                                            
