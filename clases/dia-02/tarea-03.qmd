@@ -44,7 +44,7 @@ datos <- datos |>
     zona = factor(zona),
     genero = factor(genero),
     uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
-    voto = factor(voto, levels = c("si", "no"))
+    voto = factor(voto, levels = c("no", "si"))
   )
 ```
 
@@ -102,7 +102,7 @@ Dividan los datos en 75% entrenamiento y 25% prueba con `set.seed(2026)` y estra
 
 Usando el [modelo reducido de la pregunta 4]{.alert} (edad, educación e interés político), extraigan los coeficientes con `tidy()` y calculen los odds ratios (`exp(estimate)`). ¿Cuál de los tres predictores tiene el efecto más fuerte sobre la probabilidad de votar? ¿Los signos van en la dirección que esperarían teóricamente?
 
-*Pista:* presten atención a cómo definimos los niveles de `voto` en la configuración (`c("si", "no")`). R modela la probabilidad del segundo nivel, así que verifiquen en qué dirección apunta cada coeficiente antes de interpretarlo: un signo puede significar lo contrario de lo que parece a primera vista.
+*Pista:* con los niveles `c("no", "si")` que definimos en la configuración, `glm()` modela la probabilidad del segundo nivel ("si"), así que un coeficiente positivo aumenta la probabilidad de votar. Ojo: si el factor estuviera definido al revés (`c("si", "no")`), todos los signos se invertirían; siempre verifiquen los niveles antes de interpretar.
 
 ```{r p5}
 # Escriban su código aquí
@@ -139,7 +139,7 @@ En el laboratorio usamos `grid_regular()` para crear la grilla de búsqueda. Aho
 
 ### Pregunta 8: ¿La validación cruzada predice el desempeño real?
 
-La validación cruzada estima el desempeño usando [sólo los datos de entrenamiento]{.alert}. Tomen la mejor combinación de hiperparámetros de la grilla regular (pregunta 7), finalicen el workflow, ajústenlo sobre todo el conjunto de entrenamiento y calculen el AUC sobre el conjunto de prueba. Comparen ese AUC con la estimación de la validación cruzada (media ± 2 errores estándar de `show_best()`). ¿La validación cruzada fue optimista, pesimista o acertada? ¿Por qué es importante que el conjunto de prueba no participe del tuning?
+La validación cruzada estima el desempeño usando [solo los datos de entrenamiento]{.alert}. Tomen la mejor combinación de hiperparámetros de la grilla regular (pregunta 7), finalicen el workflow, ajústenlo sobre todo el conjunto de entrenamiento y calculen el AUC sobre el conjunto de prueba. Comparen ese AUC con la estimación de la validación cruzada (media ± 2 errores estándar de `show_best()`). ¿La validación cruzada fue optimista, pesimista o acertada? ¿Por qué es importante que el conjunto de prueba no participe del tuning?
 
 *Pista:* el flujo es el mismo del final del laboratorio: `finalize_workflow()`, ajustar sobre los datos de entrenamiento, predecir sobre los de prueba.
 
@@ -193,11 +193,11 @@ Entrenen un modelo `decision_tree()` con `cost_complexity = 0.01`, `tree_depth =
 
 ### Pregunta 12: Tabla comparativa completa
 
-Creen una tabla que compare cuatro modelos (regresión logística, Random Forest, XGBoost y árbol de decisión) con las métricas: accuracy, AUC, precision, recall y F1-score. Usen `bind_rows()` para combinar y `pivot_wider()` para formatear.
+Creen una tabla que compare cuatro modelos (regresión logística, Random Forest, XGBoost y árbol de decisión) con las métricas: accuracy, AUC, precision, recall y F1. Usen `bind_rows()` para combinar y `pivot_wider()` para formatear.
 
 *Pista (XGBoost):* la sintaxis está en el [Apéndice 4 del Laboratorio 3](07-laboratorio-03.html#sec:appendix04). Usen `boost_tree()` con el motor `xgboost` en modo clasificación; pueden fijar los hiperparámetros (por ejemplo `trees`, `tree_depth`, `learn_rate`) en valores razonables.
 
-*Pista (métricas):* para cada modelo necesitan tanto la clase predicha como la probabilidad; `augment()` les da ambas en un paso. Después combinen `metrics()` con `f_meas()` (y `precision()`/`recall()` si las quieren) para armar la tabla.
+*Pista (métricas):* para cada modelo necesitan tanto la clase predicha como la probabilidad; `augment()` les da ambas en un paso. Definan una sola vez `metric_set(accuracy, roc_auc, precision, recall, f_meas)` y aplíquenla a las predicciones de cada modelo (con `event_level = "second"`, como en el laboratorio).
 
 ```{r p12}
 # Escriban su código aquí

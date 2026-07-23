@@ -75,7 +75,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 <br>
 
-[Trabajen en sus computadoras y pregunten si tienen dudas!]{.alert}
+[¡Trabajen en sus computadoras y pregunten si tienen dudas!]{.alert}
 :::
 :::
 :::
@@ -84,16 +84,18 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Cargar los paquetes necesarios
 
-:::{style="margin-top: 30px; font-size: 26px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r cargar-paquetes, message=FALSE, warning=FALSE, prompt=FALSE, echo=TRUE}
 # Si algún paquete falta:
-# install.packages(c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "xgboost"))
+# install.packages(c("tidyverse", "tidymodels", "ranger", "vip", "pdp", "xgboost", "patchwork"))
 library(tidyverse)   # readr, dplyr, ggplot2, etc
 library(tidymodels)  # rsample, parsnip, recipes, workflows, tune, yardstick
 library(ranger)      # motor rápido para Random Forest
 library(vip)         # Variable Importance Plots
 library(pdp)         # Partial Dependence Plots
+library(xgboost)     # Gradient Boosting (apéndice 4)
+library(patchwork)   # combinar gráficos con +
 
 set.seed(2026)
 ```
@@ -116,7 +118,7 @@ Vamos a trabajar con datos simulados inspirados en el [Latinobarómetro](https:/
 
 ## Descripción de las variables
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 **Variables numéricas**
@@ -155,19 +157,20 @@ Vamos a trabajar con datos simulados inspirados en el [Latinobarómetro](https:/
 ```{r cargar-datos, prompt=FALSE, echo=TRUE}
 # Cargar el dataset (generado con datos/crear-datos.R)
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
 # Convertir variables categóricas a factores
-# El primer nivel de voto es la clase positiva para yardstick
 # El orden de niveles en uso_internet y voto es importante para interpretación
+# voto usa c("no", "si"), la misma convención del Día 1: "si" es la clase
+# positiva y por eso pasamos event_level = "second" a las métricas
 datos <- datos |>
   mutate(
     pais = factor(pais),
     zona = factor(zona),
     genero = factor(genero),
     uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
-    voto = factor(voto, levels = c("si", "no")) # Diferente del lab anterior
+    voto = factor(voto, levels = c("no", "si"))
   )
 
 # Estructura y distribución del voto
@@ -243,13 +246,19 @@ ajuste_logit <- workflow() |>
 # augment(): genera predicciones y métricas para cada observación
 pred_logit <- augment(ajuste_logit, datos_test)
 
-# metrics(): calcula múltiples métricas de evaluación
+# metric_set(): las cuatro métricas que usaremos en todo el lab
+mis_metricas <- metric_set(accuracy, precision, recall, roc_auc)
+
 # truth: variable real, estimate: predicción de clase, .pred_si: probabilidades
+# event_level = "second": "si" es la clase positiva (igual que en el Día 1)
 metricas_logit <- pred_logit |>
-  metrics(truth = voto, estimate = .pred_class, .pred_si)
+  mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 metricas_logit
 ```
+
+[En la sesión 2.2 vimos `last_fit()`, que hace `fit()` + predicciones + métricas en una sola llamada. Acá guardamos las predicciones aparte porque las vamos a reusar en la matriz de confusión, la curva ROC y la comparación final]{.alert}
 :::
 
 ## Matriz de confusión del baseline
@@ -265,16 +274,16 @@ conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
 ```
 :::
 
-## Ejercicio 1: Threshold óptimo {#sec:exercise01}
+## Ejercicio 1: Umbral óptimo {#sec:exercise01}
 
 :::{style="margin-top: 30px; font-size: 20px;"}
 
-Por defecto, clasificamos como "sí" si P(sí) > 0.5. Pero este valor puede no ser óptimo
+Por defecto, clasificamos como "sí" si P(sí) > 0.5. Pero este umbral (threshold) puede no ser óptimo
 
-**Tarea:** ejecuten el código abajo (compara F1-score con tres thresholds) y respondan:
+**Tarea:** ejecuten el código abajo (compara F1 con tres umbrales) y respondan:
 
-1. ¿Qué threshold da el F1-score más alto?
-2. ¿Cómo cambia el F1 cuando subimos el threshold? ¿Por qué?
+1. ¿Qué umbral da el F1 más alto?
+2. ¿Cómo cambia el F1 cuando subimos el umbral? ¿Por qué?
 
 ```{r ej1-codigo, eval=FALSE, prompt=FALSE, echo=TRUE}
 # F1 para tres umbrales distintos
@@ -285,11 +294,12 @@ for (umbral in umbrales) {
   pred_umbral <- pred_logit |>
     mutate(
       clase = ifelse(.pred_si > umbral, "si", "no"),
-      clase = factor(clase, levels = c("si", "no"))
+      clase = factor(clase, levels = c("no", "si"))
     )
 
   # 2. Calcular el F1 de esas predicciones ("si" es la clase positiva)
-  f1 <- f_meas(pred_umbral, truth = voto, estimate = clase)
+  f1 <- f_meas(pred_umbral, truth = voto, estimate = clase,
+               event_level = "second")
 
   # 3. Mostrar el umbral y su F1
   cat("Umbral", umbral, "→ F1 =", round(f1$.estimate, 3), "\n")
@@ -300,7 +310,7 @@ for (umbral in umbrales) {
 **¿Por qué F1 y no precisión o recall?** F1 [combina ambas]{.alert} y obliga al modelo a encontrar un equilibrio. Si fuera un test de cáncer (falso negativo = paciente sin diagnosticar) usaríamos [recall]{.alert}. Si fuera un sistema de recomendación (falso positivo = recomendar algo malo) usaríamos [precisión]{.alert}. Aquí ambos errores son igual de problemáticos, así que F1 nos da el equilibrio.
 :::
 
-[Tómense 3-5 minutos!]{.alert}
+[¡Tómense 3-5 minutos!]{.alert}
 
 [[Apéndice 1: Solución]{.button}](#sec:appendix01)
 :::
@@ -389,8 +399,8 @@ resultados_tune <- tune_grid(
   wf_rf_tune,                # el workflow con tune() pendientes
   resamples = folds,         # los folds de validación cruzada
   grid = grilla_rf,          # la grilla de combinaciones a probar
-  # metric_set(): define qué métricas calcular en cada evaluación
-  metrics = metric_set(accuracy, roc_auc),
+  # metric_set(): para elegir hiperparámetros alcanza con roc_auc
+  metrics = metric_set(roc_auc),
   control = control_grid(verbose = FALSE)  # no imprimir progreso
 )
 
@@ -421,7 +431,8 @@ ajuste_rf <- wf_rf_tune |>
 pred_rf <- augment(ajuste_rf, datos_test)
 
 metricas_rf <- pred_rf |>
-  metrics(truth = voto, estimate = .pred_class, .pred_si)
+  mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 cat("Regresión logística:\n"); print(metricas_logit)
 cat("\nRandom Forest:\n");     print(metricas_rf)
@@ -436,11 +447,11 @@ cat("\nRandom Forest:\n");     print(metricas_rf)
 # roc_curve(): calcula sensibilidad y especificidad para cada umbral
 # truth: la variable real, .pred_si: probabilidades predichas
 roc_logit <- pred_logit |>
-  roc_curve(truth = voto, .pred_si) |>
+  roc_curve(truth = voto, .pred_si, event_level = "second") |>
   mutate(modelo = "Regresión logística")
 
 roc_rf <- pred_rf |>
-  roc_curve(truth = voto, .pred_si) |>
+  roc_curve(truth = voto, .pred_si, event_level = "second") |>
   mutate(modelo = "Random Forest")
 
 # Combinar y graficar
@@ -499,11 +510,10 @@ datos_prep <- bake(prep(receta), new_data = datos_train)
 
 # partial() calcula el efecto marginal sobre P(voto = "si")
 pdp_edad    <- partial(rf_engine, pred.var = "edad",
-                       train = datos_prep, prob = TRUE, which.class = 1)
+                       train = datos_prep, prob = TRUE, which.class = "si")
 pdp_interes <- partial(rf_engine, pred.var = "interes_politica",
-                       train = datos_prep, prob = TRUE, which.class = 1)
+                       train = datos_prep, prob = TRUE, which.class = "si")
 
-library(patchwork)
 autoplot(pdp_edad)    + labs(title = "Edad", y = "P(voto = sí)") +
 autoplot(pdp_interes) + labs(title = "Interés en política", y = NULL) &
   theme_minimal()
@@ -618,41 +628,42 @@ datos_uruguay <- datos |>
 
 # Apéndice: Soluciones {background-color="#2d4563"}
 
-## Apéndice 1: Threshold óptimo {#sec:appendix01}
+## Apéndice 1: Umbral óptimo {#sec:appendix01}
 
 :::{style="margin-top: 20px; font-size: 20px;"}
 
 **Respuestas:**
 
-1. El threshold cercano a [0.4-0.5]{.alert} suele dar el F1 más alto (varía según la muestra)
-2. Al subir el threshold el modelo predice "sí" con más cautela: la **precisión** sube (menos falsos positivos) pero el **recall** baja (perdemos casos reales). El F1 balancea ambos, así que crece hasta cierto punto y después baja
+1. El umbral cercano a [0.4-0.5]{.alert} suele dar el F1 más alto (varía según la muestra)
+2. Al subir el umbral el modelo predice "sí" con más cautela: la **precisión** sube (menos falsos positivos) pero el **recall** baja (perdemos casos reales). El F1 balancea ambos, así que crece hasta cierto punto y después baja
 
-**Versión extendida** — barrer thresholds finos (cada 0.05) y graficar la curva:
+**Versión extendida** — barrer umbrales finos (cada 0.05) y graficar la curva:
 
 ```{r ap1-sol, prompt=FALSE, echo=TRUE, eval=TRUE, fig.width=8, fig.height=3.5}
-thresholds <- seq(0.3, 0.7, by = 0.05)
-resultados <- data.frame(threshold = numeric(), f1 = numeric())
+umbrales <- seq(0.3, 0.7, by = 0.05)
+resultados <- data.frame(umbral = numeric(), f1 = numeric())
 
-for (t in thresholds) {
+for (t in umbrales) {
   pred_nuevo <- pred_logit |>
     mutate(.pred_class_nuevo = factor(
-      ifelse(.pred_si > t, "si", "no"), levels = c("si", "no")))
-  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo)
+      ifelse(.pred_si > t, "si", "no"), levels = c("no", "si")))
+  f1 <- f_meas(pred_nuevo, truth = voto, estimate = .pred_class_nuevo,
+               event_level = "second")
   resultados <- rbind(resultados,
-                      data.frame(threshold = t, f1 = f1$.estimate))
+                      data.frame(umbral = t, f1 = f1$.estimate))
 }
 
 resultados |> arrange(desc(f1))
 
-ggplot(resultados, aes(x = threshold, y = f1)) +
+ggplot(resultados, aes(x = umbral, y = f1)) +
   geom_line(linewidth = 1.2, color = "#2d4563") +
   geom_point(size = 3, color = "#2d4563") +
-  labs(title = "F1-score según el threshold",
-       x = "Threshold", y = "F1-score") +
+  labs(title = "F1 según el umbral",
+       x = "Umbral", y = "F1") +
   theme_minimal()
 ```
 
-- El threshold óptimo depende del [costo relativo]{.alert} de cada tipo de error: si los falsos positivos son caros, subir; si los falsos negativos son caros, bajar
+- El umbral óptimo depende del [costo relativo]{.alert} de cada tipo de error: si los falsos positivos son caros, subir; si los falsos negativos son caros, bajar
 
 [[Volver al ejercicio]{.button}](#sec:exercise01)
 :::
@@ -675,7 +686,7 @@ receta_uy <- recipe(voto ~ ., data = datos_uruguay) |>
   step_zv(all_predictors())
 
 modelo_rf_uy <- rand_forest(trees = 500, mtry = 4, min_n = 3) |>
-  set_engine("ranger", importance = "impurity") |>
+  set_engine("ranger", importance = "permutation") |>
   set_mode("classification")
 
 ajuste_rf_uy <- workflow() |>
@@ -747,7 +758,8 @@ pred_arbol <- augment(ajuste_arbol, datos_test)
 
 # Comparar métricas
 cat("Árbol de decisión:\n")
-print(pred_arbol |> metrics(truth = voto, estimate = .pred_class, .pred_si))
+print(pred_arbol |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                                 event_level = "second"))
 cat("\nRandom Forest:\n")
 print(metricas_rf)
 
@@ -804,11 +816,14 @@ ajuste_xgb <- wf_xgb |>
 pred_xgb <- augment(ajuste_xgb, datos_test)
 
 bind_rows(
-  pred_logit |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+  pred_logit |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                             event_level = "second") |>
     mutate(modelo = "Regresión logística"),
-  pred_rf |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+  pred_rf |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                          event_level = "second") |>
     mutate(modelo = "Random Forest"),
-  pred_xgb |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+  pred_xgb |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                           event_level = "second") |>
     mutate(modelo = "XGBoost")
 ) |>
   select(modelo, .metric, .estimate) |>

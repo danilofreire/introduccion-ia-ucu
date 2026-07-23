@@ -116,7 +116,7 @@ cat("Predictores en la receta preparada:",
 cat("Entrenamiento:", nrow(datos_train), "| Prueba:", nrow(datos_test), "\n")
 ```
 
-**Respuesta:** Quedan **17 predictores**: los 8 numéricos originales más las dummies de `departamento` (7), `sector` (1) y `zona` (1). El identificador `escuela` sale con `step_rm()`: dejarlo entrar como predictor sería un error clásico (400 valores únicos sin ninguna información generalizable). La normalización es necesaria porque LASSO y Ridge penalizan el tamaño de los coeficientes: sin escalar, una variable medida en pesos (presupuesto) recibiría una penalización injustamente distinta que una medida en porcentaje.
+**Respuesta:** Quedan **17 predictores**: los 8 numéricos originales más las dummies de `departamento` (7), `sector` (1) y `zona` (1). El identificador `escuela` sale con `step_rm()`: dejarlo entrar como predictor sería un error clásico (400 valores únicos sin ninguna información generalizable). La normalización es necesaria porque LASSO y Ridge penalizan el tamaño de los coeficientes: sin escalar, una variable medida en pesos (presupuesto) recibiría una penalización injustamente distinta que una medida en porcentaje. Una nota: acá no estratificamos la división; con un outcome continuo también se puede, como hicimos en el laboratorio (`strata = puntaje_prueba` lo divide por cuartiles).
 
 ### Pregunta 5: Modelo OLS
 
@@ -223,7 +223,7 @@ cat("\nEliminadas:", sum(coefs_lasso$estimate == 0), "de",
     nrow(coefs_lasso), "predictores\n")
 ```
 
-**Respuesta:** Con el lambda mínimo, LASSO elimina **10 de los 17 predictores**: `computadoras_alumno`, `horas_semanales`, `formacion_docente_pct` y casi todas las dummies de departamento, sector y zona. El caso de `computadoras_alumno` es el más instructivo: correlaciona ~0,29 con el puntaje (Pregunta 2), pero esa correlación existe sólo porque las computadoras van donde va el presupuesto. Una vez que `presupuesto_alumno` está en el modelo, las computadoras no agregan información independiente y LASSO las pone en cero. `horas_semanales` cae por la razón opuesta: nunca tuvo relación con el puntaje. LASSO no distingue entre "redundante" e "irrelevante": descarta lo que no ayuda a predecir, por dos caminos distintos.
+**Respuesta:** Con el lambda mínimo, LASSO elimina **10 de los 17 predictores**: `computadoras_alumno`, `horas_semanales`, `formacion_docente_pct` y casi todas las dummies de departamento, sector y zona. El caso de `computadoras_alumno` es el más instructivo: correlaciona ~0,29 con el puntaje (Pregunta 2), pero esa correlación existe solo porque las computadoras van donde va el presupuesto. Una vez que `presupuesto_alumno` está en el modelo, las computadoras no agregan información independiente y LASSO las pone en cero. `horas_semanales` cae por la razón opuesta: nunca tuvo relación con el puntaje. LASSO no distingue entre "redundante" e "irrelevante": descarta lo que no ayuda a predecir, por dos caminos distintos.
 
 ## Ridge y Elastic Net
 
@@ -310,17 +310,19 @@ ajuste_en <- finalize_workflow(
 ) |>
   fit(data = datos_train)
 
-evaluar <- function(ajuste, nombre) {
-  augment(ajuste, datos_test) |>
-    metrics(truth = puntaje_prueba, estimate = .pred) |>
-    mutate(modelo = nombre)
-}
-
 bind_rows(
-  evaluar(ajuste_ols, "OLS"),
-  evaluar(ajuste_lasso, "LASSO"),
-  evaluar(ajuste_ridge, "Ridge"),
-  evaluar(ajuste_en, "Elastic Net")
+  augment(ajuste_ols, datos_test) |>
+    metrics(truth = puntaje_prueba, estimate = .pred) |>
+    mutate(modelo = "OLS"),
+  augment(ajuste_lasso, datos_test) |>
+    metrics(truth = puntaje_prueba, estimate = .pred) |>
+    mutate(modelo = "LASSO"),
+  augment(ajuste_ridge, datos_test) |>
+    metrics(truth = puntaje_prueba, estimate = .pred) |>
+    mutate(modelo = "Ridge"),
+  augment(ajuste_en, datos_test) |>
+    metrics(truth = puntaje_prueba, estimate = .pred) |>
+    mutate(modelo = "Elastic Net")
 ) |>
   select(modelo, .metric, .estimate) |>
   pivot_wider(names_from = .metric, values_from = .estimate) |>
@@ -328,7 +330,7 @@ bind_rows(
   mutate(across(where(is.numeric), \(x) round(x, 2)))
 ```
 
-**Respuesta:** La tabla queda apretadísima: el mejor RMSE es el de **OLS** (~26,7), con LASSO, Elastic Net y Ridge a apenas ~0,3-0,4 puntos. En términos prácticos, **la diferencia es irrelevante**: una fracción de punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y sólo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).
+**Respuesta:** La tabla queda apretadísima: el mejor RMSE es el de **OLS** (~26,7), con LASSO, Elastic Net y Ridge a apenas ~0,3-0,5 puntos. En términos prácticos, **la diferencia es irrelevante**: una fracción de punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y solo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).
 
 ### Pregunta 13: Reflexión
 

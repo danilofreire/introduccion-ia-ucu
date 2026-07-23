@@ -34,18 +34,19 @@ set.seed(2026)
 
 # Cargar los datos
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
-# Convertir categóricas a factores. El primer nivel de voto es
-# la clase positiva para yardstick.
+# Convertir categóricas a factores. voto usa c("no", "si"), la misma
+# convención del Día 1: "si" es la clase positiva y por eso pasamos
+# event_level = "second" a las métricas.
 datos <- datos |>
   mutate(
     pais = factor(pais),
     zona = factor(zona),
     genero = factor(genero),
     uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
-    voto = factor(voto, levels = c("si", "no"))
+    voto = factor(voto, levels = c("no", "si"))
   )
 
 # Estructura y distribución del voto
@@ -89,8 +90,13 @@ ajuste_logit <- fit(wf_logit, data = datos_train)
 
 pred_logit <- augment(ajuste_logit, datos_test)
 
+# Las cuatro métricas que usaremos en todo el lab.
+# event_level = "second": "si" es la clase positiva (igual que en el Día 1).
+mis_metricas <- metric_set(accuracy, precision, recall, roc_auc)
+
 metricas_logit <- pred_logit |>
-  metrics(truth = voto, estimate = .pred_class, .pred_si)
+  mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 metricas_logit
 
@@ -101,9 +107,9 @@ conf_mat(pred_logit, truth = voto, estimate = .pred_class) |>
   labs(title = "Matriz de confusión - Regresión logística")
 
 
-# --- Ejercicio 1 + Apéndice 1: Threshold óptimo ------------
+# --- Ejercicio 1 + Apéndice 1: Umbral óptimo ---------------
 
-# Versión simple (3 thresholds) — como aparece en la diapositiva del ejercicio
+# Versión simple (3 umbrales) — como aparece en la diapositiva del ejercicio
 umbrales <- c(0.3, 0.5, 0.7)
 
 for (umbral in umbrales) {
@@ -111,38 +117,40 @@ for (umbral in umbrales) {
   pred_umbral <- pred_logit |>
     mutate(
       clase = ifelse(.pred_si > umbral, "si", "no"),
-      clase = factor(clase, levels = c("si", "no"))
+      clase = factor(clase, levels = c("no", "si"))
     )
 
   # 2. Calcular el F1 de esas predicciones ("si" es la clase positiva)
-  f1 <- f_meas(pred_umbral, truth = voto, estimate = clase)
+  f1 <- f_meas(pred_umbral, truth = voto, estimate = clase,
+               event_level = "second")
 
   # 3. Mostrar el umbral y su F1
   cat("Umbral", umbral, "→ F1 =", round(f1$.estimate, 3), "\n")
 }
 
 # Versión extendida (barrido fino) — del Apéndice 1
-thresholds <- seq(0.3, 0.7, by = 0.05)
-resultados <- data.frame(threshold = numeric(), f1 = numeric())
+umbrales_finos <- seq(0.3, 0.7, by = 0.05)
+resultados <- data.frame(umbral = numeric(), f1 = numeric())
 
-for (t in thresholds) {
+for (t in umbrales_finos) {
   pred_nuevo <- pred_logit |>
     mutate(.pred_class_nuevo = factor(
       ifelse(.pred_si > t, "si", "no"),
-      levels = c("si", "no")))
+      levels = c("no", "si")))
   f1 <- f_meas(pred_nuevo, truth = voto,
-               estimate = .pred_class_nuevo)
+               estimate = .pred_class_nuevo,
+               event_level = "second")
   resultados <- rbind(resultados,
-                      data.frame(threshold = t, f1 = f1$.estimate))
+                      data.frame(umbral = t, f1 = f1$.estimate))
 }
 
 resultados |> arrange(desc(f1))
 
-ggplot(resultados, aes(x = threshold, y = f1)) +
+ggplot(resultados, aes(x = umbral, y = f1)) +
   geom_line(linewidth = 1.2, color = "#2d4563") +
   geom_point(size = 3, color = "#2d4563") +
-  labs(title = "F1-score según el threshold",
-       x = "Threshold", y = "F1-score") +
+  labs(title = "F1 según el umbral",
+       x = "Umbral", y = "F1") +
   theme_minimal()
 
 
@@ -205,7 +213,8 @@ ajuste_rf <- wf_rf_tune |>
 pred_rf <- augment(ajuste_rf, datos_test)
 
 metricas_rf <- pred_rf |>
-  metrics(truth = voto, estimate = .pred_class, .pred_si)
+  mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 cat("Regresión logística:\n"); print(metricas_logit)
 cat("\nRandom Forest:\n");     print(metricas_rf)
@@ -214,11 +223,11 @@ cat("\nRandom Forest:\n");     print(metricas_rf)
 # --- Curva ROC comparativa ----------------------------------
 
 roc_logit <- pred_logit |>
-  roc_curve(truth = voto, .pred_si) |>
+  roc_curve(truth = voto, .pred_si, event_level = "second") |>
   mutate(modelo = "Regresión logística")
 
 roc_rf <- pred_rf |>
-  roc_curve(truth = voto, .pred_si) |>
+  roc_curve(truth = voto, .pred_si, event_level = "second") |>
   mutate(modelo = "Random Forest")
 
 bind_rows(roc_logit, roc_rf) |>
@@ -247,10 +256,10 @@ rf_engine <- extract_fit_engine(ajuste_rf)
 datos_prep <- bake(prep(receta), new_data = datos_train)
 
 pdp_edad <- partial(rf_engine, pred.var = "edad",
-                    train = datos_prep, prob = TRUE, which.class = 1)
+                    train = datos_prep, prob = TRUE, which.class = "si")
 
 pdp_interes <- partial(rf_engine, pred.var = "interes_politica",
-                       train = datos_prep, prob = TRUE, which.class = 1)
+                       train = datos_prep, prob = TRUE, which.class = "si")
 
 p1 <- autoplot(pdp_edad) +
   labs(title = "PDP: Edad", x = "Edad (normalizada)",
@@ -277,7 +286,7 @@ receta_uy <- recipe(voto ~ ., data = datos_uruguay) |>
   step_zv(all_predictors())
 
 modelo_rf_uy <- rand_forest(trees = 500, mtry = 4, min_n = 3) |>
-  set_engine("ranger", importance = "impurity") |>
+  set_engine("ranger", importance = "permutation") |>
   set_mode("classification")
 
 ajuste_rf_uy <- workflow() |>
@@ -332,7 +341,8 @@ ajuste_arbol <- finalize_workflow(wf_arbol, mejor_arbol) |>
 pred_arbol <- augment(ajuste_arbol, datos_test)
 
 cat("Árbol de decisión:\n")
-print(pred_arbol |> metrics(truth = voto, estimate = .pred_class, .pred_si))
+print(pred_arbol |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                                 event_level = "second"))
 
 cat("\nRandom Forest:\n")
 print(metricas_rf)
@@ -381,11 +391,14 @@ pred_xgb <- augment(ajuste_xgb, datos_test)
 
 # Tabla comparativa con los tres modelos
 bind_rows(
-  pred_logit |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+  pred_logit |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                             event_level = "second") |>
     mutate(modelo = "Regresión logística"),
-  pred_rf |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+  pred_rf |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                          event_level = "second") |>
     mutate(modelo = "Random Forest"),
-  pred_xgb |> metrics(truth = voto, estimate = .pred_class, .pred_si) |>
+  pred_xgb |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                           event_level = "second") |>
     mutate(modelo = "XGBoost")
 ) |>
   select(modelo, .metric, .estimate) |>

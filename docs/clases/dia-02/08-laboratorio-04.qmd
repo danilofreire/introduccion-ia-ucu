@@ -55,7 +55,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 ## Objetivos del laboratorio
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=50%}
 **Retomamos la clase de regresión.** Hoy ejecutamos paso a paso la misma receta que vimos en la teoría:
@@ -95,7 +95,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 #| warning: false
 #| eval: true
 
-# Si algún paquete falta: install.packages(c( "tidymodels", "glmnet", "ranger", "vip"))
+# Si algún paquete falta: install.packages(c("tidymodels", "tidyverse", "glmnet"))
 library(tidymodels)  # rsample, parsnip, recipes, workflows, tune, yardstick
 library(tidyverse)   # incluye readr (read_csv), dplyr, ggplot2, etc.
 library(glmnet)      # motor para LASSO, Ridge, Elastic Net
@@ -104,7 +104,7 @@ set.seed(2026)
 
 # Cargar el dataset
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
 # Convertir categóricas a factor
@@ -128,8 +128,9 @@ glimpse(datos)
 #| label: split-datos
 #| eval: true
 
-# División train/test (75/25)
-datos_split <- initial_split(datos, prop = 0.75)
+# División train/test (75/25), estratificada por el outcome
+# (con una variable numérica, rsample estratifica por cuartiles)
+datos_split <- initial_split(datos, prop = 0.75, strata = satisfaccion_vida)
 datos_train <- training(datos_split)
 datos_test  <- testing(datos_split)
 
@@ -211,8 +212,8 @@ metricas_ols |> knitr::kable(digits = 3)
 ```
 
 :::{style="margin-top:30px;"}
-- RMSE ≈ 1.2: en promedio la predicción se aleja de la realidad en ~1.2 puntos (escala 1-10)
-- R² ≈ 0.26: el modelo explica ~26% de la varianza de la satisfacción
+- RMSE ≈ 1.3: en promedio la predicción se aleja de la realidad en ~1.3 puntos (escala 1-10)
+- R² ≈ 0.23: el modelo explica ~23% de la varianza de la satisfacción
 :::
 :::
 
@@ -337,10 +338,8 @@ coef_lasso |> head(8) |> knitr::kable(digits = 3)
 #| fig-width: 10
 #| fig-height: 4
 
-coef_ols  <- tidy(ajuste_ols)   |> filter(term != "(Intercept)") |>
-             select(term, OLS   = estimate)
-coef_lasc <- tidy(ajuste_lasso) |> filter(term != "(Intercept)") |>
-             select(term, LASSO = estimate)
+coef_ols  <- tidy(ajuste_ols)   |> filter(term != "(Intercept)") |> select(term, OLS   = estimate)
+coef_lasc <- tidy(ajuste_lasso) |> filter(term != "(Intercept)") |> select(term, LASSO = estimate)
 
 left_join(coef_ols, coef_lasc, by = "term") |>
   pivot_longer(c(OLS, LASSO), names_to = "modelo", values_to = "coef") |>
@@ -361,7 +360,7 @@ left_join(coef_ols, coef_lasc, by = "term") |>
 
 :::{style="margin-top: 30px; font-size: 18px;"}
 
-**Tarea (5 min):** adapten el pipeline de LASSO que acabamos de ver. Cambia solo lo necesario para Ridge: completen los tres huecos
+**Tarea (5 min):** adapten el pipeline de LASSO que acabamos de ver. Cambien solo lo necesario para Ridge: completen los tres huecos
 
 ```{r}
 #| label: ej1-skeleton
@@ -692,11 +691,11 @@ modelo_enet <- linear_reg(penalty = tune(), mixture = tune()) |>
 
 wf_enet <- workflow() |> add_recipe(receta) |> add_model(modelo_enet)
 
-# Grilla 2D: 15 valores de λ × 5 de mixture
+# Grilla 2D: 20 valores de λ × 5 de mixture (como en la clase)
 grilla_enet <- grid_regular(
   penalty(range = c(-4, 0)),
   mixture(range = c(0, 1)),
-  levels = c(15, 5)
+  levels = c(20, 5)
 )
 
 resultados_enet <- tune_grid(
@@ -722,4 +721,4 @@ predict(ajuste_enet, datos_test) |>
 [[Volver a la sección de LASSO vs. Ridge]{.button}](#sec:lasso-vs-ridge)
 :::
 
-# Fin del día 2! 🤓 {background-color="#2d4563"}
+# ¡Fin del Día 2! 🤓 {background-color="#2d4563"}

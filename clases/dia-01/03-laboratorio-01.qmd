@@ -618,7 +618,7 @@ predicciones |>
 
 - Si el [costo de perder un caso]{.alert} es alto (p. ej., decisiones de inversión): prioricen [recall]{.alert}
 - Si el [costo de una falsa alarma]{.alert} es alto (p. ej., asignar recursos mal): prioricen [precisión]{.alert}
-- Sin preferencia clara: usen [F-Measure/F-Score]{.alert} (`f_meas`), el promedio armónico de ambas
+- Sin preferencia clara: usen [F1]{.alert} (`f_meas`), el promedio armónico de ambas
 
 [No hay respuesta universal.]{.alert} El contexto define la métrica correcta
 :::

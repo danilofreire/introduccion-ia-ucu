@@ -362,9 +362,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Dividan 80/20 con <code>set.seed(2026)</code> y creen la receta (sin <code>escuela</code>, dummies, normalización, varianza cero). ¿Cuántos predictores quedan?</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>division <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>datos_train <span class="ot">&lt;-</span> <span class="fu">training</span>(division)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>datos_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(division)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>datos_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(datos, <span class="at">prop =</span> <span class="fl">0.8</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>datos_train <span class="ot">&lt;-</span> <span class="fu">training</span>(datos_split)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>datos_test  <span class="ot">&lt;-</span> <span class="fu">testing</span>(datos_split)</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>receta <span class="ot">&lt;-</span> <span class="fu">recipe</span>(puntaje_prueba <span class="sc">~</span> ., <span class="at">data =</span> datos_train) <span class="sc">|&gt;</span></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(escuela) <span class="sc">|&gt;</span></span>
@@ -382,7 +382,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Entrenamiento: 320 | Prueba: 80 </code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Quedan <strong>17 predictores</strong>: los 8 numéricos originales más las dummies de <code>departamento</code> (7), <code>sector</code> (1) y <code>zona</code> (1). El identificador <code>escuela</code> sale con <code>step_rm()</code>: dejarlo entrar como predictor sería un error clásico (400 valores únicos sin ninguna información generalizable). La normalización es necesaria porque LASSO y Ridge penalizan el tamaño de los coeficientes: sin escalar, una variable medida en pesos (presupuesto) recibiría una penalización injustamente distinta que una medida en porcentaje.</p>
+<p><strong>Respuesta:</strong> Quedan <strong>17 predictores</strong>: los 8 numéricos originales más las dummies de <code>departamento</code> (7), <code>sector</code> (1) y <code>zona</code> (1). El identificador <code>escuela</code> sale con <code>step_rm()</code>: dejarlo entrar como predictor sería un error clásico (400 valores únicos sin ninguna información generalizable). La normalización es necesaria porque LASSO y Ridge penalizan el tamaño de los coeficientes: sin escalar, una variable medida en pesos (presupuesto) recibiría una penalización injustamente distinta que una medida en porcentaje. Una nota: acá no estratificamos la división; con un outcome continuo también se puede, como hicimos en el laboratorio (<code>strata = puntaje_prueba</code> lo divide por cuartiles).</p>
 </section>
 <section id="pregunta-5-modelo-ols" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="pregunta-5-modelo-ols"><span class="header-section-number">3.2</span> Pregunta 5: Modelo OLS</h3>
@@ -539,7 +539,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 Eliminadas: 10 de 17 predictores</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> Con el lambda mínimo, LASSO elimina <strong>10 de los 17 predictores</strong>: <code>computadoras_alumno</code>, <code>horas_semanales</code>, <code>formacion_docente_pct</code> y casi todas las dummies de departamento, sector y zona. El caso de <code>computadoras_alumno</code> es el más instructivo: correlaciona ~0,29 con el puntaje (Pregunta 2), pero esa correlación existe sólo porque las computadoras van donde va el presupuesto. Una vez que <code>presupuesto_alumno</code> está en el modelo, las computadoras no agregan información independiente y LASSO las pone en cero. <code>horas_semanales</code> cae por la razón opuesta: nunca tuvo relación con el puntaje. LASSO no distingue entre “redundante” e “irrelevante”: descarta lo que no ayuda a predecir, por dos caminos distintos.</p>
+<p><strong>Respuesta:</strong> Con el lambda mínimo, LASSO elimina <strong>10 de los 17 predictores</strong>: <code>computadoras_alumno</code>, <code>horas_semanales</code>, <code>formacion_docente_pct</code> y casi todas las dummies de departamento, sector y zona. El caso de <code>computadoras_alumno</code> es el más instructivo: correlaciona ~0,29 con el puntaje (Pregunta 2), pero esa correlación existe solo porque las computadoras van donde va el presupuesto. Una vez que <code>presupuesto_alumno</code> está en el modelo, las computadoras no agregan información independiente y LASSO las pone en cero. <code>horas_semanales</code> cae por la razón opuesta: nunca tuvo relación con el puntaje. LASSO no distingue entre “redundante” e “irrelevante”: descarta lo que no ayuda a predecir, por dos caminos distintos.</p>
 </section>
 </section>
 <section id="ridge-y-elastic-net" class="level2" data-number="5">
@@ -649,22 +649,24 @@ Eliminadas: 10 de 17 predictores</code></pre>
 <span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
 <span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> datos_train)</span>
 <span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>evaluar <span class="ot">&lt;-</span> <span class="cf">function</span>(ajuste, nombre) {</span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(ajuste, datos_test) <span class="sc">|&gt;</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(ajuste_ols, datos_test) <span class="sc">|&gt;</span></span>
 <span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> puntaje_prueba, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span></span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">modelo =</span> nombre)</span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_ols, <span class="st">"OLS"</span>),</span>
-<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_lasso, <span class="st">"LASSO"</span>),</span>
-<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_ridge, <span class="st">"Ridge"</span>),</span>
-<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">evaluar</span>(ajuste_en, <span class="st">"Elastic Net"</span>)</span>
-<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rmse) <span class="sc">|&gt;</span></span>
-<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">2</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"OLS"</span>),</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(ajuste_lasso, datos_test) <span class="sc">|&gt;</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> puntaje_prueba, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"LASSO"</span>),</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(ajuste_ridge, datos_test) <span class="sc">|&gt;</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> puntaje_prueba, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Ridge"</span>),</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(ajuste_en, datos_test) <span class="sc">|&gt;</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">metrics</span>(<span class="at">truth =</span> puntaje_prueba, <span class="at">estimate =</span> .pred) <span class="sc">|&gt;</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">modelo =</span> <span class="st">"Elastic Net"</span>)</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(modelo, .metric, .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(rmse) <span class="sc">|&gt;</span></span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">2</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 4 × 4
   modelo       rmse   rsq   mae
@@ -675,7 +677,7 @@ Eliminadas: 10 de 17 predictores</code></pre>
 4 Ridge        27.2  0.68  22.1</code></pre>
 </div>
 </div>
-<p><strong>Respuesta:</strong> La tabla queda apretadísima: el mejor RMSE es el de <strong>OLS</strong> (~26,7), con LASSO, Elastic Net y Ridge a apenas ~0,3-0,4 puntos. En términos prácticos, <strong>la diferencia es irrelevante</strong>: una fracción de punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y sólo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).</p>
+<p><strong>Respuesta:</strong> La tabla queda apretadísima: el mejor RMSE es el de <strong>OLS</strong> (~26,7), con LASSO, Elastic Net y Ridge a apenas ~0,3-0,5 puntos. En términos prácticos, <strong>la diferencia es irrelevante</strong>: una fracción de punto de RMSE, en una escala donde el error ronda los 27 puntos, no cambia ninguna decisión. ¿Por qué no gana nadie? Porque con 320 escuelas de entrenamiento y solo 17 predictores (n mucho mayor que p) y relaciones aproximadamente lineales, OLS no sufre el sobreajuste que la regularización viene a curar. La regularización brilla con muchos predictores, pocos datos o fuerte colinealidad; acá su valor no es predecir mejor sino producir un modelo más simple (LASSO rinde igual que OLS usando 7 variables en vez de 17).</p>
 </section>
 <section id="pregunta-13-reflexión" class="level3" data-number="6.2">
 <h3 data-number="6.2" class="anchored" data-anchor-id="pregunta-13-reflexión"><span class="header-section-number">6.2</span> Pregunta 13: Reflexión</h3>

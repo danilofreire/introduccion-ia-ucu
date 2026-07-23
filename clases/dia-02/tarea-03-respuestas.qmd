@@ -37,8 +37,12 @@ datos <- datos |>
     zona = factor(zona),
     genero = factor(genero),
     uso_internet = factor(uso_internet, levels = c("nunca", "semanal", "diario")),
-    voto = factor(voto, levels = c("si", "no"))
+    voto = factor(voto, levels = c("no", "si"))
   )
+
+# Las métricas del laboratorio + F1 (la pide la Pregunta 12)
+# event_level = "second": "si" es la clase positiva
+mis_metricas <- metric_set(accuracy, roc_auc, precision, recall, f_meas)
 
 # División train/test (reutilizada en varias preguntas)
 datos_split <- initial_split(datos, prop = 0.75, strata = voto)
@@ -120,7 +124,7 @@ cat("\nPar con mayor correlación:",
 cat("Correlación:", round(mat_cor[max_idx[1], max_idx[2]], 3), "\n")
 ```
 
-**Respuesta:** Las variables con mayor correlación son probablemente `educacion_anios` e `ingreso_hogar` (r ~ 0.30-0.55), lo cual tiene sentido: personas con más educación tienden a tener mayores ingresos. También hay correlación entre `interes_politica` y `confianza_gobierno`, ya que personas más interesadas en política pueden tener opiniones más formadas sobre el gobierno. Las correlaciones entre actitudes políticas (confianza en gobierno, en justicia, satisfacción democrática) son moderadas, reflejando que estas actitudes están relacionadas entre sí.
+**Respuesta:** Las variables con mayor correlación son `ingreso_hogar` y `educacion_anios` (r ≈ 0.54), lo cual tiene sentido: personas con más educación tienden a tener mayores ingresos. También hay correlación entre `interes_politica` y `confianza_gobierno`, ya que personas más interesadas en política pueden tener opiniones más formadas sobre el gobierno. Las correlaciones entre actitudes políticas (confianza en gobierno, en justicia, satisfacción democrática) son moderadas, reflejando que estas actitudes están relacionadas entre sí.
 
 ### Pregunta 3: Distribución de edad por voto
 
@@ -164,7 +168,8 @@ ajuste_reducido <- workflow() |>
 pred_reducido <- augment(ajuste_reducido, datos_test)
 
 metricas_reducido <- pred_reducido |>
-  metrics(truth = voto, estimate = .pred_class, .pred_si)
+  mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 cat("Modelo reducido (3 predictores):\n")
 metricas_reducido
@@ -178,7 +183,8 @@ ajuste_completo <- workflow() |>
 pred_completo <- augment(ajuste_completo, datos_test)
 
 metricas_completo <- pred_completo |>
-  metrics(truth = voto, estimate = .pred_class, .pred_si)
+  mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 cat("\nModelo completo (11 predictores):\n")
 metricas_completo
@@ -199,9 +205,9 @@ coefs |>
   select(term, estimate, std.error, statistic, p.value, odds_ratio)
 ```
 
-**Respuesta:** Una advertencia sobre la codificación antes de interpretar: como definimos `voto` con niveles `c("si", "no")`, R y `glm()` modelan la probabilidad del *segundo* nivel, es decir, P(no votar). Por eso un coeficiente negativo (odds ratio menor que 1) indica que la variable *aumenta* la probabilidad de votar, y uno positivo la reduce.
+**Respuesta:** Con los niveles `c("no", "si")`, `glm()` modela la probabilidad del *segundo* nivel, P(votar), así que los coeficientes se leen de forma directa: un coeficiente positivo (odds ratio mayor que 1) aumenta la probabilidad de votar.
 
-Los coeficientes están en escala normalizada (aplicamos `step_normalize()` en la receta), así que cada uno mide el efecto de una desviación estándar del predictor y son directamente comparables. El efecto más fuerte es el de `educacion_anios` (z ≈ -3.5; odds ratio ≈ 0.68: una desviación estándar más de educación reduce los odds de *no* votar en ~32%), seguido por `interes_politica` (z ≈ -3.0; OR ≈ 0.72) y `edad` (z ≈ -2.7; OR ≈ 0.75). Los tres coeficientes son negativos, es decir, los tres *aumentan* la probabilidad de votar: exactamente la dirección que predice la literatura clásica de participación electoral (más recursos cognitivos, más motivación y más arraigo, más voto).
+Los coeficientes están en escala normalizada (aplicamos `step_normalize()` en la receta), así que cada uno mide el efecto de una desviación estándar del predictor y son directamente comparables. El efecto más fuerte es el de `educacion_anios` (z ≈ 3.5; odds ratio ≈ 1.48: una desviación estándar más de educación aumenta los odds de votar en ~48%), seguido por `interes_politica` (z ≈ 3.0; OR ≈ 1.39) y `edad` (z ≈ 2.7; OR ≈ 1.34). Los tres coeficientes son positivos, es decir, los tres *aumentan* la probabilidad de votar: exactamente la dirección que predice la literatura clásica de participación electoral (más recursos cognitivos, más motivación y más arraigo, más voto). Ojo: si el factor se hubiera definido al revés (`c("si", "no")`), `glm()` modelaría P(no votar) y todos los signos aparecerían invertidos; por eso siempre conviene verificar los niveles antes de interpretar.
 
 ## Random Forest y tuning
 
@@ -224,7 +230,7 @@ for (n_trees in c(100, 500, 1000)) {
 
   auc_val <- ajuste_temp |>
     augment(datos_test) |>
-    roc_auc(truth = voto, .pred_si) |>
+    roc_auc(truth = voto, .pred_si, event_level = "second") |>
     pull(.estimate)
 
   resultados_arboles <- rbind(resultados_arboles,
@@ -309,7 +315,7 @@ ajuste_rf_final <- finalize_workflow(wf_rf_tune,
 pred_rf_final <- augment(ajuste_rf_final, datos_test)
 
 auc_test <- pred_rf_final |>
-  roc_auc(truth = voto, .pred_si)
+  roc_auc(truth = voto, .pred_si, event_level = "second")
 
 cat("AUC estimado por CV:", round(mejor_regular$mean, 3),
     "± 2 SE = [", round(mejor_regular$mean - 2 * mejor_regular$std_err, 3),
@@ -345,7 +351,7 @@ pdp_gobierno <- partial(
   pred.var = "confianza_gobierno",
   train = datos_prep,
   prob = TRUE,
-  which.class = 1
+  which.class = "si"
 )
 
 p1 <- autoplot(pdp_gobierno) +
@@ -360,7 +366,7 @@ pdp_educacion <- partial(
   pred.var = "educacion_anios",
   train = datos_prep,
   prob = TRUE,
-  which.class = 1
+  which.class = "si"
 )
 
 p2 <- autoplot(pdp_educacion) +
@@ -424,7 +430,8 @@ ajuste_arbol <- workflow() |>
 pred_arbol <- augment(ajuste_arbol, datos_test)
 
 metricas_arbol <- pred_arbol |>
-  metrics(truth = voto, estimate = .pred_class, .pred_si)
+  mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 cat("Árbol de decisión:\n")
 metricas_arbol
@@ -432,7 +439,8 @@ metricas_arbol
 # Random Forest: reusamos ajuste_rf de la pregunta 9
 pred_rf <- augment(ajuste_rf, datos_test)
 metricas_rf <- pred_rf |>
-  metrics(truth = voto, estimate = .pred_class, .pred_si)
+  mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+               event_level = "second")
 
 cat("\nRandom Forest:\n")
 metricas_rf
@@ -448,27 +456,6 @@ metricas_completo
 Creen una tabla que compare los cuatro modelos.
 
 ```{r p12}
-# Función para calcular todas las métricas
-calcular_metricas <- function(predicciones, nombre_modelo) {
-  metricas_base <- predicciones |>
-    metrics(truth = voto, estimate = .pred_class, .pred_si) |>
-    mutate(modelo = nombre_modelo)
-
-  f1 <- predicciones |>
-    f_meas(truth = voto, estimate = .pred_class) |>
-    mutate(modelo = nombre_modelo)
-
-  prec <- predicciones |>
-    precision(truth = voto, estimate = .pred_class) |>
-    mutate(modelo = nombre_modelo)
-
-  rec <- predicciones |>
-    recall(truth = voto, estimate = .pred_class) |>
-    mutate(modelo = nombre_modelo)
-
-  bind_rows(metricas_base, f1, prec, rec)
-}
-
 # XGBoost (del laboratorio)
 modelo_xgb <- boost_tree(
   trees = 500, tree_depth = 4, learn_rate = 0.01, min_n = 10
@@ -483,18 +470,25 @@ ajuste_xgb <- workflow() |>
 
 pred_xgb <- augment(ajuste_xgb, datos_test)
 
-# Calcular métricas para todos
+# Calcular las cinco métricas para cada modelo con mis_metricas
 tabla <- bind_rows(
-  calcular_metricas(pred_completo, "Reg. logística"),
-  calcular_metricas(pred_rf, "Random Forest"),
-  calcular_metricas(pred_xgb, "XGBoost"),
-  calcular_metricas(pred_arbol, "Árbol decisión")
+  pred_completo |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                                event_level = "second") |>
+    mutate(modelo = "Reg. logística"),
+  pred_rf |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                          event_level = "second") |>
+    mutate(modelo = "Random Forest"),
+  pred_xgb |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                           event_level = "second") |>
+    mutate(modelo = "XGBoost"),
+  pred_arbol |> mis_metricas(truth = voto, estimate = .pred_class, .pred_si,
+                             event_level = "second") |>
+    mutate(modelo = "Árbol decisión")
 )
 
 # Tabla resumen
 tabla |>
   select(modelo, .metric, .estimate) |>
-  distinct() |>
   pivot_wider(names_from = .metric, values_from = .estimate) |>
   mutate(across(where(is.numeric), \(x) round(x, 3))) |>
   arrange(desc(roc_auc))

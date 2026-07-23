@@ -118,7 +118,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 :::{.columns}
 :::{.column width=55%}
 - La regresión lineal (OLS) minimiza el error en los datos de entrenamiento
-- Problema: si tenemos [muchas variables relativas al número de observaciones]{.alert}, OLS se ajusta demasiado al ruido
+- Pero si tenemos [muchas variables relativas al número de observaciones]{.alert}, OLS se ajusta demasiado al ruido
 - Ejemplo: con 50 variables y 100 observaciones, OLS encuentra coeficientes que parecen funcionar pero no generalizan
 - OLS no tiene un mecanismo para [descartar variables irrelevantes]{.alert} ni para reducir coeficientes inflados
 - Solución: [regularización]{.alert}, que agrega una penalización por la magnitud de los coeficientes
@@ -187,7 +187,7 @@ $$\min \sum (y_i - \hat{y}_i)^2 + \lambda \sum \beta_j^2$$
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 24px;"}
+:::{style="text-align: center; font-size: 28px;"}
 **LASSO vs Ridge con λ = 0.1**
 
 ```
@@ -293,7 +293,7 @@ $$\min \sum (y_i - \hat{y}_i)^2 + \lambda \left[ \alpha \sum |\beta_j| + (1-\alp
 :::
 :::
 
-## ¿Explicar o predecir? El sesgo de la regularización
+## El sesgo de la regularización
 
 :::{style="margin-top: 30px; font-size: 25px;"}
 :::{.columns}
@@ -459,6 +459,8 @@ collect_predictions(resultado)
 <br>
 
 [`last_fit()` ajusta con todo el train set y evalúa con el test set en un solo paso.]{.alert} Es la forma recomendada de obtener las métricas finales del modelo
+
+Es el `fit()` y el `predict()` de la izquierda en una sola llamada, pero sobre el [split]{.alert}, no sobre un data frame: por eso el test se toca [una sola vez]{.alert}
 :::
 :::
 :::
@@ -471,7 +473,7 @@ collect_predictions(resultado)
 :::{.column width=55%}
 - Un `workflow()` [empaqueta la receta y el modelo]{.alert} en un solo objeto
 - Antes teníamos [pasos sueltos]{.alert}: preparar la receta, aplicarla al train, ajustar el modelo, aplicar la receta al test, predecir. Es fácil equivocarse en el orden
-- El workflow los une: cuando llamamos a `fit()` o `predict()`, aplica la receta y después el modelo [en el orden correcto, solo]{.alert}
+- El workflow los une: cuando llamamos a `fit()` o `predict()`, aplica la receta y después el modelo [en el orden correcto, por sí solo]{.alert}
 - Garantiza que el test pase por [exactamente la misma transformación]{.alert} que el train, con las medianas y desvíos aprendidos [solo del train]{.alert}: así se evita el _data leakage_
 - Un solo objeto viaja por todo el flujo: [ajustar, predecir, tunear y evaluar]{.alert}
 :::
@@ -522,7 +524,7 @@ collect_predictions(resultado)
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 18px;"}
+:::{style="text-align: center; font-size: 22px;"}
 **¿Qué pasa al variar λ?**
 
 [![](figures/lambda-curve.png){width="100%"}](#){data-modal-type="image" data-modal-url="figures/lambda-curve.png"}
@@ -537,12 +539,11 @@ collect_predictions(resultado)
 
 ## Validación cruzada (recordatorio)
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 28px;"}
 - Ya la usamos en el [Día 1]{.alert} y en la [sesión 2.1]{.alert}: en vez de una sola división train/test, la [validación cruzada]{.alert} entrena y evalúa $k$ veces (rotando el fold de validación) y promedia las métricas, para una estimación más [estable]{.alert}
 - Acá la usamos para [elegir $\lambda$]{.alert}: evaluamos cada valor candidato con CV y nos quedamos con el mejor
 - En tidymodels: `folds <- vfold_cv(datos_train, v = 5)`; después `tune_grid()` la usa por dentro
-
-[$k$ = 5 o 10 es lo habitual: buena estimación sin gastar demasiado cómputo]{.alert}
+- [$k$ = 5 o 10 es lo habitual: buena estimación sin gastar demasiado cómputo]{.alert}
 :::
 
 ## Tuning de la penalización con tidymodels
@@ -581,21 +582,21 @@ resultado_final <- wf_lasso |>
 collect_metrics(resultado_final)
 ```
 
-- `select_best()` da el λ con menor RMSE. Veremos una alternativa más parsimoniosa en la próxima slide
+- `select_best()` da el λ con menor RMSE. Veremos una alternativa más parsimoniosa más adelante
 - Para [Elastic Net]{.alert}, marca también `mixture = tune()` y agrega `mixture(range = c(0, 1))` a la grilla con `levels = c(20, 5)` (20 de λ × 5 de α)
-
-[Es el mismo patrón de tuning de la sesión 2.1; lo corren paso a paso en el laboratorio]{.alert}
+- [Es el mismo patrón de tuning de la sesión 2.1; lo corren paso a paso en el laboratorio]{.alert}
 :::
 
 ## Del código anterior: ¿qué hacen los pasos 5 a 7?
 
-:::{style="margin-top: 30px; font-size: 25px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - **Paso 5**, `tune_grid()`: prueba los 30 valores de λ de la grilla
 - Para [cada]{.alert} λ ajusta el modelo en los folds de validación cruzada y mide el error (RMSE, R²). Devuelve una tabla con el rendimiento de cada λ
 - **Paso 6**, `select_best()`: mira esa tabla y elige el λ con el [menor RMSE promedio]{.alert} entre folds
-- **Paso 7**, `finalize_workflow()` + `last_fit()`: fija ese λ ganador en el workflow, reajusta con [todo el train]{.alert} y evalúa [una sola vez]{.alert} en el test
+- **Paso 7**, `finalize_workflow()` + `last_fit()`: hasta acá el workflow tenía un [hueco]{.alert} (`penalty = tune()`) y no se podía ajustar
+- `finalize_workflow()` escribe el λ ganador en ese hueco; recién ahí `last_fit()` puede reajustar con [todo el train]{.alert} y evaluar [una sola vez]{.alert} en el test
 - Más información en <https://www.tidymodels.org/start/tuning/>
 :::
 
@@ -661,33 +662,25 @@ select_by_one_std_err(
 
 ## Regularización en alta dimensionalidad
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 20px; font-size: 24px;"}
 :::{.columns}
 :::{.column width=55%}
-**Útil cuando:**
-
-- [Muchas variables, pocas observaciones]{.alert} ($p \gg n$)
-- Variables altamente [correlacionadas]{.alert}
-- Solo algunas variables importan, sin hacer selección manual
-
-**Ejemplos en ciencias sociales:** análisis de texto (miles de palabras), datos genómicos, encuestas con muchas preguntas, datos administrativos
+- Con [$p > n$]{.alert} hay infinitas soluciones que pasan por todos los puntos
+- OLS no puede elegir entre ellas: deja coeficientes sin estimar y da un ajuste [perfecto]{.alert} aunque los datos sean puro ruido
+- La regularización [rompe el empate]{.alert}: se queda con la de coeficientes más chicos (Ridge) o con la que usa menos variables (LASSO)
+- Pasa con encuestas de cientos de ítems, registros administrativos y, sobre todo, [análisis de texto]{.alert}: cada palabra es una variable. Lo ven mañana con TF-IDF
+- [LASSO/Ridge/Elastic Net dan una respuesta con $p > n$; OLS ni siquiera se puede calcular]{.alert}
 :::
 
 :::{.column width=45%}
-:::{style="text-align: center; font-size: 20px;"}
-**La regla del pulgar:**
+:::{style="text-align: center; font-size: 23px;"}
+**Una regla práctica:**
 
 | Situación | Significado | Recomendación |
 |-----------|-------------|---------------|
 | $n \gg p$ | Muchos datos, pocas variables | OLS probablemente está bien |
 | $n \approx p$ | Datos y variables similares | Regularización ayuda |
 | $n \ll p$ | Pocas observaciones, muchas variables | Regularización es [necesaria]{.alert} (OLS no funciona) |
-:::
-
-<br>
-
-:::{style="font-size: 23px;"}
-[LASSO funciona incluso cuando $p > n$, lo cual es imposible con OLS clásico]{.alert}
 :::
 :::
 :::
@@ -768,12 +761,12 @@ satisf_servicios       0.00 ← eliminada
 ```
 Variable              Coef LASSO
 ─────────────────────────────────
-años_educacion_jefe    0.42 ***
-material_piso          0.28 ***
-acceso_agua_potable    0.22 ***
-num_habitaciones       0.18 **
-tiene_refrigerador     0.15 **
-material_techo         0.11 *
+años_educacion_jefe    0.42
+material_piso          0.28
+acceso_agua_potable    0.22
+num_habitaciones       0.18
+tiene_refrigerador     0.15
+material_techo         0.11
 tiene_vehiculo         0.09
 zona_urbana            0.00  ← eliminada
 genero_jefe            0.00  ← eliminada
@@ -793,8 +786,8 @@ LASSO identifica automáticamente qué variables [realmente predicen]{.alert} la
 
 :::{style="text-align: center;"}
 
-| Criterio | LASSO/Ridge | Random Forest/Gradient Boosting |
-|----------|-------------|---------------------------------|
+| Criterio | LASSO/Ridge/Elastic Net | Random Forest/Gradient Boosting |
+|--------------------------------|------------------------|----------------------------|
 | [Interpretabilidad]{.alert} | Alta (coeficientes) | Baja (importancia) |
 | [Relaciones no lineales]{.alert} | No | Sí |
 | [Interacciones]{.alert} | Manual | Automáticas |
@@ -805,9 +798,9 @@ LASSO identifica automáticamente qué variables [realmente predicen]{.alert} la
 
 :::
 
-<br>
-
+:::{style="margin-top: 40px;"}
 [En la práctica, es útil probar ambos enfoques y comparar.]{.alert} La regularización es mejor cuando las relaciones son aproximadamente lineales y queremos interpretabilidad. RF es mejor cuando hay no linealidades e interacciones complejas
+:::
 :::
 
 ## ¿Cómo interpretar los coeficientes de LASSO?

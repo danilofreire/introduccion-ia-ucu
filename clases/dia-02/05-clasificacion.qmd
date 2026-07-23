@@ -174,7 +174,7 @@ arbol_demo <- rpart(
 $$P(y = 1 | x) = \frac{1}{1 + e^{-(w_0 + w_1 x_1 + \ldots + w_n x_n)}}$$
 
 - Los [coeficientes]{.alert} ($w$) indican la dirección (positivo o negativo) y la fuerza del efecto
-- [Interpretable]{.alert}: "por cada año adicional de educación, la probabilidad de votar aumenta un X%"
+- [Interpretable]{.alert}: "por cada año adicional de educación, las chances de votar aumentan un X%"
 :::
 
 :::{.column width=45%}
@@ -294,8 +294,8 @@ broom::tidy(ajuste_log) |>
 **Interpretación del odds ratio:**
 
 - OR = 1: sin efecto
-- OR > 1: aumenta la probabilidad
-- OR < 1: disminuye la probabilidad
+- OR > 1: aumenta las chances (odds)
+- OR < 1: disminuye las chances
 
 **Ejemplo:** OR = 1.25 para confianza en el gobierno
 
@@ -358,10 +358,10 @@ Fuente: [Medium](https://medium.com/towards-data-engineering/100-days-of-machine
 :::{.column width=55%}
 1. Empezar con [todos los datos]{.alert} en la raíz
 2. Buscar la variable y el punto de corte que [mejor separen]{.alert} las clases
-    - Se usa un criterio como [Gini]{.alert} o [entropía]{.alert} (miden la "impureza" del nodo)
-3. Dividir los datos en dos grupos según esa regla
-4. Repetir recursivamente para cada grupo
-5. Parar cuando se cumple un criterio:
+    - Se usa un criterio como Gini o entropía (miden la "impureza" del nodo)
+3. [Dividir los datos en dos grupos]{.alert} según esa regla
+4. [Repetir]{.alert} recursivamente para cada grupo
+5. [Parar cuando se cumple un criterio:]{.alert}
     - Profundidad máxima
     - Mínimo de observaciones en un nodo
     - Sin mejora significativa
@@ -506,7 +506,8 @@ rpart.plot(arbol_demo,
 :::{style="text-align: center; font-size: 22px;"}
 **El trade-off (con nuestros datos):**
 
-```{r poda-tradeoff, echo=FALSE, message=FALSE, warning=FALSE, fig.height=3.5, fig.width=5, fig.align="center", out.width="100%"}
+```{r poda-tradeoff, echo=TRUE, message=FALSE, warning=FALSE, fig.height=3.5, fig.width=5, fig.align="center", out.width="100%"}
+#| code-fold: true
 profs <- c(1, 2, 3, 5, 7, 10, 15, 20)
 err <- purrr::map_dfr(profs, function(d) {
   fit <- rpart(apoya_democracia ~ .,
@@ -538,7 +539,9 @@ err |>
   theme(legend.position = "bottom")
 ```
 
+:::{style="margin-top: -20px;"}
 A partir de cierta profundidad, el error en test [empeora]{.alert} mientras el error en train sigue bajando: [la poda previene el sobreajuste]{.alert}
+:::
 :::
 :::
 :::
@@ -707,7 +710,7 @@ ajuste_rf |>
 - El patrón en tidymodels:
     1. marcar parámetros con `tune()`
     2. definir una grilla de valores
-    3. evaluar cada combinación con `tune_grid()` sobre los folds
+    3. evaluar cada combinación con `tune_grid()` sobre los folds (`resamples = folds`, `grid = grilla`)
     4. `select_best()` + `finalize_model()` para el ajuste final
 :::
 
@@ -777,7 +780,8 @@ En tidymodels, la misma interfaz de siempre:
 modelo_xgb <- boost_tree(
   trees      = 500,
   tree_depth = 3,
-  learn_rate = 0.05
+  learn_rate = 0.05,
+  min_n      = 10
 ) |>
   set_engine("xgboost") |>
   set_mode("classification")
@@ -821,7 +825,7 @@ tibble(
 :::
 
 - Acá [gana la regresión logística]{.alert}, y ni el Random Forest ni el XGBoost la superan. No es casualidad: [estos datos se generaron con relaciones lineales]{.alert}, y ningún modelo complejo puede encontrar una estructura no lineal que no existe
-- La lección: [más complejo no es sinónimo de mejor]{.alert}. Con datos reales, más ruidosos y no lineales, el orden suele invertirse. Por eso [siempre hay que comparar]{.alert} antes de elegir
+- [Más complejo no es sinónimo de mejor]{.alert}. Con datos reales, más ruidosos y no lineales, el orden suele invertirse. Por eso [siempre hay que comparar]{.alert} antes de elegir
 :::
 
 ## ¿Qué modelo elegir?
@@ -844,7 +848,7 @@ tibble(
 :::{style="margin-top: 20px;"}
 - Si necesitan [entender por qué]{.alert} el modelo predice algo: regresión logística
 - Si necesitan [explicar la lógica]{.alert} a no técnicos: árbol de decisión
-- Si necesitan la [mejor predicción posible]{.alert}: Random Forest o Gradient Boosting, pero sólo si los datos tienen estructura no lineal que aprovechar
+- Si necesitan la [mejor predicción posible]{.alert}: Random Forest o Gradient Boosting, pero solo si los datos tienen estructura no lineal que aprovechar
 - En ciencias sociales, la elección depende de si el objetivo es [explicar o predecir]{.alert}
 :::
 :::

@@ -14,7 +14,7 @@
 
 # --- Parte 1: Preparación --------------------------------------
 
-# Si algún paquete falta: install.packages(c("glmnet", "ranger", "vip"))
+# Si algún paquete falta: install.packages(c("tidymodels", "tidyverse", "glmnet"))
 library(tidymodels)   # rsample, parsnip, recipes, workflows, tune, yardstick
 library(tidyverse)    # incluye readr (read_csv), dplyr, ggplot2, etc.
 library(glmnet)       # motor para LASSO, Ridge, Elastic Net
@@ -23,7 +23,7 @@ set.seed(2026)
 
 # Cargar el dataset
 datos <- read_csv("datos/latinobarometro_sim.csv", show_col_types = FALSE)
-# Leé el archivo directo desde la web:
+# Lean el archivo directo desde la web:
 # datos <- read_csv("https://raw.githubusercontent.com/danilofreire/introduccion-ia-ucu/main/clases/dia-02/datos/latinobarometro_sim.csv", show_col_types = FALSE)
 
 # Convertir categóricas a factor
@@ -40,7 +40,9 @@ glimpse(datos)
 
 # --- Dividir los datos (75/25) ---------------------------------
 
-datos_split <- initial_split(datos, prop = 0.75)
+# Estratificada por el outcome (con una variable numérica,
+# rsample estratifica por cuartiles)
+datos_split <- initial_split(datos, prop = 0.75, strata = satisfaccion_vida)
 datos_train <- training(datos_split)
 datos_test  <- testing(datos_split)
 
@@ -300,11 +302,11 @@ modelo_enet <- linear_reg(penalty = tune(), mixture = tune()) |>
 
 wf_enet <- workflow() |> add_recipe(receta) |> add_model(modelo_enet)
 
-# Grilla 2D: 15 valores de λ × 5 de mixture
+# Grilla 2D: 20 valores de λ × 5 de mixture (como en la clase)
 grilla_enet <- grid_regular(
   penalty(range = c(-4, 0)),
   mixture(range = c(0, 1)),
-  levels = c(15, 5)
+  levels = c(20, 5)
 )
 
 resultados_enet <- tune_grid(
