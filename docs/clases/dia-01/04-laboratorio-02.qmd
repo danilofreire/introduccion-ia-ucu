@@ -192,7 +192,7 @@ Antes de modelar, conviene ver [cómo se distribuyen las variables]{.alert} y si
 
 ```{r lab2-stats, prompt=FALSE, echo=TRUE}
 # Resumen rápido de las variables numéricas
-datos |> select(where(is.numeric)) |> summary()
+datos |> select(gasto_educacion, acceso_internet, urbanizacion) |> summary()
 
 # Medias por nivel de crecimiento (3 predictores ilustrativos)
 datos |>
@@ -209,7 +209,7 @@ datos |>
 
 ## Ejercicio 1: Exploración {#sec:exercise01}
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 18px;"}
 
 **Tarea:** Exploren una de las variables que [no]{.alert} mostramos en la diapositiva anterior.
 
@@ -263,7 +263,7 @@ glimpse(datos_modelo)
 
 ## Crear nuevas variables
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 
 El [feature engineering]{.alert} puede mejorar el rendimiento del modelo:
 
@@ -291,7 +291,7 @@ datos_modelo |> select(grupo_urbanizacion, gasto_social, alto_desempleo) |> head
 
 ## Ejercicio 2: Crear un feature {#sec:exercise02}
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 
 **Tarea:** Elijan [una]{.alert} variable derivada y créenla
 
@@ -389,7 +389,7 @@ Más adelante añadiremos una variable derivada para ver si mejora el ajuste
 
 ## Evaluar el modelo logístico
 
-:::{style="margin-top: 30px; font-size: 20px;"}
+:::{style="margin-top: 30px; font-size: 18px;"}
 
 Validación cruzada en 5 folds y resumen de métricas:
 
@@ -409,11 +409,11 @@ eval_logistico <- fit_resamples(
 eval_logistico
 ```
 
-- `fit_resamples()` ajusta el modelo en cada fold de la validación cruzada
-- [`metric_set()`]{.alert} junta varias métricas en un solo objeto. Lo guardamos en `mis_metricas` y lo reusamos en cada evaluación
-- `collect_metrics()` devuelve la media y el error estándar de cada métrica entre folds
+- `fit_resamples()` ajusta el modelo [en cada fold de la validación cruzada](https://tune.tidymodels.org/reference/fit_resamples.html)
+- [`metric_set()`]{.alert} junta [varias métricas en un solo objeto](https://yardstick.tidymodels.org/reference/metric_set.html). Lo guardamos en `mis_metricas` y lo reusamos en cada evaluación
+- `collect_metrics()` devuelve la media y el error estándar de [cada métrica entre folds](https://tune.tidymodels.org/reference/collect_predictions.html)
 - `control = control_resamples(event_level = "second")` indica que la clase positiva es [`"si"`]{.alert}
-- Usamos [precision, recall y roc_auc]{.alert} en lugar de accuracy: con clases desbalanceadas, la accuracy puede ser engañosa
+- Usamos [precision, recall y roc_auc]{.alert} en lugar de accuracy: con clases desbalanceadas
 - En el resultado, [`.metric`]{.alert} guarda el nombre de cada métrica (`precision`, `recall`, `roc_auc`) y `mean` y `std_err` 
 :::
 
@@ -469,8 +469,7 @@ bind_rows(eval_logistico, eval_log_ext) |>
   arrange(.metric, modelo)
 ```
 
-- En este ejemplo, [`alto_desempleo`]{.alert} cambia las métricas del logístico apenas unas milésimas
-- Una lección: no todo feature engineering mejora el modelo. Cuando el predictor original ya capta la información, reemplazarlo por un recorte categórico es redundante. Hay que [medirlo]{.alert}, no asumirlo
+- En este ejemplo, [`alto_desempleo`]{.alert} cambia las métricas del logístico apenas unas milésimas. [No todo feature engineering mejora el modelo]{.alert}. Hay que [medirlo]{.alert}, no asumirlo
 :::
 
 ## Ejercicio 3: ¿Ayuda el feature engineering? {#sec:exercise03}
@@ -515,7 +514,7 @@ bind_rows(eval_logistico, eval_log_est, eval_arbol, eval_arb_est) |>
 
 ## Modelo final en datos de test
 
-:::{style="margin-top: 30px; font-size: 21px;"}
+:::{style="margin-top: 30px; font-size: 19px;"}
 
 Una vez elegido el mejor modelo por validación cruzada, lo entrenamos con todos los datos de train y lo evaluamos [una sola vez]{.alert} en test (los datos que el modelo nunca vio):
 

@@ -1496,22 +1496,15 @@ $ crecimiento_alto        &lt;chr&gt; &quot;si&quot;, &quot;si&quot;, &quot;no&q
 <p>Antes de modelar, conviene ver <span class="alert">cómo se distribuyen las variables</span> y si difieren entre los grupos de <code>crecimiento_alto</code>. Mostramos acá <span class="alert">3 de los 8 predictores</span></p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a></a><span class="co"># Resumen rápido de las variables numéricas</span></span>
-<span id="cb5-2"><a></a>datos <span class="sc">|&gt;</span> <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-2"><a></a>datos <span class="sc">|&gt;</span> <span class="fu">select</span>(gasto_educacion, acceso_internet, urbanizacion) <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> gasto_educacion acceso_internet  urbanizacion    gasto_salud   
- Min.   :2.100   Min.   : 5.00   Min.   :16.40   Min.   :3.200  
- 1st Qu.:4.400   1st Qu.:46.60   1st Qu.:44.70   1st Qu.:5.800  
- Median :5.000   Median :57.50   Median :58.10   Median :6.700  
- Mean   :5.027   Mean   :57.52   Mean   :58.42   Mean   :6.631  
- 3rd Qu.:5.600   3rd Qu.:68.35   3rd Qu.:73.15   3rd Qu.:7.450  
- Max.   :8.000   Max.   :99.00   Max.   :97.60   Max.   :9.500  
-   inflacion       desempleo      inversion_extranjera indice_gobierno_digital
- Min.   : 5.20   Min.   : 1.500   Min.   :0.200        Min.   :0.0800         
- 1st Qu.: 9.35   1st Qu.: 6.700   1st Qu.:3.050        1st Qu.:0.4050         
- Median :11.70   Median : 8.400   Median :4.200        Median :0.5200         
- Mean   :12.73   Mean   : 8.434   Mean   :4.079        Mean   :0.5136         
- 3rd Qu.:14.70   3rd Qu.:10.100   3rd Qu.:5.100        3rd Qu.:0.6350         
- Max.   :37.40   Max.   :16.100   Max.   :7.400        Max.   :0.9600         </code></pre>
+<pre><code> gasto_educacion acceso_internet  urbanizacion  
+ Min.   :2.100   Min.   : 5.00   Min.   :16.40  
+ 1st Qu.:4.400   1st Qu.:46.60   1st Qu.:44.70  
+ Median :5.000   Median :57.50   Median :58.10  
+ Mean   :5.027   Mean   :57.52   Mean   :58.42  
+ 3rd Qu.:5.600   3rd Qu.:68.35   3rd Qu.:73.15  
+ Max.   :8.000   Max.   :99.00   Max.   :97.60  </code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a><span class="co"># Medias por nivel de crecimiento (3 predictores ilustrativos)</span></span>
 <span id="cb7-2"><a></a>datos <span class="sc">|&gt;</span></span>
@@ -1534,7 +1527,7 @@ $ crecimiento_alto        &lt;chr&gt; &quot;si&quot;, &quot;si&quot;, &quot;no&q
 </section>
 <section id="sec:exercise01" class="slide level2 scrollable">
 <h2>Ejercicio 1: Exploración</h2>
-<div style="margin-top: 30px; font-size: 22px;">
+<div style="margin-top: 30px; font-size: 18px;">
 <p><strong>Tarea:</strong> Exploren una de las variables que <span class="alert">no</span> mostramos en la diapositiva anterior.</p>
 <ol type="1">
 <li>¿Cuántas observaciones? ¿Hay valores faltantes?</li>
@@ -1599,7 +1592,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </section>
 <section id="crear-nuevas-variables" class="slide level2">
 <h2>Crear nuevas variables</h2>
-<div style="margin-top: 30px; font-size: 22px;">
+<div style="margin-top: 30px; font-size: 20px;">
 <p>El <span class="alert">feature engineering</span> puede mejorar el rendimiento del modelo:</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a></a><span class="co"># Crear nuevas variables sobre el frame que va al modelo</span></span>
@@ -1636,7 +1629,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </section>
 <section id="sec:exercise02" class="slide level2">
 <h2>Ejercicio 2: Crear un feature</h2>
-<div style="margin-top: 30px; font-size: 24px;">
+<div style="margin-top: 30px; font-size: 21px;">
 <p><strong>Tarea:</strong> Elijan <span class="alert">una</span> variable derivada y créenla</p>
 <p>Opciones sugeridas (elijan la que más les interese). Entre paréntesis, la variable base:</p>
 <ul>
@@ -1728,7 +1721,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </section>
 <section id="evaluar-el-modelo-logístico" class="slide level2">
 <h2>Evaluar el modelo logístico</h2>
-<div style="margin-top: 30px; font-size: 20px;">
+<div style="margin-top: 30px; font-size: 18px;">
 <p>Validación cruzada en 5 folds y resumen de métricas:</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a></a><span class="co"># Las tres métricas juntas en un objeto que vamos a reusar todo el lab</span></span>
@@ -1754,11 +1747,11 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </div>
 </div>
 <ul>
-<li><code>fit_resamples()</code> ajusta el modelo en cada fold de la validación cruzada</li>
-<li><span class="alert"><code>metric_set()</code></span> junta varias métricas en un solo objeto. Lo guardamos en <code>mis_metricas</code> y lo reusamos en cada evaluación</li>
-<li><code>collect_metrics()</code> devuelve la media y el error estándar de cada métrica entre folds</li>
+<li><code>fit_resamples()</code> ajusta el modelo <a href="https://tune.tidymodels.org/reference/fit_resamples.html">en cada fold de la validación cruzada</a></li>
+<li><span class="alert"><code>metric_set()</code></span> junta <a href="https://yardstick.tidymodels.org/reference/metric_set.html">varias métricas en un solo objeto</a>. Lo guardamos en <code>mis_metricas</code> y lo reusamos en cada evaluación</li>
+<li><code>collect_metrics()</code> devuelve la media y el error estándar de <a href="https://tune.tidymodels.org/reference/collect_predictions.html">cada métrica entre folds</a></li>
 <li><code>control = control_resamples(event_level = &quot;second&quot;)</code> indica que la clase positiva es <span class="alert"><code>&quot;si&quot;</code></span></li>
-<li>Usamos <span class="alert">precision, recall y roc_auc</span> en lugar de accuracy: con clases desbalanceadas, la accuracy puede ser engañosa</li>
+<li>Usamos <span class="alert">precision, recall y roc_auc</span> en lugar de accuracy: con clases desbalanceadas</li>
 <li>En el resultado, <span class="alert"><code>.metric</code></span> guarda el nombre de cada métrica (<code>precision</code>, <code>recall</code>, <code>roc_auc</code>) y <code>mean</code> y <code>std_err</code></li>
 </ul>
 </div>
@@ -1832,8 +1825,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </div>
 </div>
 <ul>
-<li>En este ejemplo, <span class="alert"><code>alto_desempleo</code></span> cambia las métricas del logístico apenas unas milésimas</li>
-<li>Una lección: no todo feature engineering mejora el modelo. Cuando el predictor original ya capta la información, reemplazarlo por un recorte categórico es redundante. Hay que <span class="alert">medirlo</span>, no asumirlo</li>
+<li>En este ejemplo, <span class="alert"><code>alto_desempleo</code></span> cambia las métricas del logístico apenas unas milésimas. <span class="alert">No todo feature engineering mejora el modelo</span>. Hay que <span class="alert">medirlo</span>, no asumirlo</li>
 </ul>
 </div>
 </section>
@@ -1876,7 +1868,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 </section>
 <section id="modelo-final-en-datos-de-test" class="slide level2">
 <h2>Modelo final en datos de test</h2>
-<div style="margin-top: 30px; font-size: 21px;">
+<div style="margin-top: 30px; font-size: 19px;">
 <p>Una vez elegido el mejor modelo por validación cruzada, lo entrenamos con todos los datos de train y lo evaluamos <span class="alert">una sola vez</span> en test (los datos que el modelo nunca vio):</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a><span class="co"># Entrenar el modelo elegido con todos los datos de train</span></span>

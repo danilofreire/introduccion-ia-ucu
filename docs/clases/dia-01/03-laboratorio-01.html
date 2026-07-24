@@ -1553,7 +1553,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <section id="dividir-los-datos" class="slide level2">
 <h2>Dividir los datos</h2>
 <div style="margin-top: 30px; font-size: 24px;">
-<p>Usamos <code>initial_split()</code> de rsample para crear la división train/test:</p>
+<p>Usamos <code>initial_split()</code> de rsample para crear la <a href="https://rsample.tidymodels.org/reference/initial_split.html">división train/test</a>:</p>
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a></a><span class="co"># Fijar semilla para reproducibilidad</span></span>
 <span id="cb14-2"><a></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
@@ -1681,7 +1681,7 @@ Computational engine: glm </code></pre>
 <h2>Generar predicciones</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <ul>
-<li>Generamos predicciones en los datos de prueba</li>
+<li>Generamos <a href="https://parsnip.tidymodels.org/articles/Examples.html">predicciones en los datos de prueba</a></li>
 <li><code>.pred_class</code> es la clase predicha por el modelo. El punto al principio es la convención de <span class="alert">tidymodels</span> para columnas que el paquete crea por ustedes (evita chocar con columnas del usuario)</li>
 <li>Comparamos con <code>crecimiento_alto</code> (la verdad)</li>
 </ul>
@@ -1713,9 +1713,9 @@ Computational engine: glm </code></pre>
 </section>
 <section id="matriz-de-confusión" class="slide level2">
 <h2>Matriz de confusión</h2>
-<div style="margin-top: 30px; font-size: 24px;">
+<div style="margin-top: 30px; font-size: 25px;">
 <ul>
-<li>La matriz de confusión muestra todos los resultados posibles</li>
+<li><a href="https://yardstick.tidymodels.org/reference/conf_mat.html">La matriz de confusión</a> muestra todos los resultados posibles</li>
 <li><code>truth</code> es la clase real, <code>estimate</code> la clase predicha</li>
 </ul>
 <div class="cell" data-layout-align="center">
@@ -1744,7 +1744,7 @@ Prediction no si
 </section>
 <section id="métricas-de-evaluación" class="slide level2">
 <h2>Métricas de evaluación</h2>
-<div style="margin-top: 30px; font-size: 22px;">
+<div style="margin-top: 30px; font-size: 24px;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a></a><span class="co"># Conjunto completo de métricas</span></span>
 <span id="cb30-2"><a></a>predicciones <span class="sc">|&gt;</span></span>
@@ -1769,7 +1769,7 @@ Prediction no si
 13 f_meas               binary         0.8  </code></pre>
 </div>
 </div>
-<p><span class="alert">Recordatorio:</span> <code>accuracy</code> = de todas las predicciones, cuántas acertó; <code>precision</code> (también aparece como <code>ppv</code>) = de las que predijo “sí”, cuántas eran “sí”; <code>recall</code> (también <code>sens</code>) = de los “sí” reales, cuántos detectó</p>
+<p><span class="alert">Recordatorio:</span> <code>accuracy</code> = (VP + VN)/(VP + VN + FP + FN): de todas las predicciones, cuántas acertó; <code>precision</code> (también aparece como <code>ppv</code>) = VP/(VP + FP): de las que predijo “sí”, cuántas eran “sí”; <code>recall</code> (también <code>sens</code>) = VP/(VP + FN): de los “sí” reales, cuántos detectó</p>
 </div>
 </section>
 <section id="sec:exercise02" class="slide level2 scrollable">
@@ -1849,8 +1849,8 @@ Prediction no si
 <div style="margin-top: 20px; font-size: 20px;">
 <p><a href="https://es.wikipedia.org/wiki/Curva_ROC">La curva ROC</a> resume el rendimiento <span class="alert">en todos los umbrales a la vez</span>: cada punto de la curva es un umbral distinto</p>
 <ul>
-<li><span class="alert">Sensibilidad</span> (eje Y) = VP / (VP + FN): de los países que sí crecieron, ¿cuántos detecta el modelo? Es el <span class="alert">recall</span> de la sesión anterior</li>
-<li><span class="alert">1 - especificidad</span> (eje X) = FP / (FP + VN): de los países que no crecieron, ¿cuántos marcamos por error? Es la <span class="alert">tasa de falsas alarmas</span></li>
+<li><span class="alert">Sensibilidad</span> (eje Y) = VP / (VP + FN): de los países que sí crecieron, ¿cuántos detecta el modelo? Es el <span class="alert">recall</span></li>
+<li><span class="alert">1 - especificidad</span> (eje X) = FP / (FP + VN): de los países que no crecieron, ¿cuántos marcamos por error? <span class="alert">Tasa de falsas alarmas</span></li>
 <li>Bajar el umbral nos mueve hacia <span class="alert">arriba y a la derecha</span>: detectamos más casos reales, pero pagamos con más falsas alarmas. La <span class="alert">diagonal</span> es el azar</li>
 </ul>
 <div class="cell" data-layout-align="center">

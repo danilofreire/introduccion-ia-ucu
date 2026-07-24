@@ -264,7 +264,7 @@ levels(datos_modelo$crecimiento_alto)
 
 :::{style="margin-top: 30px; font-size: 24px;"}
 
-Usamos `initial_split()` de rsample para crear la división train/test:
+Usamos `initial_split()` de rsample para crear la [división train/test](https://rsample.tidymodels.org/reference/initial_split.html):
 
 ```{r lab-dividir, prompt=FALSE, echo=TRUE}
 # Fijar semilla para reproducibilidad
@@ -357,7 +357,7 @@ tidy(ajuste)
 
 :::{style="margin-top: 30px; font-size: 22px;"}
 
-- Generamos predicciones en los datos de prueba
+- Generamos [predicciones en los datos de prueba](https://parsnip.tidymodels.org/articles/Examples.html)
 - `.pred_class` es la clase predicha por el modelo. El punto al principio es la convención de [tidymodels]{.alert} para columnas que el paquete crea por ustedes (evita chocar con columnas del usuario)
 - Comparamos con `crecimiento_alto` (la verdad)
 
@@ -376,9 +376,9 @@ predicciones |>
 
 ## Matriz de confusión
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 25px;"}
 
-- La matriz de confusión muestra todos los resultados posibles
+- [La matriz de confusión](https://yardstick.tidymodels.org/reference/conf_mat.html) muestra todos los resultados posibles
 - `truth` es la clase real, `estimate` la clase predicha
 
 ```{r lab-evaluar, prompt=FALSE, echo=TRUE}
@@ -401,7 +401,7 @@ conf_mat(predicciones, truth = crecimiento_alto, estimate = .pred_class)
 
 ## Métricas de evaluación
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 24px;"}
 
 ```{r lab-metricas-adicionales, prompt=FALSE, echo=TRUE}
 # Conjunto completo de métricas
@@ -410,7 +410,7 @@ predicciones |>
   summary(event_level = "second")
 ```
 
-[Recordatorio:]{.alert} `accuracy` = de todas las predicciones, cuántas acertó; `precision` (también aparece como `ppv`) = de las que predijo "sí", cuántas eran "sí"; `recall` (también `sens`) = de los "sí" reales, cuántos detectó
+[Recordatorio:]{.alert} `accuracy` = (VP + VN)/(VP + VN + FP + FN): de todas las predicciones, cuántas acertó; `precision` (también aparece como `ppv`) = VP/(VP + FP): de las que predijo "sí", cuántas eran "sí"; `recall` (también `sens`) = VP/(VP + FN): de los "sí" reales, cuántos detectó
 :::
 
 ## Ejercicio 2: Interpretación {#sec:exercise02}
@@ -461,8 +461,8 @@ pred_probs |> select(crecimiento_alto, .pred_no, .pred_si) |> head(5)
 
 [La curva ROC](https://es.wikipedia.org/wiki/Curva_ROC) resume el rendimiento [en todos los umbrales a la vez]{.alert}: cada punto de la curva es un umbral distinto
 
-- [Sensibilidad]{.alert} (eje Y) = VP / (VP + FN): de los países que sí crecieron, ¿cuántos detecta el modelo? Es el [recall]{.alert} de la sesión anterior
-- [1 - especificidad]{.alert} (eje X) = FP / (FP + VN): de los países que no crecieron, ¿cuántos marcamos por error? Es la [tasa de falsas alarmas]{.alert}
+- [Sensibilidad]{.alert} (eje Y) = VP / (VP + FN): de los países que sí crecieron, ¿cuántos detecta el modelo? Es el [recall]{.alert}
+- [1 - especificidad]{.alert} (eje X) = FP / (FP + VN): de los países que no crecieron, ¿cuántos marcamos por error? [Tasa de falsas alarmas]{.alert}
 - Bajar el umbral nos mueve hacia [arriba y a la derecha]{.alert}: detectamos más casos reales, pero pagamos con más falsas alarmas. La [diagonal]{.alert} es el azar
 
 ```{r roc-demo, prompt=FALSE, fig.width=8, fig.height=4.5, out.width="45%", echo=TRUE}
