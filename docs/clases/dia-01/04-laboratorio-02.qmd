@@ -413,7 +413,7 @@ eval_logistico
 - [`metric_set()`]{.alert} junta [varias métricas en un solo objeto](https://yardstick.tidymodels.org/reference/metric_set.html). Lo guardamos en `mis_metricas` y lo reusamos en cada evaluación
 - `collect_metrics()` devuelve la media y el error estándar de [cada métrica entre folds](https://tune.tidymodels.org/reference/collect_predictions.html)
 - `control = control_resamples(event_level = "second")` indica que la clase positiva es [`"si"`]{.alert}
-- Usamos [precision, recall y roc_auc]{.alert} en lugar de accuracy: con clases desbalanceadas
+- Usamos [precision, recall y roc_auc]{.alert} en lugar de accuracy: con clases desbalanceadas la accuracy puede ser engañosa
 - En el resultado, [`.metric`]{.alert} guarda el nombre de cada métrica (`precision`, `recall`, `roc_auc`) y `mean` y `std_err` 
 :::
 

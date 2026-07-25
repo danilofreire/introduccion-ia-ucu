@@ -1751,7 +1751,7 @@ $ crecimiento_alto        &lt;fct&gt; si, si, no, no, no, si, no, no, si, no, no
 <li><span class="alert"><code>metric_set()</code></span> junta <a href="https://yardstick.tidymodels.org/reference/metric_set.html">varias métricas en un solo objeto</a>. Lo guardamos en <code>mis_metricas</code> y lo reusamos en cada evaluación</li>
 <li><code>collect_metrics()</code> devuelve la media y el error estándar de <a href="https://tune.tidymodels.org/reference/collect_predictions.html">cada métrica entre folds</a></li>
 <li><code>control = control_resamples(event_level = &quot;second&quot;)</code> indica que la clase positiva es <span class="alert"><code>&quot;si&quot;</code></span></li>
-<li>Usamos <span class="alert">precision, recall y roc_auc</span> en lugar de accuracy: con clases desbalanceadas</li>
+<li>Usamos <span class="alert">precision, recall y roc_auc</span> en lugar de accuracy: con clases desbalanceadas la accuracy puede ser engañosa</li>
 <li>En el resultado, <span class="alert"><code>.metric</code></span> guarda el nombre de cada métrica (<code>precision</code>, <code>recall</code>, <code>roc_auc</code>) y <code>mean</code> y <code>std_err</code></li>
 </ul>
 </div>
