@@ -114,7 +114,7 @@ El resultado: traducción, resumen, razonamiento, conversación. Todo con [una s
 :::
 :::
 
-# La gran idea: predicción del próximo token {background-color="#2d4563"}
+# La única idea: predicción del próximo token {background-color="#2d4563"}
 
 ## ¿Qué es un LLM?
 
@@ -149,7 +149,7 @@ Fuente: [Jay Alammar](https://jalammar.github.io/illustrated-transformer/)
 - Dada una secuencia, el modelo calcula una [distribución de probabilidad]{.alert} sobre todos los tokens posibles del vocabulario
 - Ejemplo: "El gato se sentó en la ___"
 
-:::{style="font-size: 22px;"}
+:::{style="font-size: 24px; margin-top: 30px; margin-bottom: 30px;"}
 | Token | Probabilidad |
 |-------|--------------|
 | alfombra | 0,28 |
@@ -247,8 +247,8 @@ Fuente: [OpenAI Tokenizer (GPT 3)](https://platform.openai.com/tokenizer)
     3. Fusionar el par más frecuente en un nuevo token ("en")
     4. Repetir hasta llegar al tamaño de vocabulario deseado
 - Resultado: tokens que reflejan la [estadística del idioma de entrenamiento]{.alert}
-- Una palabra rara como "antidisestablishmentarianism" se descompone en partes pequeñas
-- Una palabra común como "the" es un solo token
+- Una palabra rara como "anticonstitucionalmente" se descompone en partes pequeñas
+- Una palabra común como "de" es un solo token
 :::
 
 :::{.column width=45%}
@@ -443,17 +443,17 @@ Esa es la innovación de los transformers
 - Ejemplo de resolución de ambigüedad:
 
 :::{style="font-size: 22px;"}
-*"El gato se sentó en la alfombra porque ella estaba caliente."*
+*"La gata se sentó en la alfombra porque estaba caliente."*
 
-Para entender a qué se refiere [ella]{.alert}, el modelo computa atención:
+Para saber [qué estaba caliente]{.alert}, el modelo computa atención desde "estaba":
 
-- ella → "gato": 0,05
-- ella → "alfombra": 0,72
-- ella → "caliente": 0,11
-- ella → otros: 0,12
+- estaba → "gata": 0,05
+- estaba → "alfombra": 0,72
+- estaba → "porque": 0,11
+- estaba → otros: 0,12
 :::
 
-- El modelo "resuelve" que [ella]{.alert} se refiere a [alfombra]{.alert}, no a [gato]{.alert}, porque la atención lo pondera así
+- El modelo "resuelve" que lo caliente era la [alfombra]{.alert} y no la [gata]{.alert}, porque la atención lo pondera así
 :::
 
 :::{.column width=45%}
@@ -470,11 +470,11 @@ Cada celda muestra cuánto un token presta atención a otro
 
 ## Multi-cabeza: varios tipos de "qué importa"
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
 - Una sola cabeza de atención solo captura un tipo de relación a la vez
-- Los transformers usan [atención multi-cabeza]{.alert}: varias capas de atención en paralelo
+- Los transformers usan [atención multi-cabeza]{.alert}: varios mecanismos de atención en paralelo dentro de la misma capa
 - Cada cabeza aprende un patrón distinto:
     - Una cabeza puede aprender [sintaxis]{.alert} (sujeto-verbo)
     - Otra puede aprender [co-referencia]{.alert} (pronombres → antecedentes)
@@ -483,7 +483,7 @@ Cada celda muestra cuánto un token presta atención a otro
 - En total: miles de patrones aprendidos en paralelo
 
 :::{.callout-note}
-Las primeras capas tienden a aprender gramática. Las últimas, semántica y razonamiento. Esto se ha confirmado con investigaciones de interpretabilidad.
+Las primeras capas tienden a aprender gramática. Las últimas, semántica y razonamiento. Es lo que sugieren los estudios de interpretabilidad
 :::
 :::
 
