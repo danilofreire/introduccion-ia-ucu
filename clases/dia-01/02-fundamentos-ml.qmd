@@ -293,13 +293,13 @@ tendencia_reciente       ← ¿aumenta o baja?
 :::{style="margin-top: 30px; font-size: 26px;"}
 :::{.columns}
 :::{.column width=55%}
-- Dividimos los datos en [K partes]{.alert} (folds) de tamaño similar
+- Dividimos los datos en [K partes (folds) de tamaño similar](https://es.wikipedia.org/wiki/Validaci%C3%B3n_cruzada)
 - Entrenamos K veces, cada vez usando [K-1 folds para entrenamiento]{.alert} y [1 fold para validación]{.alert}
 - Repetimos K veces, rotando el fold de validación
 - [Promediamos]{.alert} los resultados de las K iteraciones
 - Cada observación es usada para validación exactamente una vez
 - Más [confiable]{.alert} que una sola división, especialmente con pocos datos
-- K = 5 o K = 10 son los valores más comunes
+- [K = 5 o K = 10]{.alert} son los valores más comunes
 :::
 
 :::{.column width=45%}
@@ -410,7 +410,7 @@ Fuente: [X.com](https://x.com/MaartenvSmeden/status/1522230905468862464)
 
 ## El compromiso sesgo-varianza
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
 - El [sesgo (bias)](https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff){.alert} es el error por suposiciones simplificadoras: un modelo con alto sesgo "no presta atención" a los datos

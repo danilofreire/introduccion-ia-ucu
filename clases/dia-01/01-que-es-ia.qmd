@@ -88,10 +88,10 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 Todos los materiales del curso (diapositivas, código, laboratorios y lecturas) están disponibles en nuestro [sitio web](https://danilofreire.github.io/introduccion-ia-ucu) y [repositorio de GitHub](https://github.com/danilofreire/introduccion-ia-ucu)
 
-Las diapositivas se publicarán antes de cada sesión y se actualizarán a lo largo de la semana si surgen nuevas ideas o preguntas 😉
+Las diapositivas ya están publicadas, así que pueden leerlas antes de cada sesión o repasarlas después 😉
 
 ::: {.callout-note}
-¡Revisen el repositorio del curso con frecuencia para ver actualizaciones y nuevos materiales!
+Si algo cambia durante la semana, será un ajuste menor: revisen el repositorio para tener siempre la última versión
 :::
 :::
 
@@ -298,8 +298,8 @@ Fuente: [Wikipedia - Test de Turing](https://es.wikipedia.org/wiki/Test_de_Turin
 :::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
-- **Verano de 1956**: un [taller en Dartmouth College](https://es.wikipedia.org/wiki/Conferencia_de_Dartmouth) marca el nacimiento de la IA como campo de estudio
-- Organizado por [John McCarthy](https://es.wikipedia.org/wiki/John_McCarthy), [Marvin Minsky](https://es.wikipedia.org/wiki/Marvin_Minsky), Nathaniel Rochester y [Claude Shannon](https://es.wikipedia.org/wiki/Claude_Shannon)
+- **Verano de 1956**: un [taller en Dartmouth College](https://en.wikipedia.org/wiki/Dartmouth_workshop) marca el nacimiento de la IA como campo de estudio
+- Organizado por [John McCarthy](https://en.wikipedia.org/wiki/John_McCarthy), [Marvin Minsky](https://en.wikipedia.org/wiki/Marvin_Minsky), [Nathaniel Rochester](https://en.wikipedia.org/wiki/Nathaniel_Rochester_(computer_scientist)) y [Claude Shannon](https://en.wikipedia.org/wiki/Claude_Shannon)
 - Primera vez que se usa el término "[Inteligencia Artificial]{.alert}"
 - La conjetura fundacional:
 
