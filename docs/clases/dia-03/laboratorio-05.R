@@ -15,9 +15,10 @@
 # --- Cargar paquetes -----------------------------------------
 
 # Si algún paquete falta:
-# install.packages(c("tidyverse", "cluster", "factoextra", "corrplot"))
+# install.packages(c("tidyverse", "tidymodels", "cluster", "factoextra", "corrplot"))
 
 library(tidyverse)
+library(tidymodels)   # recipe(), step_normalize()
 library(cluster)      # silhouette()
 library(factoextra)   # fviz_cluster(), fviz_pca_*(), fviz_nbclust()
 library(corrplot)     # matriz de correlación
@@ -72,12 +73,18 @@ paises |>
 
 # --- Preparar datos para clustering --------------------------
 
-# column_to_rownames("pais") mueve la columna pais a los nombres
-# de fila, así scale() puede trabajar solo con las variables numéricas
-# y los nombres de países se preservan automáticamente en los plots
-datos_scaled <- paises |>
-  column_to_rownames("pais") |>
-  scale()
+# step_normalize() hace lo mismo que scale(): centra en 0 y divide
+# por el desvío. Es la sintaxis de recipes que usamos en el Día 2.
+# La receta no tiene variable objetivo (empieza con ~) y update_role()
+# marca a pais como identificador, no como variable a normalizar.
+# column_to_rownames("pais") mueve la columna pais a los nombres de
+# fila, así los nombres de países se preservan en los plots
+receta_paises <- recipe(~ ., data = paises) |>
+  update_role(pais, new_role = "id") |>
+  step_normalize(all_numeric_predictors())
+
+datos_scaled <- receta_paises |> prep() |> juice() |>
+  column_to_rownames("pais")
 
 head(datos_scaled, 5)
 

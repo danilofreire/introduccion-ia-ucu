@@ -1332,18 +1332,19 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Instala los que falten y los carga</span></span>
 <span id="cb1-2"><a></a>R<span class="sc">&gt;</span> paquetes <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb1-3"><a></a><span class="sc">+</span>   <span class="st">&quot;tidyverse&quot;</span>,</span>
-<span id="cb1-4"><a></a><span class="sc">+</span>   <span class="st">&quot;cluster&quot;</span>,      <span class="co"># silhouette()</span></span>
-<span id="cb1-5"><a></a><span class="sc">+</span>   <span class="st">&quot;factoextra&quot;</span>,   <span class="co"># fviz_cluster(), fviz_nbclust(), fviz_pca(), ...</span></span>
-<span id="cb1-6"><a></a><span class="sc">+</span>   <span class="st">&quot;corrplot&quot;</span>      <span class="co"># matriz de correlación</span></span>
-<span id="cb1-7"><a></a><span class="sc">+</span> )</span>
-<span id="cb1-8"><a></a>R<span class="sc">&gt;</span> <span class="cf">for</span> (pkg <span class="cf">in</span> paquetes) {</span>
-<span id="cb1-9"><a></a><span class="sc">+</span>   <span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(pkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb1-10"><a></a><span class="sc">+</span>     <span class="fu">install.packages</span>(pkg, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-11"><a></a><span class="sc">+</span>     <span class="fu">library</span>(pkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-12"><a></a><span class="sc">+</span>   }</span>
-<span id="cb1-13"><a></a><span class="sc">+</span> }</span>
-<span id="cb1-14"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb1-15"><a></a>R<span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">2026</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-4"><a></a><span class="sc">+</span>   <span class="st">&quot;tidymodels&quot;</span>,   <span class="co"># recipe(), step_normalize()</span></span>
+<span id="cb1-5"><a></a><span class="sc">+</span>   <span class="st">&quot;cluster&quot;</span>,      <span class="co"># silhouette()</span></span>
+<span id="cb1-6"><a></a><span class="sc">+</span>   <span class="st">&quot;factoextra&quot;</span>,   <span class="co"># fviz_cluster(), fviz_nbclust(), fviz_pca(), ...</span></span>
+<span id="cb1-7"><a></a><span class="sc">+</span>   <span class="st">&quot;corrplot&quot;</span>      <span class="co"># matriz de correlación</span></span>
+<span id="cb1-8"><a></a><span class="sc">+</span> )</span>
+<span id="cb1-9"><a></a>R<span class="sc">&gt;</span> <span class="cf">for</span> (pkg <span class="cf">in</span> paquetes) {</span>
+<span id="cb1-10"><a></a><span class="sc">+</span>   <span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(pkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb1-11"><a></a><span class="sc">+</span>     <span class="fu">install.packages</span>(pkg, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-12"><a></a><span class="sc">+</span>     <span class="fu">library</span>(pkg, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-13"><a></a><span class="sc">+</span>   }</span>
+<span id="cb1-14"><a></a><span class="sc">+</span> }</span>
+<span id="cb1-15"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb1-16"><a></a>R<span class="sc">&gt;</span> <span class="fu">set.seed</span>(<span class="dv">2026</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
@@ -1523,12 +1524,15 @@ $ indice_democracia &lt;dbl&gt; 6.7, 4.4, 7.0, 8.1, 7.0, 8.3, 5.7, 5.8, 4.9, 5.4
 <h2>Preparar datos para clustering</h2>
 <div style="margin-top: 30px; font-size: 22px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Mover `pais` a rownames, luego escalar (media = 0, sd = 1)</span></span>
-<span id="cb7-2"><a></a>R<span class="sc">&gt;</span> datos_scaled <span class="ot">&lt;-</span> paises <span class="sc">|&gt;</span></span>
-<span id="cb7-3"><a></a><span class="sc">+</span>   <span class="fu">column_to_rownames</span>(<span class="st">&quot;pais&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb7-4"><a></a><span class="sc">+</span>   <span class="fu">scale</span>()</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Escalar con una receta (media = 0, sd = 1), como en el Día 2</span></span>
+<span id="cb7-2"><a></a>R<span class="sc">&gt;</span> receta_paises <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> paises) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a></a><span class="sc">+</span>   <span class="fu">update_role</span>(pais, <span class="at">new_role =</span> <span class="st">&quot;id&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a></a><span class="sc">+</span>   <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
 <span id="cb7-5"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb7-6"><a></a>R<span class="sc">&gt;</span> <span class="fu">head</span>(datos_scaled, <span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-6"><a></a>R<span class="sc">&gt;</span> datos_scaled <span class="ot">&lt;-</span> receta_paises <span class="sc">|&gt;</span> <span class="fu">prep</span>() <span class="sc">|&gt;</span> <span class="fu">juice</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-7"><a></a><span class="sc">+</span>   <span class="fu">column_to_rownames</span>(<span class="st">&quot;pais&quot;</span>)</span>
+<span id="cb7-8"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb7-9"><a></a>R<span class="sc">&gt;</span> <span class="fu">head</span>(datos_scaled, <span class="dv">5</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          pib_per_capita esperanza_vida anios_educacion acceso_internet
 Argentina      0.5937295     0.17882893       1.6006861       1.1829170
@@ -1544,7 +1548,8 @@ Chile           0.9902931  0.02677714    0.9174721         1.2241040
 Colombia        0.4134233  1.29516821    0.4447288         0.5636882</code></pre>
 </div>
 </div>
-<p><span class="alert"><code>column_to_rownames(&quot;pais&quot;)</code></span> mueve la columna <code>pais</code> a los nombres de fila. Así <code>scale()</code> puede trabajar solo con las 8 variables numéricas, y los nombres de países se preservan automáticamente en todos los plots posteriores (clusters, dendrograma, biplot)</p>
+<p><span class="alert"><code>step_normalize()</code></span> hace lo mismo que <code>scale()</code> y es la sintaxis que ya usamos en los laboratorios del Día 2. La receta <span class="alert">no tiene variable objetivo</span> (empieza con <code>~</code>) y <code>update_role()</code> marca a <code>pais</code> como identificador, no como variable a normalizar</p>
+<p><span class="alert"><code>column_to_rownames(&quot;pais&quot;)</code></span> mueve la columna <code>pais</code> a los nombres de fila, así los nombres de países se preservan automáticamente en todos los plots posteriores (clusters, dendrograma, biplot)</p>
 </div>
 </section></section>
 <section>
@@ -1956,7 +1961,7 @@ Cumulative Proportion  1.00000</code></pre>
 </div><div class="column" style="width:50%;">
 <p><strong>Funciones clave:</strong></p>
 <ul>
-<li><code>scale()</code>: normalizar datos</li>
+<li><code>step_normalize()</code>: normalizar datos</li>
 <li><code>kmeans()</code>: clustering</li>
 <li><code>silhouette()</code>: evaluar clusters</li>
 <li><code>prcomp()</code>: PCA</li>

@@ -96,6 +96,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 # Instala los que falten y los carga
 paquetes <- c(
   "tidyverse",
+  "tidymodels",   # recipe(), step_normalize()
   "cluster",      # silhouette()
   "factoextra",   # fviz_cluster(), fviz_nbclust(), fviz_pca(), ...
   "corrplot"      # matriz de correlación
@@ -253,15 +254,20 @@ Elijan dos países del dataset que les interesen (por ejemplo, Uruguay vs. Hondu
 #| echo: true
 #| eval: true
 
-# Mover `pais` a rownames, luego escalar (media = 0, sd = 1)
-datos_scaled <- paises |>
-  column_to_rownames("pais") |>
-  scale()
+# Escalar con una receta (media = 0, sd = 1), como en el Día 2
+receta_paises <- recipe(~ ., data = paises) |>
+  update_role(pais, new_role = "id") |>
+  step_normalize(all_numeric_predictors())
+
+datos_scaled <- receta_paises |> prep() |> juice() |>
+  column_to_rownames("pais")
 
 head(datos_scaled, 5)
 ```
 
-[`column_to_rownames("pais")`]{.alert} mueve la columna `pais` a los nombres de fila. Así `scale()` puede trabajar solo con las 8 variables numéricas, y los nombres de países se preservan automáticamente en todos los plots posteriores (clusters, dendrograma, biplot)
+[`step_normalize()`]{.alert} hace lo mismo que `scale()` y es la sintaxis que ya usamos en los laboratorios del Día 2. La receta [no tiene variable objetivo]{.alert} (empieza con `~`) y `update_role()` marca a `pais` como identificador, no como variable a normalizar
+
+[`column_to_rownames("pais")`]{.alert} mueve la columna `pais` a los nombres de fila, así los nombres de países se preservan automáticamente en todos los plots posteriores (clusters, dendrograma, biplot)
 :::
 
 # Parte 2: K-means y evaluación {background-color="#2d4563"}
@@ -656,7 +662,7 @@ fviz_pca_biplot(pca,
 :::{.column width=50%}
 **Funciones clave:**
 
-- `scale()`: normalizar datos
+- `step_normalize()`: normalizar datos
 - `kmeans()`: clustering
 - `silhouette()`: evaluar clusters
 - `prcomp()`: PCA
