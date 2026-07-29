@@ -4057,7 +4057,7 @@
     "href": "clases/dia-03/09-clustering-pca.html#sec:resumen-3-1",
     "title": "IA para Científicos Sociales",
     "section": "Resumen de la sesión",
-    "text": "Resumen de la sesión\n\n\n\nClustering:\n\nK-means: rápido, asume clusters esféricos, requiere elegir K\nJerárquico: produce dendrograma, no requiere K de antemano\nSilueta: mide calidad de los clusters\nEscalar siempre antes de aplicar\nRecomendación: DBSCAN y HDBSCAN manejan clusters no esféricos\n\n\nPCA:\n\nReduce dimensionalidad preservando varianza\nLos loadings indican qué variables contribuyen a cada componente\nScree plot ayuda a elegir cuántos componentes conservar\nBiplot visualiza observaciones y variables juntas\nRecomendación: t-SNE y UMAP son alternativas no lineales para visualización\n\n\n\n\n\nSon herramientas de exploración: generan hipótesis, no las confirman\n\nApéndices: caracterizar clusters"
+    "text": "Resumen de la sesión\n\n\n\nClustering:\n\nK-means: rápido, asume clusters esféricos, requiere elegir K\nJerárquico: produce dendrograma, no requiere K de antemano\nSilueta: mide calidad de los clusters\nEscalar siempre antes de aplicar\nRecomendación: DBSCAN y HDBSCAN manejan clusters no esféricos\n\n\nPCA:\n\nReduce dimensionalidad preservando varianza\nLos loadings indican qué variables contribuyen a cada componente\nScree plot ayuda a elegir cuántos componentes conservar\nBiplot visualiza observaciones y variables juntas\nRecomendación: t-SNE y UMAP son alternativas no lineales para visualización\n\n\n\n\n\nSon herramientas de exploración: generan hipótesis, no las confirman\n\nApéndices: caracterizar clusters predecir un caso nuevo"
   },
   {
     "objectID": "clases/dia-03/09-clustering-pca.html#sec:apendice-cluster",
@@ -6102,5 +6102,26 @@
     "title": "IA para Científicos Sociales",
     "section": "Preparación",
     "text": "Preparación\n\n\nR&gt; # Instalar paquetes si no están disponibles\nR&gt; if (!require(\"fairmodels\")) install.packages(\"fairmodels\")\nR&gt; if (!require(\"DALEX\")) install.packages(\"DALEX\")\nR&gt; \nR&gt; # Cargar paquetes\nR&gt; library(tidymodels)\nR&gt; library(fairmodels)\nR&gt; library(DALEX)\n\nfairmodels usa explicadores de DALEX para auditar modelos. Funciona con cualquier modelo de clasificación\nPara más informaciones, ver la documentación oficial y el artículo oficial: https://modeloriented.github.io/fairmodels/articles/fairmodels.html y https://arxiv.org/abs/2104.00507"
+  },
+  {
+    "objectID": "clases/dia-03/09-clustering-pca.html#sec:apendice-produccion",
+    "href": "clases/dia-03/09-clustering-pca.html#sec:apendice-produccion",
+    "title": "IA para Científicos Sociales",
+    "section": "¿Cuándo predecimos un caso nuevo?",
+    "text": "¿Cuándo predecimos un caso nuevo?\n\nEn el Día 2 siempre predijimos sobre datos_test, que ya estaba dentro del archivo. Un caso nuevo funciona exactamente igual: cambia lo que pasamos como segundo argumento, no la función\n\n\nEvaluar vs. predecir\n\n\n\n\nSegundo argumento\n¿Trae la respuesta?\n\n\n\n\nEvaluar\ndatos_test\nSí (voto)\n\n\nPredecir\nuna fila nueva\nNo\n\n\n\n\n\nAl evaluar comparamos la predicción con la realidad para calcular métricas\nAl predecir no hay con qué comparar: la respuesta todavía no ocurrió\n\n\n\nTres funciones, tres salidas\n\npredict(ajuste, caso) devuelve .pred_class\npredict(ajuste, caso, type = \"prob\") devuelve .pred_no y .pred_si\naugment(ajuste, caso) devuelve el caso más las tres columnas\n\n.pred_class no es un cálculo aparte: es .pred_si &gt; 0,5 con otro nombre"
+  },
+  {
+    "objectID": "clases/dia-03/09-clustering-pca.html#un-caso-nuevo-una-votante-uruguaya",
+    "href": "clases/dia-03/09-clustering-pca.html#un-caso-nuevo-una-votante-uruguaya",
+    "title": "IA para Científicos Sociales",
+    "section": "Un caso nuevo: una votante uruguaya",
+    "text": "Un caso nuevo: una votante uruguaya\n\n\n\n\nR&gt; # Una fila con las mismas columnas que los datos\nR&gt; # de entrenamiento (sin voto, que es lo que\nR&gt; # queremos predecir)\nR&gt; nuevo_caso &lt;- tibble(\n+   pais = \"Uruguay\", edad = 42,\n+   educacion_anios = 16, ingreso_hogar = 7,\n+   zona = \"urbana\", genero = \"mujer\",\n+   confianza_gobierno = 3, confianza_justicia = 3,\n+   satisfaccion_democracia = 4,\n+   percepcion_economia = 3,\n+   uso_internet = \"diario\", interes_politica = 3,\n+   satisfaccion_vida = 7.5\n+ )\nR&gt; \nR&gt; augment(ajuste_voto, nuevo_caso) |&gt;\n+   select(pais, .pred_class, .pred_no, .pred_si)\n\n# A tibble: 1 × 4\n  pais    .pred_class .pred_no .pred_si\n  &lt;chr&gt;   &lt;fct&gt;          &lt;dbl&gt;    &lt;dbl&gt;\n1 Uruguay si             0.273    0.727\n\n\n\n\nEl workflow() guarda adentro la receta ya estimada: las medias y desvíos de step_normalize(), las dummies de step_dummy()\nSi pasamos diez filas en lugar de una, salen diez predicciones. La sintaxis no cambia\nEs el mismo augment() del Laboratorio 3, con otra tabla adelante"
+  },
+  {
+    "objectID": "clases/dia-03/09-clustering-pca.html#detalles-que-hacen-fallar-la-predicción",
+    "href": "clases/dia-03/09-clustering-pca.html#detalles-que-hacen-fallar-la-predicción",
+    "title": "IA para Científicos Sociales",
+    "section": "Detalles que hacen fallar la predicción",
+    "text": "Detalles que hacen fallar la predicción\n\n\n\n1. Faltan columnas\nLa receta valida el caso nuevo contra los datos originales, así que exige todas las columnas, incluso pais y satisfaccion_vida, que step_rm() borra un paso después\nError in `hardhat::forge()`:\n! The required column \"pais\" is missing.\n2. Niveles mal escritos\nEscribir \"Urbana\" en lugar de \"urbana\" no da error: devuelve NA con un warning. Los niveles son rural/urbana, diario/nunca/semanal\n\n3. El umbral es una decisión de ustedes\naugment(ajuste_voto, casos) |&gt;\n  mutate(clase = if_else(.pred_si &gt; 0.4,\n                         \"si\", \"no\"))\n4. Guardar el modelo para usarlo después\nsaveRDS(ajuste_voto, \"modelo_voto.rds\")\nmodelo &lt;- readRDS(\"modelo_voto.rds\")\npredict(modelo, nuevo_caso, type = \"prob\")\nSi ajustaron con last_fit(), primero extraigan el workflow: extract_workflow(ajuste_final)\n\n\nVolver al resumen"
   }
 ]

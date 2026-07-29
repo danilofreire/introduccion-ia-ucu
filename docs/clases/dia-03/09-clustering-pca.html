@@ -1632,7 +1632,7 @@ real     1  2  3
 <span id="cb9-2"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Método del codo&quot;</span>, <span class="at">subtitle =</span> <span class="cn">NULL</span>)</span>
 <span id="cb9-3"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_nbclust</span>(datos_scaled, kmeans, <span class="at">method =</span> <span class="st">&quot;silhouette&quot;</span>, <span class="at">nstart =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
 <span id="cb9-4"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Método de la silueta&quot;</span>, <span class="at">subtitle =</span> <span class="cn">NULL</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell quarto-layout-panel" data-layout-align="center" data-layout-ncol="2">
+<div class="cell quarto-layout-panel" data-layout-ncol="2" data-layout-align="center">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
@@ -2133,7 +2133,7 @@ Cumulative Proportion  0.70 0.95 0.98 1.00</code></pre>
 </div>
 <p><span class="alert">Son herramientas de exploración: generan hipótesis, no las confirman</span></p>
 <div style="margin-top: 12px; text-align: center; font-size: 18px;">
-<p>Apéndices: <a href="#/sec:apendice-cluster"><span class="button">caracterizar clusters</span></a></p>
+<p>Apéndices: <a href="#/sec:apendice-cluster"><span class="button">caracterizar clusters</span></a> <a href="#/sec:apendice-produccion"><span class="button">predecir un caso nuevo</span></a></p>
 </div>
 </div>
 </section>
@@ -2188,6 +2188,116 @@ Cumulative Proportion  0.70 0.95 0.98 1.00</code></pre>
 <p><strong>2. Validación externa:</strong> cruzar con variables <span class="alert">no usadas</span> en el clustering (región, partido, año). Si los grupos separan esas variables, tienen evidencia de estructura real</p>
 <p><strong>3. Nombrar los clusters:</strong> etiquetas sustantivas (“alto desarrollo”, “ingreso medio”, “bajo desarrollo”) en lugar de “1, 2, 3”</p>
 <p><strong>4. Cuidado con la reificación:</strong> los clusters <span class="alert">no son categorías naturales</span>. Dependen de K y de las variables elegidas</p>
+</div></div>
+<div style="text-align: center; margin-top: 10px;">
+<p><a href="#/sec:resumen-3-1"><span class="button">Volver al resumen</span></a></p>
+</div>
+</div>
+</section>
+<section id="sec:apendice-produccion" class="slide level2">
+<h2>¿Cuándo predecimos un caso nuevo?</h2>
+<div style="margin-top: 20px; font-size: 23px;">
+<p>En el Día 2 siempre predijimos sobre <code>datos_test</code>, que ya estaba dentro del archivo. Un caso nuevo funciona <span class="alert">exactamente igual</span>: cambia lo que pasamos como segundo argumento, no la función</p>
+<div class="columns">
+<div class="column" style="width:52%;">
+<p><strong>Evaluar vs. predecir</strong></p>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th>Segundo argumento</th>
+<th>¿Trae la respuesta?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Evaluar</td>
+<td><code>datos_test</code></td>
+<td>Sí (<code>voto</code>)</td>
+</tr>
+<tr class="even">
+<td>Predecir</td>
+<td>una fila nueva</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<div style="margin-top: 30px;">
+<ul>
+<li>Al evaluar comparamos la predicción con la realidad para calcular métricas</li>
+<li>Al predecir no hay con qué comparar: la respuesta todavía no ocurrió</li>
+</ul>
+</div>
+</div><div class="column" style="width:48%;">
+<p><strong>Tres funciones, tres salidas</strong></p>
+<ul>
+<li><code>predict(ajuste, caso)</code> devuelve <code>.pred_class</code></li>
+<li><code>predict(ajuste, caso, type = &quot;prob&quot;)</code> devuelve <code>.pred_no</code> y <code>.pred_si</code></li>
+<li><code>augment(ajuste, caso)</code> devuelve el caso <span class="alert">más las tres columnas</span></li>
+</ul>
+<p><span class="alert"><code>.pred_class</code> no es un cálculo aparte: es <code>.pred_si &gt; 0,5</code> con otro nombre</span></p>
+</div></div>
+</div>
+</section>
+<section id="un-caso-nuevo-una-votante-uruguaya" class="slide level2">
+<h2>Un caso nuevo: una votante uruguaya</h2>
+<div style="margin-top: 20px; font-size: 24px;">
+<div class="columns">
+<div class="column" style="width:55%;">
+<div class="cell" data-layout-align="center">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Una fila con las mismas columnas que los datos</span></span>
+<span id="cb22-2"><a></a>R<span class="sc">&gt;</span> <span class="co"># de entrenamiento (sin voto, que es lo que</span></span>
+<span id="cb22-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># queremos predecir)</span></span>
+<span id="cb22-4"><a></a>R<span class="sc">&gt;</span> nuevo_caso <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb22-5"><a></a><span class="sc">+</span>   <span class="at">pais =</span> <span class="st">&quot;Uruguay&quot;</span>, <span class="at">edad =</span> <span class="dv">42</span>,</span>
+<span id="cb22-6"><a></a><span class="sc">+</span>   <span class="at">educacion_anios =</span> <span class="dv">16</span>, <span class="at">ingreso_hogar =</span> <span class="dv">7</span>,</span>
+<span id="cb22-7"><a></a><span class="sc">+</span>   <span class="at">zona =</span> <span class="st">&quot;urbana&quot;</span>, <span class="at">genero =</span> <span class="st">&quot;mujer&quot;</span>,</span>
+<span id="cb22-8"><a></a><span class="sc">+</span>   <span class="at">confianza_gobierno =</span> <span class="dv">3</span>, <span class="at">confianza_justicia =</span> <span class="dv">3</span>,</span>
+<span id="cb22-9"><a></a><span class="sc">+</span>   <span class="at">satisfaccion_democracia =</span> <span class="dv">4</span>,</span>
+<span id="cb22-10"><a></a><span class="sc">+</span>   <span class="at">percepcion_economia =</span> <span class="dv">3</span>,</span>
+<span id="cb22-11"><a></a><span class="sc">+</span>   <span class="at">uso_internet =</span> <span class="st">&quot;diario&quot;</span>, <span class="at">interes_politica =</span> <span class="dv">3</span>,</span>
+<span id="cb22-12"><a></a><span class="sc">+</span>   <span class="at">satisfaccion_vida =</span> <span class="fl">7.5</span></span>
+<span id="cb22-13"><a></a><span class="sc">+</span> )</span>
+<span id="cb22-14"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb22-15"><a></a>R<span class="sc">&gt;</span> <span class="fu">augment</span>(ajuste_voto, nuevo_caso) <span class="sc">|&gt;</span></span>
+<span id="cb22-16"><a></a><span class="sc">+</span>   <span class="fu">select</span>(pais, .pred_class, .pred_no, .pred_si)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  pais    .pred_class .pred_no .pred_si
+  &lt;chr&gt;   &lt;fct&gt;          &lt;dbl&gt;    &lt;dbl&gt;
+1 Uruguay si             0.273    0.727</code></pre>
+</div>
+</div>
+</div><div class="column" style="width:45%;">
+<ul>
+<li>El <code>workflow()</code> guarda adentro la receta ya estimada: las medias y desvíos de <code>step_normalize()</code>, las dummies de <code>step_dummy()</code></li>
+<li>Si pasamos diez filas en lugar de una, salen diez predicciones. La sintaxis no cambia</li>
+<li>Es el mismo <code>augment()</code> del Laboratorio 3, con otra tabla adelante</li>
+</ul>
+</div></div>
+</div>
+</section>
+<section id="detalles-que-hacen-fallar-la-predicción" class="slide level2">
+<h2>Detalles que hacen fallar la predicción</h2>
+<div style="margin-top: 20px; font-size: 21px;">
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>1. Faltan columnas</strong></p>
+<p>La receta valida el caso nuevo contra los datos originales, así que exige <span class="alert">todas las columnas</span>, incluso <code>pais</code> y <code>satisfaccion_vida</code>, que <code>step_rm()</code> borra un paso después</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a></a>Error <span class="cf">in</span> <span class="st">`</span><span class="at">hardhat::forge()</span><span class="st">`</span><span class="sc">:</span></span>
+<span id="cb24-2"><a></a><span class="sc">!</span> The required column <span class="st">&quot;pais&quot;</span> is missing.</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>2. Niveles mal escritos</strong></p>
+<p>Escribir <code>&quot;Urbana&quot;</code> en lugar de <code>&quot;urbana&quot;</code> no da error: devuelve <code>NA</code> con un warning. Los niveles son <code>rural</code>/<code>urbana</code>, <code>diario</code>/<code>nunca</code>/<code>semanal</code></p>
+</div><div class="column" style="width:50%;">
+<p><strong>3. El umbral es una decisión de ustedes</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a></a><span class="fu">augment</span>(ajuste_voto, casos) <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a></a>  <span class="fu">mutate</span>(<span class="at">clase =</span> <span class="fu">if_else</span>(.pred_si <span class="sc">&gt;</span> <span class="fl">0.4</span>,</span>
+<span id="cb25-3"><a></a>                         <span class="st">&quot;si&quot;</span>, <span class="st">&quot;no&quot;</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>4. Guardar el modelo para usarlo después</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a></a><span class="fu">saveRDS</span>(ajuste_voto, <span class="st">&quot;modelo_voto.rds&quot;</span>)</span>
+<span id="cb26-2"><a></a>modelo <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;modelo_voto.rds&quot;</span>)</span>
+<span id="cb26-3"><a></a><span class="fu">predict</span>(modelo, nuevo_caso, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Si ajustaron con <code>last_fit()</code>, primero extraigan el workflow: <code>extract_workflow(ajuste_final)</code></p>
 </div></div>
 <div style="text-align: center; margin-top: 10px;">
 <p><a href="#/sec:resumen-3-1"><span class="button">Volver al resumen</span></a></p>

@@ -745,7 +745,7 @@ Muchos índices que usamos en ciencias sociales (bienestar, confianza institucio
 [Son herramientas de exploración: generan hipótesis, no las confirman]{.alert}
 
 :::{style="margin-top: 12px; text-align: center; font-size: 18px;"}
-Apéndices: [[caracterizar clusters]{.button}](#sec:apendice-cluster)
+Apéndices: [[caracterizar clusters]{.button}](#sec:apendice-cluster) [[predecir un caso nuevo]{.button}](#sec:apendice-produccion)
 :::
 :::
 
@@ -793,6 +793,142 @@ datos |>
 **3. Nombrar los clusters:** etiquetas sustantivas ("alto desarrollo", "ingreso medio", "bajo desarrollo") en lugar de "1, 2, 3"
 
 **4. Cuidado con la reificación:** los clusters [no son categorías naturales]{.alert}. Dependen de K y de las variables elegidas
+:::
+:::
+
+:::{style="text-align: center; margin-top: 10px;"}
+[[Volver al resumen]{.button}](#sec:resumen-3-1)
+:::
+:::
+
+```{r apendice-produccion-setup, include=FALSE}
+# Reajustamos el modelo del Laboratorio 3 para el apéndice siguiente
+suppressPackageStartupMessages(library(tidymodels))
+
+encuesta <- read_csv("../dia-02/datos/latinobarometro_sim.csv",
+                     show_col_types = FALSE) |>
+  mutate(across(where(is.character), as.factor))
+
+set.seed(2026)
+split_encuesta <- initial_split(encuesta, prop = 0.75, strata = voto)
+
+receta_voto <- recipe(voto ~ ., data = training(split_encuesta)) |>
+  step_rm(pais, satisfaccion_vida) |>
+  step_dummy(all_nominal_predictors()) |>
+  step_normalize(all_numeric_predictors()) |>
+  step_zv(all_predictors())
+
+ajuste_voto <- workflow() |>
+  add_recipe(receta_voto) |>
+  add_model(logistic_reg() |> set_engine("glm") |> set_mode("classification")) |>
+  fit(data = training(split_encuesta))
+```
+
+## ¿Cuándo predecimos un caso nuevo? {#sec:apendice-produccion}
+
+:::{style="margin-top: 20px; font-size: 23px;"}
+
+En el Día 2 siempre predijimos sobre `datos_test`, que ya estaba dentro del archivo. Un caso nuevo funciona [exactamente igual]{.alert}: cambia lo que pasamos como segundo argumento, no la función
+
+:::{.columns}
+:::{.column width=52%}
+**Evaluar vs. predecir**
+
+| | Segundo argumento | ¿Trae la respuesta? |
+|---|---|---|
+| Evaluar | `datos_test` | Sí (`voto`) |
+| Predecir | una fila nueva | No |
+
+:::{style="margin-top: 30px;"}
+- Al evaluar comparamos la predicción con la realidad para calcular métricas
+- Al predecir no hay con qué comparar: la respuesta todavía no ocurrió
+:::
+:::
+
+:::{.column width=48%}
+**Tres funciones, tres salidas**
+
+- `predict(ajuste, caso)` devuelve `.pred_class`
+- `predict(ajuste, caso, type = "prob")` devuelve `.pred_no` y `.pred_si`
+- `augment(ajuste, caso)` devuelve el caso [más las tres columnas]{.alert}
+
+[`.pred_class` no es un cálculo aparte: es `.pred_si > 0,5` con otro nombre]{.alert}
+:::
+:::
+:::
+
+## Un caso nuevo: una votante uruguaya
+
+:::{style="margin-top: 20px; font-size: 24px;"}
+
+:::{.columns}
+:::{.column width=55%}
+```{r nuevo-caso, echo=TRUE, eval=TRUE}
+# Una fila con las mismas columnas que los datos
+# de entrenamiento (sin voto, que es lo que
+# queremos predecir)
+nuevo_caso <- tibble(
+  pais = "Uruguay", edad = 42,
+  educacion_anios = 16, ingreso_hogar = 7,
+  zona = "urbana", genero = "mujer",
+  confianza_gobierno = 3, confianza_justicia = 3,
+  satisfaccion_democracia = 4,
+  percepcion_economia = 3,
+  uso_internet = "diario", interes_politica = 3,
+  satisfaccion_vida = 7.5
+)
+
+augment(ajuste_voto, nuevo_caso) |>
+  select(pais, .pred_class, .pred_no, .pred_si)
+```
+:::
+
+:::{.column width=45%}
+- El `workflow()` guarda adentro la receta ya estimada: las medias y desvíos de `step_normalize()`, las dummies de `step_dummy()`
+- Si pasamos diez filas en lugar de una, salen diez predicciones. La sintaxis no cambia
+- Es el mismo `augment()` del Laboratorio 3, con otra tabla adelante
+:::
+:::
+:::
+
+## Detalles que hacen fallar la predicción
+
+:::{style="margin-top: 20px; font-size: 21px;"}
+
+:::{.columns}
+:::{.column width=50%}
+**1. Faltan columnas**
+
+La receta valida el caso nuevo contra los datos originales, así que exige [todas las columnas]{.alert}, incluso `pais` y `satisfaccion_vida`, que `step_rm()` borra un paso después
+
+```r
+Error in `hardhat::forge()`:
+! The required column "pais" is missing.
+```
+
+**2. Niveles mal escritos**
+
+Escribir `"Urbana"` en lugar de `"urbana"` no da error: devuelve `NA` con un warning. Los niveles son `rural`/`urbana`, `diario`/`nunca`/`semanal`
+:::
+
+:::{.column width=50%}
+**3. El umbral es una decisión de ustedes**
+
+```r
+augment(ajuste_voto, casos) |>
+  mutate(clase = if_else(.pred_si > 0.4,
+                         "si", "no"))
+```
+
+**4. Guardar el modelo para usarlo después**
+
+```r
+saveRDS(ajuste_voto, "modelo_voto.rds")
+modelo <- readRDS("modelo_voto.rds")
+predict(modelo, nuevo_caso, type = "prob")
+```
+
+Si ajustaron con `last_fit()`, primero extraigan el workflow: `extract_workflow(ajuste_final)`
 :::
 :::
 
