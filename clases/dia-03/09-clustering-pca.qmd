@@ -50,6 +50,7 @@ if (!require("fontawesome", character.only = TRUE)) {
 
 suppressPackageStartupMessages({
   library(tidyverse)
+  library(tidymodels)
   library(cluster)
   library(factoextra)
 })
@@ -292,6 +293,7 @@ datos <- bind_rows(
 :::{.column width=55%}
 ```{r kmeans-glimpse, echo=TRUE, eval=TRUE}
 # library("tidyverse")
+# library("tidymodels")
 # library("cluster")
 # library("factoextra")
 
@@ -311,10 +313,12 @@ glimpse(datos)
 #| fig-height: 3.2
 #| fig-align: center
 
-# Escalar (siempre antes de K-means)
-datos_scaled <- datos |>
-  select(where(is.numeric)) |>
-  scale()
+# Escalar (siempre antes de K-means), con la misma receta del Día 2
+receta_km <- recipe(~ ., data = datos) |>
+  step_rm(grupo_real) |>          # la etiqueta no entra al clustering
+  step_normalize(all_numeric_predictors())
+
+datos_scaled <- receta_km |> prep() |> juice()
 
 # Ajustar K-means con K=3 y 25 inicializaciones aleatorias
 km <- kmeans(datos_scaled, centers = 3, nstart = 25)
@@ -331,6 +335,7 @@ fviz_cluster(km, data = datos_scaled, geom = "point",
   theme_minimal(base_size = 11)
 ```
 
+- `step_normalize()` hace lo mismo que `scale()`: centra en 0 y divide por el desvío. Acá la receta [no tiene variable objetivo]{.alert}, por eso la fórmula empieza con `~`
 - `nstart = 25` protege contra mínimos locales por una mala inicialización aleatoria
 :::
 
@@ -803,8 +808,6 @@ datos |>
 
 ```{r apendice-produccion-setup, include=FALSE}
 # Reajustamos el modelo del Laboratorio 3 para el apéndice siguiente
-suppressPackageStartupMessages(library(tidymodels))
-
 encuesta <- read_csv("../dia-02/datos/latinobarometro_sim.csv",
                      show_col_types = FALSE) |>
   mutate(across(where(is.character), as.factor))

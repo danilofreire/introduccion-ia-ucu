@@ -1564,10 +1564,11 @@ Danilo Freire <a href="https://orcid.org/0000-0002-4712-6810" class="quarto-titl
 </div><div class="column" style="width:55%;">
 <div class="cell" data-layout-align="center">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># library(&quot;tidyverse&quot;)</span></span>
-<span id="cb2-2"><a></a>R<span class="sc">&gt;</span> <span class="co"># library(&quot;cluster&quot;)</span></span>
-<span id="cb2-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># library(&quot;factoextra&quot;)</span></span>
-<span id="cb2-4"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb2-5"><a></a>R<span class="sc">&gt;</span> <span class="fu">glimpse</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-2"><a></a>R<span class="sc">&gt;</span> <span class="co"># library(&quot;tidymodels&quot;)</span></span>
+<span id="cb2-3"><a></a>R<span class="sc">&gt;</span> <span class="co"># library(&quot;cluster&quot;)</span></span>
+<span id="cb2-4"><a></a>R<span class="sc">&gt;</span> <span class="co"># library(&quot;factoextra&quot;)</span></span>
+<span id="cb2-5"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb2-6"><a></a>R<span class="sc">&gt;</span> <span class="fu">glimpse</span>(datos)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 90
 Columns: 5
@@ -1585,17 +1586,19 @@ $ grupo_real  &lt;chr&gt; &quot;alto&quot;, &quot;alto&quot;, &quot;alto&quot;, 
 <h2>K-means en R: ajuste y evaluación</h2>
 <div style="margin-top: 20px; font-size: 20px;">
 <div class="cell" data-layout-align="center">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Escalar (siempre antes de K-means)</span></span>
-<span id="cb4-2"><a></a>R<span class="sc">&gt;</span> datos_scaled <span class="ot">&lt;-</span> datos <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a></a><span class="sc">+</span>   <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">|&gt;</span></span>
-<span id="cb4-4"><a></a><span class="sc">+</span>   <span class="fu">scale</span>()</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Escalar (siempre antes de K-means), con la misma receta del Día 2</span></span>
+<span id="cb4-2"><a></a>R<span class="sc">&gt;</span> receta_km <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> datos) <span class="sc">|&gt;</span></span>
+<span id="cb4-3"><a></a><span class="sc">+</span>   <span class="fu">step_rm</span>(grupo_real) <span class="sc">|&gt;</span>          <span class="co"># la etiqueta no entra al clustering</span></span>
+<span id="cb4-4"><a></a><span class="sc">+</span>   <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
 <span id="cb4-5"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb4-6"><a></a>R<span class="sc">&gt;</span> <span class="co"># Ajustar K-means con K=3 y 25 inicializaciones aleatorias</span></span>
-<span id="cb4-7"><a></a>R<span class="sc">&gt;</span> km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
-<span id="cb4-8"><a></a>R<span class="sc">&gt;</span> </span>
-<span id="cb4-9"><a></a>R<span class="sc">&gt;</span> <span class="co"># Silueta promedio</span></span>
-<span id="cb4-10"><a></a>R<span class="sc">&gt;</span> sil <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
-<span id="cb4-11"><a></a>R<span class="sc">&gt;</span> <span class="fu">round</span>(<span class="fu">mean</span>(sil[, <span class="st">&quot;sil_width&quot;</span>]), <span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-6"><a></a>R<span class="sc">&gt;</span> datos_scaled <span class="ot">&lt;-</span> receta_km <span class="sc">|&gt;</span> <span class="fu">prep</span>() <span class="sc">|&gt;</span> <span class="fu">juice</span>()</span>
+<span id="cb4-7"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb4-8"><a></a>R<span class="sc">&gt;</span> <span class="co"># Ajustar K-means con K=3 y 25 inicializaciones aleatorias</span></span>
+<span id="cb4-9"><a></a>R<span class="sc">&gt;</span> km <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(datos_scaled, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart =</span> <span class="dv">25</span>)</span>
+<span id="cb4-10"><a></a>R<span class="sc">&gt;</span> </span>
+<span id="cb4-11"><a></a>R<span class="sc">&gt;</span> <span class="co"># Silueta promedio</span></span>
+<span id="cb4-12"><a></a>R<span class="sc">&gt;</span> sil <span class="ot">&lt;-</span> <span class="fu">silhouette</span>(km<span class="sc">$</span>cluster, <span class="fu">dist</span>(datos_scaled))</span>
+<span id="cb4-13"><a></a>R<span class="sc">&gt;</span> <span class="fu">round</span>(<span class="fu">mean</span>(sil[, <span class="st">&quot;sil_width&quot;</span>]), <span class="dv">3</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.553</code></pre>
 </div>
@@ -1620,6 +1623,7 @@ real     1  2  3
 </div>
 </div>
 <ul>
+<li><code>step_normalize()</code> hace lo mismo que <code>scale()</code>: centra en 0 y divide por el desvío. Acá la receta <span class="alert">no tiene variable objetivo</span>, por eso la fórmula empieza con <code>~</code></li>
 <li><code>nstart = 25</code> protege contra mínimos locales por una mala inicialización aleatoria</li>
 </ul>
 </div>
@@ -1632,7 +1636,7 @@ real     1  2  3
 <span id="cb9-2"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Método del codo&quot;</span>, <span class="at">subtitle =</span> <span class="cn">NULL</span>)</span>
 <span id="cb9-3"><a></a>R<span class="sc">&gt;</span> <span class="fu">fviz_nbclust</span>(datos_scaled, kmeans, <span class="at">method =</span> <span class="st">&quot;silhouette&quot;</span>, <span class="at">nstart =</span> <span class="dv">25</span>) <span class="sc">+</span></span>
 <span id="cb9-4"><a></a><span class="sc">+</span>   <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Método de la silueta&quot;</span>, <span class="at">subtitle =</span> <span class="cn">NULL</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell quarto-layout-panel" data-layout-ncol="2" data-layout-align="center">
+<div class="cell quarto-layout-panel" data-layout-align="center" data-layout-ncol="2">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
 <div class="quarto-figure quarto-figure-center">
