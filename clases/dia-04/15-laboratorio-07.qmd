@@ -915,10 +915,6 @@ ner <- chat_openrouter(
 )
 
 respuesta <- ner$chat(textos$texto[5])
-cat(respuesta)
-
-# Parsear
-fromJSON(respuesta)
 ```
 
 [Este patrón funciona, pero a veces el modelo agrega texto fuera del JSON y rompe el parsing. La solución limpia (`$chat_structured()` con tipos, base del paquete `quallmer`) la vemos en el Lab 8]{.alert}

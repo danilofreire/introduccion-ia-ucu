@@ -139,7 +139,7 @@ Esta clase es sobre [cómo aprovechar lo primero sin caer en lo segundo]{.alert}
 
 ## Caso completo: el abogado y los seis casos fantasma
 
-:::{style="margin-top: 30px; font-size: 22px;"}
+:::{style="margin-top: 30px; font-size: 21px;"}
 :::{.columns}
 :::{.column width=55%}
 - **Mata vs. Avianca Inc.**, Tribunal del Distrito Sur de Nueva York, 2023
@@ -171,7 +171,7 @@ Cuando el abogado le preguntó a ChatGPT si los casos eran reales, [el modelo le
 
 ## Tipos de alucinación
 
-:::{style="margin-top: 30px; font-size: 24px;"}
+:::{style="margin-top: 30px; font-size: 23px;"}
 :::{.columns}
 :::{.column width=55%}
 - [Fabricación]{.alert}: el modelo inventa datos, nombres, fechas o eventos que no existen
@@ -186,7 +186,7 @@ Las cuatro defensas que veremos atacan distintas alucinaciones. Ninguna defensa 
 :::
 
 :::{.column width=45%}
-:::{style="font-size: 22px;"}
+:::{style="font-size: 21px; margin-top: -10px;"}
 **Una cita falsa**
 
 :::{style="border-left: 4px solid #b85450; padding: 8px 18px; font-size: 20px; margin-top: 10px;"}
@@ -379,7 +379,7 @@ Clasificación: POSITIVO
 :::{.columns}
 :::{.column width=55%}
 - La [temperatura]{.alert} controla qué tanto el modelo se aparta del token más probable ([Holtzman et al., 2020](https://arxiv.org/abs/1904.09751); [Renze y Guven, 2024](https://arxiv.org/abs/2402.05201))
-- Va típicamente de 0 a 2
+- Va típicamente de 0 a 1
 - Para investigación, casi siempre [temperatura baja]{.alert}:
     - Análisis y clasificación: 0,0 - 0,2
     - Resumen factual: 0,2 - 0,4
@@ -400,7 +400,7 @@ Clasificación: POSITIVO
 | Resumen | 0,2 - 0,4 |
 | Análisis abierto | 0,3 - 0,5 |
 | Escritura creativa | 0,7 - 1,0 |
-| Brainstorming | 0,8 - 1,2 |
+| Brainstorming | 0,8 - 1,0 |
 
 [Para investigación reproducible: temperatura 0 siempre que se pueda]{.alert}
 :::
@@ -498,7 +498,7 @@ clasificador$chat_structured(
 )
 ```
 
-Resultado: una lista R lista para usar, sin parsear texto
+Resultado: una lista R lista para usar, sin parsear texto. Más información en <https://ellmer.tidyverse.org/articles/structured-data.html>
 :::
 :::
 :::
@@ -595,7 +595,7 @@ A veces "RAG" es exagerado. Si su PDF entra en el contexto, pueden pegarlo direc
 
 ## Validación: comparar con gold standard
 
-:::{style="margin-top: 30px; font-size: 21px;"}
+:::{style="margin-top: 30px; font-size: 20px;"}
 :::{.columns}
 :::{.column width=55%}
 - Antes de usar un LLM para anotar todo su corpus, [valídenlo en una muestra]{.alert}
@@ -688,7 +688,7 @@ archivos_guardados:
 
 ## Anotación automática de texto
 
-:::{style="margin-top: 30px; font-size: 23px;"}
+:::{style="margin-top: 30px; font-size: 22px;"}
 :::{.columns}
 :::{.column width=55%}
 - El uso más común en ciencias sociales: [clasificar texto a escala]{.alert}
@@ -829,7 +829,7 @@ Con [ellmer]{.alert} pueden cambiar de proveedor [sin reescribir su código]{.al
     - `chat$tokens()`: contar tokens usados
 - Trabaja bien con `purrr::map()` para procesar muchos textos en pipeline
 
-[Detalles, errores comunes y mini-proyecto: en los Laboratorios 7 y 8]{.alert}
+[Más detalles en los Laboratorios 7 y 8]{.alert}
 :::
 
 :::{.column width=45%}

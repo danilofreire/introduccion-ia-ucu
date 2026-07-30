@@ -2593,33 +2593,9 @@ CATEGORIA: economia</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>{
   &quot;personas&quot;: [],
-  &quot;organizaciones&quot;: [
-    &quot;banco central&quot;
-  ],
+  &quot;organizaciones&quot;: [&quot;banco central&quot;],
   &quot;lugares&quot;: []
 }</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a></a>R<span class="sc">&gt;</span> <span class="fu">cat</span>(respuesta)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>{
-  &quot;personas&quot;: [],
-  &quot;organizaciones&quot;: [
-    &quot;banco central&quot;
-  ],
-  &quot;lugares&quot;: []
-}</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a></a>R<span class="sc">&gt;</span> <span class="co"># Parsear</span></span>
-<span id="cb67-2"><a></a>R<span class="sc">&gt;</span> <span class="fu">fromJSON</span>(respuesta)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>$personas
-list()
-
-$organizaciones
-[1] &quot;banco central&quot;
-
-$lugares
-list()</code></pre>
 </div>
 </div>
 <p><span class="alert">Este patrón funciona, pero a veces el modelo agrega texto fuera del JSON y rompe el parsing. La solución limpia (<code>$chat_structured()</code> con tipos, base del paquete <code>quallmer</code>) la vemos en el Lab 8</span></p>
