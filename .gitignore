@@ -582,3 +582,10 @@ rsconnect/
 
 # Quarto freeze: keep execution cache, skip regenerable vendor assets
 /_freeze/site_libs/
+
+# Claude and AI agent configuration files
+CLAUDE.md
+AGENTS.md
+agents.md
+humaniser-skill.md
+.claude/
